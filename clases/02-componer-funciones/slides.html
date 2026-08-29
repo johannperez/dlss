@@ -91,7 +91,9 @@
 <section>
   <h2>El desafío de hoy</h2>
   <p class="bajada">Cuánto se habló de <strong>inflación</strong> en cada discurso presidencial
-     de apertura de sesiones. Datos reales, 1984-2019.</p>
+     de apertura de sesiones. Datos reales, 1984-2019, <strong>suavizados</strong> con una media
+     móvil de 3 años: la pregunta que contestan es «en qué parte del período el tema estuvo en
+     agenda», no «cuánto habló ese año».</p>
   <div class="viz-frame" style="padding:8px" id="caja-serie"></div>
   <p class="viz-pie"><b>La consigna:</b> ajustale una recta. Dale, la mejor recta posible.
      Gritame valores y yo los pongo.</p>
@@ -456,7 +458,7 @@ mas_diez(doble(3))   # 16
   <h2>A las manos · parte 1</h2>
   <div class="manos">
     Abrí <code>notebook.ipynb</code> y corré hasta el <strong>TODO 3</strong>.
-    <strong>Veinte minutos.</strong> Si algo no corre, levantá la mano.
+    <strong>Diecisiete minutos.</strong> Si algo no corre, levantá la mano.
   </div>
   <ul>
     <li><strong>TODO 1</strong> — escribí una tercera función y componé las tres.
@@ -483,7 +485,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ PAUSA ============================ -->
+<!-- ============================ 19. PAUSA ============================ -->
 <section class="pausa">
   <h2>Pausa</h2>
   <p class="minutos">10 minutos</p>
@@ -497,7 +499,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 19. VOLVIMOS ============================ -->
+<!-- ============================ 20. VOLVIMOS ============================ -->
 <section>
   <h2>Volvimos</h2>
   <p class="bajada">Antes de seguir: ¿cómo les fue con la V invertida?</p>
@@ -514,7 +516,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 20. Y AHORA EL TRUCO ============================ -->
+<!-- ============================ 21. Y AHORA EL TRUCO ============================ -->
 <section>
   <h2>Y ahora, el truco</h2>
   <p class="enorme">¿Qué pasa si sumo <em>muchas</em> rampas,<br>cada una con el codo en un lugar distinto?
@@ -527,7 +529,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 21. LA VIZ CENTRAL ============================ -->
+<!-- ============================ 22. LA VIZ CENTRAL ============================ -->
 <section>
   <span class="marca">viz · la importante</span>
   <h3>Una. Dos. Cuatro. Ocho.</h3>
@@ -548,13 +550,17 @@ mas_diez(doble(3))   # 16
     · <b>2 rampas</b> — "un poquito mejor". Señalá que cada una se hace cargo de un tramo.<br>
     · <b>4 rampas</b> — "uy".<br>
     · <b>8 rampas</b> — y acá <b>callate cinco segundos</b>. Contalos.<br>
+    Si querés la imagen más limpia posible para ese silencio, poné
+    <b>«qué mostrar debajo» → «nada, sólo el resultado»</b>: quedan sólo la curva negra y
+    la azul encima. Las sumas parciales (el modo por defecto) sirven con 2 y con 4 rampas,
+    donde se ve cada rampa doblando la curva anterior; con 8 son ocho líneas cruzando el cuadro.<br>
     Recién después: "esto es una red neuronal. Ya está. Eso es todo lo que hay."<br>
     Recordá el desajuste de la recta: 0.00150. Con ocho rampas: 0.00014. Diez veces mejor.<br>
-    <b>No aprietes «32» todavía.</b> Eso va en la slide 30.
+    <b>No aprietes «32» todavía.</b> Eso va en la slide 31.
   </aside>
 </section>
 
-<!-- ============================ 22. EL SILENCIO ============================ -->
+<!-- ============================ 23. EL SILENCIO ============================ -->
 <section>
   <p class="enorme" style="margin-top:1.2em">Esto es una red neuronal.
     <small>Ya está. Eso es todo lo que hay: rampas sumadas,
@@ -566,7 +572,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 23. EL TEOREMA ============================ -->
+<!-- ============================ 24. EL TEOREMA ============================ -->
 <section>
   <h2>Lo que acaban de ver tiene nombre</h2>
   <div class="intuicion compacta">
@@ -585,7 +591,7 @@ mas_diez(doble(3))   # 16
     cualquier resultado no explica nada</strong>.
   </div>
   <aside class="notes">
-    <b>79-83 min.</b> La analogía con Popper es la más potente de la clase para esta audiencia.
+    <b>79-82 min.</b> La analogía con Popper es la más potente de la clase para esta audiencia.
     Usala explícitamente y despacio.<br>
     Preguntá: "¿qué le criticarías a una teoría que explica cualquier resultado?".
     Van a contestar bien solos. Después: "bueno, acabamos de construir una función así".<br>
@@ -594,7 +600,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 24. DIBUJADO COMO RED ============================ -->
+<!-- ============================ 25. DIBUJADO COMO RED ============================ -->
 <section>
   <h2>Lo mismo, dibujado como red</h2>
   <p class="bajada">El diagrama de circulitos y flechas que viste mil veces en notas de divulgación.</p>
@@ -613,13 +619,13 @@ mas_diez(doble(3))   # 16
     </div>
   </div>
   <aside class="notes">
-    <b>83-85 min.</b> Este diagrama es el ícono que les generó respeto reverencial durante años.
+    <b>82-84 min.</b> Este diagrama es el ícono que les generó respeto reverencial durante años.
     Desactivarlo es media clase.<br>
     Frase: "el diagrama no tiene nada de místico: es un plano de cableado".
   </aside>
 </section>
 
-<!-- ============================ 25. VIZ RED COMO DIBUJANTE ============================ -->
+<!-- ============================ 26. VIZ RED COMO DIBUJANTE ============================ -->
 <section>
   <span class="marca">viz</span>
   <h3>Tocá una perilla, mirá la curva</h3>
@@ -627,10 +633,11 @@ mas_diez(doble(3))   # 16
     <iframe src="viz/red-como-dibujante.html" title="el diagrama de red, por dentro" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> pasá el mouse por una bolita y se enciende <em>su</em>
-     rampa. Hacé clic en una flecha y movela: se mueve <b>esa</b> parte de la curva
-     y el resto ni se entera.</p>
+     rampa. Hacé clic en la flecha que <b>sale</b> de esa bolita y movela: se mueve
+     <b>esa</b> parte de la curva y el resto ni se entera. (Las flechas de entrada
+     y los sesgos mueven el codo de lugar, que es otro efecto: probalos también.)</p>
   <aside class="notes">
-    <b>85-88 min.</b> Hacé clic en la flecha de salida de la bolita 5 (la del codo en 2014)
+    <b>84-87 min.</b> Hacé clic en la flecha de salida de la bolita 5 (la del codo en 2014)
     y movela hasta el tope. Se dispara el final de la curva y el resto queda igual.<br>
     Frase: <b>"toqué esta flecha de acá y se movió esa parte de la curva de allá.
     Cada perilla tiene su territorio."</b><br>
@@ -639,7 +646,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 26. VOCABULARIO ============================ -->
+<!-- ============================ 27. VOCABULARIO ============================ -->
 <section>
   <h2>El vocabulario mínimo</h2>
   <table>
@@ -658,14 +665,14 @@ mas_diez(doble(3))   # 16
     distinta y con el mismo nombre en inglés. Es la trampa de vocabulario número uno del campo.
   </div>
   <aside class="notes">
-    <b>88-91 min.</b> "Siete palabras. Con estas siete entendés el 90 % del vocabulario de
+    <b>87-89 min.</b> "Siete palabras. Con estas siete entendés el 90 % del vocabulario de
     cualquier paper."<br>
     Deteneté en <b>bias</b>. Es un falso amigo que va a causar malentendidos toda la cursada
     y conviene clavarlo ahora.
   </aside>
 </section>
 
-<!-- ============================ 27. ANCHO VS PROFUNDO ============================ -->
+<!-- ============================ 28. ANCHO VS PROFUNDO ============================ -->
 <section>
   <h2>¿Y por qué «profundo»?</h2>
   <div class="comparacion">
@@ -685,19 +692,19 @@ mas_diez(doble(3))   # 16
   <p>Lo segundo suele ser más eficiente, y de ahí sale la palabra <em>deep</em>.
      Se va a ver muy claro con imágenes en la clase 5.</p>
   <aside class="notes">
-    <b>91-93 min.</b> Si vas atrasado, ésta es la primera slide que se recorta. Se puede decir
+    <b>89-90 min.</b> Si vas atrasado, ésta es la primera slide que se recorta. Se puede decir
     en una frase: "profundo quiere decir que hay varias capas, una atrás de la otra, y cada una
     trabaja sobre lo que armó la anterior. Lo vemos en la clase 5."<br>
     La analogía de los codificadores es la que funciona con esta audiencia.
   </aside>
 </section>
 
-<!-- ============================ 28. BLOQUE PRÁCTICO 2 ============================ -->
+<!-- ============================ 29. BLOQUE PRÁCTICO 2 ============================ -->
 <section>
   <h2>A las manos · parte 2</h2>
   <div class="manos">
     De a dos. Del <strong>TODO 4</strong> hasta el final del notebook.
-    <strong>Veinte minutos.</strong>
+    <strong>Diecisiete minutos.</strong>
   </div>
   <ul>
     <li><strong>TODO 4</strong> — bajá el desajuste de <code>0.00056</code> agregando y
@@ -712,7 +719,7 @@ mas_diez(doble(3))   # 16
     sin importar nada raro. Es la misma cuenta que hace una librería de verdad.
   </div>
   <aside class="notes">
-    <b>93-105 min.</b> De a dos, en serio: que discutan dónde poner el próximo codo.<br>
+    <b>90-107 min.</b> De a dos, en serio: que discutan dónde poner el próximo codo.<br>
     Recorré preguntando <b>"¿por qué pusiste el codo ahí?"</b>. La respuesta que buscás es
     "porque ahí la curva cambia de dirección" o "porque ahí el palito rojo era el más largo".<br>
     Si alguien llega abajo de 0.00040, que lo cuente al aula: hay que reconocer lo difícil que es
@@ -720,7 +727,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 29. LO QUE NO ES ============================ -->
+<!-- ============================ 30. LO QUE NO ES ============================ -->
 <section>
   <h2>Lo que <em>no</em> es</h2>
   <ul>
@@ -736,14 +743,14 @@ mas_diez(doble(3))   # 16
     cuando son otra cosa. Lo vamos a ver en la clase 8.
   </div>
   <aside class="notes">
-    <b>105-108 min.</b> Acá aparece siempre la pregunta de si las neuronas artificiales imitan
+    <b>107-109 min.</b> Acá aparece siempre la pregunta de si las neuronas artificiales imitan
     a las reales. La respuesta: <i>"una neurona artificial es una rampa. Una neurona real es una
     célula viva de una complejidad brutal. La analogía te va a hacer sobreestimar el modelo."</i><br>
     No lo digas con desprecio: el entusiasmo es bueno, lo que no sirve es la magia.
   </aside>
 </section>
 
-<!-- ============================ 30. EL PROBLEMA QUE QUEDA ============================ -->
+<!-- ============================ 31. EL PROBLEMA QUE QUEDA ============================ -->
 <section>
   <span class="marca">viz · volvé a rampas.html</span>
   <h2>Un momento. Apretá «32».</h2>
@@ -755,8 +762,9 @@ mas_diez(doble(3))   # 16
     </div>
     <div>
       <h4>Con 32 rampas</h4>
-      <p>La curva azul pasa por <strong>todos</strong> los puntos. Incluidos los que son
-         claramente ruido del instrumento. Desajuste <code>0.00001</code>.</p>
+      <p>La curva azul pasa por <strong>todos</strong> los puntos. Incluidos los que
+         casi seguro son ruido del instrumento —el léxico lo escribimos nosotros—.
+         Desajuste <code>0.00001</code>.</p>
       <p>96 perillas. Y sólo hay <strong>36 datos</strong>.</p>
     </div>
   </div>
@@ -765,7 +773,7 @@ mas_diez(doble(3))   # 16
     y va a ser el error más común de los papers que te toque revisar.
   </div>
   <aside class="notes">
-    <b>108-111 min.</b> Volvé a <code>viz/rampas.html</code> y apretá <b>«32»</b>.
+    <b>109-112 min.</b> Volvé a <code>viz/rampas.html</code> y apretá <b>«32»</b>.
     Dejala en pantalla.<br>
     <b>No expliques el sobreajuste hoy.</b> La tentación es enorme y hay que resistirla:
     la siembra funciona porque queda incómoda. Decí sólo: "guarden esta imagen".<br>
@@ -774,7 +782,7 @@ mas_diez(doble(3))   # 16
   </aside>
 </section>
 
-<!-- ============================ 31. EL LUNES ============================ -->
+<!-- ============================ 32. EL LUNES ============================ -->
 <section>
   <span class="marca">el lunes</span>
   <h2>Qué te llevás para el lunes</h2>
@@ -791,13 +799,13 @@ mas_diez(doble(3))   # 16
     resultado</strong>. Con esas dos preguntas ya podés escribir media revisión.
   </div>
   <aside class="notes">
-    <b>111-114 min.</b> Éste es el entregable concreto de la clase. Que lo anoten.<br>
+    <b>112-115 min.</b> Éste es el entregable concreto de la clase. Que lo anoten.<br>
     Preguntá: "¿alguien está revisando algo ahora mismo donde podría preguntar esto?".
     Si hay una mano, dejalo contar el caso: vale más que cualquier ejemplo tuyo.
   </aside>
 </section>
 
-<!-- ============================ 32. QUÉ TE LLEVÁS ============================ -->
+<!-- ============================ 33. QUÉ TE LLEVÁS ============================ -->
 <section>
   <h2>Las tres cosas de hoy</h2>
   <ol style="font-size:1.05em">
@@ -809,12 +817,12 @@ mas_diez(doble(3))   # 16
         figura — pero <em>poder dibujarla</em> no es lo mismo que <em>predecir bien</em>.</li>
   </ol>
   <aside class="notes">
-    <b>114-115 min.</b> Tres, no cuatro. Si te piden una cuarta, la cuarta es la tercera dicha
+    <b>115-116 min.</b> Tres, no cuatro. Si te piden una cuarta, la cuarta es la tercera dicha
     de nuevo: aproximar no es predecir.
   </aside>
 </section>
 
-<!-- ============================ 33. GLOSARIO ============================ -->
+<!-- ============================ 34. GLOSARIO ============================ -->
 <section>
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista" style="font-size:.86em">
@@ -830,13 +838,13 @@ mas_diez(doble(3))   # 16
     <li><b>universal approximation</b><span>aproximación universal — con suficientes rampas, cualquier figura</span></li>
   </ul>
   <aside class="notes">
-    <b>115-117 min.</b> Diez términos. Están todos en <code>recursos/glosario.md</code> con la clase
+    <b>116-118 min.</b> Diez términos. Están todos en <code>recursos/glosario.md</code> con la clase
     donde aparecieron. No los leas uno por uno: señalá los dos que más se confunden
     (<i>bias</i> y <i>neuron</i>) y pasá.
   </aside>
 </section>
 
-<!-- ============================ 34. EL PUENTE ============================ -->
+<!-- ============================ 35. EL PUENTE ============================ -->
 <section class="portada">
   <p class="num-clase">La que viene</p>
   <h1>Clase 3: estar equivocado es un número,<br>y ese número tiene pendiente</h1>
@@ -845,7 +853,7 @@ mas_diez(doble(3))   # 16
      perillas ya es un suplicio. Un modelo de verdad tiene millones.
      <strong>¿Cómo los encuentra solo?</strong></p>
   <aside class="notes">
-    <b>117-120 min.</b> Cerrá con la promesa concreta: "hacen falta dos cosas.
+    <b>118-120 min.</b> Cerrá con la promesa concreta: "hacen falta dos cosas.
     Un número que mida qué tan mal está —y ése ya lo vieron: es el desajuste que estuvieron
     bajando a mano— y una brújula que diga para dónde ir."<br>
     Última frase: "las dos las vieron hoy sin saberlo".<br>

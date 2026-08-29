@@ -329,6 +329,25 @@ function randomizar() {
     red.w2[j] = +((r() * 2 - 1) * 2).toFixed(2);
   }
   red.b2 = +(r() * 0.16).toFixed(3);
+
+  // Las alturas al azar dan salidas del orden de ±5 y los datos viven entre 0 y
+  // 0,2: sin reescalar, la curva azul se va del cuadro y lo que ve el aula es
+  // un gráfico VACÍO, que se lee como "se rompió" y no como "salió cualquier
+  // cosa". Reescalamos las alturas y la base para que la porquería sea VISIBLE.
+  // La FORMA sigue siendo la que salió al azar: no se corrige nada, sólo se
+  // encuadra. (Es lo mismo que hacer zoom, y está dicho en el panel.)
+  let lo = Infinity, hi = -Infinity;
+  for (let k = 0; k <= 120; k++) {
+    const v = salida(k / 120);
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  // salida'(t) = k·(salida(t) − lo) + 0.02  →  se reparte en las alturas y la base
+  const k = 0.16 / Math.max(hi - lo, 1e-6);
+  const b2Viejo = red.b2;
+  for (let j = 0; j < H; j++) red.w2[j] = +(red.w2[j] * k).toFixed(3);
+  red.b2 = +(k * (b2Viejo - lo) + 0.02).toFixed(3);
+
   seleccion = null; clavePerilla = null;
   refrescar();
 }

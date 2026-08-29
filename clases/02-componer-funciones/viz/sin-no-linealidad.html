@@ -293,7 +293,7 @@ function actualizar() {
   } else { ctl.texto('cajas', ''); }
 
   ctl.texto('prueba',
-    'Las <b>' + N + (N === 1 ? ' caja</b> es' : ' cajas</b> juntas son') +
+    (N === 1 ? 'Una <b>sola caja</b> ya es' : 'Las <b>' + N + ' cajas</b> juntas son') +
     ' una sola recta:<br><span class="cadena"><b>y = ' + Viz.num(c.a, 3) + '·x ' +
     (c.b >= 0 ? '+ ' : '− ') + Viz.num(Math.abs(c.b), 3) + '</b></span><br>' +
     'La cadena entera se desvía de esa recta en <b>' + desv.toFixed(6) + '</b>. ' +
