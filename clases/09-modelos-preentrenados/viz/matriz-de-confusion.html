@@ -329,9 +329,15 @@ function pintarMetricas(m) {
       '<span class="nom">el bobo</span><span class="val c-error">' + Viz.num(m.baseline, 2) + '</span>' +
       '<span class="fr">Un modelo que dice siempre «' +
       (m.positivos > N / 2 ? 'sí' : 'no') + '», sin mirar nada, saca <b>' +
-      Math.round(m.baseline * 100) + '</b> de accuracy. Tu modelo le gana por <b>' +
-      (gana >= 0 ? '+' : '') + Math.round(gana * 100) + ' puntos</b>' +
-      (gana < 0.02 ? ' — o sea, prácticamente nada.' : '.') + '</span></div>';
+      Math.round(m.baseline * 100) + '</b> de accuracy. ' +
+      (gana < -0.005
+        ? 'Tu modelo <b>pierde por ' + Math.abs(Math.round(gana * 100)) +
+          ' puntos</b> contra algo que no mira nada.'
+        : (gana < 0.02
+            ? 'Tu modelo le gana por <b>+' + Math.round(gana * 100) +
+              ' puntos</b> — o sea, prácticamente nada.'
+            : 'Tu modelo le gana por <b>+' + Math.round(gana * 100) + ' puntos</b>.')) +
+      '</span></div>';
   }
   document.getElementById('metricas').innerHTML = html;
 }

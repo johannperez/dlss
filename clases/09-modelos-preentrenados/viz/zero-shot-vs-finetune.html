@@ -283,7 +283,9 @@ function pintarRecomendacion() {
         'reportar el acuerdo: ' + Math.round(horas(estado.n * 0.2) * 60) + ' minutos más). ') +
     (estado.n > 0
       ? 'Le saca <b>' + Viz.num(Math.abs(ventaja), 2) + '</b> de F1 a ' +
-        ESTRATEGIAS[segundo].nombre + '. ' + E.cuidado
+        (/^el /.test(ESTRATEGIAS[segundo].nombre)
+          ? 'l' + ESTRATEGIAS[segundo].nombre.slice(1)   // "a el diccionario" -> "al diccionario"
+          : ESTRATEGIAS[segundo].nombre) + '. ' + E.cuidado
       : '');
 
   let html = '';

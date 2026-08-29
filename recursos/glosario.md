@@ -141,7 +141,7 @@ te acordás de la analogía, te acordás del concepto.
 | **softmax** | softmax | Convertir puntajes cualesquiera en porcentajes que suman 1. |
 | **máscara causal** | máscara causal | Taparle el futuro al modelo, para que al predecir la palabra 5 no pueda espiar la 6. |
 | **cabeza** (*head*) | cabeza | Una copia del mecanismo de atención mirando una relación distinta. |
-| **multi-head** | atención de varias cabezas | Varias cabezas en paralelo: una sigue la sintaxis, otra la correferencia, otra vaya a saber qué. |
+| **multi-head** | atención de varias cabezas | Varias cabezas en paralelo, cada una con su propio juego de perillas Q, K y V. Se les suele adjudicar un rol lingüístico prolijo (una la sintaxis, otra la correferencia); en un modelo real la mayoría no se deja resumir así, y la clase 7 lo muestra midiendo. |
 | **positional encoding** | codificación de posición | Ponerle a cada palabra una marca de en qué lugar de la frase está. Sin eso, attention no distingue el orden. |
 | **conexión residual** (*residual / skip connection*) | conexión residual | Un atajo que deja pasar la entrada sin tocar, sumada a la salida. Hace entrenables las redes profundas. |
 | **normalización** (*layer norm*) | normalización | Reescalar los números para que no se disparen entre capa y capa. Plomería, pero plomería necesaria. |

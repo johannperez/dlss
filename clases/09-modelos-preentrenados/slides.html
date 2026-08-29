@@ -428,9 +428,10 @@ for epoca in range(3):
       <tr><td>RoBERTuito</td><td class="c-ok">70,2</td><td class="c-ok">55,3</td><td class="c-ok">74,1</td></tr>
     </table>
     <div class="ojo compacta">
-      <strong>Mirá los números de verdad: 70, no 95.</strong> El mejor modelo en
-      castellano acierta dos de cada tres en sentimiento. Si usás uno entrenado en inglés
-      sobre texto en castellano <em>va a andar</em> —te devuelve etiquetas con su
+      <strong>Mirá los números de verdad: 70, no 95.</strong> Y ojo con <em>qué</em>
+      número es: <strong>70 de macro-F1</strong>, no de accuracy, en una tarea de
+      <em>tres</em> clases (positivo / negativo / neutro). Si usás un modelo entrenado en
+      inglés sobre texto en castellano <em>va a andar</em> —te devuelve etiquetas con su
       probabilidad y todo— y va a andar <strong>peor que eso</strong>. Y no te vas a
       enterar si no evaluás.
     </div>
@@ -438,9 +439,11 @@ for epoca in range(3):
       3 min. Si tenés red, hacé la demo: la misma oración por un modelo en inglés y uno
       en castellano. Es de las cosas más convincentes de la clase.
       Los números de la tabla salen del repositorio de pysentimiento (docs/TASKS.md,
-      bajado y verificado). Son macro-F1, promedio de varias corridas. Decilos en voz alta:
-      "el mejor modelo en castellano acierta 70 de cada 100 en una tarea de tres clases.
-      Cuando alguien te muestre 0,95, preguntá contra qué."
+      bajado y verificado). Son macro-F1 con su desvío (RoBERTuito en sentimiento:
+      70,2 ± 0,2), promedio de varias corridas. NO son accuracy, y hoy es justamente la
+      clase donde prohibimos confundirlas: no digas "acierta 70 de cada 100". Decí:
+      "el mejor modelo en castellano llega a 70 de macro-F1 en una tarea de tres clases.
+      Cuando alguien te muestre 0,95, preguntá qué métrica, en qué corpus y en qué idioma."
       IMPORTANTE: los nombres de modelo cambian y los modelos se despublican. Antes de dar
       la clase verificá que existan y **anotá la revisión exacta**. El identificador
       `pysentimiento/robertuito-sentiment-analysis` está verificado contra el código

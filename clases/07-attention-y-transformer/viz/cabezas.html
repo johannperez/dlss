@@ -228,22 +228,26 @@ function actualizar() {
   // OJO: que a las cuatro les toque el mismo RÓTULO no quiere decir que hagan lo
   // mismo. El rótulo es un resumen grueso; los mapas pueden ser bien distintos.
   // Se mide de verdad: diferencia media entre cada par de mapas de esta oración.
+  // Se compara lo mismo que ve el ojo: en qué columna cae la casilla más oscura de
+  // cada fila. Si las cuatro cabezas coinciden en casi todas las filas, hacen lo mismo.
   const M = oracion().atencion[estado.capa];
-  let dif = 0;
-  for (let a = 0; a < M.length; a++) {
-    for (let b = a + 1; b < M.length; b++) {
-      let acum = 0, n = 0;
-      for (let i = 0; i < M[a].length; i++)
-        for (let j = 0; j < M[a][i].length; j++) { acum += Math.abs(M[a][i][j] - M[b][i][j]); n++; }
-      dif = Math.max(dif, acum / n);
-    }
-  }
-  const mismosMapas = dif < 0.02;
+  const donde = M.map(A => A.map(f => f.indexOf(Math.max.apply(null, f))));
+  let coinciden = 0;
+  for (let i = 0; i < donde[0].length; i++)
+    if (donde.every(d => d[i] === donde[0][i])) coinciden++;
+  // «la misma diagonal» tiene un significado preciso y medido: las cuatro cabezas se
+  // quedan con casi toda su atención en su propia palabra. El número sale del JSON
+  // (est.misma), promediado sobre las cinco oraciones: es propiedad de la cabeza, no
+  // de la oración que estés mirando.
+  const mismas = D.cabezas[estado.capa].map(h => h.est.misma);
+  const mismosMapas = mismas.every(m => m >= 0.45) ||
+                      coinciden / donde[0].length >= 0.8;
   ctl.texto('nota',
     'En el <b>bloque ' + (estado.capa + 1) + '</b>, ' +
     (mismoRotulo && mismosMapas
-      ? 'las cuatro cabezas hacen <b>lo mismo</b>: «' + titulos[0] + '». ' +
-        'Cuatro juegos de perillas distintos que terminaron en el mismo lugar. ' +
+      ? 'las cuatro cabezas hacen <b>lo mismo</b>: «' + titulos[0] + '». Se quedan con ' +
+        mismas.map(m => Viz.num(m, 2)).join(' · ') + ' de su atención en su propia ' +
+        'palabra: cuatro juegos de perillas distintos que terminaron en el mismo lugar. ' +
         'Pasa, y es un dato honesto sobre modelos chicos.'
      : mismoRotulo
       ? 'a las cuatro les queda el <b>mismo rótulo</b> («' + titulos[0] + '») y sin ' +

@@ -46,10 +46,15 @@
 | **0:30** | 15 | Q, K, V | 10-17 | El aviso clasificado, el puntaje, softmax, y recién ahí la fórmula. |
 | **0:45** | 15 | **Manos 1** | 18 | Notebook, secciones 2 y 3. |
 | **1:00** | 10 | **PAUSA** | 19 | **No se toca.** |
-| **1:10** | 15 | Las tres decisiones | 20-26 | Máscara, cabezas, posición. Dos viz. |
-| **1:25** | 10 | El bloque completo | 27-32 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
-| **1:35** | 20 | **Manos 2** | 33 | Notebook, secciones 4 a 8, de a dos. |
-| **1:55** | 15 | Cierre | 34-38 | La advertencia, el lunes, las tres ideas, el glosario y el puente. |
+| **1:10** | 9 | Las tres decisiones | 20-26 | Máscara, cabezas, posición. Dos viz. |
+| **1:19** | 6 | El bloque completo | 27-32 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
+| **1:25** | 20 | **Manos 2** | 33 | Notebook, secciones 4 a 8, de a dos. |
+| **1:45** | 15 | Cierre | 34-38 | La advertencia, el lunes, las tres ideas, el glosario y el puente. |
+
+**Suma 120 exactos** y coincide con el plan minuto a minuto de `PROGRAMA.md`. Los quince
+minutos de 1:10 a 1:25 son para **trece slides**, así que van rápido y en bloque: es el
+tramo que hay que ensayar. Si te comés cinco minutos ahí, se los sacás al bloque práctico
+2 (sección 6), nunca al cierre.
 
 > **Los números de slide de esta tabla son los del `slides.html`** (38 en total, los que
 > muestra el contador abajo a la derecha), no los de la especificación, que iba hasta 35.
@@ -57,7 +62,7 @@
 > clase 5 (32) y «las tres cosas de hoy» (36).
 
 **Los relojes que importan.** Si a las **0:45** no arrancaste el bloque práctico 1,
-estás atrasado. Si a la **1:35** no arrancaste el 2, recortá según la sección 6 de estas
+estás atrasado. Si a la **1:25** no arrancaste el 2, recortá según la sección 6 de estas
 notas. La pausa arranca a la 1:00 pase lo que pase.
 
 ---
@@ -105,7 +110,7 @@ final, porque es de ellos.
 **Qué hacés:** «Eso es redondeo al imprimir, no un bug. Y ahora la pregunta que importa:
 ¿cuánto sumaron las columnas?» Silencio. «Cualquier cosa. Y está bien.»
 
-### Minuto 100 — slide 34, la advertencia
+### Minuto 106 — slide 34, la advertencia
 **Preguntá:** «¿Qué evidencia pedirían ustedes para afirmar que el modelo **usó** esa
 palabra?»
 **Van a decir, en este orden:** «que la mire mucho» (no alcanza), «que se repita en
