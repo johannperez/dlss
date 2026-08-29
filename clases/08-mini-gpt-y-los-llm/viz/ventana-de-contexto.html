@@ -55,6 +55,11 @@
   .respuesta .txt.mal  { color: var(--c-error); background: var(--c-error-suave); }
   .cartel[hidden] { display: none; }
   .cartel { margin-top: .55rem; }
+
+  /* --- embebida en la slide: el iframe mide ~560 px de alto, así que apretamos
+     el panel para que los controles entren en lo que se ve sin scrollear. ---- */
+  body.embebido .panel { font-size: .85em; padding: .5rem .6rem .6rem; }
+  body.embebido .ctrl { margin-bottom: .5rem; }
 </style>
 </head>
 <body class="curso">
@@ -96,10 +101,12 @@
       <br><br>
       Ahora cambiá a la pista <b>lejos</b>, y mirá la curva otra vez. <b>Es plana.</b>
       Aunque la pista esté adentro de la ventana, este modelo no la usa: su horizonte
-      efectivo es más corto que su ventana. En los modelos grandes pasa lo mismo y tiene
-      nombre — <em>lost in the middle</em>: lo que queda en el medio de un contexto largo
-      se atiende peor que lo que queda en las puntas. Por eso, en un prompt largo,
-      <b>lo importante va al final</b>.
+      efectivo es más corto que su ventana. En los modelos grandes el fenómeno es más
+      sutil, pero es de la misma naturaleza y tiene nombre — <em>lost in the middle</em>:
+      lo que queda en el medio de un contexto largo se atiende peor que lo que queda en
+      las puntas. (Ojo con la diferencia: allá el modelo <em>podría</em> usar el dato y
+      lo usa peor; acá directamente nunca aprendió esa dependencia larga.) Por eso, en un
+      prompt largo, <b>lo importante va al final</b>.
     </div>
     <p class="viz-pie">
       Medición real sobre pasajes del corpus <b>Aguasclaras</b> con el mini-GPT de la
@@ -204,15 +211,17 @@ const ctl = Viz.controles('#panel', [
     min: 4, max: CTX_MAX, paso: 4, valor: CTX_MAX, decimales: 0, color: 'parametro' },
   { tipo: 'medidor', id: 'acc', etiqueta: 'aciertos con esta ventana' },
   { tipo: 'texto', id: 'lectura', html: '' },
+  // Estos dos van arriba a propósito: embebida en la slide se ve una ventana de
+  // ~560 px, y «Romperla» es el botón que el docente aprieta delante de todos.
+  { tipo: 'boton', texto: 'Romperla (ventana 8)', principal: true,
+    alClic: () => ctl.set('ventana', 8) },
+  { tipo: 'boton', texto: 'Ventana al máximo',
+    alClic: () => ctl.set('ventana', CTX_MAX) },
   { tipo: 'titulo', texto: 'Dónde está la pista' },
   { tipo: 'botones', id: 'caso', etiqueta: 'el caso', valor: '0',
     opciones: CASOS.map((c, i) => ({ valor: String(i),
       texto: c.id === 'cerca' ? 'cerca (≈16 fichas)' : 'lejos (≈70 fichas)' })) },
   { tipo: 'texto', id: 'explica', html: '' },
-  { tipo: 'boton', texto: 'Ventana al máximo', principal: true,
-    alClic: () => ctl.set('ventana', CTX_MAX) },
-  { tipo: 'boton', texto: 'Romperla (ventana 8)',
-    alClic: () => ctl.set('ventana', 8) },
   { tipo: 'titulo', texto: 'Y esto para qué te sirve' },
   { tipo: 'texto', id: 'practica', html:
     'En un prompt largo, poné las instrucciones importantes <b>al final</b>. ' +

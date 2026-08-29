@@ -58,6 +58,11 @@
                   color: var(--tinta); }
   .veredicto.si { background: var(--c-ok-suave); border: 1px solid var(--c-ok);
                   color: var(--tinta); }
+
+  /* --- embebida en la slide: el iframe mide ~560 px de alto, así que apretamos
+     el panel para que los controles entren en lo que se ve sin scrollear. ---- */
+  body.embebido .panel { font-size: .85em; padding: .5rem .6rem .6rem; }
+  body.embebido .ctrl { margin-bottom: .5rem; }
 </style>
 </head>
 <body class="curso">
