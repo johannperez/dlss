@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La memoria que se olvida — Clase 6</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "para saber si va 'lo' o 'la' necesito la palabra 2, y cuando
+     llego a la palabra 32 de la palabra 2 no queda casi nada. Agrando la
+     mochila y el olvido se hace más lento... pero sigue olvidando."
+
+     OJO, HONESTIDAD: esto es una ILUSTRACIÓN ESQUEMÁTICA del olvido de una RNN,
+     no una RNN corriendo. El fenómeno (la información vieja se degrada con la
+     distancia) es real y está medido en la literatura; la curva de acá es
+     didáctica: un decaimiento exponencial cuya velocidad depende del tamaño del
+     estado oculto. Está dicho en la página, no escondido en un comentario.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* la oración, palabra por palabra */
+  .oracion {
+    background: var(--papel-2);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-medio);
+    padding: .9rem 1rem;
+    line-height: 2.35;
+    font-size: 1.02rem;
+    margin-bottom: .7rem;
+  }
+  .oracion .pal {
+    padding: .1em .28em;
+    border-radius: 5px;
+    transition: opacity .12s linear, background .12s linear;
+    white-space: nowrap;
+  }
+  .oracion .pal.clave  { font-weight: 700; }
+  .oracion .pal.cursor { background: var(--c-acento-suave);
+                         box-shadow: 0 0 0 2px var(--c-acento) inset; }
+  .oracion .pal.futura { opacity: .18; font-style: italic; }
+  .oracion .pal.nec    { outline: 2px dashed var(--c-parametro); outline-offset: 2px; }
+  .apuesta { display: flex; gap: .6rem; margin: .5rem 0 0; }
+  .apuesta > div { flex: 1; border: 1px solid var(--borde); border-radius: var(--r-chico);
+                   padding: .4rem .6rem; background: var(--papel-2); }
+  .apuesta b { font-family: var(--f-mono); }
+  .apuesta .barra { height: 8px; background: var(--papel-3); border-radius: 4px;
+                    overflow: hidden; margin-top: .3rem; }
+  .apuesta .barra > i { display: block; height: 100%; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La mochila que se va vaciando</h1>
+    <p>Una red que lee <em>en orden</em> arrastra una mochila con todo lo que entendió
+       hasta ahora. Apretá <b>Leer</b> y mirá qué le queda de cada palabra cuando llega
+       al final. La palabra que necesita para decidir está en el puesto 2.</p>
+  </header>
+
+  <div>
+    <div class="oracion" id="oracion"></div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="apuesta" id="apuesta"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Poné la mochila en el mínimo y apretá <b>Leer</b>.
+      Cuando el cursor llega a <em>«lo»</em>, la barra de <em>«proyecto»</em> ya es
+      un hilito: el modelo tiene que elegir entre <em>lo</em> y <em>la</em> casi
+      tirando una moneda. Ahora agrandá la mochila al máximo y volvé a leer: el
+      olvido se hace <em>más lento</em> — y la barra igual llega abajo. Agrandar la
+      memoria posterga el problema; no lo resuelve. Ese es el hueco que viene a
+      tapar <b>attention</b> la clase que viene.
+    </div>
+    <p class="viz-pie">
+      <b>Ilustración esquemática</b>, no una RNN entrenada corriendo. El decaimiento
+      con la distancia es un fenómeno real y medido; esta curva es didáctica y su
+      velocidad depende del tamaño del estado oculto (la "mochila"). La oración es
+      un ejemplo escrito para la clase, con vocabulario parlamentario.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* --- 1. la oración ---------------------------------------------------------
+   34 palabras. La palabra 2 ("proyecto") es masculina: de ella depende que al
+   final vaya "lo" y no "la". Entre las dos hay 30 palabras de distancia. */
+const PALABRAS = ('El proyecto de reforma del código procesal penal que la comisión ' +
+  'del Senado había girado a Diputados en diciembre, después de meses de audiencias ' +
+  'y de dos dictámenes en minoría, finalmente lo aprobó ayer').split(' ');
+
+const I_CLAVE = 1;                                   // "proyecto" (base 0)
+const I_DECISION = PALABRAS.indexOf('lo');           // dónde hay que decidir
+const N = PALABRAS.length;
+
+// --- 2. estado --------------------------------------------------------------
+const estado = { cursor: 0, mochila: 8, marcarNecesaria: true };
+
+/** Cuánto queda de la palabra `i` cuando el cursor está en `c`.
+ *  Decaimiento exponencial: cada palabra nueva pisa un poco a las viejas.
+ *  `tau` (cuántas palabras tarda en caer a 1/3) crece con la mochila, pero
+ *  crece despacio: duplicar la memoria no duplica el alcance. */
+function tau() { return 1.45 * Math.sqrt(estado.mochila); }
+function queda(i, c) { return i > c ? 0 : Math.exp(-(c - i) / tau()); }
+
+// --- 3. la oración en HTML --------------------------------------------------
+const cajaOracion = document.getElementById('oracion');
+const spans = PALABRAS.map((w, i) => {
+  const s = document.createElement('span');
+  s.className = 'pal' + (i === I_CLAVE ? ' clave' : '');
+  s.textContent = w;
+  cajaOracion.appendChild(s);
+  cajaOracion.appendChild(document.createTextNode(' '));
+  return s;
+});
+
+function pintarOracion() {
+  const c = estado.cursor;
+  for (let i = 0; i < N; i++) {
+    const s = spans[i];
+    s.classList.toggle('futura', i > c);
+    s.classList.toggle('cursor', i === c);
+    s.classList.toggle('nec', estado.marcarNecesaria && i === I_CLAVE && c >= I_DECISION);
+    s.style.opacity = i > c ? '' : String(0.16 + 0.84 * queda(i, c));
+    s.style.color = (i === I_CLAVE) ? Viz.color('parametro') : '';
+  }
+}
+
+// --- 4. el dibujo -----------------------------------------------------------
+const p = Viz.plano('#lienzo', {
+  xmin: -0.5, xmax: N - 0.5, ymin: 0, ymax: 1.06,
+  ejeX: 'posición de la palabra en la oración',
+  ejeY: 'cuánto queda de ella en la mochila',
+  titulo: 'lo que la memoria conserva de cada palabra, ahora mismo',
+  alto: 330
+});
+
+p.alDibujar(() => {
+  p.fondo(); p.grilla();
+  p.ejes({ formatoX: v => (Math.abs(v - Math.round(v)) < 1e-6 && v >= 0 && v < N)
+                          ? String(Math.round(v) + 1) : '',
+           formatoY: v => Viz.num(v, 1) });
+
+  const c = estado.cursor;
+
+  // barras: cuánto queda de cada palabra ya leída
+  for (let i = 0; i <= c; i++) {
+    const q = queda(i, c);
+    const col = (i === I_CLAVE) ? 'parametro' : 'datos';
+    p.segmento(i, 0, i, q, { color: col, grosor: i === I_CLAVE ? 6 : 4,
+                             opacidad: i === I_CLAVE ? 1 : .55 });
+  }
+
+  // la curva del olvido, para que se vea la forma
+  if (c > 0) {
+    const curva = [];
+    for (let i = 0; i <= c; i++) curva.push({ x: i, y: queda(i, c) });
+    p.linea(curva, { color: 'modelo', grosor: 2.5, opacidad: .9 });
+  }
+
+  // dónde está parada la lectura
+  p.segmento(c, 0, c, 1.06, { color: 'acento', grosor: 2, punteada: [5, 4] });
+  p.texto(c, 1.02, 'voy leyendo acá', { color: 'acento', tam: 11, peso: '700',
+    alinear: c > N * 0.6 ? 'right' : 'left', dx: c > N * 0.6 ? -8 : 8, caja: true });
+
+  // la palabra clave
+  const q = queda(I_CLAVE, c);
+  p.punto(I_CLAVE, q, { color: 'parametro', r: 6, halo: true });
+  p.texto(I_CLAVE, q, '«proyecto»: ' + (q * 100).toFixed(0) + '%',
+    { color: 'parametro', tam: 12, peso: '700', dx: 10, dy: -16, caja: true });
+
+  if (estado.marcarNecesaria) {
+    p.texto(I_DECISION, 0.62, 'acá hay que decidir «lo» o «la»',
+      { color: 'error', tam: 11, peso: '700', alinear: 'right', dx: -10, caja: true });
+    p.segmento(I_DECISION, 0, I_DECISION, .58, { color: 'error', grosor: 1.6,
+      punteada: [4, 4], opacidad: .8 });
+  }
+
+  p.leyenda([
+    { color: 'datos', texto: 'una palabra cualquiera', forma: 'linea' },
+    { color: 'parametro', texto: 'la palabra que hace falta al final', forma: 'linea' },
+    { color: 'acento', texto: 'dónde va la lectura', forma: 'linea', punteada: true }
+  ], { pos: 'ad' });
+});
+
+// --- 5. la apuesta del modelo ----------------------------------------------
+const cajaApuesta = document.getElementById('apuesta');
+function pintarApuesta() {
+  const q = queda(I_CLAVE, estado.cursor);
+  // si de "proyecto" no queda nada, el modelo no sabe el género: tira una moneda
+  const pLo = 0.5 + 0.5 * q;
+  const filas = [['lo', pLo, 'ok'], ['la', 1 - pLo, 'error']];
+  cajaApuesta.innerHTML = filas.map(([t, v, col]) =>
+    '<div><b>«' + t + '»</b> &nbsp;' + (v * 100).toFixed(0) + '%' +
+    '<div class="barra"><i style="width:' + (v * 100).toFixed(0) + '%;background:' +
+    Viz.color(col) + '"></i></div></div>').join('');
+}
+
+// --- 6. la animación de lectura --------------------------------------------
+const anim = Viz.animacion({
+  cadaMs: 210,
+  paso: () => { estado.cursor = Math.min(N - 1, estado.cursor + 1); actualizar();
+                return estado.cursor < N - 1; },
+  reset: () => { estado.cursor = 0; actualizar(); }
+});
+
+// --- 7. el panel ------------------------------------------------------------
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La lectura' },
+  { tipo: 'slider', id: 'cursor', etiqueta: 'por qué palabra voy',
+    sub: 'movelo a mano si preferís', min: 0, max: N - 1, paso: 1, valor: 0,
+    decimales: 0, formato: v => (v + 1) + ' de ' + N, color: 'acento' },
+  { tipo: 'slider', id: 'mochila', etiqueta: 'qué tan grande es la mochila',
+    sub: 'dimensiones del estado que arrastra', min: 4, max: 512, escala: 'log',
+    valor: 8, formato: v => Math.round(v) + ' dim', color: 'parametro' },
+  { tipo: 'checkbox', id: 'marcarNecesaria', etiqueta: 'marcar la palabra que hace falta',
+    valor: true },
+  { tipo: 'medidor', id: 'resto', etiqueta: 'queda de «proyecto»' },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => {
+  estado.cursor = Math.round(ctl.valores.cursor);
+  estado.mochila = ctl.valores.mochila;
+  estado.marcarNecesaria = ctl.valores.marcarNecesaria;
+  dibujar();
+});
+
+Viz.controlesAnimacion('#panel', anim, {
+  textoPlay: 'Leer', textoPausa: 'Frenar',
+  textoPaso: 'Una palabra', textoReset: 'Volver al principio'
+});
+
+function dibujar() {
+  const q = queda(I_CLAVE, estado.cursor);
+  ctl.medidor('resto', q, (q * 100).toFixed(0) + '%');
+  const enDecision = estado.cursor >= I_DECISION;
+  ctl.texto('lectura',
+    enDecision
+      ? ('Llegaste a <b>«lo»</b> y de <b>«proyecto»</b> queda el <b>' +
+         (q * 100).toFixed(0) + '%</b>. ' +
+         (q < .12 ? 'Con eso no alcanza para saber el género: el modelo adivina.'
+                  : 'Todavía alcanza, pero fijate cuánto tuviste que agrandar la mochila.'))
+      : ('Vas por la palabra <b>' + (estado.cursor + 1) + '</b> de ' + N +
+         '. Faltan <b>' + (I_DECISION - estado.cursor) + '</b> para tener que decidir ' +
+         'entre «lo» y «la».'));
+  pintarOracion();
+  pintarApuesta();
+  p.redibujar();
+}
+
+function actualizar() { ctl.set('cursor', estado.cursor, true); dibujar(); }
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

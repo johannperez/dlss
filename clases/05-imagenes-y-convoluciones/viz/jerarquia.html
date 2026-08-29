@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La jerarquía: lo grande está hecho de lo chico — Clase 5</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "hice clic en la unidad que reconoce una RUEDA y se encendieron
+     tres unidades de la capa anterior: un arco, una línea recta y un círculo
+     chiquito. Nadie le dijo al modelo que existían las ruedas. Aparecieron
+     porque servían para predecir."
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  #escenario { position:relative; }
+  .capas { display:grid; grid-template-columns:repeat(4,1fr); gap:22px; position:relative; z-index:2; }
+  .capa h3 {
+    font-size:.72rem; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--tinta-3); margin:0 0 .15rem; font-weight:700;
+  }
+  .capa p.que { font-size:.74rem; color:var(--tinta-2); margin:0 0 .5rem; min-height:2.4em; }
+  .rejilla { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
+  .unidad {
+    position:relative; border:1.5px solid var(--borde); border-radius:var(--r-chico);
+    background:var(--papel); cursor:pointer; padding:0; overflow:hidden;
+    transition:transform .08s ease, border-color .15s ease;
+  }
+  .unidad:hover { transform:translateY(-1px); }
+  .unidad canvas { display:block; width:100%; height:auto; }
+  .unidad.elegida  { border-color:var(--c-acento); border-width:2.5px;
+                     box-shadow:0 0 0 3px color-mix(in srgb, var(--c-acento) 22%, transparent); }
+  .unidad.padre    { border-color:var(--c-parametro); border-width:2.5px; }
+  .unidad.apagada  { opacity:.28; }
+  .unidad .nom {
+    position:absolute; left:0; right:0; bottom:0; font:600 9px var(--f-texto);
+    background:color-mix(in srgb, var(--papel) 82%, transparent);
+    color:var(--tinta-2); text-align:center; padding:1px 0;
+  }
+  #lineas { position:absolute; inset:0; z-index:1; pointer-events:none; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Lo grande está hecho de lo chico</h1>
+    <p>Cuatro capas de una red convolucional. Cada cuadradito es <em>una unidad</em>, y lo
+       que ves dibujado es lo que hace que esa unidad se encienda al máximo.
+       Hacé clic en una unidad de las capas 3 o 4 y mirá de qué está hecha.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:14px">
+      <div id="escenario">
+        <svg id="lineas"></svg>
+        <div class="capas" id="capas"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Hacé clic en <b>la rueda</b> de la capa 3. Se encienden,
+      en la capa 2, un arco, un círculo y una unión en T; y detrás de ellos, en la capa 1,
+      bordes en distintos ángulos y una manchita. <b>Nadie programó «rueda».</b> Nadie
+      escribió un libro de códigos. Esas piezas intermedias aparecieron solas porque eran útiles para bajar la
+      loss — que es la misma loss de la clase 3.
+    </div>
+    <p class="viz-pie">
+      <b>Esquema ilustrativo</b> <span class="chip sintetico">dibujado con código</span>:
+      los patrones están generados con canvas, no son visualizaciones de un modelo real.
+      La idea —bordes → texturas → partes → objetos— sí sale de la literatura de
+      <i>feature visualization</i> (Zeiler &amp; Fergus 2014; Olah et al., Distill 2017).
+      Los filtros de verdad que aprende <em>nuestra</em> CNN los mirás en el notebook,
+      celda «ver los filtros aprendidos».
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* --------------------------------------------------------------------------
+   1. Qué dibuja cada unidad. Todo con primitivas de canvas: sin imágenes,
+      sin red, y sin fingir que son visualizaciones de un modelo entrenado.
+   -------------------------------------------------------------------------- */
+const S = 62;   // lado del dibujito, en px
+
+function pincel(cv) {
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = S * dpr; cv.height = S * dpr;
+  cv.style.width = '100%'; cv.style.aspectRatio = '1 / 1';
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = Viz.color('papel'); c.fillRect(0, 0, S, S);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  return c;
+}
+
+/* --- capa 1: bordes y degradés (lo único que ve una ventana de 3x3) ------- */
+function borde(ang) {
+  return c => {
+    const g = c.createLinearGradient(
+      S / 2 - Math.cos(ang) * S / 2, S / 2 - Math.sin(ang) * S / 2,
+      S / 2 + Math.cos(ang) * S / 2, S / 2 + Math.sin(ang) * S / 2);
+    g.addColorStop(0, Viz.color('tinta')); g.addColorStop(.5, Viz.color('papel'));
+    g.addColorStop(1, Viz.color('tinta'));
+    c.fillStyle = g; c.fillRect(0, 0, S, S);
+  };
+}
+function rayas(ang, paso) {
+  return c => {
+    c.save(); c.translate(S / 2, S / 2); c.rotate(ang); c.translate(-S / 2, -S / 2);
+    c.strokeStyle = Viz.color('tinta'); c.lineWidth = paso * .45;
+    for (let x = -S; x < 2 * S; x += paso) { c.beginPath(); c.moveTo(x, -S); c.lineTo(x, 2 * S); c.stroke(); }
+    c.restore();
+  };
+}
+function manchita(c) {
+  const g = c.createRadialGradient(S / 2, S / 2, 2, S / 2, S / 2, S / 2);
+  g.addColorStop(0, Viz.color('tinta')); g.addColorStop(1, Viz.color('papel'));
+  c.fillStyle = g; c.fillRect(0, 0, S, S);
+}
+function degrade(c) {
+  const g = c.createLinearGradient(0, 0, S, S);
+  g.addColorStop(0, Viz.color('papel')); g.addColorStop(1, Viz.color('tinta'));
+  c.fillStyle = g; c.fillRect(0, 0, S, S);
+}
+
+/* --- capa 2: esquinas, curvas, texturas ----------------------------------- */
+function trazo(pasos, ancho) {
+  return c => {
+    c.strokeStyle = Viz.color('tinta'); c.lineWidth = ancho || 5;
+    c.beginPath(); pasos(c); c.stroke();
+  };
+}
+const esquina = trazo(c => { c.moveTo(14, 50); c.lineTo(14, 14); c.lineTo(50, 14); });
+const cruz = trazo(c => { c.moveTo(31, 10); c.lineTo(31, 52); c.moveTo(10, 31); c.lineTo(52, 31); });
+const arcoAb = trazo(c => c.arc(31, 40, 20, Math.PI, 2 * Math.PI));
+const circulito = trazo(c => c.arc(31, 31, 16, 0, 7));
+const zigzag = trazo(c => { c.moveTo(8, 42); c.lineTo(20, 20); c.lineTo(31, 42); c.lineTo(43, 20); c.lineTo(54, 42); }, 4);
+const teJota = trazo(c => { c.moveTo(10, 20); c.lineTo(52, 20); c.moveTo(31, 20); c.lineTo(31, 54); });
+function damero(c) {
+  c.fillStyle = Viz.color('tinta');
+  for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++)
+    if ((i + j) % 2 === 0) c.fillRect(i * S / 6, j * S / 6, S / 6, S / 6);
+}
+const paralelas = trazo(c => { c.moveTo(12, 10); c.lineTo(12, 52); c.moveTo(31, 10); c.lineTo(31, 52); c.moveTo(50, 10); c.lineTo(50, 52); }, 4);
+
+/* --- capa 3: partes ------------------------------------------------------- */
+function rueda(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 4;
+  c.beginPath(); c.arc(31, 31, 20, 0, 7); c.stroke();
+  c.lineWidth = 2.5;
+  for (let k = 0; k < 6; k++) {
+    const a = k * Math.PI / 3;
+    c.beginPath(); c.moveTo(31, 31); c.lineTo(31 + Math.cos(a) * 18, 31 + Math.sin(a) * 18); c.stroke();
+  }
+}
+function ventana(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 4;
+  c.strokeRect(12, 10, 38, 42);
+  c.lineWidth = 2.5;
+  c.beginPath(); c.moveTo(31, 10); c.lineTo(31, 52); c.moveTo(12, 31); c.lineTo(50, 31); c.stroke();
+}
+function ojo(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3.5;
+  c.beginPath(); c.moveTo(8, 31); c.quadraticCurveTo(31, 10, 54, 31);
+  c.quadraticCurveTo(31, 52, 8, 31); c.stroke();
+  c.fillStyle = Viz.color('tinta'); c.beginPath(); c.arc(31, 31, 7, 0, 7); c.fill();
+}
+function pancarta(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3.5;
+  c.strokeRect(10, 10, 42, 24);
+  c.beginPath(); c.moveTo(31, 34); c.lineTo(31, 54); c.stroke();
+  c.lineWidth = 2.5;
+  c.beginPath(); c.moveTo(16, 19); c.lineTo(46, 19); c.moveTo(16, 26); c.lineTo(38, 26); c.stroke();
+}
+function arcoPuerta(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 4;
+  c.beginPath(); c.moveTo(14, 54); c.lineTo(14, 30);
+  c.arc(31, 30, 17, Math.PI, 2 * Math.PI); c.lineTo(48, 54); c.stroke();
+}
+function cabeza(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3.5;
+  c.beginPath(); c.arc(31, 24, 13, 0, 7); c.stroke();
+  c.beginPath(); c.moveTo(13, 56); c.quadraticCurveTo(31, 36, 49, 56); c.stroke();
+}
+function columna(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3.5;
+  c.strokeRect(12, 8, 38, 6); c.strokeRect(12, 48, 38, 6);
+  c.lineWidth = 4;
+  c.beginPath(); c.moveTo(21, 14); c.lineTo(21, 48); c.moveTo(41, 14); c.lineTo(41, 48); c.stroke();
+}
+function letraA(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 4.5;
+  c.beginPath(); c.moveTo(13, 52); c.lineTo(31, 12); c.lineTo(49, 52); c.moveTo(20, 38); c.lineTo(42, 38); c.stroke();
+}
+
+/* --- capa 4: objetos y escenas -------------------------------------------- */
+function auto(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3;
+  c.beginPath(); c.moveTo(6, 40); c.lineTo(10, 28); c.lineTo(22, 20); c.lineTo(42, 20);
+  c.lineTo(52, 28); c.lineTo(56, 40); c.lineTo(6, 40); c.stroke();
+  c.beginPath(); c.arc(19, 42, 7, 0, 7); c.moveTo(50, 42); c.arc(43, 42, 7, 0, 7); c.stroke();
+}
+function casa(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3;
+  c.beginPath(); c.moveTo(8, 30); c.lineTo(31, 10); c.lineTo(54, 30); c.stroke();
+  c.strokeRect(13, 30, 36, 24);
+  c.lineWidth = 2; c.strokeRect(20, 36, 10, 10); c.strokeRect(35, 38, 9, 16);
+}
+function cara(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3;
+  c.beginPath(); c.arc(31, 31, 21, 0, 7); c.stroke();
+  c.lineWidth = 2.5;
+  c.beginPath(); c.arc(24, 26, 3, 0, 7); c.moveTo(43, 26); c.arc(40, 26, 3, 0, 7); c.stroke();
+  c.beginPath(); c.moveTo(22, 39); c.quadraticCurveTo(31, 47, 40, 39); c.stroke();
+}
+function multitud(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 2;
+  const r = Viz.azar(9);
+  for (let k = 0; k < 16; k++) {
+    const x = 6 + r() * 50, y = 20 + r() * 34;
+    c.beginPath(); c.arc(x, y, 3.4, 0, 7); c.stroke();
+    c.beginPath(); c.moveTo(x, y + 3.6); c.lineTo(x, y + 9); c.stroke();
+  }
+}
+function calle(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 2.5;
+  c.beginPath(); c.moveTo(4, 56); c.lineTo(24, 22); c.moveTo(58, 56); c.lineTo(38, 22); c.stroke();
+  c.lineWidth = 3;
+  for (let y = 26; y < 56; y += 10) { c.beginPath(); c.moveTo(31, y); c.lineTo(31, y + 5); c.stroke(); }
+}
+function bandera(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 3;
+  c.beginPath(); c.moveTo(12, 8); c.lineTo(12, 56); c.stroke();
+  c.lineWidth = 2.5;
+  c.beginPath(); c.moveTo(12, 12); c.lineTo(52, 12); c.lineTo(52, 34); c.lineTo(12, 34); c.stroke();
+  c.beginPath(); c.moveTo(12, 23); c.lineTo(52, 23); c.stroke();
+}
+function aula(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 2.5;
+  c.strokeRect(8, 8, 46, 16);
+  for (let j = 0; j < 2; j++) for (let i = 0; i < 3; i++) {
+    c.beginPath(); c.arc(16 + i * 15, 34 + j * 14, 3.2, 0, 7); c.stroke();
+    c.beginPath(); c.moveTo(9 + i * 15, 41 + j * 14); c.lineTo(23 + i * 15, 41 + j * 14); c.stroke();
+  }
+}
+function plaza(c) {
+  c.strokeStyle = Viz.color('tinta'); c.lineWidth = 2.5;
+  c.beginPath(); c.arc(31, 24, 9, 0, 7); c.stroke();
+  c.beginPath(); c.moveTo(31, 33); c.lineTo(31, 44); c.stroke();
+  c.beginPath(); c.moveTo(6, 48); c.lineTo(56, 48); c.stroke();
+  const r = Viz.azar(3);
+  for (let k = 0; k < 9; k++) { const x = 8 + r() * 46; c.beginPath(); c.arc(x, 54, 2.6, 0, 7); c.stroke(); }
+}
+
+/* --------------------------------------------------------------------------
+   2. Las cuatro capas y quién alimenta a quién
+   -------------------------------------------------------------------------- */
+const CAPAS = [
+  {
+    titulo: 'Capa 1', que: 'bordes y degradés: todo lo que se puede ver en 3×3 píxeles',
+    unidades: [
+      { n: 'borde |', d: borde(0) }, { n: 'borde —', d: borde(Math.PI / 2) },
+      { n: 'borde /', d: borde(-Math.PI / 4) }, { n: 'borde \\', d: borde(Math.PI / 4) },
+      { n: 'rayas', d: rayas(0.3, 9) }, { n: 'rayas finas', d: rayas(1.4, 6) },
+      { n: 'manchita', d: manchita }, { n: 'degradé', d: degrade }
+    ]
+  },
+  {
+    titulo: 'Capa 2', que: 'esquinas, curvas y texturas: combinaciones de bordes',
+    unidades: [
+      { n: 'esquina', d: esquina }, { n: 'cruz', d: cruz },
+      { n: 'arco', d: arcoAb }, { n: 'círculo', d: circulito },
+      { n: 'zigzag', d: zigzag }, { n: 'unión T', d: teJota },
+      { n: 'damero', d: damero }, { n: 'paralelas', d: paralelas }
+    ],
+    padres: [[0, 1], [0, 1], [2, 3, 6], [2, 3], [2, 3], [0, 1], [4, 5], [0, 4]]
+  },
+  {
+    titulo: 'Capa 3', que: 'partes: pedazos de cosas, ya reconocibles',
+    unidades: [
+      { n: 'rueda', d: rueda }, { n: 'ventana', d: ventana },
+      { n: 'ojo', d: ojo }, { n: 'pancarta', d: pancarta },
+      { n: 'arco/puerta', d: arcoPuerta }, { n: 'cabeza', d: cabeza },
+      { n: 'columnas', d: columna }, { n: 'letra', d: letraA }
+    ],
+    padres: [[2, 3, 5], [0, 1, 7], [2, 3], [0, 1, 7], [2, 0], [3, 2], [7, 0], [0, 4]]
+  },
+  {
+    titulo: 'Capa 4', que: 'objetos y escenas enteras',
+    unidades: [
+      { n: 'auto', d: auto }, { n: 'casa', d: casa },
+      { n: 'cara', d: cara }, { n: 'multitud', d: multitud },
+      { n: 'calle', d: calle }, { n: 'bandera', d: bandera },
+      { n: 'aula', d: aula }, { n: 'plaza', d: plaza }
+    ],
+    padres: [[0, 4, 1], [1, 4, 6], [2, 5], [5, 3], [1, 4, 6], [3, 6], [1, 5, 3], [5, 3, 4]]
+  }
+];
+
+/* --------------------------------------------------------------------------
+   3. Dibujar la grilla
+   -------------------------------------------------------------------------- */
+const contCapas = document.getElementById('capas');
+const svg = document.getElementById('lineas');
+const nodos = [];       // nodos[capa][unidad] = <button>
+
+function construir() {
+  contCapas.innerHTML = ''; nodos.length = 0;
+  CAPAS.forEach((capa, ci) => {
+    const div = Viz.el('div', { class: 'capa' }, contCapas);
+    Viz.el('h3', { texto: capa.titulo }, div);
+    Viz.el('p', { class: 'que', texto: capa.que }, div);
+    const rej = Viz.el('div', { class: 'rejilla' }, div);
+    nodos.push([]);
+    capa.unidades.forEach((u, ui) => {
+      const b = Viz.el('button', { class: 'unidad' }, rej);
+      b.setAttribute('aria-label', capa.titulo + ': ' + u.n);
+      const cv = Viz.el('canvas', {}, b);
+      u.d(pincel(cv));
+      Viz.el('span', { class: 'nom', texto: u.n }, b);
+      b.addEventListener('click', () => elegir(ci, ui));
+      nodos[ci].push(b);
+    });
+  });
+}
+
+/* --------------------------------------------------------------------------
+   4. La cadena hacia abajo: de qué está hecha esta unidad
+   -------------------------------------------------------------------------- */
+let elegida = null;     // {c, u}
+
+function cadena(ci, ui) {
+  // devuelve [[capa, unidad], ...] con la unidad elegida y todos sus ancestros
+  const lista = [[ci, ui]];
+  let nivel = [[ci, ui]];
+  while (nivel.length && nivel[0][0] > 0) {
+    const sig = [];
+    for (const [c, u] of nivel) {
+      for (const p of (CAPAS[c].padres[u] || [])) {
+        if (!sig.some(q => q[0] === c - 1 && q[1] === p)) sig.push([c - 1, p]);
+      }
+    }
+    for (const q of sig) lista.push(q);
+    nivel = sig;
+  }
+  return lista;
+}
+
+function centro(nodo, base) {
+  const r = nodo.getBoundingClientRect(), b = base.getBoundingClientRect();
+  return { x: r.left - b.left + r.width / 2, y: r.top - b.top + r.height / 2,
+           iz: r.left - b.left, de: r.right - b.left };
+}
+
+function elegir(ci, ui) {
+  elegida = (elegida && elegida.c === ci && elegida.u === ui) ? null : { c: ci, u: ui };
+  pintarSeleccion();
+}
+
+function pintarSeleccion() {
+  const escenario = document.getElementById('escenario');
+  Viz.svg.limpiar(svg);
+  for (const fila of nodos) for (const b of fila) b.className = 'unidad';
+
+  if (!elegida) {
+    ctl.texto('lectura', 'Hacé clic en una unidad de la <b>capa 3</b> o la <b>capa 4</b> ' +
+      'y mirá de qué piezas está hecha.');
+    return;
+  }
+
+  const lista = cadena(elegida.c, elegida.u);
+  const enLista = (c, u) => lista.some(q => q[0] === c && q[1] === u);
+  for (let c = 0; c < nodos.length; c++) for (let u = 0; u < nodos[c].length; u++) {
+    if (c === elegida.c && u === elegida.u) nodos[c][u].classList.add('elegida');
+    else if (enLista(c, u)) nodos[c][u].classList.add('padre');
+    else nodos[c][u].classList.add('apagada');
+  }
+
+  // las líneas de composición
+  const w = escenario.clientWidth, h = escenario.clientHeight;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.setAttribute('width', w); svg.setAttribute('height', h);
+  for (const [c, u] of lista) {
+    if (c === 0) continue;
+    for (const p of (CAPAS[c].padres[u] || [])) {
+      const a = centro(nodos[c][u], escenario), b = centro(nodos[c - 1][p], escenario);
+      Viz.svg.el('path', {
+        d: `M ${b.de} ${b.y} C ${(b.de + a.iz) / 2} ${b.y}, ${(b.de + a.iz) / 2} ${a.y}, ${a.iz} ${a.y}`,
+        fill: 'none', stroke: Viz.color('parametro'), 'stroke-width': 2, opacity: .55
+      }, svg);
+    }
+  }
+
+  const nom = CAPAS[elegida.c].unidades[elegida.u].n;
+  const padres = (CAPAS[elegida.c].padres || [])[elegida.u] || [];
+  const nomPadres = padres.map(p => '<b>' + CAPAS[elegida.c - 1].unidades[p].n + '</b>').join(', ');
+  ctl.texto('lectura', elegida.c === 0
+    ? 'La <b>capa 1</b> es el piso: mira los píxeles directamente. Con una ventana de 3×3 ' +
+      'no se puede ver nada más complicado que esto.'
+    : `«${nom}» está hecha de ${nomPadres} de la capa ${elegida.c}. ` +
+      `Y esas, a su vez, de las de más atrás. <b>Nadie escribió esa receta</b>: ` +
+      `emergió porque bajaba la loss.`);
+}
+
+/* --------------------------------------------------------------------------
+   5. El panel
+   -------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'De qué está hecha' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Atajos' },
+  { tipo: 'botones', id: 'atajo', etiqueta: 'mostrame la composición de…',
+    opciones: [
+      { texto: 'la rueda', alClic: () => elegir(2, 0) },
+      { texto: 'la cara', alClic: () => elegir(3, 2) },
+      { texto: 'la multitud', alClic: () => elegir(3, 3) },
+      { texto: 'la pancarta', alClic: () => elegir(2, 3) }
+    ] },
+  { tipo: 'boton', texto: 'Apagar todo', alClic: () => { elegida = null; pintarSeleccion(); } },
+  { tipo: 'titulo', texto: 'Ojo con esto' },
+  { tipo: 'texto', id: 'ojo', html:
+      'Un filtro de 3×3 <b>no puede</b> detectar una persona: sólo ve nueve píxeles. ' +
+      'Las cosas grandes aparecen recién en las capas profundas, y aparecen ' +
+      '<i>por composición</i>. Eso es lo que quiere decir “profundo”.' }
+], () => {});
+
+construir();
+pintarSeleccion();
+window.addEventListener('resize', () => { if (elegida) pintarSeleccion(); });
+Viz.botonTema();
+</script>
+</body>
+</html>
