@@ -72,7 +72,7 @@ va, lo recortás adentro de su casilla, **no le comés minutos a la siguiente**.
 | 73-75 | El techo humano | 29 | Acá ellos saben más que el ingeniero. Aprovechalo. |
 | **75-100** | **Manos 2 — el proyecto chico** | 30 | |
 | 75-77 | Las consignas | 30 | De a dos. Repartí quién hace qué. |
-| 77-100 | Notebook, secciones 5 a 12 | — | El grueso: comparación honesta y los 30 errores. |
+| 77-100 | Notebook, secciones 5 a 11 | — | El grueso: comparación honesta y los 30 errores. (La 12, el kappa, la hacés vos en la slide 29; si a alguna pareja le sobra tiempo, que la corra.) |
 | **100-120** | **Cierre** | 31-40 | |
 | 100-104 | Resultados del aula | 31 | Que hablen ellos. Manos arriba. |
 | 104-109 | **La trampa del corpus** | 32 | **Lo más importante de la segunda mitad.** |
@@ -307,20 +307,33 @@ el de la sátira. La prueba barata: partí por grupo y mirá si se cae.
 - **Hugging Face no se pudo probar** en el contenedor donde se construyó este material
   (`huggingface.co` da 403; ver `datos/README.md` §2). En consecuencia:
   - El **camino B** (embeddings PPMI+SVD propios + scikit-learn) está corrido y verificado
-    entero: el notebook completo corre de punta a punta en **entre 1 y 2 minutos** en CPU y
-    sin red (dos corridas medidas con `nbconvert --execute` en el contenedor de
-    construcción: 58 s y 1 min 49 s; la diferencia es cuánta CPU había libre). El grueso
-    es levantar el kernel e importar torch; el cómputo propio son ~25 s.
+    entero: el notebook completo corre de punta a punta **en menos de dos minutos** en CPU
+    y sin red. Cinco corridas medidas con `nbconvert --execute`: **19, 20 y 21 segundos**
+    con la máquina libre, y 58 s y 1 min 49 s con la máquina cargada. O sea: **contá
+    medio minuto si estás sola/o en la máquina y hasta dos minutos si el aula entera está
+    corriendo cosas.** El grueso de ese tiempo es levantar el kernel e importar torch; el
+    cómputo propio del notebook es poco: construir los embeddings con numpy tarda **4 s**
+    y la curva de etiquetas entera, **3 s** (los dos números los imprime el propio
+    notebook con `utils.medir_tiempo`).
   - El **camino A** está escrito con cuidado y **no ejecutado**. Las celdas están marcadas
     `# ── CAMINO A ──`.
   - El identificador `pysentimiento/robertuito-sentiment-analysis` está **verificado
     contra el código fuente** de la biblioteca (`pysentimiento/analyzer.py`), no contra el
     servidor de modelos. Los de BETO (`dccuchile/bert-base-spanish-wwm-uncased` y
-    `-cased`) están verificados contra el README oficial del repositorio. El de embeddings
-    de oración multilingüe **no está verificado**: probalo en Colab antes de la clase.
+    `-cased`) están verificados contra el README oficial del repositorio. Y el de
+    embeddings de oración, `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`,
+    está verificado contra la documentación oficial de `sentence-transformers`
+    (`docs/sentence_transformer/pretrained_models.md`, bajado con `curl`, línea 140).
+    Los tres identificadores existen y están bien escritos; lo que no se pudo probar es
+    **bajar los pesos**, porque el Hub está bloqueado acá.
   - **Tarea para quien dé esta clase por primera vez:** correr el notebook en un Colab con
-    red, confirmar los tres nombres de modelo, anotar las revisiones exactas en
-    `referencias.md`, y reemplazar esta viñeta por el resultado.
+    red, confirmar que los tres modelos bajan, **anotar la revisión exacta de cada uno**
+    (el hash del commit en el Hub, que es lo que la slide 34 pide reportar) en
+    `referencias.md`, y reemplazar esta viñeta por el resultado. Ojo también con los
+    números: los del camino A van a ser **otros —mejores— que los del camino B** que están
+    hoy en las slides 28 y 32 y en las viz. Si vas a dar la clase por el camino A,
+    volvé a correr `medir-clase09.py` y actualizá los números, o decí en voz alta que
+    los de pantalla son los del camino sin red.
 - **Todos los números de las slides están medidos**, no estimados. Salen de
   `medir-clase09.py` (que produce `datos-clase09.js`, lo que leen las viz) y del propio
   notebook. Si cambiás el corpus o la semilla, **volvé a correr el script y actualizá las

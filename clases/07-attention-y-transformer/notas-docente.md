@@ -204,10 +204,11 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 - **Abrí `viz/attention-como-mesa.html` y pediles oraciones.** Están las cinco del corpus;
   recorré la de la enumeración («la educación, la salud, la seguridad y la justicia») y
   preguntá qué esperan que mire cada sustantivo. Se arma una discusión buena.
-- **Contá el costo cuadrático.** «Si cada palabra mira a todas, con 100 palabras hay
-  10.000 pares; con 1.000 palabras hay un millón. Por eso existe la ventana de contexto,
-  y por eso cuesta plata que sea grande.» Es la puerta directa a la clase 8 y prepara el
-  ítem 9 del cuestionario.
+- **Detenete en el recuadro del costo cuadrático de la slide 31** en vez de pasarlo.
+  «Si cada palabra mira a todas, con 100 palabras hay 10.000 pares; con 1.000, un millón.
+  Por eso existe la ventana de contexto y por eso cuesta plata que sea grande.» Es la
+  puerta directa a la clase 8 y es lo que necesitan para el **ítem 9 del cuestionario**;
+  si vas muy justo de tiempo se lee en veinte segundos, pero no lo saltees del todo.
 - **Mostrá `medir-atencion.py`** proyectado, la clase `BloqueTransformer`, y compará
   línea por línea con la del notebook. Que vean que es el mismo código, y que el modelo
   que produjo los mapas de las viz se entrenó con eso, en CPU, en menos de un minuto.

@@ -24,6 +24,13 @@
   .reveal .mono { font-family: var(--f-mono); }
   /* el rótulo .marca flota arriba a la derecha: que el título no se le meta abajo */
   .reveal .marca + h2, .reveal .marca + h3 { padding-right: 10.5rem; }
+  /* Los pasos de `data-line-numbers="1-2|3-4"` los arma el plugin clonando el <code>
+     y poniéndolo en position:absolute. Sin un ancestro posicionado, ese clon se ancla
+     a la <section> y se come el título. El <pre> tiene que ser el ancestro. */
+  .reveal pre { position: relative; }
+  .reveal pre > code.fragment { top: 0; left: 0; width: 100%; box-sizing: border-box; }
+  /* mientras se ve un paso, el bloque de base no tiene que asomar por detrás */
+  .reveal pre:has(> code.fragment.visible) > code:first-child { visibility: hidden; }
 </style>
 </head>
 <body>
@@ -296,7 +303,7 @@ clasificador(titulares[:20])
   <!-- =========================== 12 · ESTRATEGIA A =========================== -->
   <section>
     <h3>A · Embeddings + clasificador simple</h3>
-    <pre><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
 X = vectorizar(titulares)          # texto -> un punto en 100 dimensiones
                                    # (clase 6: el mapa donde viven las palabras)
 modelo_a = LogisticRegression(max_iter=2000, class_weight="balanced")
@@ -351,7 +358,7 @@ proba_a = modelo_a.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el s�
   <!-- =========================== 14 · ESTRATEGIA C =========================== -->
   <section>
     <h3>C · Fine-tuning: y adentro no hay magia</h3>
-    <pre><code class="language-python" data-trim data-line-numbers>
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 for epoca in range(3):
     for lote in cargador:
         prediccion = modelo(**lote)      # 1. PREDECIR
@@ -562,10 +569,10 @@ for epoca in range(3):
       </div>
       <div>
         <h4>Como se escribe</h4>
-        <p><strong>74</strong> notas de protesta que el modelo encontró<br>
-           <strong>51</strong> notas que no eran protesta y marcó igual<br>
-           <strong>29</strong> notas de protesta que se le pasaron<br>
-           <strong>214</strong> notas comunes que dejó pasar bien</p>
+        <p><strong>74</strong> notas sobre política que el modelo encontró<br>
+           <strong>51</strong> notas que no eran sobre política y marcó igual<br>
+           <strong>29</strong> notas sobre política que se le pasaron<br>
+           <strong>214</strong> notas de otro tema que dejó pasar bien</p>
       </div>
     </div>
     <p class="fragment"><strong>Cuatro números, y cada uno significa algo distinto para tu
@@ -574,7 +581,10 @@ for epoca in range(3):
       fenómeno. <span style="font-size:.8em">(Los cuatro números son los del notebook de
       hoy, tarea «¿es una nota sobre política?», test de 368 casos.)</span></p>
     <aside class="notes">
-      3 min. Escribí los cuatro casilleros en el pizarrón CON LAS PALABRAS DE ELLOS.
+      3 min. Los cuatro números son los de la corrida de hoy (tarea «¿es una nota sobre
+      política?», test de 368): 74 + 51 + 29 + 214. Si tu aula prefiere el ejemplo de
+      protesta, cambiá el sustantivo Y los números, nunca sólo uno de los dos.
+      Escribí los cuatro casilleros en el pizarrón CON LAS PALABRAS DE ELLOS.
       Pedí un ejemplo del aula: "alguien que tenga un corpus, ¿qué sería un falso
       positivo en su caso?" Que lo digan en su dominio.
     </aside>
