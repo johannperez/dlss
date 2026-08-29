@@ -370,7 +370,14 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'checkbox', id: 'agrupar', etiqueta: 'agrupar por grupo', valor: false }
 ], () => pintar());
 
-estado.semilla = 1983;
+// La semilla del curso es 1983, pero acá va 2019 A PROPÓSITO: con 1983 el sorteo
+// manda 2005 a entrenamiento y 2006 a validación, o sea que la copia idéntica
+// ensucia la decisión pero no el test — un caso más flojo, y encima distinto del
+// que cuentan el notebook y la slide 35. Con 2019 el sorteo reproduce exactamente
+// la escena del notebook: 2005 cae en TEST y 2006 en ENTRENAMIENTO, 7 de los 7
+// casos del test comparten presidente con el entrenamiento y hay 6 presidentes
+// cruzados. El botón «otro sorteo» sigue barajando desde acá.
+estado.semilla = 2019;
 pintar();
 Viz.botonTema();
 
