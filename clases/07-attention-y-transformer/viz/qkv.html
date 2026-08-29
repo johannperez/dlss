@@ -37,6 +37,16 @@
   .peso-fila.gana .n { color: var(--c-acento); font-weight: 700; }
   .rotulo-chico { font-size: .72rem; color: var(--tinta-3); text-transform: uppercase;
                   letter-spacing: .08em; margin: .2rem 0 0; }
+
+  /* Embebida en la slide hay 610 px de alto y nada más. El plano es CUADRADO, así
+     que achicarlo de ancho es lo que más alto libera; sin esto, las barras de los
+     porcentajes —que son justo lo que hay que mirar al mover la perilla— quedaban
+     cortadas abajo del borde del iframe. Suelta se ve grande. */
+  body.embebido #lienzo { max-width: 330px; }
+  body.embebido .peso-fila { font-size: .76rem; margin: 2px 0;
+                             grid-template-columns: 84px 1fr 42px; }
+  body.embebido .peso-fila .barra { height: 13px; }
+  body.embebido .leyenda { font-size: .76rem; }
 </style>
 </head>
 <body class="curso">

@@ -45,11 +45,16 @@
 | **0:10** | 20 | Attention a mano | 6-9 | El mecanismo sin fórmulas + la cuenta en el pizarrón + la viz central. |
 | **0:30** | 15 | Q, K, V | 10-17 | El aviso clasificado, el puntaje, softmax, y recién ahí la fórmula. |
 | **0:45** | 15 | **Manos 1** | 18 | Notebook, secciones 2 y 3. |
-| **1:00** | 10 | **PAUSA** | — | **No se toca.** |
-| **1:10** | 15 | Las tres decisiones | 19-25 | Máscara, cabezas, posición. Dos viz. |
-| **1:25** | 10 | El bloque completo | 26-30b | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
-| **1:35** | 20 | **Manos 2** | 31 | Notebook, secciones 4 a 8, de a dos. |
-| **1:55** | 15 | Cierre | 32-36 | La advertencia, el lunes, las tres ideas, el puente. |
+| **1:00** | 10 | **PAUSA** | 19 | **No se toca.** |
+| **1:10** | 15 | Las tres decisiones | 20-26 | Máscara, cabezas, posición. Dos viz. |
+| **1:25** | 10 | El bloque completo | 27-32 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
+| **1:35** | 20 | **Manos 2** | 33 | Notebook, secciones 4 a 8, de a dos. |
+| **1:55** | 15 | Cierre | 34-38 | La advertencia, el lunes, las tres ideas, el glosario y el puente. |
+
+> **Los números de slide de esta tabla son los del `slides.html`** (38 en total, los que
+> muestra el contador abajo a la derecha), no los de la especificación, que iba hasta 35.
+> La diferencia son tres slides que se agregaron: la de la pausa (19), la tabla de la
+> clase 5 (32) y «las tres cosas de hoy» (36).
 
 **Los relojes que importan.** Si a las **0:45** no arrancaste el bloque práctico 1,
 estás atrasado. Si a la **1:35** no arrancaste el 2, recortá según la sección 6 de estas
@@ -75,7 +80,7 @@ risa.
 **«¿releíste la oración entera para encontrarla?»**. Va a decir que no. Ese «no» es la
 clase. Repetilo en voz alta: «no releyó. **Saltó.**»
 **Si alguien vota D en serio** (no en chiste): es oro. Preguntale por qué, y vas a
-escuchar un argumento sintáctico legítimo (el sujeto más cercano). Usalo en la slide 32:
+escuchar un argumento sintáctico legítimo (el sujeto más cercano). Usalo en la slide 34:
 «hasta nosotros, que somos hablantes nativos, tenemos ambigüedad acá. Y sin embargo un
 modelo con medio millón de perillas se juega por una».
 
@@ -91,16 +96,16 @@ está ganada.
 ### Minuto 26 — slide 9, la viz central
 **Preguntá:** «¿Alguien encontró una palabra que mire a algo raro?»
 **Siempre aparece una.** Anotala en el pizarrón con el nombre de quien la encontró y
-volvé a ella en la slide 32. Es el mejor material que vas a tener para la advertencia
+volvé a ella en la slide 34. Es el mejor material que vas a tener para la advertencia
 final, porque es de ellos.
 
-### Minuto 62 — slide 19, «volvimos»
+### Minuto 62 — slide 20, «volvimos»
 **Preguntá:** «¿Les sumaron 1 las filas?»
 **Van a decir:** «sí», y alguno «a mí me dio 0,99».
 **Qué hacés:** «Eso es redondeo al imprimir, no un bug. Y ahora la pregunta que importa:
 ¿cuánto sumaron las columnas?» Silencio. «Cualquier cosa. Y está bien.»
 
-### Minuto 100 — slide 32, la advertencia
+### Minuto 100 — slide 34, la advertencia
 **Preguntá:** «¿Qué evidencia pedirían ustedes para afirmar que el modelo **usó** esa
 palabra?»
 **Van a decir, en este orden:** «que la mire mucho» (no alcanza), «que se repita en
@@ -158,12 +163,12 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 
 **Se recorta en este orden. Lo de más arriba se saca primero.**
 
-1. **Slide 30b (`supuestos-de-arquitectura.html`).** Es un gesto de continuidad muy lindo
+1. **Slide 32 (`supuestos-de-arquitectura.html`).** Es un gesto de continuidad muy lindo
    y cuesta 2 minutos. Se muestra 20 segundos diciendo «acá está la tabla de la clase 5
    con las dos filas que estaban grises, abiertas» y se pasa. O se saca entera.
-2. **Slide 29 (la normalización).** Se resume en una frase al pasar: «hay una pieza más
+2. **Slide 30 (la normalización).** Se resume en una frase al pasar: «hay una pieza más
    que reescala los números para que no se disparen. Es plomería, importa que esté.»
-3. **Slide 22 + viz de cabezas (23) → dejá sólo la viz.** La idea de multi-head se dice
+3. **Slide 23 + viz de cabezas (24) → dejá sólo la viz.** La idea de multi-head se dice
    en 40 segundos mientras la viz está en pantalla.
 4. **Slide 15 (el producto punto).** Se puede decir sin la viz: «producto punto es cuánto
    apuntan dos flechas para el mismo lado».
@@ -178,7 +183,7 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
   trabajo— queda en tres minutos apurados.
 - **La slide 8 (la cuenta a mano).** Es la única aritmética explícita de la clase y es la
   que sostiene todo lo demás. Sin ella, la fórmula de la slide 17 es magia.
-- **Las slides 32-33 (attention no es explicación).** Es el `[EL LUNES]` de la clase y lo
+- **Las slides 34-35 (attention no es explicación).** Es el `[EL LUNES]` de la clase y lo
   más útil que se llevan. Si tenés que elegir entre terminar el bloque completo y hacer
   la advertencia, hacé la advertencia.
 - **El puente a la clase 8.** Treinta segundos, y son los que hacen que vuelvan.
@@ -187,7 +192,7 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 
 ## 7. Si vas adelantado
 
-- **Hacé la demostración de la bolsa de palabras en vivo**, en la slide 24: escribí las
+- **Hacé la demostración de la bolsa de palabras en vivo**, en la slide 25: escribí las
   dos oraciones («la comisión rechazó al ministro» / «el ministro rechazó a la comisión»)
   y preguntá qué le pasaría a la matriz de atención si permutaras las palabras. Después
   corré la celda del notebook que lo demuestra, proyectada.
@@ -200,8 +205,7 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
   ítem 9 del cuestionario.
 - **Mostrá `medir-atencion.py`** proyectado, la clase `BloqueTransformer`, y compará
   línea por línea con la del notebook. Que vean que es el mismo código, y que el modelo
-  que produjo los mapas de las viz se entrenó con eso, en esta computadora, en doce
-  minutos.
+  que produjo los mapas de las viz se entrenó con eso, en CPU, en menos de un minuto.
 
 ---
 
@@ -265,16 +269,23 @@ elegir un bando**.
   el otro **antes** de empezar, no durante.
 - **Los mapas de atención de las viz son de un modelo real y chiquito.** Si alguien
   pregunta si son «de verdad», la respuesta es sí, y `medir-atencion.py` está en la
-  carpeta: se corre en unos minutos en CPU y da lo mismo, porque la semilla está fija.
+  carpeta: se corre en menos de un minuto en CPU y da **exactamente** lo mismo, porque la
+  semilla está fija (se verificó dos veces: sale igual hasta el cuarto decimal).
 - **Si el bloque 1 del modelo te muestra cabezas que se miran casi sólo a sí mismas**, no
   es un error de la viz: es lo que aprendió. Decilo. Es una observación real sobre modelos
   chicos y poco entrenados, y sirve de antídoto contra la idea de que cada pieza hace algo
   interpretable.
-- **El notebook entero corre en menos de un minuto en CPU** (medido: 12 s en el contenedor
-  de construcción, 0 errores). La única celda que se hace esperar es la de los embeddings
+- **El notebook entero corre en menos de un minuto en CPU** (medido dos veces: 12 s y 15 s,
+  0 errores). La única celda que se hace esperar es la de los embeddings
   de la clase 6, que recalcula PPMI + SVD sobre el corpus real sin red: entre 5 y 30
   segundos según la máquina. Avisalo antes de que arranquen el bloque práctico 1, o vas a
   tener cinco manos levantadas diciendo «se colgó».
+- **No entrenes el modelo «un poco más» pensando que va a mejorar.** Se probó: con 6000
+  pasos y una tasa de aprendizaje más baja la loss de validación mejora (4,60 → 4,23) y
+  **la clase empeora**. Las cabezas se vuelven difusas, «lo» pasa a mirarse sobre todo a
+  sí misma y en la enumeración la atención se va a los artículos: se pierden los dos
+  momentos aha de las viz. El modelo que está en el repo se eligió por lo que **muestra**,
+  y eso está dicho en `medir-atencion.py`.
 - **Si querés cambiar las oraciones de las visualizaciones**, corré
   `python3 medir-atencion.py --listar-candidatas`: imprime las 563 oraciones del corpus
   que califican (largo justo y todas sus palabras en el vocabulario) y sale sin entrenar.

@@ -67,7 +67,7 @@ Machine Learning and the Social Sciences*. Princeton University Press.**
 `[VERIFICAR URL]` (el preprint es arXiv:1902.10186). **El código sí está verificado:**
 `https://raw.githubusercontent.com/successar/AttentionExplanation/master/README.md`
 `[VERIFICADA 2026-08-29]`
-> **Es el paper que sostiene las slides 32 y 33 y el ítem 11 del cuestionario.** El
+> **Es el paper que sostiene las slides 34 y 35 y el ítem 11 del cuestionario.** El
 > argumento es limpio y te lo podés llevar entero: construyen mapas de atención
 > *adversarios* —muy distintos del original— que producen **la misma predicción**. Si dos
 > mapas contradictorios dan la misma salida, el mapa no determina la salida y no puede
@@ -88,7 +88,7 @@ Machine Learning and the Social Sciences*. Princeton University Press.**
 > La herramienta estándar para mirar la atención de un modelo pre-entrenado de verdad,
 > capa por capa y cabeza por cabeza, adentro de un notebook. En la clase 9 vas a tener
 > modelos pre-entrenados a mano: éste es el visor. **Usalo para explorar, con la
-> advertencia de la slide 32 puesta.**
+> advertencia de la slide 34 puesta.**
 > Se instala con `pip install bertviz` y corre en Colab.
 
 **9. Karpathy, A., *nanoGPT* — el código del modelo, comentado.**

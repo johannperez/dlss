@@ -68,7 +68,17 @@
   body.embebido .tabla-sup th { font-size:.63rem; }
   body.embebido .tabla-sup { border-spacing:0 5px; }
   body.embebido #ayuda-caja { display:none; }
-  body.embebido .ojo, body.embebido .ss { font-size:.76rem; padding:.5rem .7rem; }
+  body.embebido .ojo, body.embebido .ss { font-size:.72rem; padding:.4rem .6rem;
+    line-height:1.32; }
+  /* Con las CUATRO filas abiertas (en la clase 5 dos estaban grises y ocupaban la
+     mitad) la tabla no entra en el alto del iframe y la fila del Transformer —que es
+     justo la de hoy— quedaba abajo del corte. Se aprieta un poco más que allá. */
+  body.embebido #cartel:not(:empty) { margin-bottom:6px; }
+  body.embebido .fila td { padding:4px 8px; font-size:.715rem; line-height:1.28; }
+  body.embebido .tabla-sup { border-spacing:0 4px; }
+  body.embebido .nombre-arq { margin-bottom:.18rem; }
+  body.embebido .badge { margin-bottom:.2rem; }
+  body.embebido .justif { line-height:1.28; }
   @media (max-width:900px){
     .tabla-sup, .tabla-sup tbody, .tabla-sup tr, .tabla-sup td { display:block; width:auto; }
     .tabla-sup thead { display:none; }

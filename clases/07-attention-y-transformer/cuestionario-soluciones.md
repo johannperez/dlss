@@ -31,7 +31,7 @@ clase 8. Sin esto, el mini-GPT de la 8 no se entiende.
 |---|---|---|
 | **A** (tres entradas distintas) | Los nombres suenan a cosas separadas, y en una base de datos una *query* y una *key* **sí** son objetos distintos. | Es la confusión más común con Q, K y V: creer que son tres cosas que entran. Se desarma con la slide 13 (las tres cajas saliendo del mismo embedding) y señalando la `X` en `Q = X @ W_q`, `K = X @ W_k`, `V = X @ W_v`: la misma `X`, tres veces. |
 | **C** (query y key son lo mismo) | Es media verdad peligrosa: en *self*-attention las tres salen del mismo texto, así que se sienten iguales. | No distinguen **rol** de **origen**. El mismo origen, tres roles: qué busco, qué ofrezco, qué aporto. La analogía del aviso clasificado existe exactamente para esto. |
-| **D** (son las tres capas) | «Tres cosas con nombre raro» + «un modelo tiene capas» = conclusión razonable si te perdiste. | Se perdió en la arquitectura general. No es grave a esta altura; se recupera con el diagrama de la slide 26. |
+| **D** (son las tres capas) | «Tres cosas con nombre raro» + «un modelo tiene capas» = conclusión razonable si te perdiste. | Se perdió en la arquitectura general. No es grave a esta altura; se recupera con el diagrama de la slide 27. |
 
 ---
 
@@ -60,10 +60,16 @@ cabeza «sea» la cabeza de las enumeraciones (habría que verlo en muchas oraci
 una); y sobre todo, que esas tres palabras **causen** la salida del modelo. El mapa
 describe por dónde pasó la información. Nada más. *(Esto anticipa el ítem 11.)*
 
-**d)** Porque **están después de «y»**, y la máscara causal tapa el futuro. La columna de
-una palabra sólo puede recibir atención de las palabras que vienen **después** de ella; las
-dos últimas de la oración no tienen a nadie después. La última columna de una matriz causal
-siempre suma 0 (salvo su propia diagonal, que en este recorte no está incluida).
+**d)** Por la **máscara causal**. La columna de una palabra sólo puede recibir atención de
+ella misma y de las que vienen **después**; las dos últimas de la oración casi no tienen a
+nadie detrás. A la última columna (*justicia*) sólo podría mirarla la propia *justicia*, y
+a la anteúltima (*la*), sólo *la* y *justicia*.
+
+Y acá hay un segundo paso, que es el que hay que hacer explícito: que esas columnas den
+**0,00 y no otra cosa** no lo decide la máscara, lo decide el modelo. Esa última palabra
+tenía permitido mirarse a sí misma y eligió no hacerlo (reparte su 100% entre las dos
+comas). En otra cabeza, esa misma columna podría valer hasta 1,00. **La máscara acota
+cuánto puede valer una columna; el valor exacto lo pone el modelo.**
 
 > **Si alguien responde «porque son palabras poco importantes»**, ahí hay una lectura del
 > heatmap como si fuera un ranking de importancia. Es un error caro y conviene corregirlo:
@@ -100,6 +106,13 @@ el síntoma.
 es *«la comisión rechazó al ministro»* / *«el ministro rechazó a la comisión»*. Se busca que
 den una propia: *«el sindicato denunció a la empresa»* / *«la empresa denunció al
 sindicato»*; *«el juez procesó al intendente»* / *«el intendente procesó al juez»*.
+
+> **Si alguien objeta que en esos pares también cambian los artículos** (*al* de un lado,
+> *a la* del otro), tiene razón y es una buena objeción: en rigor no son la misma bolsa de
+> palabras hasta que sacás las palabras vacías, que es exactamente la aclaración que hizo
+> la clase 6. La demostración limpia, sin artículos de por medio, es la del notebook:
+> **la misma oración con las palabras barajadas** da la misma salida, sólo que reordenada
+> (diferencia máxima ≈ 5·10⁻⁷, que es error de redondeo). Dale el punto y mostrá esa celda.
 
 > **El ejercicio real es que sea del área de quien responde**, porque ahí se ve que el
 > problema no es lingüístico sino sustantivo: en su investigación, **quién le hace qué a

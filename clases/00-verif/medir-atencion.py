@@ -208,7 +208,7 @@ def lote(ids, tam, ctx, gen):
     return x, y
 
 
-def entrenar(modelo, ids_train, ids_val, pasos, lr=1.2e-3):
+def entrenar(modelo, ids_train, ids_val, pasos, lr=3e-3):
     gen = torch.Generator().manual_seed(SEMILLA)
     opt = torch.optim.AdamW(modelo.parameters(), lr=lr, weight_decay=0.01)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=pasos)
