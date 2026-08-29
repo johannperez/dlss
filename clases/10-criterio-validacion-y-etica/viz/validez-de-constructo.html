@@ -155,7 +155,7 @@ function dibujarCaso1() {
     const marcas = [
       { f1: D.ablacion[0].f1, txt: 'sin ablación' },
       { f1: D.ablacion[1].f1, txt: 'sin el término n.º 1' },
-      { f1: D.ablacion[4].f1, txt: 'sin los 14 nombres propios' }
+      { f1: D.ablacion[4].f1, txt: 'sin los ' + D.ablacion[4].n_quitados + ' nombres propios' }
     ];
     for (const m of marcas) {
       p.segmento(m.f1, 0.75, m.f1, 1.55, { color: 'parametro', grosor: 2.5 });
@@ -254,7 +254,8 @@ const T = {
         ' fragmentos de discursos presidenciales argentinos 2015-2024, que son 100 % política.',
       evidencia: 'Encuentra el <b>' + (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) +
         ' %</b> donde debería encontrar el 100 %. Y la ablación —quitar los ' +
-        '14 nombres propios y reentrenar— movió el F1 de ' + D.modelo.metricas.f1.toFixed(3) +
+        D.ablacion[4].n_quitados + ' nombres propios y reentrenar— movió el F1 de ' +
+        D.modelo.metricas.f1.toFixed(3) +
         ' a ' + D.ablacion[4].f1.toFixed(3) + ': menos que el ruido de la partición, que va de ' +
         D.ruido_de_particion.minimo.toFixed(3) + ' a ' + D.ruido_de_particion.maximo.toFixed(3) + '.'
     }

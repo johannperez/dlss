@@ -27,48 +27,46 @@
 
 ---
 
-## 2. Plan de tiempos real, bloque por bloque
+## 2. El plan de 120 minutos
+
+**Esta tabla suma 120 exactos y es la que hay que llevar al aula.** Los minutos que están
+acá son los mismos que figuran arriba de cada `<aside class="notes">` en `slides.html`: si
+tocás uno, tocá el otro.
 
 | Min | Bloque | Slides | Qué pasa |
 |---|---|---|---|
-| **0-2** | Portada | 1 | «Si el curso tuviera una sola clase, sería esta.» |
-| **2-5** | De dónde venimos | 2 | Puente desde la clase 9: la fuente predecía la etiqueta al 96 %. |
-| **5-8** | **El hallazgo** | 3 | El panel de métricas. *«¿Alguien tiene una objeción?»* Silencio. |
-| **8-12** | Los dos pliegues | 4-5 | Los términos, y el 21 % en discursos presidenciales. |
-| **12-14** | El modelo no falló | 6 | Y no se arregla con más datos. |
-| **14-19** | Desempeño ≠ validez · ustedes tienen ventaja | 7-8 | Cronbach & Meehl, 1955. |
-| **19-21** | Validez de constructo, dibujada | 9 | Dos círculos y el abismo, en el pizarrón. |
-| **21-29** | **VIZ 1 · tres casos** | 10 | Los tres, con apuesta antes de «aplicar el arreglo». |
-| **29-31** | Contenido y externa | 11 | «El corpus de entrenamiento es su muestra.» |
-| **31-43** | Los cinco procedimientos | 12-17 | La slide que se fotografía, y uno por uno. |
-| **43-47** | **La banda de ruido** | 18 | 25 semillas. La ablación se mueve menos que el ruido. |
-| **47-48** | Portada de sección | 19 | Cambio de tono. |
-| **48-52** | Tres sesgos que no son lo mismo | 20 | El termómetro y el país que hace calor. |
-| **52-58** | **VIZ 2 · sesgo en el espejo** | 21 | Con la advertencia roja, obligatoria. |
-| **58-61** | Ceguera no es equidad | 22 | Los cuatro sujetos con el mismo decimal. |
-| **61-62** | Consignas del práctico 1 | 23 | |
-| **62-92** | **MANOS 1 · la auditoría** | — | Notebook, secciones 1 a 9, de a dos. |
-| **92-102** | **PAUSA** | 24 | **No negociable.** |
-| **102-105** | El sesgo como hallazgo | 25 | Antídoto contra la sobrecorrección. |
-| **105-112** | Reproducibilidad | 26-28 | El checklist, la función, los modelos cerrados. |
-| **112-123** | Ética aplicada · los cuatro casos | 29 | Discusión. Dos minutos por caso. |
-| **123-126** | Los criterios que sí sirven | 30 | Las cinco preguntas. |
-| **126-151** | **MANOS 2 · el juicio** | 31-32 | 15 de preparación, 10 de audiencia. |
-| **151-155** | Cuándo NO usar deep learning | 33 | La slide más honesta. |
-| **155-161** | **VIZ 3 · el checklist** | 34 | En vivo, en el proyector. |
-| **161-163** | Las seis objeciones | 35 | La versión que se memoriza. |
-| **163-166** | El mapa del curso | 36 | Las diez clases en tres minutos. |
-| **166-167** | Glosario | 37 | Rápido. |
-| **167-172** | Qué te llevás · adónde seguir | 38-39 | Tres ideas, ni una más. |
-| **172-173** | Cierre | 40 | La frase sola en la pantalla. |
+| **0-10** | **Gancho** | 1-6 | Portada (1), el puente desde la clase 9 (2), el panel de métricas y *«¿alguien tiene una objeción?»* (3), los dos pliegues (4-5), «el modelo no falló» (6). |
+| **10-30** | **Validez** | 7-18 | Desempeño ≠ validez (7), ustedes tienen ventaja (8), el abismo (9), **VIZ 1, 5 min** (10), contenido y externa (11), los cinco procedimientos (12), uno por uno (13-17), **la banda de ruido** (18). |
+| **30-38** | **Sesgo** | 19-22 | Los tres sesgos (20), **VIZ 2, 4 min** (21), ceguera no es equidad (22). |
+| **38-39** | Consignas del práctico 1 | 23 | |
+| **39-59** | **MANOS 1 · la auditoría** | — | Notebook, secciones 1 a 9, de a dos. **20 minutos.** |
+| **59-69** | **PAUSA** | 24 | **No negociable.** |
+| **69-71** | El sesgo como hallazgo | 25 | Antídoto contra la sobrecorrección. |
+| **71-76** | Reproducibilidad | 26-28 | El checklist (27) y los modelos cerrados (28). |
+| **76-85** | Ética aplicada | 29-30 | Los cuatro casos (7 min) y las cinco preguntas (2). |
+| **85-105** | **MANOS 2 · el juicio** | 31-32 | **12 de preparación + 8 de audiencia.** El veredicto (32) se arma durante la audiencia. |
+| **105-108** | Cuándo NO usar deep learning | 33 | La slide más honesta. |
+| **108-111** | **VIZ 3 · el checklist** | 34 | En vivo, en el proyector. |
+| **111-113** | Las seis objeciones | 35 | La versión que se memoriza. |
+| **113-115** | El mapa del curso | 36 | Las diez clases, una frase cada una. |
+| **115-116** | Glosario | 37 | Rápido: señalá dos términos y seguí. |
+| **116-118** | Qué te llevás | 38 | Tres ideas y el bloque del lunes. |
+| **118-119** | Adónde seguir | 39 | |
+| **119-120** | Cierre | 40 | La frase sola en la pantalla. |
 
-> **Ojo, esto suma más de 120.** Es a propósito: el plan de arriba es el ideal y la clase
-> real se atrasa. La sección 5 dice qué se recorta, en qué orden. El presupuesto oficial
-> (`PROGRAMA.md`) es 10 gancho + 20 validez + 20 manos 1 + 10 pausa + 15 repro/ética +
-> 25 el juicio + 15 caja de herramientas + 5 cierre. **Si tenés que llegar, achicá los
-> bloques 12-17 y el juicio a 20 minutos; nunca la pausa ni el cierre.**
-
----
+> **De dónde salen los recortes.** El mazo dado sin apuro, con la VIZ 1 recorrida entera, los
+> cinco procedimientos uno por uno y el juicio de 25 minutos, son **unos 150 minutos**: hay
+> media hora de más y **ya está descontada en la tabla de arriba**. Lo que se sacrificó, en
+> este orden: la VIZ 1 de 8 a 5 minutos, los procedimientos 13 a 17 a un minuto cada uno
+> (están enteros en la lista de la slide 12), el práctico 1 de 30 a 20, el juicio de 25 a 20,
+> y los casos de ética de 11 a 7. **Si el aula es chica y vas holgado**, lo primero que
+> conviene devolver es el juicio a 25 minutos; lo segundo, la VIZ 1.
+>
+> El presupuesto oficial de `PROGRAMA.md` es 10 gancho + 20 validez + 20 manos 1 + 10 pausa +
+> 15 repro/ética + 25 el juicio + 15 caja de herramientas + 5 cierre. La tabla de arriba lo
+> respeta bloque por bloque, salvo que corre la pausa nueve minutos más tarde (queda igual en
+> el medio de la clase) y le devuelve esos minutos al bloque de sesgo, que en el guion
+> original vivía adentro del práctico.
 
 ## 3. Qué preguntar al aula, y cuándo
 
@@ -134,17 +132,23 @@ total. Si el aula termina paralizada, la clase salió mal.
 
 ## 5. Si vas atrasado (y vas a ir atrasado)
 
-**Lo que se recorta, en este orden:**
+El plan de la sección 2 ya viene ajustado a 120. Si **igual** te atrasás —y te vas a
+atrasar— esto es lo que se recorta, **en este orden**:
 
 1. **Slides 13 y 17** (la muestra a mano y la validación externa). Están en la lista numerada
-   de la slide 12; se mencionan en veinte segundos desde ahí.
+   de la slide 12; se mencionan en veinte segundos desde ahí. **Ganás 2 minutos.**
 2. **Slide 11** (contenido y externa). Una frase: «lo mismo que saben de muestreo».
+   **1 minuto.**
 3. **Slide 25** (el sesgo como hallazgo). Duele, pero se puede decir en una oración mientras
-   se pasa.
+   se pasa. **2 minutos.**
 4. **VIZ 1, caso 3.** Los casos 1 y 2 tienen datos reales; el 3 es construido. Si hay que
-   cortar algo de la viz, cortá el 3.
-5. **El juicio de 25 a 18 minutos**: 12 de preparación, 6 de audiencia. Se sostiene.
-6. **Slide 39** (adónde seguir). Está todo en `referencias.md`.
+   cortar algo de la viz, cortá el 3. **1 minuto.**
+5. **El juicio de 20 a 15 minutos**: 10 de preparación, 5 de audiencia. Se sostiene, apretado.
+   **5 minutos.**
+6. **Slide 39** (adónde seguir). Está todo en `referencias.md`. **1 minuto.**
+
+Los seis juntos son **12 minutos**: alcanzan para absorber un arranque tarde o una discusión
+que se fue de tiempo, sin tocar nada de la lista de abajo.
 
 **Lo que NUNCA se recorta, aunque haya que terminar cinco minutos tarde:**
 
@@ -157,8 +161,10 @@ total. Si el aula termina paralizada, la clase salió mal.
 
 **Si vas adelantado** (raro, pero pasa si el aula es chica):
 
-- Alargá el juicio: dale 20 de preparación y hacé **dos rondas**, invirtiendo los roles.
-  Es lo más formativo de la clase.
+- **Devolvé el juicio a 25 minutos** (15 de preparación + 10 de audiencia); si sobra más,
+  hacé **dos rondas** invirtiendo los roles. Es lo más formativo de la clase.
+- **Devolvé la VIZ 1 a 8 minutos** y recorré el caso 2 sin apuro: es el más difícil y el más
+  valioso.
 - Abrí la VIZ 3 y completala en vivo **para el proyecto de alguien del aula**. Pedí un
   voluntario. Es incómodo y es exactamente por eso que enseña.
 - En la VIZ 2, escribí una plantilla del campo de ellos y probala.
@@ -243,13 +249,22 @@ publicable y a veces un hallazgo.
   un archivo, y evita que la mitad del aula se distraiga con la pantalla.
 - **La VIZ 3 guarda en `localStorage`.** Si vas a proyectarla en la máquina del aula, apretá
   *Vaciar* antes de empezar: si no, aparece lo que escribió el docente anterior.
-- **El notebook corre entero en menos de 20 segundos** en CPU y sin red (medido acá: 13 s de
-  cómputo; el bloque más lento son las 25 particiones de la sección 4, 8 s). No hace falta GPU ni Colab pago.
+- **El notebook corre entero en menos de 20 segundos** en CPU y sin red (medido con
+  `nbconvert --execute`: **14 s** de punta a punta; el bloque más lento son las 25 particiones
+  de la sección 4, que el propio notebook cronometra en **4,2 s**). No hace falta GPU ni Colab pago.
   Si el wifi del aula falla, el notebook anda igual: todos los datos salen de `datos/muestras/`.
 - Los números de las slides salen de `medir-clase10.py`, y las figuras de `figuras/` las
   produce `exportar-figuras.py` **corriendo el notebook** (no copiando su código). Si tocás el
   notebook, corré los dos y actualizá las slides. Un número inventado en un curso sobre no
   inventar números es el peor error posible.
+- **Dos listas viven duplicadas a propósito y tienen que quedar iguales:** los 18 nombres
+  propios de la ablación y los 17 sujetos de la auditoría de sesgo están escritos tanto en
+  `notebook.ipynb` como en `medir-clase10.py`. Si cambiás una, cambiá la otra: dos definiciones
+  del mismo experimento son exactamente el error que denuncia la slide 27.
+- **El ejemplo precargado de la VIZ 3 es la auditoría real de esta clase, agujeros incluidos.**
+  Los campos «cuántos casos leíste a mano» y «acuerdo entre codificadores» dicen que no lo
+  hicimos, porque no lo hicimos. Si alguien pregunta por qué el ejemplo no está «completo»,
+  esa es la respuesta y es la clase entera en una línea.
 - Si el aula pregunta por los datos: el corpus de prensa es **real** y CC BY 4.0; los discursos
   presidenciales son **reales** y de dominio público sin licencia declarada; Aguasclaras es
   **sintético** y hay que decirlo cada vez que aparece.

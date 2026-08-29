@@ -139,12 +139,17 @@ frase que empieza con «por eso»**. Si una pieza no termina en un «por eso», 
 
 El orden importa y es este:
 
-1. **Por qué alucina** (viz `por-que-alucina.html`) — 8 min, el más largo.
-2. **Por qué le importa el prompt** — 3 min, con la demo de dos prompts del notebook.
-3. **La ventana de contexto** (viz `ventana-de-contexto.html`) — 5 min.
-4. **La temperatura** (viz `temperatura.html`) — 5 min.
-5. **Por qué cuenta mal las letras** (viz `contar-letras.html`) — 3 min.
-6. **Por qué se contradice y por qué repite** — 2 min, sin viz.
+0. La **curva de loss** (slide 19), que quedó pendiente del bloque anterior — 2,5 min.
+1. **Por qué alucina** (slides 21-23, viz `por-que-alucina.html`) — 7 min, el más largo.
+2. **Por qué le importa el prompt** (24) — 2 min, con la demo de dos prompts del notebook.
+3. **La ventana de contexto** (25-27, viz `ventana-de-contexto.html`) — 5 min.
+4. **La temperatura** (28-30, viz `temperatura.html`) — 5 min.
+5. **Por qué cuenta mal las letras** (31-32, viz `contar-letras.html`) — 2 min.
+6. **Por qué se contradice y por qué repite** (33) — 1 min, sin viz.
+
+**Suman 24,5 y el bloque tiene 25.** No hay aire: los minutos de cada slide están en
+sus `aside` y ya están ajustados a esa suma. Si te pasás en una, sacale a otra — o usá
+la lista de recortes de §7, que está en orden.
 
 **El momento clave de todo el módulo** es el de la alucinación, y se hace así:
 mostrás el prompt del diputado que existe, el modelo contesta bien, mostrás el padrón,
