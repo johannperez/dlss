@@ -332,8 +332,8 @@ en el contenedor de construcción. **Si citás un número en el aula, citá esto
 |---|---|
 | parámetros del modelo | **1.541.056** (4 bloques · 4 cabezas · dim 176 · ventana 128 fichas) |
 | corpus | Aguasclaras, 1.098.206 caracteres, vocabulario de **71** fichas |
-| entrenamiento (la celda sola, 1200 pasos) | **entre 4 y 7 minutos** en CPU con **4 hilos**. Cinco cronometrajes de la misma corrida: **243 s** y **267 s** con `entrenar-mini-gpt.py`, y **297 s**, **360 s** y **432 s** con la celda del notebook (0,25 a 0,36 s por paso). |
-| el notebook ENTERO, de punta a punta | **entre 5 min 40 s y 8 min** (`nbconvert --execute`): **339 s**, **361 s**, **368 s**, **376 s**, **404 s**, **480 s**. |
+| entrenamiento (la celda sola, 1200 pasos) | **entre 4 y 7 minutos** en CPU con **4 hilos**. Seis cronometrajes de la misma corrida: **243 s** y **267 s** con `entrenar-mini-gpt.py`, y **280 s**, **297 s**, **360 s** y **432 s** con la celda del notebook (0,23 a 0,36 s por paso). |
+| el notebook ENTERO, de punta a punta | **entre 5 min 20 s y 8 min** (`nbconvert --execute`): **322 s**, **339 s**, **361 s**, **368 s**, **376 s**, **404 s**, **480 s**. |
 | por qué se mueve tanto | La CPU es compartida: el mismo notebook, en la misma máquina, tarda un 40-80% más si tenés el navegador con las viz abierto al lado — que es exactamente lo que va a pasar en el aula. **Decí «entre cuatro y siete minutos» y planificá con siete.** Nunca des un número al segundo. |
 | loss de validación | **4,23 → 0,19** (el piso teórico de «no tengo idea» es log 71 = 4,26) |
 | loss del bigrama en validación | **2,24** (la línea de base tonta) |
