@@ -193,8 +193,8 @@ Arrastra un estado de tamaño fijo que se va sobrescribiendo.
 | distractor | por qué tienta | qué confusión revela |
 |---|---|---|
 | **A** (pocos parámetros) | Es la explicación por defecto para todo lo que no anda. | Que no vieron que el problema es **estructural, no de tamaño**. La viz lo muestra: agrandás la mochila al máximo y el olvido se hace más lento, pero **igual llega abajo**. Desarme: `viz/memoria-que-se-olvida.html`, slider al máximo. |
-| **C** (lee al revés) | Suena a algo que podría pasar. | Confusión con las RNN bidireccionales, que existen y leen en los dos sentidos — y **tampoco** resuelven el problema. |
-| **D** (no usa embeddings) | Mezcla las dos mitades de la clase. | Una RNN **sí** usa embeddings: los recibe como entrada. Lo que le falla es cómo los combina a lo largo del tiempo. |
+| **C** (promedia y el promedio no tiene orden) | **Es el distractor más peligroso del ítem**, porque describe algo que sí vimos hoy y que sí es verdad… de *otra* cosa. | Confunde las dos maneras de armar el vector de una frase. **Promediar** (slides 31-32) tira el orden de entrada; **la RNN no promedia**: lee en orden, y por eso el orden sí le llega. Su problema es otro y es posterior: lo que leyó primero se le degrada. Si alguien elige C, la mitad final de la clase se le mezcló, y conviene volver sobre la slide 33 («leer en orden, con una mochila»). |
+| **D** (las palabras lejanas quedan fuera del vocabulario) | Mezcla el problema de **memoria** con el de **vocabulario**, y los dos aparecieron hoy. | Estar fuera de vocabulario no tiene nada que ver con estar lejos en la oración: `<desc>` depende de la frecuencia de la palabra en el corpus, no de su posición. Son dos límites distintos y se arreglan con cosas distintas. |
 
 ---
 

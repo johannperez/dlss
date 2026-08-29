@@ -2,7 +2,8 @@
 
 **El ciclo de entrenamiento, y la diferencia entre dibujar y calcar**
 
-Doce preguntas. Las de opción múltiple tienen **una sola** respuesta correcta.
+Doce preguntas con puntaje, más una última para llevarse a casa. Las de opción múltiple
+tienen **una sola** respuesta correcta.
 Las abiertas se contestan en dos o tres oraciones: no buscamos extensión, buscamos criterio.
 
 Podés mirar el notebook y las slides. No es un examen de memoria.
@@ -52,7 +53,7 @@ Este es el gráfico que salió del notebook: 16 rampas, 22 casos de entrenamient
       └──┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬──
          0   150  300  450  600  750  900 1050 1200 1350 1500
                                 épocas
-       ▼ = el punto más bajo de la naranja, en la época 42
+       ▼ = el punto más bajo de la naranja: época 42, loss 0.0133
 ```
 
 **a.** ¿En qué época habría que haber parado el entrenamiento? ¿Por qué esa y no otra?
@@ -67,8 +68,8 @@ un montón"*. ¿Qué le contestás?
 
 ## 4. Cuatro diagnósticos *(apareamiento)*
 
-Apareá cada combinación de losses con su diagnóstico. Sobra un diagnóstico y falta ninguno:
-uno de los cuatro casos es raro y merece una nota aparte.
+Apareá cada combinación de losses con su diagnóstico: son cuatro y cuatro, uno por uno.
+Ojo con el cuarto caso, que es raro y merece una nota aparte.
 
 | | loss de entrenamiento | loss de validación |
 |---|---|---|

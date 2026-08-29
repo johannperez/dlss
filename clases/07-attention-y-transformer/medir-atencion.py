@@ -25,8 +25,16 @@ Uso:
 
 Los valores por defecto (2000 pasos, lr 3e-3, semilla 1983) son EXACTAMENTE los que
 produjeron el `datos-atencion.js` que está en el repo. Si los cambiás, cambian los
-mapas de las cuatro visualizaciones y los números del notebook. Tardó 751 s en el
-contenedor de construcción, con la CPU compartida.
+mapas de las cuatro visualizaciones y los números del notebook. Corrélo y te da los
+mismos números hasta el cuarto decimal: se verificó dos veces, en CPU, y lo único que
+cambia entre corridas es el campo `segundos` del `meta`. Tarda **entre 50 y 60 s** con
+la CPU libre (751 s la primera vez, con la máquina cargada por otros procesos).
+
+Se probó también una corrida más larga y más suave (--pasos 6000 con lr 1.2e-3): baja
+la loss de validación de 4,60 a 4,23 **y arruina la clase**. Las cabezas quedan
+difusas, «lo» se mira sobre todo a sí misma y la enumeración se va a los artículos: se
+pierden los dos momentos aha de las visualizaciones. Está anotado acá para que nadie
+lo vuelva a intentar creyendo que mejora.
 
 Salidas:
     clases/07-attention-y-transformer/datos-atencion.js    (lo que leen las viz)

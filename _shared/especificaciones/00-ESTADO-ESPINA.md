@@ -1,5 +1,16 @@
 # Estado de la espina del curso
 
+> **Este documento es histórico: describe la base compartida ANTES de que se
+> construyeran las diez clases, y se deja tal cual como registro.** Para el
+> estado de HOY —las diez clases construidas, medidas y verificadas en conjunto—
+> leé **`00-ESTADO-CURSO.md`**, en esta misma carpeta.
+>
+> Lo que sigue vale entero **salvo la sección 6**, que quedó desactualizada: de
+> sus seis ítems abiertos, el **1** (los enlaces) sigue abierto, el **6** (la
+> licencia de los corpus de discursos) sigue abierto, y los otros cuatro se
+> cerraron. Los detalles están en `00-ESTADO-CURSO.md` §6.
+> **La sección 5 —las trampas— sigue siendo obligatoria y no cambió.**
+
 **Verificación adversarial de la base compartida antes de construir las 10 clases.**
 Todo lo que dice acá se comprobó **corriendo el código**, no leyéndolo: Chromium
 vía Playwright con `page.route` interceptando cualquier salida a la red,
@@ -281,6 +292,13 @@ para la nube y para la frontera.
 ---
 
 ## 6. Lo que queda abierto (nada de esto frena a un equipo)
+
+> **Desactualizado, se deja como registro.** Estado real al cerrar el curso:
+> **1** sigue abierto · **2 cerrado** (las diez clases tienen slide de glosario) ·
+> **3** sigue abierto (nadie pudo probar Hugging Face) · **4 cerrado** (el
+> entrenamiento del mini-GPT está medido ocho veces: 4 a 7 minutos) ·
+> **5 cerrado** (la clase 6 entra en su presupuesto) · **6** sigue abierto.
+> Ver `00-ESTADO-CURSO.md` §6.
 
 | # | Qué | Para quién |
 |---|---|---|

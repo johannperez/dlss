@@ -87,8 +87,11 @@
       principio, no al final.
     </div>
     <p class="viz-pie">
-      El ejemplo precargado es la auditoría real de esta clase, con los números que salen de
-      <code>medir-clase10.py</code>. Lo que escribas se guarda en tu navegador (y sólo ahí):
+      El ejemplo precargado es la auditoría <b>que efectivamente hicimos hoy</b>: los números
+      salen de <code>medir-clase10.py</code> y del notebook, y donde no hicimos algo —la muestra
+      leída a mano, la doble codificación, la validación externa— <b>dice que no lo hicimos</b>.
+      Está así a propósito: es el párrafo de métodos de este análisis, agujeros incluidos, y
+      declararlos es la jugada correcta. Lo que escribas se guarda en tu navegador (y sólo ahí):
       podés cerrar la pestaña y volver.
     </p>
   </footer>
@@ -103,7 +106,7 @@ const M = D.modelo.metricas;
 const n2 = v => v.toFixed(2);
 
 /* ==========================================================================
-   Las 21 preguntas. `fatal: true` marca las que, si faltan, hunden el paper.
+   Las 22 preguntas. `fatal: true` marca las que, si faltan, hunden el paper.
    `revisor` es el comentario que se genera si está vacía, redactado como lo
    escribiría un revisor cortés (que existen).
    ========================================================================== */
@@ -119,7 +122,7 @@ const SECCIONES = [
     ej: 'prensa digital de México, España, Argentina, Colombia y Chile; cinco meses de pandemia. No cubre otros países ni otros años.', fatal: true,
     revisor: 'El artículo generaliza más allá del período y la región efectivamente cubiertos. Convendría acotar las afirmaciones o mostrar validación fuera de la ventana.' },
   { id: 'exclusiones', et: '¿Qué casos se excluyeron y por qué?', pista: 'los faltantes casi nunca faltan al azar',
-    ej: 'se excluyeron 72 notas sin titular. La exclusión no está relacionada con la etiqueta.',
+    ej: 'ninguna: entran las 1471 notas del corpus. Del cuerpo de cada nota usamos los primeros 600 caracteres, que es un recorte de preprocesamiento y no una exclusión de casos.',
     revisor: 'No se informan las exclusiones. Si el criterio de exclusión se correlaciona con la variable de interés, las estimaciones quedan sesgadas.' },
   { id: 'disponible', et: '¿El corpus está disponible?', tipo: 'select',
     opciones: ['', 'sí, con enlace y licencia', 'sí, previa solicitud', 'no, y explico por qué'],
@@ -134,10 +137,10 @@ const SECCIONES = [
     ej: 'la nota está codificada con el tema «Política» en el corpus fuente; esa codificación la hizo el equipo original, no nosotros', fatal: true,
     revisor: 'Falta la definición operativa: la regla concreta que separa un caso positivo de uno negativo. Distintas reglas producen conclusiones distintas.' },
   { id: 'validadas', et: '¿Cuántos casos leíste y etiquetaste a mano?', pista: 'un número; si es cero, decilo',
-    ej: '150 casos leídos a ciegas, estratificados por la predicción del modelo', fatal: true,
+    ej: '0 en este ejercicio: heredamos la codificación de tema del corpus fuente y no leímos una muestra a ciegas. Es la limitación principal del análisis y la declaramos como tal.', fatal: true,
     revisor: 'No se reporta validación manual. Una métrica contra etiquetas heredadas mide acuerdo con esas etiquetas, no validez de la medida.' },
   { id: 'acuerdo', et: '¿Cuánto coinciden dos codificadores?', pista: 'kappa, alfa, o el acuerdo crudo',
-    ej: 'kappa de Cohen = 0,46 sobre 100 casos doblemente codificados (moderado; lo discutimos en la sección 5)',
+    ej: 'no lo sabemos: la codificación la hizo un solo equipo (el que armó el corpus) y no hay doble codificación. Sin ese número no conocemos el techo realista del F1.',
     revisor: 'No se informa acuerdo entre codificadores. Ese número es el techo realista del modelo: sin él no se puede interpretar un F1 alto.' }
 ]},
 { id: 'modelo', titulo: 'Modelo', campos: [
@@ -159,7 +162,7 @@ const SECCIONES = [
     ej: 'sobre ' + D.modelo.n_test + ' casos de test, precisión ' + n2(M.precision) + ', recall ' + n2(M.recall) + ', F1 ' + n2(M.f1) + '. De cada 100 notas que el modelo llamó política, ' + Math.round(M.precision * 100) + ' lo eran.', fatal: true,
     revisor: 'Faltan métricas desagregadas sobre el conjunto de test. La accuracy sola oculta el comportamiento en la clase minoritaria.' },
   { id: 'errores', et: '¿Leíste los falsos positivos? ¿Qué encontraste?', pista: 'ahí está el conocimiento, no en los aciertos',
-    ej: 'leímos 30 falsos positivos: la mayoría son notas de Covid con contenido de política sanitaria, es decir, desacuerdo con la etiqueta original, no error del modelo',
+    ej: 'leímos los 20 falsos positivos de mayor puntaje (de 25 en el test): la mayoría no son errores del modelo sino desacuerdos con la codificación original — elecciones, protestas y subsidios codificados como Sociedad, Internacional o Economía.',
     revisor: 'No hay análisis cualitativo de errores. Leer treinta falsos positivos suele revelar si el problema es del modelo o de la definición de la categoría.' },
   { id: 'placebo', et: '¿Hiciste un test de placebo o casos límite?', pista: 'aplicarlo donde el fenómeno no debería estar; o pares mínimos',
     ej: 'aplicamos el clasificador a ' + D.placebo.casarosada.n + ' fragmentos de discursos presidenciales argentinos, que son 100 % política: marcó el ' + Math.round(D.placebo.casarosada.proporcion_marcada * 100) + ' %. Además, 8 pares mínimos escritos a mano.', fatal: true,
@@ -179,7 +182,7 @@ const SECCIONES = [
     ej: 'repositorio público con los notebooks, los datos derivados y el script de medición',
     revisor: 'No se indica dónde está el código. Y conviene recordar que publicar el código sin la semilla, las versiones y los datos no alcanza para reproducir nada.' },
   { id: 'sesgo', et: '¿Auditaste el modelo por subgrupo?', pista: 'pares mínimos, o métricas desagregadas',
-    ej: 'sí: 18 sujetos en tres dimensiones sobre una plantilla fija. Diferencia máxima de puntaje ' + D.sesgo.diferencia_maxima.toFixed(3) + '; parte de ella se explica por el artículo («los» vs «las») y no por el sustantivo.',
+    ej: 'sí: ' + D.sesgo.filas.length + ' sujetos en tres dimensiones sobre una plantilla fija. Diferencia máxima de puntaje ' + D.sesgo.diferencia_maxima.toFixed(3) + '; parte de ella se explica por el artículo («los» vs «las») y no por el sustantivo.',
     revisor: 'No hay auditoría por subgrupo. Si el modelo se va a usar para decidir sobre personas, esa auditoría es condición, no adorno.' },
   { id: 'uso', et: '¿Para qué se va a usar el resultado y quién paga el error?', pista: 'medir no es lo mismo que decidir',
     ej: 'sólo para describir la composición temática de un corpus. No se usa para decidir sobre casos individuales.', fatal: true,

@@ -25,6 +25,8 @@
   table.clases td.tit { font-weight: 600; }
   table.clases td.tit small { display: block; font-weight: 400; color: var(--tinta-2); margin-top: .2rem; }
   table.clases td.ent { font-family: var(--f-mono); font-size: .78rem; color: var(--tinta-3); white-space: nowrap; }
+  table.clases td.tiempo { font-family: var(--f-mono); font-size: .78rem; color: var(--c-acento);
+    white-space: nowrap; text-align: right; }
   .modulo td { background: var(--papel-2); font-size: .74rem; letter-spacing: .12em;
     text-transform: uppercase; color: var(--tinta-2); font-weight: 700; }
   .cajas { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin: 1rem 0 2rem; }
@@ -61,6 +63,11 @@
     minuto a minuto de cada clase y el mapa de puentes.</p>
   </div>
   <div class="caja">
+    <h3>Si vas a dictarlo</h3>
+    <p><a href="recursos/GUIA-DEL-DOCENTE.md">recursos/GUIA-DEL-DOCENTE.md</a> — cómo
+    preparar cada clase, los diez momentos donde el aula se pierde, y cómo evaluar.</p>
+  </div>
+  <div class="caja">
     <h3>Antes de la clase 1</h3>
     <p><a href="recursos/setup.md">recursos/setup.md</a> — cómo abrir los notebooks
     en Colab y qué hacer si algo explota.</p>
@@ -86,17 +93,18 @@
 
 <table class="clases">
   <thead>
-    <tr><th>#</th><th>Clase</th><th>Entregables</th></tr>
+    <tr><th>#</th><th>Clase</th><th>Entregables</th><th>El notebook<br>tarda</th></tr>
   </thead>
   <tbody>
-    <tr class="modulo"><td colspan="3">Módulo 1 · qué es aprender (clases 1-4)</td></tr>
+    <tr class="modulo"><td colspan="4">Módulo 1 · qué es aprender (clases 1-4)</td></tr>
     <tr>
       <td class="n">01</td>
       <td class="tit">Una función es una máquina con perillas
         <small>Entradas que recorren la figura, parámetros que la deforman. Aprender es mover parámetros.</small></td>
       <td class="ent"><a href="clases/01-funciones-y-parametros/slides.html">slides</a> ·
         <a href="clases/01-funciones-y-parametros/notebook.ipynb">notebook</a> ·
-        <a href="clases/01-funciones-y-parametros/viz/">viz</a></td>
+        <a href="clases/01-funciones-y-parametros/viz/">3 viz</a></td>
+      <td class="tiempo">8 s</td>
     </tr>
     <tr>
       <td class="n">02</td>
@@ -104,7 +112,8 @@
         <small>Apilando rampas se dibuja cualquier figura. Eso, y no otra cosa, es una red neuronal.</small></td>
       <td class="ent"><a href="clases/02-componer-funciones/slides.html">slides</a> ·
         <a href="clases/02-componer-funciones/notebook.ipynb">notebook</a> ·
-        <a href="clases/02-componer-funciones/viz/">viz</a></td>
+        <a href="clases/02-componer-funciones/viz/">5 viz</a></td>
+      <td class="tiempo">9 s</td>
     </tr>
     <tr>
       <td class="n">03</td>
@@ -112,7 +121,8 @@
         <small>Si podés medir cuán mal dibujás, podés bajar por esa medida hasta el fondo del valle.</small></td>
       <td class="ent"><a href="clases/03-loss-y-gradiente/slides.html">slides</a> ·
         <a href="clases/03-loss-y-gradiente/notebook.ipynb">notebook</a> ·
-        <a href="clases/03-loss-y-gradiente/viz/">viz</a></td>
+        <a href="clases/03-loss-y-gradiente/viz/">4 viz</a></td>
+      <td class="tiempo">9 s</td>
     </tr>
     <tr>
       <td class="n">04</td>
@@ -120,17 +130,19 @@
         <small>Un modelo con demasiada libertad memoriza tu muestra. Por eso existe la validación.</small></td>
       <td class="ent"><a href="clases/04-entrenar-de-verdad/slides.html">slides</a> ·
         <a href="clases/04-entrenar-de-verdad/notebook.ipynb">notebook</a> ·
-        <a href="clases/04-entrenar-de-verdad/viz/">viz</a></td>
+        <a href="clases/04-entrenar-de-verdad/viz/">3 viz</a></td>
+      <td class="tiempo">29 s</td>
     </tr>
 
-    <tr class="modulo"><td colspan="3">Módulo 2 · la forma del dato manda (clases 5-8)</td></tr>
+    <tr class="modulo"><td colspan="4">Módulo 2 · la forma del dato manda (clases 5-8)</td></tr>
     <tr>
       <td class="n">05</td>
       <td class="tit">La forma de los datos manda: imágenes
         <small>La arquitectura es una teoría sobre cómo es el mundo. Una CNN supone que lo que importa es local.</small></td>
       <td class="ent"><a href="clases/05-imagenes-y-convoluciones/slides.html">slides</a> ·
         <a href="clases/05-imagenes-y-convoluciones/notebook.ipynb">notebook</a> ·
-        <a href="clases/05-imagenes-y-convoluciones/viz/">viz</a></td>
+        <a href="clases/05-imagenes-y-convoluciones/viz/">4 viz</a></td>
+      <td class="tiempo">1 min 21 s</td>
     </tr>
     <tr>
       <td class="n">06</td>
@@ -138,7 +150,8 @@
         <small>El orden es información, y cada palabra necesita un lugar en el espacio.</small></td>
       <td class="ent"><a href="clases/06-texto-secuencias-embeddings/slides.html">slides</a> ·
         <a href="clases/06-texto-secuencias-embeddings/notebook.ipynb">notebook</a> ·
-        <a href="clases/06-texto-secuencias-embeddings/viz/">viz</a></td>
+        <a href="clases/06-texto-secuencias-embeddings/viz/">5 viz</a></td>
+      <td class="tiempo">19 s</td>
     </tr>
     <tr>
       <td class="n">07</td>
@@ -146,7 +159,8 @@
         <small>En vez de leer en orden y olvidarse, cada palabra mira a todas y decide a cuál prestarle atención.</small></td>
       <td class="ent"><a href="clases/07-attention-y-transformer/slides.html">slides</a> ·
         <a href="clases/07-attention-y-transformer/notebook.ipynb">notebook</a> ·
-        <a href="clases/07-attention-y-transformer/viz/">viz</a></td>
+        <a href="clases/07-attention-y-transformer/viz/">5 viz</a></td>
+      <td class="tiempo">15 s</td>
     </tr>
     <tr>
       <td class="n">08</td>
@@ -154,17 +168,19 @@
         <small>Un LLM dibuja la distribución de la próxima palabra. Todo lo raro que hace ChatGPT sale de ahí.</small></td>
       <td class="ent"><a href="clases/08-mini-gpt-y-los-llm/slides.html">slides</a> ·
         <a href="clases/08-mini-gpt-y-los-llm/notebook.ipynb">notebook</a> ·
-        <a href="clases/08-mini-gpt-y-los-llm/viz/">viz</a></td>
+        <a href="clases/08-mini-gpt-y-los-llm/viz/">4 viz</a></td>
+      <td class="tiempo">5 min 29 s</td>
     </tr>
 
-    <tr class="modulo"><td colspan="3">Módulo 3 · usarlo con criterio (clases 9-10)</td></tr>
+    <tr class="modulo"><td colspan="4">Módulo 3 · usarlo con criterio (clases 9-10)</td></tr>
     <tr>
       <td class="n">09</td>
       <td class="tit">Usar modelos que ya existen, sin creerles
         <small>Un modelo pre-entrenado es un informante clave: sabe muchísimo y tiene sus sesgos.</small></td>
       <td class="ent"><a href="clases/09-modelos-preentrenados/slides.html">slides</a> ·
         <a href="clases/09-modelos-preentrenados/notebook.ipynb">notebook</a> ·
-        <a href="clases/09-modelos-preentrenados/viz/">viz</a></td>
+        <a href="clases/09-modelos-preentrenados/viz/">3 viz</a></td>
+      <td class="tiempo">17 s</td>
     </tr>
     <tr>
       <td class="n">10</td>
@@ -172,16 +188,22 @@
         <small>El modelo mide algo. Tu trabajo es demostrar que ese algo es lo que decís que es.</small></td>
       <td class="ent"><a href="clases/10-criterio-validacion-y-etica/slides.html">slides</a> ·
         <a href="clases/10-criterio-validacion-y-etica/notebook.ipynb">notebook</a> ·
-        <a href="clases/10-criterio-validacion-y-etica/viz/">viz</a></td>
+        <a href="clases/10-criterio-validacion-y-etica/viz/">3 viz</a></td>
+      <td class="tiempo">15 s</td>
     </tr>
   </tbody>
 </table>
 
 <div class="aviso">
-  <b>Los enlaces a las clases van a dar 404 hasta que esa clase esté construida.</b>
-  Esta página es el índice del repo, no una promesa de que todo esté hecho. El
-  estado real de la base compartida está en
-  <a href="_shared/especificaciones/00-ESTADO-ESPINA.md">_shared/especificaciones/00-ESTADO-ESPINA.md</a>.
+  <b>Las diez clases están construidas y verificadas.</b> Los enlaces de esta tabla
+  se comprobaron uno por uno contra el disco: los 30 archivos existen y las 39
+  visualizaciones abren sin internet. Los tiempos de la última columna son
+  <b>medidos</b> (<code>nbconvert --execute</code> en CPU, sin GPU, en este repo):
+  en Colab gratis contá entre una y dos veces eso. El estado final medido de todo
+  está en
+  <a href="_shared/especificaciones/00-ESTADO-CURSO.md">_shared/especificaciones/00-ESTADO-CURSO.md</a>,
+  y el de la base compartida en
+  <a href="_shared/especificaciones/00-ESTADO-ESPINA.md">00-ESTADO-ESPINA.md</a>.
 </div>
 
 <h2>Para quien construye una clase</h2>

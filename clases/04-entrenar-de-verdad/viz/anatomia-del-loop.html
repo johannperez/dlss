@@ -17,6 +17,14 @@
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
 <style>
+  /* DEFECTO DE BASE (parcheado acá, conviene subirlo a _shared/css/curso.css):
+     curso.css no declara `box-sizing: border-box` en ningún lado, así que
+     `.viz-frame { width: 100% }` + su padding + su borde se le van 26 px por
+     la derecha a la columna del grid. Suelta la página no se nota; embebida en
+     una slide (donde el panel mide 268 px) el dibujo se mete ENCIMA del panel
+     y le come la primera letra a cada rótulo. Una línea lo arregla. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
   .fila-arriba { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: .55rem; }
   .fila-abajo  { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-top: .55rem; }
   @media (max-width: 760px) {

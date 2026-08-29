@@ -55,6 +55,9 @@
   table.dist td.act { background: var(--c-acento-suave); font-weight: 700; }
   table.dist td.alto { color: var(--c-ok); font-weight: 700; }
   table.dist td.bajo { color: var(--c-error); }
+  /* el botón flotante «Tema» es position:fixed abajo a la derecha y se le monta
+     encima a la última línea del texto. Le dejamos aire. (Suelta, no embebida.) */
+  body.curso:not(.embebido) .viz-pagina { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body class="curso">
@@ -173,8 +176,9 @@ function pintar() {
   document.getElementById('cuenta-oh').innerHTML =
     '<b>' + NVOC.toLocaleString('es-AR') + '</b> números para escribir una palabra, ' +
     'y <b>' + (NVOC - 1).toLocaleString('es-AR') + '</b> de ellos son cero. ' +
-    'El único 1 está en la posición <b>' + id + '</b>, que es el orden alfabético ' +
-    'de nada: es simplemente el lugar donde quedó esta palabra en la lista.';
+    'El único 1 está en la posición <b>' + id + '</b>, y ese número no significa ' +
+    'nada: no es un orden alfabético ni una medida de nada. Es simplemente el ' +
+    'lugar donde quedó esta palabra en la lista.';
 
   // --- embedding ---
   const M = Math.max.apply(null, v.map(Math.abs));

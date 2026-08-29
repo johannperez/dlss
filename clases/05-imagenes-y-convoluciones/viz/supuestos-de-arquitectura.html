@@ -65,7 +65,10 @@
   body.embebido .justif { font-size:.68rem; }
   body.embebido .tabla-sup th { font-size:.63rem; }
   body.embebido .tabla-sup { border-spacing:0 5px; }
-  body.embebido #ayuda-caja { display:none; }
+  /* embebida en la slide el alto es fijo: se esconde la ayuda ENTERA
+     (el titulo y su caja), no solo el texto, para no dejar un recuadro
+     vacio con rotulo y nada adentro. */
+  body.embebido .solo-suelta { display:none; }
   body.embebido .ojo, body.embebido .ss { font-size:.76rem; padding:.5rem .7rem; }
   @media (max-width:900px){
     .tabla-sup, .tabla-sup tbody, .tabla-sup tr, .tabla-sup td { display:block; width:auto; }
@@ -390,6 +393,16 @@ const ctl = Viz.controles('#panel', [
       'afirmando algo falso.<br><br>Hacé clic en cualquier celda para abrir el ejemplo.</span>' },
   { tipo: 'boton', texto: 'Cerrar los ejemplos', alClic: () => { abierta = null; pintar(); } }
 ], () => pintar());
+
+/* La ayuda «cómo se lee» sólo tiene sentido con la página suelta: adentro del
+   iframe de la slide el alto es fijo y el docente ya está explicando. Marcamos
+   la caja Y su título para poder esconder los dos juntos. */
+(function () {
+  const caja = ctl.nodos.ayuda;
+  if (!caja) return;
+  caja.classList.add('solo-suelta');
+  if (caja.previousElementSibling) caja.previousElementSibling.classList.add('solo-suelta');
+})();
 
 ctl.disparar();
 Viz.botonTema();

@@ -58,6 +58,11 @@
                   color: var(--tinta); }
   .veredicto.si { background: var(--c-ok-suave); border: 1px solid var(--c-ok);
                   color: var(--tinta); }
+
+  /* --- embebida en la slide: el iframe mide ~560 px de alto, así que apretamos
+     el panel para que los controles entren en lo que se ve sin scrollear. ---- */
+  body.embebido .panel { font-size: .85em; padding: .5rem .6rem .6rem; }
+  body.embebido .ctrl { margin-bottom: .5rem; }
 </style>
 </head>
 <body class="curso">
@@ -99,9 +104,10 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Alterná entre el primer prompt (un diputado que
-      existe) y el segundo (uno que nos inventamos). Mirá las barras de abajo a la
-      izquierda: en los dos casos hay una que se lleva casi todo. Y mirá el gráfico
-      de la derecha: <b>las cuatro barras miden más o menos lo mismo</b>. El modelo
+      existe) y el segundo (uno que nos inventamos). Mirá el gráfico
+      <em>«qué tan segura estaba la primera ficha»</em>: en los dos casos hay una barra
+      que se lleva casi todo. Y mirá el de <em>«qué tan seguro estuvo en cada caso»</em>:
+      <b>las cuatro barras miden más o menos lo mismo</b>. El modelo
       está igual de seguro cuando dice la verdad que cuando fabrica una diputada que
       no existe. No hay ninguna señal en la salida que las separe: por eso la
       confianza de un LLM <b>no</b> es evidencia de nada.
@@ -273,7 +279,7 @@ p.alDibujar(() => {
 /* --- la comparación: los cuatro casos, uno al lado del otro ------------------ */
 const p2 = Viz.plano('#lienzo-conf', {
   xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 210,
-  titulo: 'seguridad del modelo en los cuatro casos',
+  titulo: 'qué tan seguro estuvo en cada caso',
   margen: { i: 14, d: 16, a: 30, b: 26 }
 });
 p2.alDibujar(() => {

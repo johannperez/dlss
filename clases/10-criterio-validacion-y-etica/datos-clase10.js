@@ -255,20 +255,20 @@ window.DATOS10 = {
    "f1": 0.6834
   },
   {
-   "quitado": "los 14 nombres propios",
-   "n_quitados": 14,
+   "quitado": "los 18 nombres propios",
+   "n_quitados": 18,
    "metricas": {
     "vp": 65,
-    "fp": 24,
-    "vn": 241,
+    "fp": 26,
+    "vn": 239,
     "fn": 38,
-    "accuracy": 0.8315,
-    "precision": 0.7303,
+    "accuracy": 0.8261,
+    "precision": 0.7143,
     "recall": 0.6311,
-    "f1": 0.6771,
+    "f1": 0.6701,
     "prevalencia": 0.2799
    },
-   "f1": 0.6771
+   "f1": 0.6701
   }
  ],
  "ablacion_vs_ruido": {
@@ -450,12 +450,6 @@ window.DATOS10 = {
    },
    {
     "dimension": "genero",
-    "sujeto": "los empresarios",
-    "score": 0.2574,
-    "fuera_de_vocabulario": []
-   },
-   {
-    "dimension": "ocupacion",
     "sujeto": "los empresarios",
     "score": 0.2574,
     "fuera_de_vocabulario": []

@@ -33,6 +33,7 @@
   .tabla-bruta { font-size: .82em !important; }
   .tabla-bruta td.muerte { color: var(--c-error); font-weight: 700; }
 
+
   .dos-canvas { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
   .tres-canvas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; }
 
@@ -40,6 +41,15 @@
      bajo, un valle redondo se ve como una elipse aplastada y la flecha del
      gradiente deja de verse perpendicular a las curvas de nivel. */
   .mapa-angosto { max-width: 620px; margin: .4em auto 0; }
+
+  /* Las cuatro viz de esta clase traen panel con botones de animación y
+     lecturas en vivo: a los 610 px del `grande` estándar el panel se cortaba
+     abajo y el botón «Soltar la pelota» quedaba fuera de la pantalla. */
+  .viz-frame[data-alto="viz3"] { height: 614px; }
+  /* y le apretamos un poco el título y el pie a esas slides, que es de donde
+     sale el alto extra sin que nada se salga de la pantalla */
+  section:has(> .viz-frame[data-alto="viz3"]) h3 { margin-bottom: .16em; }
+  section:has(> .viz-frame[data-alto="viz3"]) .viz-pie { margin-top: .18em; font-size: .74em; }
 
   /* doce términos: entran justo si se los compacta un poco */
   .glosario-dos li { font-size: .78em; padding: .18em 0;
@@ -201,7 +211,7 @@
 <section>
   <span class="marca">viz</span>
   <h3>Arrastrá el outlier</h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/comparador-de-losses.html" title="MSE contra MAE, arrastrando un caso" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> apretá «plantar un caso extremo». La recta azul
@@ -383,7 +393,7 @@
 <section>
   <span class="marca">viz</span>
   <h3>Movete por el mapa</h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/valle-de-loss.html" title="el valle de la loss: el mapa y la recta, sincronizados" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> los dos paneles a la vez. Cuando arrastrás el punto
@@ -425,7 +435,8 @@
      Nos quedamos con la mejor.</p>
   <div class="viz-frame mapa-angosto" style="padding:8px" id="caja-grilla"></div>
   <p class="viz-pie"><b>Y funciona.</b> Con dos perillas, probar todo es una estrategia
-     perfectamente razonable. En el notebook lo hacemos con 14.400 y tarda menos de un segundo.</p>
+     perfectamente razonable. En el notebook lo hacemos con 14.400 y tarda menos de un segundo.
+     (Los puntitos del dibujo son 40&times;26: diez mil no se distinguirían.)</p>
   <aside class="notes">
     <b>54-56 min.</b> «Esto no es una estrategia tonta. Con dos perillas es lo que haría
     cualquiera y está bien.» Que se sientan cómodos antes de la slide siguiente.
@@ -438,7 +449,7 @@
   <table class="tabla-bruta">
     <tr><th>modelo</th><th>perillas</th><th>rectas a probar</th><th>cuánto tarda</th></tr>
     <tr><td>nuestra recta</td><td>2</td><td>10<sup>4</sup></td><td>menos de un parpadeo</td></tr>
-    <tr><td>una recta con 2 variables</td><td>4</td><td>10<sup>8</sup></td><td>una décima de segundo</td></tr>
+    <tr><td>una regresión con 3 variables</td><td>4</td><td>10<sup>8</sup></td><td>una décima de segundo</td></tr>
     <tr class="muerte"><td>la red de 8 rampas de la clase 2</td><td>8</td><td>10<sup>16</sup></td>
         <td class="muerte">115 días</td></tr>
     <tr><td>una red chiquita</td><td>100</td><td>10<sup>200</sup></td>
@@ -482,7 +493,7 @@
 <section>
   <span class="marca">viz</span>
   <h3>La pendiente, con una resta</h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/loss-1d.html" title="la derivada como una resta" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> con el pasito grande, la línea turquesa está torcida.
@@ -541,7 +552,7 @@
 <section>
   <span class="marca">viz</span>
   <h3>Soltá la pelota</h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/valle-de-loss.html" title="descenso por gradiente, con rastro" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> el rastro. Los puntitos arrancan separados y terminan
@@ -563,10 +574,10 @@
 <section>
   <span class="marca">viz</span>
   <h3>El paso: <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span></h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/tasa-de-aprendizaje.html" title="tres learning rates en paralelo" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>. El quiz de firmas se scrollea en el panel.</p>
   <aside class="notes">
     <b>79-85 min.</b> «Izquierda: paso microscópico, no llega nunca. Centro: bien.
     Derecha: se va del mapa.»<br>
@@ -634,7 +645,7 @@
 <section>
   <h2>¿Quién lo rompió mejor?</h2>
   <p class="bajada">Proyectamos dos o tres curvas del aula.</p>
-  <div class="cita-aula">«Puse 1.5 y en el paso cuatro ya tenía un número con nueve dígitos.»</div>
+  <div class="cita-aula">«Puse 1.5 y en el paso trece ya tenía un número con nueve dígitos.»</div>
   <div class="cita-aula">«Con 0.000001 la curva es una raya. Ni se movió.»</div>
   <div class="cita-aula">«Arranqué desde a=-5 y llegó al mismo lugar. ¿Siempre pasa eso?»</div>
   <p><strong>Esa última pregunta es la mejor de la clase</strong>, y la contestamos en tres slides.</p>
@@ -1096,7 +1107,7 @@
     const p = nuevoPlano('#caja-grilla', {
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 400,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
-      titulo: 'diez mil rectas, probadas una por una'
+      titulo: 'la grilla, probada punto por punto (acá se dibuja más rala para que se vea)'
     });
     // la grilla que se dibuja es de 40x26 para que se vea; la del notebook es
     // de 120x120 y tarda dos segundos
@@ -1169,7 +1180,7 @@
   /* --- slide 20: el mapa con la flecha del gradiente --------------------- */
   (function () {
     const p = nuevoPlano('#caja-gradiente', {
-      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 355,
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 340,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'la flecha, en el mismo mapa de antes'
     });
@@ -1180,10 +1191,12 @@
       p.contornos(lossDe, { niveles: 11, color: 'tinta3', opacidad: .35 });
       p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
       const gr = gradDe(pa, pb), k = 0.20;
-      p.flecha(pa, pb, pa + k * gr[0] * 0.4, pb + k * gr[1] * 0.4,
-               { color: 'error', grosor: 3, cabeza: 11 });
-      p.texto(-0.385, 0.415, 'el gradiente: para arriba',
-              { color: 'error', tam: 13, peso: '700', alinear: 'left', caja: true });
+      // la flecha roja va sobre fondo naranja: si es corta no se ve de lejos
+      p.flecha(pa, pb, pa + k * gr[0] * 0.62, pb + k * gr[1] * 0.62,
+               { color: 'error', grosor: 3.4, cabeza: 13 });
+      p.texto(pa + k * gr[0] * 0.62, pb + k * gr[1] * 0.62, 'el gradiente: para arriba',
+              { color: 'error', tam: 13, peso: '700', alinear: 'left', dx: 6, dy: -10,
+                caja: true });
       p.flecha(pa, pb, pa - k * gr[0], pb - k * gr[1],
                { color: 'tinta', grosor: 3.2, cabeza: 12 });
       p.texto(pa - k * gr[0], pb - k * gr[1], 'nosotros vamos para acá',

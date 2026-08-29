@@ -37,6 +37,14 @@
      lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
      Abierta suelta, la página se ve completa y esta regla no hace nada. */
   body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+  /* y además lo compactamos y le damos un poco más de ancho, para que entre
+     entero sin scrollear adentro del marco de la slide. */
+  body.embebido .viz-pagina { grid-template-columns: minmax(0, 1fr) 330px; }
+  body.embebido .panel { font-size: .86em; padding: .5rem .55rem .55rem; }
+  body.embebido .ctrl { margin-bottom: .38rem; }
+  body.embebido .par-perillas > div { padding: .22em .4em; }
+  body.embebido .par-perillas { margin: 0 0 .2rem; }
+  body.embebido .lectura-grande { font-size: 1.12rem; }
 </style>
 </head>
 <body class="curso">
@@ -154,12 +162,17 @@ function grad(a, b) {
 // El ancho en `a` y el alto en `b` están elegidos para que el valle salga
 // REDONDO en pantalla: así la flecha se ve perpendicular a las curvas de nivel,
 // que es exactamente lo que queremos que se entienda.
+// Adentro de la slide el marco es más alto que la página suelta: aprovechamos
+// ese alto para que los dos dibujos se vean de lejos en un proyector.
+const EMBEBIDO = Viz.detectarEmbebido();
+const ALTO_PANEL = EMBEBIDO ? 390 : 300;
+
 const mapa = Viz.plano('#caja-mapa', {
   xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445,
   ejeX: 'qué tan empinada (puntos por década)',
   ejeY: 'dónde arranca',
   titulo: 'el mapa: cada punto es una recta entera',
-  alto: 300
+  alto: ALTO_PANEL
 });
 
 const puntoP = { x: estado.a, y: estado.b };
@@ -233,7 +246,7 @@ const datos = Viz.plano('#caja-datos', {
   xmin: 1982, xmax: 2021, ymin: -0.06, ymax: 0.50,
   ejeX: 'año', ejeY: '% de palabras',
   titulo: 'la recta que corresponde a ese punto',
-  alto: 300
+  alto: ALTO_PANEL
 });
 
 datos.alDibujar(function () {
@@ -315,26 +328,59 @@ function unPaso() {
   puntoP.x = estado.a; puntoP.y = estado.b;
 }
 
+// Llevamos NUESTRO contador de pasos. El de `Viz.animacion` no se reinicia
+// solo: si nos colgáramos de él, la segunda vez que apretás «Soltar la pelota»
+// —o después de cambiar de paisaje— la pelota daría UN paso y se frenaría.
+let pasosDados = 0;
+
 const anim = Viz.animacion({
   cadaMs: 90,
-  paso: function (i) { unPaso(); refrescar(); return i < 45; },
+  paso: function () { unPaso(); refrescar(); pasosDados++; return pasosDados < 45; },
   reset: function () {
-    estado.a = -0.30; estado.b = 0.40;
+    // «Volver arriba» tiene que devolverte al arranque DEL PAISAJE que estás mirando
+    estado.a = estado.paisaje === 'datos' ? -0.30 : -0.34;
+    estado.b = estado.paisaje === 'datos' ? 0.40 : 0.38;
     puntoP.x = estado.a; puntoP.y = estado.b;
     estado.rastro = []; estado.perdidas = [];
+    pasosDados = 0;
     refrescar();
   }
 });
+// cada vez que arranca, el contador vuelve a cero
+anim.on(function (a) { if (a.corriendo()) pasosDados = 0; });
 
 /* ---------------------------------------------------------------------------
    7. EL PANEL
    --------------------------------------------------------------------------- */
-const ctl = Viz.controles('#panel', [
+/* El ORDEN del panel importa: adentro de la slide el marco es de 660 px y lo
+   que sobra queda abajo de todo. Por eso los botones de la animación —que son
+   el corazón de las slides 14 y 22— van arriba, y los textos largos, al final. */
+const ctlPaso = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'La pelota' },
   { tipo: 'slider', id: 'lr', etiqueta: 'tamaño del paso',
     sub: 'el learning rate: cuánto te movés cada vez',
     min: 0.0001, max: 2.0, escala: 'log', valor: 0.15, color: 'acento',
-    formato: function (v) { return Viz.num(v, 4); } },
+    formato: function (v) { return Viz.num(v, 4); } }
+], function (v) { estado.lr = v.lr; refrescar(); });
+
+Viz.controlesAnimacion('#panel', anim, {
+  textoPlay: 'Soltar la pelota', textoPausa: 'Frenar',
+  textoPaso: 'Un paso', textoReset: 'Volver arriba'
+});
+
+Viz.controles('#panel', [
+  { tipo: 'boton', texto: 'Soltarla desde otro lugar', alClic: function () {
+      const r = Viz.azar(estado.semilla++);
+      anim.pausa();
+      estado.a = -0.38 + r() * 0.85;
+      estado.b = -0.11 + r() * 0.53;
+      puntoP.x = estado.a; puntoP.y = estado.b;
+      estado.rastro = []; estado.perdidas = [];
+      refrescar();
+    } }
+]);
+
+const ctl = Viz.controles('#panel', [
   { tipo: 'texto', id: 'perillas', html: '' },
   { tipo: 'texto', id: 'frase', html: '' },
   { tipo: 'checkbox', id: 'flecha', etiqueta: 'mostrar la flecha del gradiente', valor: true },
@@ -344,7 +390,6 @@ const ctl = Viz.controles('#panel', [
                { valor: 'dificil', texto: 'uno con dos pozos' }] },
   { tipo: 'texto', id: 'lectura', html: '' }
 ], function (v, id) {
-  estado.lr = v.lr;
   estado.flecha = v.flecha;
   estado.curva = v.curva;
   if (id === 'paisaje' && v.paisaje !== estado.paisaje) {
@@ -359,23 +404,6 @@ const ctl = Viz.controles('#panel', [
   if (v.curva) { curva.redimensionar(); }
   refrescar();
 });
-
-Viz.controlesAnimacion('#panel', anim, {
-  textoPlay: 'Soltar la pelota', textoPausa: 'Frenar',
-  textoPaso: 'Un paso', textoReset: 'Volver arriba'
-});
-
-const extra = Viz.controles('#panel', [
-  { tipo: 'boton', texto: 'Soltarla desde otro lugar', alClic: function () {
-      const r = Viz.azar(estado.semilla++);
-      anim.pausa();
-      estado.a = -0.38 + r() * 0.85;
-      estado.b = -0.11 + r() * 0.53;
-      puntoP.x = estado.a; puntoP.y = estado.b;
-      estado.rastro = []; estado.perdidas = [];
-      refrescar();
-    } }
-]);
 
 /* ---------------------------------------------------------------------------
    8. REFRESCAR TODO (esto es lo que corre mientras se arrastra)
@@ -418,7 +446,7 @@ function refrescar() {
     msg = 'La flecha se hizo chiquita: estás en el fondo. <b>Nadie frenó la pelota</b>: ' +
           'se frenó sola porque acá el terreno es plano y no hay para dónde bajar.';
   } else {
-    msg = 'La flecha negra apunta <b>para donde hay que ir</b>, que es justo al revés de ' +
+    msg = 'La flecha gruesa apunta <b>para donde hay que ir</b>, que es justo al revés de ' +
           'la roja: la roja es la dirección en la que la loss <em>sube</em> más rápido. ' +
           'Todo el gradiente es eso.';
   }

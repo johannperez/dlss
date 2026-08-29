@@ -52,6 +52,19 @@
   }
   .lectura-mini b { color: var(--tinta); }
   .techo { color: var(--c-error); }
+
+  /* Modo embebido: el <iframe> de la slide mide 1280x610 y las SEIS tarjetas
+     tienen que entrar ahi. Suelta (que es como conviene proyectarla) se ve
+     completa, con la frase de cada forma y su fórmula. */
+  body.embebido .viz-pagina   { padding: .35rem; }
+  body.embebido .zoo          { gap: .45rem; }
+  body.embebido .lectura-mini { font-size: .7rem; margin-top: .2rem; }
+  body.embebido .tarjeta-zoo  { padding: .35rem .45rem .4rem; border-width: 1px; }
+  body.embebido .tarjeta-zoo .sub,
+  body.embebido .tarjeta-zoo .formula { display: none; }
+  body.embebido .tarjeta-zoo h3 { font-size: .82rem; }
+  body.embebido .mini-panel .ctrl { margin-bottom: .25rem; }
+  body.embebido .panel        { font-size: .86em; }
 </style>
 </head>
 <body class="curso">
@@ -94,6 +107,9 @@
 /* ===========================================================================
    1. LAS SEIS FORMAS
    =========================================================================== */
+// viz.js ya le puso la clase `embebido` al <body> si estamos adentro de un iframe.
+const EMBEBIDO = document.body.classList.contains('embebido');
+
 const XMIN = 0, XMAX = 10, YMIN = -1, YMAX = 9.5;
 const UMBRAL = 0.02;                        // por debajo de esto: «¡esa es!»
 const MUESTRAS = Viz.linspace(XMIN, XMAX, 60);
@@ -180,7 +196,7 @@ const DESAFIOS = {
                      - 1.6 * Math.exp(-Math.pow((x - 5.5) / 1.1, 2))
                      + 1.9 * Math.exp(-Math.pow((x - 8.5) / 0.9, 2)),
     texto: 'Objetivo: dos picos y un valle. Esto se parece bastante a una serie real de ' +
-           'menciones a un tema en cuarenta años de discursos. Suerte.'
+           'menciones a un tema en treinta y seis años de discursos. Suerte.'
   }
 };
 
@@ -222,8 +238,8 @@ for (const forma of FORMAS) {
   forma.lectura = lectura;
 
   forma.plano = Viz.plano(caja, {
-    xmin: XMIN, xmax: XMAX, ymin: YMIN, ymax: YMAX, alto: 150,
-    margen: { i: 34, d: 10, a: 10, b: 26 }
+    xmin: XMIN, xmax: XMAX, ymin: YMIN, ymax: YMAX, alto: EMBEBIDO ? 88 : 150,
+    margen: EMBEBIDO ? { i: 28, d: 8, a: 6, b: 20 } : { i: 34, d: 10, a: 10, b: 26 }
   });
 
   forma.plano.alDibujar(() => {
@@ -330,9 +346,15 @@ function actualizar() {
         ? 'Probá con la recta hasta convencerte de que no se puede. Después mirá la sigmoide.'
         : 'Una sola. La forma de la función es una <b>restricción sobre lo que podés afirmar</b>.';
     } else {
-      v = 'Ninguna de las seis la saca, y no es culpa tuya: está medido. ' +
-          'Mirá el techo de cada forma y fijate que el mejor (el seno, 0.213) igual se ve mal. ' +
-          '<b>Guardate esta frustración para la clase que viene.</b>';
+      // Ojo: acá NO se adelanta el resultado. Primero que se cansen probando;
+      // el «ninguna la saca» aparece recién cuando piden el techo medido.
+      v = mostrarTechos
+        ? 'Ninguna de las seis la saca, y no es culpa tuya: está medido. ' +
+          'Fijate que hasta el mejor techo (el seno, 0.213) se ve mal. ' +
+          '<b>Guardate esta frustración para la clase que viene.</b>'
+        : 'Probá con las seis, sin apuro. Cuando ya no puedas bajar más el desajuste ' +
+          'de ninguna, apretá <b>«mostrar el techo de cada forma»</b>: ahí vas a ver ' +
+          'hasta dónde llega cada una, medido.';
     }
     ctl.texto('veredicto', v);
   }

@@ -135,9 +135,15 @@ Words with Subword Units*. ACL.** `[VERIFICAR URL]`
 ## Los datos de hoy
 
 - **Discursos de apertura de sesiones (Argentina, 1854-2019).** Recopilación de
-  **Lucas Ariel**: `https://raw.githubusercontent.com/lucariel/discursos_presidenciales/`
-  **[VERIFICADA · 2026-08-29]**. Los textos son mensajes presidenciales al Congreso de
-  la Nación: documentos públicos. **La recopilación no declara licencia**; se usa acá
+  **Lucas Ariel**. Los archivos que baja el curso viven en
+  `https://raw.githubusercontent.com/lucariel/discursos_presidenciales/master/data/sesiones_ordinarias/`
+  — **ojo: esa ruta es un directorio y `raw.githubusercontent.com` no lista
+  directorios, así que sola devuelve 404. Lo que se verifica es cada archivo**:
+  `.../sesiones_ordinarias/1984-raul_alfonsin.txt` → 200
+  y el README en `.../master/README.md` → 200, las dos **[VERIFICADA · 2026-08-29]**.
+  La portada del repo (`github.com/lucariel/discursos_presidenciales`) no se pudo
+  abrir desde acá: `github.com` en HTML da 403. `[VERIFICAR URL]`.
+  Los textos son mensajes presidenciales al Congreso de la Nación: documentos públicos. **La recopilación no declara licencia**; se usa acá
   con fines educativos y se cita. Las trampas del corpus (los agujeros son los golpes
   de Estado; 2005 y 2006 son el mismo discurso; el largo varía por un factor de 9)
   están documentadas en `datos/README.md` §1.1, y **hay que leerlas antes de sacar

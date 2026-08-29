@@ -1,7 +1,7 @@
 # Figuras de la clase 10
 
-Las cinco figuras que produce `notebook.ipynb` al correrlo entero, guardadas acá para que
-el docente las pueda proyectar sin abrir el notebook.
+Las cinco figuras que dibuja `notebook.ipynb`, guardadas acá para que el docente las pueda
+proyectar sin abrir el notebook.
 
 | archivo | de qué sección del notebook sale |
 |---|---|
@@ -11,6 +11,15 @@ el docente las pueda proyectar sin abrir el notebook.
 | `04-pares-minimos.png` | §8 — qué mueve el puntaje y qué no |
 | `05-sesgo-por-sujeto.png` | §9 — la misma oración, distinto sujeto (en gris, fuera de vocabulario) |
 
-**Se regeneran solas** corriendo el notebook. Si cambiás el notebook, volvé a exportarlas
-y volvé a correr `medir-clase10.py`, porque las slides y las visualizaciones citan estos
-mismos números.
+## Cómo se regeneran
+
+```bash
+python3 clases/10-criterio-validacion-y-etica/exportar-figuras.py    # ~15 s, CPU, sin red
+```
+
+Ese script **no copia el código del notebook: lo corre**. Lee `notebook.ipynb`, ejecuta sus
+celdas en orden y guarda cada figura que aparece. Por eso es imposible que estos PNG digan
+una cosa y el notebook otra — que es exactamente el problema del que habla la clase.
+
+Si cambiás el notebook, corré también `medir-clase10.py`: de ahí salen los números que citan
+las slides y las visualizaciones.

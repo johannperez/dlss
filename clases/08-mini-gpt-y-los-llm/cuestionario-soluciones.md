@@ -131,9 +131,16 @@ equivocada. **Ése es todo el argumento de por qué existe el conjunto de valida
 por qué la clase 4 va antes que ésta.
 
 > **Contexto para el docente.** Estos números salen de entrenar el mismo mini-GPT sobre
-> los primeros 25 KB del corpus (1200 pasos, 224 s). Con el corpus entero, train y val
-> terminan en 0,185 y 0,186: **una diferencia de 0,001**. La comparación entre las dos
-> corridas es lo que hace la pregunta.
+> los primeros 25 KB del corpus (1200 pasos, entre 224 s y 360 s según el día). Con el
+> corpus entero, train y val terminan en 0,185 y 0,186: **una diferencia de 0,001**. La
+> comparación entre las dos corridas es lo que hace la pregunta.
+>
+> **Y una honestidad que conviene tener a mano por si alguien lo reproduce:** con 25 KB
+> el conjunto de validación son 2.500 fichas y la loss medida sobre él tiene un ruido de
+> ±0,1. La **forma** (tijera clarísima) sale siempre; el paso exacto del mínimo se mueve
+> entre el 700 y el 900 según la corrida. Si alguien contesta «700» en vez de «900»,
+> **está bien igual**: lo que la pregunta mide es que sepa mirar dónde la validación deja
+> de bajar, no que acierte un número. Está anotado en `notas-docente.md` §9.
 >
 > **Bandera roja:** si alguien contesta «se rompió el entrenamiento» o «la loss de
 > validación está mal calculada», el concepto de la clase 4 no está. No sigas a la clase 9

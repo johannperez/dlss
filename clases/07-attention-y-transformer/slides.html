@@ -152,14 +152,12 @@
          aria-label="la palabra lo repartiendo su atención entre las demás">
       <!-- arcos -->
       <path d="M 830 168 Q 505 20 180 168" style="fill:none;stroke:var(--c-acento);stroke-width:17;stroke-opacity:.85;stroke-linecap:round"/>
-      <path d="M 830 168 Q 605 60 380 168" style="fill:none;stroke:var(--c-acento);stroke-width:7;stroke-opacity:.7;stroke-linecap:round"/>
+      <path d="M 830 168 Q 605 60 380 168" style="fill:none;stroke:var(--c-acento);stroke-width:9;stroke-opacity:.7;stroke-linecap:round"/>
       <path d="M 830 168 Q 705 95 580 168" style="fill:none;stroke:var(--c-acento);stroke-width:4;stroke-opacity:.55;stroke-linecap:round"/>
-      <path d="M 830 168 Q 780 130 730 168" style="fill:none;stroke:var(--c-acento);stroke-width:2;stroke-opacity:.45;stroke-linecap:round"/>
       <!-- pesos -->
       <text x="505" y="42"  style="fill:var(--c-acento);font-size:20px;font-weight:700" text-anchor="middle">0,60</text>
-      <text x="605" y="80"  style="fill:var(--c-acento);font-size:17px;font-weight:700" text-anchor="middle">0,20</text>
+      <text x="605" y="80"  style="fill:var(--c-acento);font-size:17px;font-weight:700" text-anchor="middle">0,30</text>
       <text x="712" y="100" style="fill:var(--c-acento);font-size:15px;font-weight:700" text-anchor="middle">0,10</text>
-      <text x="806" y="118" style="fill:var(--c-acento);font-size:14px;font-weight:700" text-anchor="middle">0,05</text>
       <!-- cajitas -->
       <g style="font-size:19px">
         <rect x="110" y="172" width="140" height="42" rx="8" style="fill:var(--papel-2);stroke:var(--borde)"/>
@@ -174,20 +172,22 @@
         <text x="830" y="199" text-anchor="middle" style="fill:var(--papel);font-weight:700">lo</text>
       </g>
       <text x="500" y="238" text-anchor="middle" style="fill:var(--tinta-3);font-size:15px">
-        0,60 + 0,20 + 0,10 + 0,05 + 0,05 (lo que se queda para sí) = 1,00
+        0,60 + 0,30 + 0,10 = 1,00 · a «recinto» y a sí misma, esta vez, no les tocó nada
       </text>
     </svg>
   </div>
   <div class="intuicion compacta">
-    <strong>Reparte, no inventa.</strong> Los cinco números suman 1. Si le da más a una,
-    le da menos a otra. Y todavía no escribimos ninguna fórmula.
+    <strong>Reparte, no inventa.</strong> Los números suman 1. Si le da más a una,
+    le da menos a otra — y a algunas no les da nada. Y todavía no escribimos
+    ninguna fórmula.
   </div>
   <aside class="notes">
     Decilo así: «cada palabra reparte 100 puntos de atención entre todas las demás.
     <b>Reparte</b>, no inventa: si le da más a una, le da menos a otra.» Preguntá:
     «¿de dónde salen esos números?» y contestá: «en un rato. Todavía no.» (2 min)
-    Los números de esta slide son redondos a propósito, para el pizarrón. Los reales
-    los van a ver en la viz de la slide 9.
+    Los números de esta slide son redondos a propósito, para el pizarrón, y son los
+    mismos tres pesos que van a escribir en la primera celda del notebook (0,60 · 0,30
+    · 0,10). Los reales los van a ver en la viz de la slide 9.
   </aside>
 </section>
 
@@ -204,8 +204,8 @@
       <h4>Después</h4>
       <p>El vector de <code>lo</code> pasa a ser
          <span class="peso-mini">0,60</span> del vector de «proyecto» +
-         <span class="peso-mini">0,20</span> del de «comisión» +
-         <span class="peso-mini">0,10</span> del de «ministro» + …</p>
+         <span class="peso-mini">0,30</span> del de «comisión» +
+         <span class="peso-mini">0,10</span> del de «ministro».</p>
     </div>
   </div>
   <div class="intuicion">
@@ -247,18 +247,33 @@
 
 <!-- ===================== 9. VIZ: attention como mesa ===================== -->
 <section>
-  <span class="marca">viz</span>
+  <span class="marca">viz · callback dibujo</span>
   <h3>Hacé clic en una palabra</h3>
-  <div class="viz-frame" data-alto="medio">
+  <div class="viz-frame" data-alto="medio" style="height:470px">
     <iframe src="viz/attention-como-mesa.html" title="cada palabra arma su propio resumen" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> hacé clic en «lo» y después en «si». Son mapas
     completamente distintos. <b>Cada palabra tiene el suyo.</b> Y los pesos no son
-    inventados: salen de un transformer entrenado sobre discursos de apertura reales.</p>
+    inventados: salen de un transformer entrenado sobre discursos de apertura reales.<br>
+    <b>Y seguimos dibujando:</b> en la clase 1 la máquina dibujaba una curva sobre unos
+    puntos; en la 6, el mapa donde viven las palabras; hoy <b>cada palabra dibuja su propio
+    mapa de a quién mira</b> — y ese mapa también tiene perillas.</p>
   <aside class="notes">
+    <b>Éste es el [CALLBACK DIBUJO] de la clase: decilo con todas las letras</b>, señalando
+    la pantalla mientras un mapa está abierto. Es la frase que cose la clase 7 al resto del
+    curso.<br>
     Movelo vos primero, despacio, dos o tres palabras. Después dejá que lo toquen 2
     minutos. Pregunta al aula: «¿alguien encontró una palabra que mire a algo raro?».
-    Siempre aparece una, y es oro: sirve para la slide 32. (6 min con la exploración)
+    Siempre aparece una, y es oro: sirve para la slide 34. (6 min con la exploración)
+    <br><b>El recorrido que conviene, en tres pasos</b> (está escrito entero en el pie de
+    la viz suelta, que la slide no muestra):
+    <b>(1)</b> así como abre: «lo» → «algo», dos palabras atrás, y le da el 100%.
+    <b>(2)</b> cambiá a la oración de la <b>enumeración</b> Y a la cabeza
+    <b>«bloque 2 · cabeza 1»</b>, hacé clic en la <b>«y»</b>: reparte 28% educación,
+    23% salud, 39% seguridad. Ése es el promedio ponderado en vivo. Ojo: si te quedás en
+    la cabeza 2, la «y» mira los artículos y no se ve nada.
+    <b>(3)</b> pasá a cualquier cabeza del <b>bloque 1</b>: los arcos desaparecen, se
+    miran a sí mismas. No está roto, es lo que aprendió.
   </aside>
 </section>
 
@@ -402,9 +417,9 @@
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/qkv.html" title="query, key y value con flechas" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> con «lo» preguntando, girá <b>el aviso</b> hasta +60°.
-    La oración no cambió y sin embargo «lo» dejó de mirar a «algo» y se puso a mirar a la
-    coma. <b>La atención no está en el texto: se aprende.</b></p>
+  <p class="viz-pie"><b>Qué mirar:</b> con «lo» preguntando, girá <b>el aviso</b> hasta +60°:
+    «lo» deja de mirar a «algo» y se pone a mirar la coma. <b>La atención no está en el
+    texto, se aprende.</b></p>
   <aside class="notes">
     Movelo vos. Es la slide donde se entiende que Q y K son parámetros. Frase:
     «entrenar un transformer es, en buena medida, ajustar estas dos perillas hasta que
@@ -574,7 +589,7 @@
 <section>
   <span class="marca">viz</span>
   <h3>La matriz, y las dos sumas que hay que mirar</h3>
-  <div class="viz-frame" data-alto="medio">
+  <div class="viz-frame" data-alto="medio" style="height:530px">
     <iframe src="viz/matriz-de-atencion.html" title="la matriz de atención" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> la columna verde dice 1,00 en todas las filas; la
@@ -617,15 +632,13 @@
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/cabezas.html" title="cuatro cabezas de atención" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> leé los rótulos. <b>A ninguna de las cuatro se la
-    puede resumir en una regla simple</b>, y eso no lo decidimos nosotros: se calcula
-    midiendo. Después apretá «bloque 1» y mirá cómo las cuatro se vuelven la misma
-    diagonal. En un modelo real, la mayoría de las cabezas no se entienden — y funciona
-    igual.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> los rótulos se calculan midiendo, no los
+    escribimos nosotros — y a ninguna de las cuatro se la puede resumir en una regla
+    simple. Apretá «bloque 1»: las cuatro se vuelven la misma diagonal.</p>
   <aside class="notes">
-    Frase clave, decila textual: «una de estas cuatro no se entiende. En un modelo de
-    verdad, la mayoría no se entiende. Y sin embargo funciona.» Es la vacuna contra los
-    papers que le ponen nombre lingüístico a cada cabeza. (4 min)
+    Frase clave, decila textual: «ninguna de estas cuatro se deja explicar en una
+    frase. En un modelo de verdad, la mayoría no se entiende. Y sin embargo funciona.»
+    Es la vacuna contra los papers que le ponen nombre lingüístico a cada cabeza. (4 min)
   </aside>
 </section>
 
@@ -643,15 +656,19 @@
     </div>
   </div>
   <div class="ojo">
-    <strong>Para attention pura, esas dos oraciones son la misma entrada.</strong> No hay
-    ningún lugar en la cuenta donde entre el orden: cada palabra mira a todas, y a todas
-    les hace la misma cuenta. Acabamos de volver a la <b>bolsa de palabras de la clase 6</b>,
-    pero carísima.
+    <strong>Attention sola no ve el orden.</strong> No hay ningún lugar de la cuenta
+    donde entre: cada palabra mira a todas, y a todas les hace la misma cuenta.
+    <b>Barajá las palabras y sale exactamente lo mismo</b>, sólo que reordenado — lo
+    comprobás en el notebook, en una línea. Con este par pasa además lo de la clase 6:
+    lo único que las distingue son los artículos, y sin palabras vacías son la misma
+    bolsa. Volvimos a la <b>bolsa de palabras</b>, pero carísima.
   </div>
   <aside class="notes">
-    Es el callback más importante de la clase. Es la misma oración con la que abrió la
-    clase 6. Preguntá: «¿se acuerdan de esta oración?». Alguien se va a acordar y se le
-    va a caer la ficha solo. (2 min)
+    Es el callback más importante de la clase: son las dos oraciones con las que abrió
+    la clase 6. Preguntá «¿se acuerdan de estas dos?». Alguien se va a acordar y se le
+    va a caer la ficha solo. Si alguien salta con «pero cambia <i>al</i> por <i>a la</i>»,
+    celebralo: es exactamente la aclaración que hicimos en la clase 6, y la demostración
+    limpia es la del notebook, que baraja la MISMA oración. (2 min)
   </aside>
 </section>
 
@@ -847,9 +864,17 @@ self.mlp = nn.Sequential(
     </svg>
   </div>
   <div class="tarjetas">
-    <div><h4>el de hoy</h4>2 bloques, 4 cabezas, ~0,5 M de perillas</div>
+    <div><h4>el de hoy</h4>6 bloques, 4 cabezas, ~1,25 M de perillas. Armado y apagado:
+      lo entrenamos la clase que viene.</div>
     <div><h4>GPT-2 chico</h4>12 bloques, 12 cabezas, 124 M</div>
     <div><h4>los grandes</h4>más de 100 bloques. Misma idea, más plata.</div>
+  </div>
+  <div class="ojo compacta">
+    <strong>Lo que sí se paga: el cuadrado.</strong> La matriz de atención es cuadrada.
+    10 palabras, 100 celdas; 1.000 palabras, un millón; 100.000, diez mil millones. Por
+    eso la <b>ventana de contexto</b> es finita y «más contexto» cuesta plata de verdad.
+    Attention arregló el olvido de la RNN <b>y trajo un problema nuevo</b>, que es de
+    costo. Lo cobramos en la clase 8.
   </div>
   <aside class="notes">
     Frase: «no hay una idea nueva por piso. Es el mismo piso repetido, con más plata».
@@ -861,12 +886,11 @@ self.mlp = nn.Sequential(
 <section>
   <span class="marca">prometido en la clase 5, cumplido</span>
   <h3>Se llenaron las dos filas grises</h3>
-  <div class="viz-frame" data-alto="grande">
+  <div class="viz-frame" data-alto="grande" style="height:611px">
     <iframe src="viz/supuestos-de-arquitectura.html" title="qué supone cada arquitectura" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> es la misma tabla de la clase 5, con las filas de
-    RNN y de Transformer <b>abiertas</b>. Elegí «una tabla de encuesta»: el transformer
-    tampoco se pone verde. <b>Casi no supone nada, y eso se paga en datos.</b></p>
+  <p class="viz-pie"><b>Qué mirar:</b> elegí «una tabla de encuesta»: el transformer
+    tampoco se pone verde. Casi no supone nada, y <b>eso se paga en datos</b>.</p>
   <aside class="notes">
     Gesto de continuidad: «esta la abrimos en la clase 5 y quedaron dos filas grises.
     Hoy se llenaron». Si vas justo de tiempo, esta slide se muestra 30 segundos y se
@@ -915,13 +939,13 @@ self.mlp = nn.Sequential(
         determina la salida, no puede explicarla.</p>
     </div>
   </div>
-  <div class="ss">
+  <div class="ss compacta">
     Ustedes ya tienen el vocabulario para esto: <strong>que el modelo haya mirado una
-    palabra no prueba que esa palabra haya causado la salida</strong>. Es correlación y
-    causalidad, otra vez, en un envase nuevo. Hay literatura entera: Jain &amp; Wallace
-    (2019), <em>Attention is not Explanation</em> — y su réplica, Wiegreffe &amp; Pinter
-    (2019), <em>Attention is not not Explanation</em>. El debate está abierto, y que esté
-    abierto también es un dato sobre cómo funciona el campo.
+    palabra no prueba que esa palabra haya causado la salida</strong>. Correlación y
+    causalidad, otra vez, en envase nuevo. Hay literatura entera: Jain &amp; Wallace
+    (2019), <em>Attention is not Explanation</em>, y su réplica, Wiegreffe &amp; Pinter
+    (2019), <em>Attention is not not Explanation</em>. Que el debate siga abierto también
+    es un dato sobre el campo.
   </div>
   <aside class="notes">
     Es la slide más importante de la clase para esta audiencia. No la apures.

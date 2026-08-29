@@ -48,8 +48,8 @@ el modelo; el pulso lo pone el gradiente.»*
 | 0:40 | 11-13 | Idea 2a | Reformular el problema · **el salto conceptual** · el mapa de altura. |
 | 0:48 | 14-15 | **Viz 2** + apuesta | `valle-de-loss.html` en modo arrastrar. Se vota antes de mover. |
 | 0:54 | 16-18 | Idea 2b | Fuerza bruta, la tabla que la mata, la niebla. |
-| 0:60 | 19 | **Viz 3** | `loss-1d.html`. **Acá se dice «derivada» por primera vez.** |
-| **0:60** | 20 | **PAUSA** | **10 minutos. No se toca.** |
+| 0:57 | 19 | **Viz 3** | `loss-1d.html`. **Acá se dice «derivada» por primera vez.** |
+| **1:00** | 20 | **PAUSA** | **10 minutos. No se toca.** |
 | 1:10 | 21 | El gradiente | La flecha y el signo menos, en el pizarrón, con un número. |
 | 1:13 | 22-23 | **Viz 2 y 4** | Soltá la pelota · las tres tasas de aprendizaje en paralelo. |
 | 1:25 | 24 | Las tres firmas | La slide de la que hay que sacar foto. |
@@ -60,7 +60,7 @@ el modelo; el pulso lo pone el gradiente.»*
 
 Suma: 120 minutos exactos, con la pausa adentro.
 
-**Ojo con el minuto 60.** La viz `loss-1d` está *justo antes* de la pausa a propósito: es la
+**Ojo con el minuto 57.** La viz `loss-1d` está *justo antes* de la pausa a propósito: es la
 que hace que nadie necesite haber estudiado cálculo, y conviene que la digieran con un café
 en la mano. Si vas dos minutos tarde, entrá igual a la pausa: la recuperás en el bloque 21-24.
 
@@ -195,8 +195,9 @@ backpropagation: *«por eso las bibliotecas de verdad no usan restas».*
 
 Lo que se recorta, **en este orden**:
 
-1. **Slide 29 (optimizadores).** Un renglón: «van a ver `Adam` en todos lados; es la pelota
-   con inercia y con paso que se autorregula». Y seguís.
+1. **Slide 30 (optimizadores, «los nombres que vas a ver»).** Un renglón: «van a ver `Adam`
+   en todos lados; es la pelota con inercia y con paso que se autorregula». Y seguís.
+   **Ojo: la 30 se recorta, la 29 no.** La 29 es la honestidad y está en la lista de abajo.
 2. **Slide 27 (censo o muestra).** Se puede decir en veinte segundos sin la figura:
    «calcular con todos los datos es un censo, con unos pocos es una muestra». Vuelve en la clase 4.
 3. **Slide 16 (la grilla de fuerza bruta).** Se salta y se va directo a la tabla de la 17,
@@ -222,6 +223,11 @@ Lo que **NUNCA** se recorta, pase lo que pase:
 - **El barrido de MAE en vivo.** En `comparador-de-losses.html`, arrastrá el punto de 2002
   (el que vale cero) hasta arriba de todo, despacio, y narrá cómo la azul lo sigue y la
   naranja no. Cinco minutos y no cansa.
+  **Y de paso, un regalo:** ese cero de 2002 *no* quiere decir que en 2002 no se habló de
+  inseguridad. Quiere decir que en ese discurso, con nuestro léxico de 23 palabras, no
+  apareció ninguna (está en `datos/README.md`). Un cero exacto en una serie de proporciones
+  casi siempre es un problema de instrumento, no un hallazgo — y acá es, además, el caso
+  extremo que más le tironea la recta al MSE. Dos ideas de la clase 10 en treinta segundos.
 - **El quiz de firmas** de `tasa-de-aprendizaje.html`, de a dos, con las tres curvas sin
   etiquetar. Convierte la viz en evaluación formativa y sale muy bien.
 - **La última celda del notebook** (el año centrado contra el año crudo). Proyectala: la

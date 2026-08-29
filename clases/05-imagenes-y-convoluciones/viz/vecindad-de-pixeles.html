@@ -132,6 +132,11 @@ const PERM = DATOS_EXP.permutacion;          // la permutación exacta que se us
 const IMGS = DATOS_EXP.muestras;
 const N = 28;
 
+/* Coma decimal: en las slides los mismos numeros se escriben «85,6 %» y esta
+   viz va embebida al lado de ese texto. Viz.num devuelve punto, asi que lo
+   traducimos aca, local, sin tocar la biblioteca compartida. */
+const pc = (v, d) => Viz.num(v, d === undefined ? 1 : d).replace('.', ',');
+
 const estado = {
   modo: 'barajar',      // 'barajar' | 'correr'
   imagen: 0,
@@ -241,7 +246,7 @@ function refrescarTiras() {
    --------------------------------------------------------------------------- */
 function barra(etq, valor, colorTok, nota) {
   return '<div class="b-fila">' +
-    '<div class="b-cabeza"><span>' + etq + '</span><b>' + Viz.num(valor,1) + ' %</b></div>' +
+    '<div class="b-cabeza"><span>' + etq + '</span><b>' + pc(valor) + ' %</b></div>' +
     '<div class="b-riel"><i class="b-relleno" style="display:block;width:' +
       (valor) + '%;background:' + Viz.color(colorTok) + '"></i></div>' +
     (nota ? '<p class="b-nota">' + nota + '</p>' : '') + '</div>';
@@ -255,15 +260,15 @@ function refrescarBarras() {
     caja.innerHTML =
       barra('red densa · foto normal', R.densa_normal.exactitud, 'datos') +
       (mezclado ? barra('red densa · píxeles barajados', R.densa_barajada.exactitud, 'datos',
-            'pierde ' + Viz.num(R.densa_normal.exactitud - R.densa_barajada.exactitud, 1) + ' puntos') : '') +
+            'pierde ' + pc(R.densa_normal.exactitud - R.densa_barajada.exactitud) + ' puntos') : '') +
       barra('CNN · foto normal', R.cnn_normal.exactitud, 'modelo') +
       (mezclado ? barra('CNN · píxeles barajados', R.cnn_barajada.exactitud, 'modelo',
-            'pierde ' + Viz.num(R.cnn_normal.exactitud - R.cnn_barajada.exactitud, 1) + ' puntos') : '');
+            'pierde ' + pc(R.cnn_normal.exactitud - R.cnn_barajada.exactitud) + ' puntos') : '');
     ver.innerHTML = mezclado
       ? '<div class="aha compacta" style="margin:0">La densa quedó igual (<b>' +
-        Viz.num(R.densa_normal.exactitud - R.densa_barajada.exactitud, 1) +
+        pc(R.densa_normal.exactitud - R.densa_barajada.exactitud) +
         '</b> puntos de diferencia). La CNN perdió <b>' +
-        Viz.num(R.cnn_normal.exactitud - R.cnn_barajada.exactitud, 1) +
+        pc(R.cnn_normal.exactitud - R.cnn_barajada.exactitud) +
         '</b>. Esa diferencia es <em>todo</em> lo que la CNN estaba sacando de la grilla.</div>'
       : '<div class="ojo compacta" style="margin:0">Apostá primero: si barajo los píxeles de <b>todas</b> las imágenes con la misma permutación y vuelvo a entrenar, ¿a quién le va a ir peor?</div>';
   } else {
@@ -273,14 +278,14 @@ function refrescarBarras() {
     caja.innerHTML =
       barra('red densa · sin correr', CORR.densa[0], 'datos') +
       barra('red densa · corrida ' + d + ' px', vd, 'datos',
-            d ? 'pierde ' + Viz.num(CORR.densa[0] - vd, 1) + ' puntos' : 'es la foto original') +
+            d ? 'pierde ' + pc(CORR.densa[0] - vd) + ' puntos' : 'es la foto original') +
       barra('CNN · sin correr', CORR.cnn[0], 'modelo') +
       barra('CNN · corrida ' + d + ' px', vc, 'modelo',
-            d ? 'pierde ' + Viz.num(CORR.cnn[0] - vc, 1) + ' puntos' : 'es la foto original');
+            d ? 'pierde ' + pc(CORR.cnn[0] - vc) + ' puntos' : 'es la foto original');
     ver.innerHTML = d === 0
       ? '<div class="ojo compacta" style="margin:0">Movés el slider y corrés la foto. Los dos modelos ya están entrenados: <b>no se vuelve a entrenar nada</b>, es la misma foto un poco más a la derecha.</div>'
       : '<div class="aha compacta" style="margin:0">Con <b>' + d + ' píxeles</b> de corrimiento la densa cae a <b>' +
-        Viz.num(vd,1) + ' %</b> y la CNN se queda en <b>' + Viz.num(vc,1) +
+        pc(vd) + ' %</b> y la CNN se queda en <b>' + pc(vc) +
         ' %</b>. Para vos es la misma foto; para la densa cambiaron todas las variables.</div>';
   }
 }

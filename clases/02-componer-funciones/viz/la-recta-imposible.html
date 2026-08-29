@@ -11,7 +11,7 @@
 
      Ésta es la viz del gancho. El aula grita valores, el docente los pone, y el
      desajuste no baja de un piso. Después viene el segundo golpe: agregarle
-     perillas a la recta no sirve para nada, porque todas se colapsan a dos
+     perillas a la recta no compra NADA de flexibilidad: todas se colapsan a dos
      números.
 
      NÚMEROS MEDIDOS sobre la serie real (media móvil de 3 años de las menciones
@@ -81,10 +81,12 @@
       da <b>0.00152</b>. O sea que <em>la mejor recta posible casi no mejora
       sobre no hacer nada</em>: explica el 1,3 % de la variación.
       Y ahora el golpe de verdad: pasá a <b>3</b> y a <b>5 perillas</b>. Movelas
-      todas. El desajuste no baja ni un poquito, porque las cinco se colapsan
-      siempre a los mismos dos números. <b>Más parámetros no es más
-      flexibilidad.</b> Acordate de esto cuando alguien te venda un modelo por su
-      tamaño.
+      todas. La recta se mueve —claro que se mueve—, pero <em>sigue siendo una
+      recta</em>: mirá el renglón del panel, las cinco se vuelven a colapsar a
+      <b>dos</b> números. Y por eso <b>el desajuste nunca baja del mismo piso de
+      0.00150</b>, tengas dos perillas o tengas cinco.
+      <b>Más parámetros no es más flexibilidad.</b> Acordate de esto cuando
+      alguien te venda un modelo por su tamaño.
     </div>
     <p class="viz-pie">
       Datos <b>reales</b>: porcentaje de palabras del discurso de apertura de
@@ -228,7 +230,8 @@ function actualizar() {
     Viz.num(c.pend, 5) + '·(año−1984) ' + (c.orden < 0 ? '− ' : '+ ') +
     Viz.num(Math.abs(c.orden), 3) + '</b></div>' +
     (n > 2 ? '<div style="font-size:.8rem;line-height:1.4">Las <b>' + n +
-      '</b> se colapsan a <b>dos</b> números, siempre. Movelas todas: la forma no cambia.</div>' : ''));
+      '</b> se colapsan a <b>dos</b> números, siempre. Movelas todas: la recta se ' +
+      'mueve, pero nunca deja de ser una recta y nunca baja del piso.</div>' : ''));
 
   let msg = EMBEBIDO
     ? 'Piso de cualquier recta: <b>' + MEJOR_RECTA.toFixed(5) + '</b>. ' +
@@ -244,8 +247,11 @@ function actualizar() {
   p.redibujar();
 }
 
-actualizar();
+// `Viz.botonTema()` aplica el tema guardado y ya recarga la paleta solo
+// (arreglado en `_shared/js/viz.js`). El redibujo de acá es por las dudas.
 Viz.botonTema();
+Viz.recargarColores();
+actualizar();
 </script>
 </body>
 </html>

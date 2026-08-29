@@ -134,6 +134,12 @@ Las cifras de la slide 2 (**modelo A: 99 % / 61 %; modelo B: 84 % / 82 %**) son 
 construido**, no una corrida guardada. Están elegidas con los órdenes de magnitud que aparecen
 de verdad cuando se entrena un clasificador de titulares sobre el corpus (11) dejando la fuente
 adentro y después se evalúa con una partición honesta. **Decilo en el aula si alguien pregunta.**
+Hay un segundo número construido, y es chiquito: la línea **«a ojo, con dos sliders (clase 1)»**
+de la slide 18 (MSE **0.0195**) no es una corrida guardada de la clase 1 sino una recta plausible
+de las que salían ahí, fijada a mano en `medir-figuras.py` (`a = 0.02`, `b = 0.22`). El MSE **sí**
+está medido sobre los datos reales; lo elegido a dedo son los dos parámetros. Está para dar escala,
+no para citarse.
+
 Los números del resto de la clase —el reencuentro, las tres capacidades, el calco, la tijera y
 la comparación de particiones— **sí** salen de una corrida real y reproducible: los genera
 `medir-figuras.py` con la semilla 1983, y son los mismos que produce `notebook.ipynb`.

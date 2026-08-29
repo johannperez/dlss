@@ -105,6 +105,9 @@ BERT-Networks*. EMNLP.** Preprint arXiv:1908.10084 `[VERIFICAR URL]` ·
 biblioteca: `https://raw.githubusercontent.com/UKPLab/sentence-transformers/master/README.md`
 `[VERIFICADA 2026-08-29]` · paquete: `https://pypi.org/project/sentence-transformers/`
 `[VERIFICADA 2026-08-29]`
+> Identificador del modelo multilingüe que usa el camino A del notebook, verificado
+> contra `docs/sentence_transformer/pretrained_models.md` de ese mismo repositorio
+> `[VERIFICADA 2026-08-29]`: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`.
 > El paper que explica **por qué** promediar las salidas de BERT no es una buena manera de
 > representar una oración, y qué hay que hacer en cambio. Es directamente relevante para
 > lo que hicimos hoy: nuestro camino B promedia vectores de palabra, y esto te dice
@@ -158,7 +161,7 @@ sobre todo:
 # las curvas de las viz y los números de las slides
 PYTHONPATH=_shared python3 clases/09-modelos-preentrenados/medir-clase09.py
 
-# el notebook entero, sin red, en CPU (~45 s)
+# el notebook entero, sin red, en CPU (medido: ~20 s con la máquina libre, hasta 2 min si está cargada)
 python3 -m nbconvert --to notebook --execute \
         --output /tmp/nb-09.ipynb clases/09-modelos-preentrenados/notebook.ipynb
 ```

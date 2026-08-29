@@ -6,8 +6,9 @@
 <title>¿Cuántas etiquetas hacen falta? — Clase 9</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA (tarea "política"): "con menos de 400 etiquetas, la estrategia
-     MÁS SOFISTICADA es la PEOR. Aprender el vocabulario desde cero necesita
+     MOMENTO AHA (tarea "política"): "hasta las ~680 etiquetas, la estrategia
+     MÁS SOFISTICADA es la PEOR (el cruce medido está entre 400 y 800, en 681
+     interpolando en log). Aprender el vocabulario desde cero necesita
      muchos ejemplos; usar vectores que ya venían hechos, no. Es la clase 4 otra
      vez: capacidad contra datos."
 
@@ -195,12 +196,15 @@ p.alDibujar(() => {
     }
   }
 
+  // dónde estoy parado (se calcula acá arriba porque el rótulo del diccionario
+  // se va al lado contrario para no encimarse con el de la línea vertical)
+  const X = estado.n >= 25 ? L(estado.n) : XMIN + 0.012;
+  const marcaEnDerecha = X > (XMIN + XMAX) / 2;
+
   // el diccionario: no mejora con más etiquetas, así que es una recta
   const fd = T.diccionario.f1;
   p.linea([{ x: XMIN, y: fd }, { x: XMAX, y: fd }],
           { color: 'datos', grosor: 2.5, punteada: [7, 5] });
-  p.texto(XMAX, fd, 'cero etiquetas: ' + Viz.num(fd, 2),
-          { color: 'datos', tam: 11, peso: '700', alinear: 'right', dy: -12, caja: true });
 
   // las dos curvas medidas
   for (const clave of ['embeddings', 'tfidf']) {
@@ -209,13 +213,21 @@ p.alDibujar(() => {
     p.puntos(pts, { color: ESTRATEGIAS[clave].color, r: 4 });
   }
 
-  // dónde estoy parado
-  const X = estado.n >= 25 ? L(estado.n) : XMIN + 0.012;
+  // el rótulo del diccionario va DESPUÉS de las curvas (si no, la curva se le
+  // dibuja encima) y del lado contrario a la línea vertical. A la izquierda va
+  // por debajo de la recta, que es donde no hay nada.
+  p.texto(marcaEnDerecha ? XMIN : XMAX, fd, 'cero etiquetas: ' + Viz.num(fd, 2),
+          { color: 'datos', tam: 11, peso: '700',
+            alinear: marcaEnDerecha ? 'left' : 'right',
+            dx: marcaEnDerecha ? 6 : -2,
+            dy: marcaEnDerecha ? 14 : -12, caja: true });
+
+  // la línea vertical del presupuesto elegido
   p.segmento(X, 0, X, 1, { color: 'acento', grosor: 2.5, punteada: [4, 4] });
   p.texto(X, 0.965, estado.n === 0 ? 'sin etiquetas' : estado.n + ' etiquetas',
-          { color: 'acento', tam: 11.5, peso: '700', dx: 7, caja: true,
-            alinear: X > (XMIN + XMAX) / 2 ? 'right' : 'left',
-            dx: X > (XMIN + XMAX) / 2 ? -7 : 7 });
+          { color: 'acento', tam: 11.5, peso: '700', caja: true,
+            alinear: marcaEnDerecha ? 'right' : 'left',
+            dx: marcaEnDerecha ? -7 : 7 });
 
   // marcar el ganador en ese punto
   const g = ganador();
@@ -270,8 +282,10 @@ function pintarRecomendacion() {
         '</b> de codificación (más un <b>20 %</b> doblemente codificado para poder ' +
         'reportar el acuerdo: ' + Math.round(horas(estado.n * 0.2) * 60) + ' minutos más). ') +
     (estado.n > 0
-      ? 'Le saca <b>' + Viz.num(Math.abs(ventaja), 2) + '</b> de F1 a ' +
-        ESTRATEGIAS[segundo].nombre + '. ' + E.cuidado
+      ? 'Le saca <b>' + Viz.num(Math.abs(ventaja), 2) + '</b> de F1 a' +
+        (/^el /.test(ESTRATEGIAS[segundo].nombre)
+          ? 'l' + ESTRATEGIAS[segundo].nombre.slice(2)   // "a el diccionario" -> "al diccionario"
+          : ' ' + ESTRATEGIAS[segundo].nombre) + '. ' + E.cuidado
       : '');
 
   let html = '';

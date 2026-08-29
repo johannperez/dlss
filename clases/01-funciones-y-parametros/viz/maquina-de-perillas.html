@@ -23,6 +23,16 @@
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* Modo embebido: el <iframe> de la slide mide 1280x610 y la pagina entera
+     tiene que entrar ahi sin cortarse. Suelta se ve igual que siempre. */
+  body.embebido .lectura   { font-size: .78rem; padding: .45rem .6rem; line-height: 1.35; }
+  body.embebido .panel     { font-size: .84em; }
+  body.embebido .panel > h2 { margin-bottom: .4rem; }
+  body.embebido .panel .ctrl { margin-bottom: .45rem; }
+  body.embebido #maquina   { margin-bottom: .4rem !important; padding: 2px !important; }
+  body.embebido .viz-pagina { padding: .35rem; }
+</style>
 </head>
 <body class="curso">
 
@@ -114,11 +124,14 @@ function peorCaso() {
 /* ===========================================================================
    3. EL PLANO
    =========================================================================== */
+// viz.js ya le puso la clase `embebido` al <body> si estamos adentro de un iframe.
+const EMBEBIDO = document.body.classList.contains('embebido');
+
 const p = Viz.plano('#lienzo', {
   xmin: 1982.5, xmax: 2021, ymin: -0.06, ymax: 0.50,
   ejeX: 'año', ejeY: '% de palabras del discurso',
   titulo: 'menciones a «seguridad» en el discurso de apertura',
-  alto: 400
+  alto: EMBEBIDO ? 288 : 400
 });
 
 p.alDibujar(() => {
@@ -161,7 +174,14 @@ p.tooltip(w => {
 /* ===========================================================================
    4. EL DIBUJO DE LA MÁQUINA (SVG): las perillas giran de verdad
    =========================================================================== */
-const svgMaquina = Viz.svg.crear('#maquina', { ancho: 280, alto: 200 });
+// Embebida en la slide sólo hay 610 px de alto: la columna de la derecha (la
+// máquina + el panel) no entra. Mudamos el dibujo de la máquina a la columna
+// izquierda, debajo de la fórmula, donde sí hay lugar para que se lea.
+if (EMBEBIDO) {
+  document.getElementById('formula').parentNode.appendChild(document.getElementById('maquina'));
+}
+const SVG_W = EMBEBIDO ? 340 : 280, SVG_H = EMBEBIDO ? 150 : 200;
+const svgMaquina = Viz.svg.crear('#maquina', { ancho: SVG_W, alto: SVG_H });
 
 function perilla(cx, cy, t, rotulo, valor) {
   const R = 24;
@@ -189,34 +209,43 @@ function dibujarMaquina() {
   Viz.svg.limpiar(svgMaquina);
   const S = Viz.svg, c = Viz.colores();
 
+  const CY = 30;                    // centro de las perillas
+  const TOP = CY + 24 + 42;         // arriba de la caja: bien debajo del valor
+  const ALTO = SVG_H - TOP - 14;
+  const MED = TOP + ALTO / 2;                  // la linea de las flechas
+
+  const CXB = SVG_W / 2, BW = 140;
   // la caja
-  S.el('rect', { x: 70, y: 78, width: 140, height: 74, rx: 12,
+  S.el('rect', { x: CXB - BW / 2, y: TOP, width: BW, height: ALTO, rx: 12,
                  fill: c.papel2, stroke: c.borde, 'stroke-width': 2 }, svgMaquina);
-  S.el('text', { x: 140, y: 120, 'text-anchor': 'middle', fill: c.tinta2,
+  S.el('text', { x: CXB, y: MED + 5, 'text-anchor': 'middle', fill: c.tinta2,
                  'font-size': 13, 'font-weight': 700, 'font-family': c.fuente,
                  texto: 'la máquina' }, svgMaquina);
 
   // flecha de entrada
-  S.el('line', { x1: 8, y1: 115, x2: 62, y2: 115, stroke: Viz.color('datos'),
+  S.el('line', { x1: 8, y1: MED, x2: CXB - BW / 2 - 8, y2: MED, stroke: Viz.color('datos'),
                  'stroke-width': 2.5 }, svgMaquina);
-  S.el('path', { d: 'M 62 115 l -9 -5 l 0 10 z', fill: Viz.color('datos') }, svgMaquina);
-  S.el('text', { x: 8, y: 104, fill: Viz.color('datos'), 'font-size': 11,
+  S.el('path', { d: 'M ' + (CXB - BW / 2 - 8) + ' ' + MED + ' l -9 -5 l 0 10 z',
+                 fill: Viz.color('datos') }, svgMaquina);
+  S.el('text', { x: 8, y: MED - 11, fill: Viz.color('datos'), 'font-size': 11,
                  'font-weight': 700, 'font-family': c.fuente, texto: 'entra: el año' }, svgMaquina);
 
   // flecha de salida
-  S.el('line', { x1: 210, y1: 115, x2: 264, y2: 115, stroke: Viz.color('modelo'),
+  S.el('line', { x1: CXB + BW / 2, y1: MED, x2: SVG_W - 16, y2: MED, stroke: Viz.color('modelo'),
                  'stroke-width': 2.5 }, svgMaquina);
-  S.el('path', { d: 'M 272 115 l -10 -5 l 0 10 z', fill: Viz.color('modelo') }, svgMaquina);
-  S.el('text', { x: 272, y: 104, 'text-anchor': 'end', fill: Viz.color('modelo'),
+  S.el('path', { d: 'M ' + (SVG_W - 8) + ' ' + MED + ' l -10 -5 l 0 10 z',
+                 fill: Viz.color('modelo') }, svgMaquina);
+  S.el('text', { x: SVG_W - 8, y: MED - 11, 'text-anchor': 'end', fill: Viz.color('modelo'),
                  'font-size': 11, 'font-weight': 700, 'font-family': c.fuente,
                  texto: 'sale: el %' }, svgMaquina);
 
   // los dos tallos de las perillas
-  S.el('line', { x1: 105, y1: 78, x2: 105, y2: 58, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
-  S.el('line', { x1: 175, y1: 78, x2: 175, y2: 58, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
+  const PX1 = CXB - 35, PX2 = CXB + 35;
+  S.el('line', { x1: PX1, y1: TOP, x2: PX1, y2: CY + 22, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
+  S.el('line', { x1: PX2, y1: TOP, x2: PX2, y2: CY + 22, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
 
-  perilla(105, 34, (a + 0.02) / 0.04, 'empinada', Viz.num(a, 4));
-  perilla(175, 34, b / 0.40,          'arranca',  Viz.num(b, 3));
+  perilla(PX1, CY, (a + 0.02) / 0.04, 'empinada', Viz.num(a, 4));
+  perilla(PX2, CY, b / 0.40,          'arranca',  Viz.num(b, 3));
 }
 window.addEventListener('viz:tema', dibujarMaquina);
 
@@ -240,7 +269,7 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'boton', texto: 'La mejor recta posible', principal: true, alClic: () => {
       ctl.set('a', MEJOR_A, true); ctl.set('b', MEJOR_B, true); actualizar();
     } }
-], () => actualizar());
+].filter(d => !(EMBEBIDO && d.texto === 'Volver al principio')), () => actualizar());
 
 /* ===========================================================================
    6. ACTUALIZAR: la traducción del parámetro a afirmación sustantiva
@@ -266,11 +295,12 @@ function actualizar() {
     veredicto = 'Todavía estás peor que una raya horizontal en el promedio.';
   }
   ctl.texto('lectura',
-    'Lo mejor que se consigue con una recta sobre estos datos es <b>' +
-    Viz.num(MEJOR_RECTA, 4) + '</b> (lo medimos, no lo estimamos).<br>' +
-    'Una raya horizontal en el promedio da <b>' + Viz.num(RAYA_PROMEDIO, 4) + '</b>.<br>' +
-    veredicto + '<br>' +
-    'El año peor dibujado es <b>' + peor.d.x + '</b>, con ' + Viz.num(peor.e, 3) + ' de error.');
+    'El piso de la recta es <b>' + Viz.num(MEJOR_RECTA, 4) + '</b> y una raya horizontal ' +
+    'en el promedio da <b>' + Viz.num(RAYA_PROMEDIO, 4) + '</b> ' +
+    '(los dos medidos, no estimados).<br>' +
+    veredicto +
+    (EMBEBIDO ? '' : '<br>El año peor dibujado es <b>' + peor.d.x + '</b>, con ' +
+                     Viz.num(peor.e, 3) + ' de error.'));
 
   // la fórmula con los valores puestos, y su traducción al castellano
   const subeBaja = a >= 0 ? 'sube' : 'baja';

@@ -7,8 +7,9 @@
 
 <!-- ==========================================================================
      MOMENTO AHA: "para saber si va 'lo' o 'la' necesito la palabra 2, y cuando
-     llego a la palabra 32 de la palabra 2 no queda casi nada. Agrando la
-     mochila y el olvido se hace más lento... pero sigue olvidando."
+     llego a la palabra 32 de la palabra 2 no queda nada: 50 y 50. Agrando la
+     mochila 128 veces y recién ahí llega con el 40 %: el olvido se posterga,
+     no se arregla."
 
      OJO, HONESTIDAD: esto es una ILUSTRACIÓN ESQUEMÁTICA del olvido de una RNN,
      no una RNN corriendo. El fenómeno (la información vieja se degrada con la
@@ -47,6 +48,9 @@
   .apuesta .barra { height: 8px; background: var(--papel-3); border-radius: 4px;
                     overflow: hidden; margin-top: .3rem; }
   .apuesta .barra > i { display: block; height: 100%; }
+  /* el botón flotante «Tema» es position:fixed abajo a la derecha y se le monta
+     encima a la última línea del texto. Le dejamos aire. (Suelta, no embebida.) */
+  body.curso:not(.embebido) .viz-pagina { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body class="curso">
@@ -62,7 +66,7 @@
 
   <div>
     <div class="oracion" id="oracion"></div>
-    <div class="viz-frame" style="padding:10px">
+    <div class="viz-frame" style="padding:10px;box-sizing:border-box;max-width:100%">
       <div id="lienzo"></div>
     </div>
     <div class="apuesta" id="apuesta"></div>
@@ -72,13 +76,15 @@
 
   <footer>
     <div class="aha">
-      <strong>Qué mirar.</strong> Poné la mochila en el mínimo y apretá <b>Leer</b>.
-      Cuando el cursor llega a <em>«lo»</em>, la barra de <em>«proyecto»</em> ya es
-      un hilito: el modelo tiene que elegir entre <em>lo</em> y <em>la</em> casi
-      tirando una moneda. Ahora agrandá la mochila al máximo y volvé a leer: el
-      olvido se hace <em>más lento</em> — y la barra igual llega abajo. Agrandar la
-      memoria posterga el problema; no lo resuelve. Ese es el hueco que viene a
-      tapar <b>attention</b> la clase que viene.
+      <strong>Qué mirar.</strong> Poné la mochila en el mínimo (4 dimensiones) y
+      apretá <b>Leer</b>. Cuando el cursor llega a <em>«lo»</em>, de
+      <em>«proyecto»</em> no queda nada: el modelo elige entre <em>lo</em> y
+      <em>la</em> tirando una moneda, 50 y 50. Ahora subí la mochila al máximo
+      (512) y volvé a leer: ahora sí acierta, pero <b>de la primera palabra perdió
+      igual el 60 %</b>. Ciento veintiocho veces más memoria para llegar con menos
+      de la mitad — y si la oración fuera el doble de larga, volvés a cero.
+      Agrandar la memoria <b>posterga</b> el problema; no lo resuelve. Ese es el
+      hueco que viene a tapar <b>attention</b> la clase que viene.
     </div>
     <p class="viz-pie">
       <b>Ilustración esquemática</b>, no una RNN entrenada corriendo. El decaimiento
@@ -97,7 +103,7 @@
    final vaya "lo" y no "la". Entre las dos hay 30 palabras de distancia. */
 const PALABRAS = ('El proyecto de reforma del código procesal penal que la comisión ' +
   'del Senado había girado a Diputados en diciembre, después de meses de audiencias ' +
-  'y de dos dictámenes en minoría, finalmente lo aprobó ayer').split(' ');
+  'y de dos dictámenes en minoría, finalmente lo aprobaron ayer').split(' ');
 
 const I_CLAVE = 1;                                   // "proyecto" (base 0)
 const I_DECISION = PALABRAS.indexOf('lo');           // dónde hay que decidir
