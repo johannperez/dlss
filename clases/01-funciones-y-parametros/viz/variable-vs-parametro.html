@@ -110,8 +110,12 @@ pI.alDibujar(() => {
   pI.segmento(LIM.xmin, y, x, y, { color: 'acento', grosor: 1.4, punteada: true, opacidad: .8 });
 
   pI.punto(x, y, { color: 'acento', r: 8, halo: true });
+  // el rótulo se da vuelta cerca del borde derecho: si no, queda cortado
+  const aLaIzq = x > 1.2;
   pI.texto(x, y, '(' + Viz.num(x, 2) + ' , ' + Viz.num(y, 2) + ')',
-           { color: 'acento', tam: 12, peso: '700', dx: 10, dy: -16, caja: true });
+           { color: 'acento', tam: 12, peso: '700',
+             alinear: aLaIzq ? 'right' : 'left',
+             dx: aLaIzq ? -12 : 10, dy: -16, caja: true });
   pI.texto(x, LIM.ymin, 'x', { color: 'acento', tam: 12, peso: '700', dy: -12, alinear: 'center' });
 
   pI.textoPx(pI.L + 8, pI.T + 6, 'la curva no se mueve: a = ' + A_FIJO,
@@ -226,8 +230,10 @@ function actualizar() {
   a = ctl.valores.a;
   if (ctl.valores.rastro) guardarRastro(a); else RASTRO.length = 0;
   frases();
-  pI.redibujar();
-  pD.redibujar();
+  // `redibujarYa` y no `redibujar`: si el dibujo se difiere un frame, durante la
+  // animación el número del canvas y el de la frase de abajo no coinciden.
+  pI.redibujarYa();
+  pD.redibujarYa();
 }
 
 actualizar();

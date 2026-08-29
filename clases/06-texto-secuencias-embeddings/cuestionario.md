@@ -140,8 +140,9 @@ está a treinta palabras del verbo)?
 - **A.** Porque no tiene suficientes parámetros.
 - **B.** Porque arrastra un estado de tamaño fijo que se va sobrescribiendo con cada
   palabra nueva, y la información vieja se degrada.
-- **C.** Porque lee de derecha a izquierda.
-- **D.** Porque no usa embeddings.
+- **C.** Porque promedia los vectores de todas las palabras de la oración, y un
+  promedio no tiene orden.
+- **D.** Porque las palabras lejanas suelen quedar fuera de su vocabulario y se pierden.
 
 ---
 

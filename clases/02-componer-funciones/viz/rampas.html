@@ -42,7 +42,8 @@
     max-height: 260px; overflow-y: auto; padding: .15rem .3rem .3rem 0;
   }
   /* adentro de una slide hay menos alto: el taller se achica y scrollea */
-  body.embebido .taller { max-height: 186px; }
+  body.embebido .taller { max-height: 252px; }   /* una tarjeta entera, sin cortar el control */
+  body.embebido .viz-pagina { padding: .5rem; }
   body.embebido .aviso-taller { font-size: .78rem; padding: .45rem .6rem; }
   .tarjeta-rampa {
     background: var(--papel-2); border: 1px solid var(--borde);
@@ -131,8 +132,9 @@
     </div>
     <p class="viz-pie">
       <b>Y una cosa más:</b> apretá <b>32 rampas</b>. La curva azul pasa por
-      <em>todos</em> los puntos, incluidos los que son claramente ruido de
-      medición. Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
+      <em>todos</em> los puntos, incluidos los que casi seguro son ruido de
+      medición —el léxico que produce esta serie lo escribimos nosotros—.
+      Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
       tener nombre.
     </p>
     <p class="viz-pie">
@@ -604,8 +606,8 @@ function actualizar() {
     msg = 'Todavía estás <b class="c-error">peor que la mejor recta</b>. ';
   }
   if (REF.mejorN[n] !== undefined) {
-    msg += 'Con ' + n + (n === 1 ? ' rampa' : ' rampas') + ' bien puestas se puede llegar a <b>' +
-      fmt(REF.mejorN[n]) + '</b>.';
+    msg += (n === 1 ? 'Con 1 rampa bien puesta' : 'Con ' + n + ' rampas bien puestas') +
+      ' se puede llegar a <b>' + fmt(REF.mejorN[n]) + '</b>.';
   } else {
     msg += 'Movés el codo, movés la altura, y mirás el número.';
   }
@@ -621,11 +623,17 @@ function actualizar() {
 function redibujarTodo() { construirTaller(); actualizar(); }
 
 // primer dibujo
-redibujarTodo();
+// `Viz.botonTema()` aplica el tema guardado y ya recarga la paleta solo
+// (arreglado en `_shared/js/viz.js`). El redibujo de acá es por las dudas.
 Viz.botonTema();
+Viz.recargarColores();
+redibujarTodo();
 
 // que los mini-gráficos se reacomoden si cambia el ancho o el tema
 window.addEventListener('resize', () => { construirTaller(); });
+// y que se repinten al cambiar de tema: el fondo del mini-canvas se dibuja una
+// sola vez, así que sin esto quedaban claros sobre el tema oscuro.
+window.addEventListener('viz:tema', () => { construirTaller(); });
 </script>
 </body>
 </html>

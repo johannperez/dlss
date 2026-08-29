@@ -21,7 +21,7 @@
 ## 1. El arco narrativo, en diez líneas
 
 1. Se lee un párrafo de debate parlamentario. Suena real. Se vota. Lo escribió una máquina.
-2. Esa máquina tiene 1.541.056 perillas y se entrena en cuatro minutos y medio, acá.
+2. Esa máquina tiene 1.541.056 perillas y se entrena en seis minutos, acá.
 3. Su único objetivo es tontísimo: **poner una probabilidad a la próxima ficha**.
 4. Y sin embargo, con ese objetivo, el dataset se arma solo y aparece todo lo demás.
 5. Se arranca el entrenamiento en el minuto 20 y se lo deja corriendo como teatro.
@@ -139,12 +139,17 @@ frase que empieza con «por eso»**. Si una pieza no termina en un «por eso», 
 
 El orden importa y es este:
 
-1. **Por qué alucina** (viz `por-que-alucina.html`) — 8 min, el más largo.
-2. **Por qué le importa el prompt** — 3 min, con la demo de dos prompts del notebook.
-3. **La ventana de contexto** (viz `ventana-de-contexto.html`) — 5 min.
-4. **La temperatura** (viz `temperatura.html`) — 5 min.
-5. **Por qué cuenta mal las letras** (viz `contar-letras.html`) — 3 min.
-6. **Por qué se contradice y por qué repite** — 2 min, sin viz.
+0. La **curva de loss** (slide 19), que quedó pendiente del bloque anterior — 2,5 min.
+1. **Por qué alucina** (slides 21-23, viz `por-que-alucina.html`) — 7 min, el más largo.
+2. **Por qué le importa el prompt** (24) — 2 min, con la demo de dos prompts del notebook.
+3. **La ventana de contexto** (25-27, viz `ventana-de-contexto.html`) — 5 min.
+4. **La temperatura** (28-30, viz `temperatura.html`) — 5 min.
+5. **Por qué cuenta mal las letras** (31-32, viz `contar-letras.html`) — 2 min.
+6. **Por qué se contradice y por qué repite** (33) — 1 min, sin viz.
+
+**Suman 24,5 y el bloque tiene 25.** No hay aire: los minutos de cada slide están en
+sus `aside` y ya están ajustados a esa suma. Si te pasás en una, sacale a otra — o usá
+la lista de recortes de §7, que está en orden.
 
 **El momento clave de todo el módulo** es el de la alucinación, y se hace así:
 mostrás el prompt del diputado que existe, el modelo contesta bien, mostrás el padrón,
@@ -281,8 +286,13 @@ Se recorta **en este orden**, y ni un paso antes de tiempo:
   ¿qué cambiaría?»* (Respuesta: aprendería mucho peor con el mismo presupuesto, el
   vocabulario es 10-20 veces más rico; y no podríamos hacer la demo de la alucinación,
   porque nadie puede verificar en cinco segundos si un diputado argentino existe.)
-- Que alguien busque en el `padron_detalle` de `datos-mini-gpt.json` los 7 diputados a
-  los que el modelo les erra el bloque, y que discutan si tienen algo en común.
+- Que alguien busque en el `padron_detalle` de `datos-mini-gpt.json` los **6** diputados
+  a los que el modelo les erra el bloque, y que discutan si tienen algo en común.
+  (Comprobado: **cinco de los seis** comparten nombre de pila o apellido con otro
+  diputado —Godoy, Peralta y Zabaleta con uno de **otro** bloque; Osvaldo **Y**barra
+  del VVA con Osvaldo **I**barra del MPR, que es el más lindo de todos—. El único sin
+  ninguna colisión es Fabián Heredia. O sea: el modelo aprendió «apellido → bloque»,
+  y se le cae justo donde el apellido no alcanza.)
 
 ---
 
@@ -322,7 +332,9 @@ en el contenedor de construcción. **Si citás un número en el aula, citá esto
 |---|---|
 | parámetros del modelo | **1.541.056** (4 bloques · 4 cabezas · dim 176 · ventana 128 fichas) |
 | corpus | Aguasclaras, 1.098.206 caracteres, vocabulario de **71** fichas |
-| entrenamiento | **1200 pasos en 243 s = 4,1 min**, CPU con **4 hilos** (0,20 s por paso). En una segunda corrida idéntica dio 267 s: la CPU del contenedor es compartida, así que **decí «cuatro minutos y medio» y no un número al segundo**. |
+| entrenamiento (la celda sola, 1200 pasos) | **entre 4 y 7 minutos** en CPU con **4 hilos**. Seis cronometrajes de la misma corrida: **243 s** y **267 s** con `entrenar-mini-gpt.py`, y **280 s**, **297 s**, **360 s** y **432 s** con la celda del notebook (0,23 a 0,36 s por paso). |
+| el notebook ENTERO, de punta a punta | **entre 5 min 20 s y 8 min** (`nbconvert --execute`): **322 s**, **339 s**, **361 s**, **368 s**, **376 s**, **404 s**, **480 s**. |
+| por qué se mueve tanto | La CPU es compartida: el mismo notebook, en la misma máquina, tarda un 40-80% más si tenés el navegador con las viz abierto al lado — que es exactamente lo que va a pasar en el aula. **Decí «entre cuatro y siete minutos» y planificá con siete.** Nunca des un número al segundo. |
 | loss de validación | **4,23 → 0,19** (el piso teórico de «no tengo idea» es log 71 = 4,26) |
 | loss del bigrama en validación | **2,24** (la línea de base tonta) |
 | tamaño del checkpoint | 6,2 MB para un corpus de 1,1 MB |
@@ -345,9 +357,19 @@ mismo modelo se puede entrenar encima para comparar.
 **Y sobre la tijera (clase 4).** Con el corpus entero **no hay tijera**: al paso 1200,
 train 0,185 y val 0,186. Tiene sentido: 1,5 millones de perillas sobre casi un millón de
 fichas de un texto muy repetitivo. Si querés mostrar una tijera de verdad, entrená el
-mismo modelo sobre `texto[:25_000]` (25 KB): la validación toca fondo en **0,70 al paso
-900** y sube a **0,79 al 1200** mientras la de train sigue bajando a **0,10**. Está
-medido (224 s) y es el ítem 6 del cuestionario.
+mismo modelo sobre `texto[:25_000]` (25 KB): la validación toca fondo cerca del paso
+**700-900** (≈ 0,70-0,74) y **sube** hacia el 1200 (0,79-0,82) mientras la de train sigue
+bajando a **0,10**. Ésos son los números del ítem 6 del cuestionario.
+
+> **Precisión sobre estos números, porque importa en una clase que enseña a no inventar.**
+> Se corrieron **dos veces**. La **forma** —tijera clarísima, train diez veces más chica
+> que val— sale idéntica las dos veces. Los **valores paso a paso, no**: con 25 KB el
+> conjunto de validación son 2.500 fichas, y medir la loss sobre ocho lotes de ese
+> puñado tiene ruido de ±0,1. En una corrida el mínimo cayó en el paso 900 (0,70) y en
+> la otra en el 700 (0,74). **La tabla del cuestionario es una corrida real, no la
+> única posible**, y si alguien la reproduce y le da el mínimo en otro paso, la
+> respuesta sigue siendo la misma y el motivo es una buena conversación de clase.
+> Tiempo: entre **224 s y 360 s**, con la misma dispersión de CPU que todo lo demás.
 
 ---
 
@@ -449,7 +471,7 @@ esquivarla.
 Lo que el experimento muestra: **una parte muy grande de la información de un texto
 institucional está en su forma**, y esa parte es aprendible con relativamente poco. Eso no
 es una novedad para nadie que haya trabajado con análisis del discurso — es la noción de
-género — pero acá está **cuantificada**: 1,5 millones de parámetros y cuatro minutos.
+género — pero acá está **cuantificada**: 1,5 millones de parámetros y cinco minutos.
 
 Lo que **no** muestra: que el contenido sea predecible. El modelo produce forma vacía. La
 disputa política —qué se dice, quién lo dice, qué consecuencias tiene— no está en lo que

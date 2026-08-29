@@ -2,7 +2,7 @@
 
 **La forma de los datos manda (I): imágenes**
 
-Once preguntas. Las de opción múltiple tienen **una** respuesta correcta.
+Doce preguntas. Las de opción múltiple tienen **una** respuesta correcta.
 Las abiertas se responden en tres o cuatro oraciones: no se busca extensión, se busca criterio.
 
 Podés tener el notebook abierto. De hecho, para algunas conviene.

@@ -125,8 +125,12 @@ def quitar(corpus, palabras):
     return [patron.sub(" ", t) for t in corpus]
 
 
+# MISMA lista que la del notebook (celda de la seccion 3). Si cambia una,
+# cambia la otra: dos definiciones del mismo experimento en un curso sobre
+# reproducibilidad seria exactamente el error que la clase denuncia.
 NOMBRES_PROPIOS = ["amlo", "meade", "morena", "anaya", "epn", "salinas", "pri",
-                   "peña", "bronco", "sánchez", "putin", "irán", "cienfuegos", "pp"]
+                   "peña", "bronco", "sánchez", "putin", "irán", "cienfuegos",
+                   "pp", "lópez", "obrador", "trump", "biden"]
 
 ablaciones = []
 for etiqueta, quitados in [
@@ -134,7 +138,7 @@ for etiqueta, quitados in [
         ("el termino n.o 1", [top_pos[0]["termino"]]),
         ("los 5 primeros", [t["termino"] for t in top_pos[:5]]),
         ("los 20 primeros", [t["termino"] for t in top_pos[:20]]),
-        ("los 14 nombres propios", NOMBRES_PROPIOS)]:
+        (f"los {len(NOMBRES_PROPIOS)} nombres propios", NOMBRES_PROPIOS)]:
     corpus2 = quitar(documentos, quitados)
     v2, m2 = entrenar(corpus2, i_train, y)
     met = evaluar(v2, m2, corpus2, i_test, y)
@@ -230,13 +234,15 @@ R["pares_minimos"] = filas_pares
 # 6. AUDITORIA DE SESGO — la misma oracion, distinto sujeto
 # =============================================================================
 PLANTILLA = "{} reclamó frente a la sede del ministerio"
+# MISMA lista que la del notebook (seccion 9). 17 sujetos, ninguno repetido:
+# antes "los empresarios" estaba en dos dimensiones y la auditoria decia 18.
 SUJETOS = [
     ("genero", "los trabajadores"), ("genero", "las trabajadoras"),
     ("genero", "los médicos"), ("genero", "las médicas"),
     ("genero", "los empresarios"), ("genero", "las empresarias"),
     ("ocupacion", "los docentes"), ("ocupacion", "los policías"),
     ("ocupacion", "los taxistas"), ("ocupacion", "los estudiantes"),
-    ("ocupacion", "los empresarios"), ("ocupacion", "los enfermeros"),
+    ("ocupacion", "los enfermeros"),
     ("origen", "los vecinos"), ("origen", "los migrantes"),
     ("origen", "los venezolanos"), ("origen", "los mexicanos"),
     ("origen", "los campesinos"), ("origen", "los indígenas"),

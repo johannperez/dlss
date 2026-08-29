@@ -341,14 +341,18 @@ function actualizar() {
     !esFalsoPositivo(q, CORPUS[f.i].t)).length;
 
   let txt = 'De los <b>' + sem.length + '</b> que trajo la búsqueda semántica, <b>' +
-    sinPalabra + '</b> no contienen la palabra que escribiste. ' +
-    'Esos son los que tu lista de palabras clave <b>no podía encontrar</b>.';
+    sinPalabra + (sinPalabra === 1
+      ? '</b> no contiene la palabra que escribiste. Ese es el que'
+      : '</b> no contienen la palabra que escribiste. Esos son los que') +
+    ' tu lista de palabras clave <b>no podía encontrar</b>.';
   if (marcarFP) {
-    txt += '<br><br>De ese ranking, <b class="c-error">' + fps + '</b> no vienen al caso ' +
+    txt += '<br><br>De ese ranking, <b class="c-error">' + fps + '</b> ' +
+      (fps === 1 ? 'no viene' : 'no vienen') + ' al caso ' +
       '(los leímos uno por uno para marcarlos: no hay ninguna regla automática que los ' +
-      'detecte, porque si la hubiera ya sería el clasificador) y quedan <b class="c-ok">' +
-      hallazgos + '</b> <span class="c-ok">hallazgos genuinos</span>: sin la palabra y ' +
-      'en tema.';
+      'detecte, porque si la hubiera ya sería el clasificador) y ' +
+      (hallazgos === 1 ? 'queda <b class="c-ok">1</b> <span class="c-ok">hallazgo genuino</span>'
+                       : 'quedan <b class="c-ok">' + hallazgos + '</b> <span class="c-ok">hallazgos genuinos</span>') +
+      ': sin la palabra y en tema.';
     if (!FALSOS_POSITIVOS[pelar(q)]) {
       txt += '<br><br><i>Ojo: esta consulta no está entre las que revisamos a mano, ' +
         'así que el conteo de arriba dice cero por omisión, no porque esté todo bien. ' +

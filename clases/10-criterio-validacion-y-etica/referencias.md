@@ -68,7 +68,7 @@ University Press. Disponible online.** `[VERIFICAR URL]`
 > entre la teoría de la medición de las ciencias sociales —constructo, operacionalización,
 > validez— y la literatura de *fairness* en machine learning. Si vas a discutir con
 > ingenieros, este es el paper que te da el terreno común: no tenés que traducir tu
-> vocabulario, tenés que mostrarles que el suyo ya existía. **Léelo con Cronbach al lado.**
+> vocabulario, tenés que mostrarles que el suyo ya existía. **Leelo con Cronbach al lado.**
 
 **7. Cronbach, L. J. & Meehl, P. E. (1955). *Construct Validity in Psychological Tests*.
 Psychological Bulletin 52(4), 281-302.** `[VERIFICAR URL]`
@@ -84,7 +84,7 @@ Crawford, K. (2021). *Datasheets for Datasets*. Communications of the ACM 64(12)
 > El hermano de la ficha del modelo, para los **datos**: cómo se recolectaron, quién los
 > etiquetó, con qué instrucciones, qué se excluyó. Si trabajás armando corpus —y casi todos
 > los proyectos de esta audiencia empiezan armando un corpus— esto es más útil que la ficha
-> del modelo. Léelo junto con `datos/README.md` de este curso, que está escrito con esa forma.
+> del modelo. Leelo junto con `datos/README.md` de este curso, que está escrito con esa forma.
 
 **9. Selbst, A. D., boyd, d., Friedler, S. A., Venkatasubramanian, S. & Vertesi, J. (2019).
 *Fairness and Abstraction in Sociotechnical Systems*. FAccT '19, 59-68.** `[VERIFICAR URL]`
@@ -127,10 +127,17 @@ Recopilación de J. M. Diéguez, discursos de Casa Rosada 2015-2024:
 > escribile a los recopiladores. Que esa frase esté en un `referencias.md` en vez de estar
 > escondida también es parte de lo que enseña la clase.
 
-**`medir-clase10.py`** — en esta misma carpeta.
-> Todos los números de las slides y de las visualizaciones salen de ahí, y el script se corre
-> en un minuto. **Es el modelo de lo que tu propio proyecto debería tener**: un archivo que
-> reproduce cada número que afirmás, y que se puede correr de nuevo para comprobarlo. Ábrilo
+**`material-el-juicio.md`** — los dos papers del bloque práctico 2, en esta misma carpeta.
+> **Son ficticios y están rotulados como material didáctico en su primera línea.** No hay
+> autores, no hay revista, no hay datos: están escritos para esta clase con los errores puestos
+> a propósito, y **no se pueden citar**. El A es defendible con reparos menores; el B tiene un
+> problema fatal de validez. Al final del archivo está la clave de corrección para el docente.
+
+**`medir-clase10.py`** y **`exportar-figuras.py`** — en esta misma carpeta.
+> Todos los números de las slides y de las visualizaciones salen del primero, y las cinco
+> figuras salen del segundo, que **corre el notebook** en vez de copiarle el código. Los dos
+> tardan menos de un minuto. **Es el modelo de lo que tu propio proyecto debería tener**: un archivo que
+> reproduce cada número que afirmás, y que se puede correr de nuevo para comprobarlo. Abrilo
 > aunque no vayas a modificarlo.
 
 **`scikit-learn`, guía de *model evaluation*.**

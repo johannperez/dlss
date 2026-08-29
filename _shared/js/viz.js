@@ -1730,7 +1730,14 @@
   function botonTema() {
     let guardado = null;
     try { guardado = localStorage.getItem('dlss-tema'); } catch (e) { }
-    if (guardado) document.documentElement.setAttribute('data-tema', guardado);
+    if (guardado) {
+      document.documentElement.setAttribute('data-tema', guardado);
+      // aplicar el tema guardado NO alcanza: los colores del canvas se leen del
+      // CSS una sola vez. Sin esto, una viz abierta con el tema oscuro ya
+      // guardado dibuja el fondo oscuro y encima la paleta clara.
+      recargarColores();
+      global.dispatchEvent(new Event('viz:tema'));
+    }
     const b = el('button', { class: 'toggle-tema', texto: 'Tema' }, document.body);
     b.addEventListener('click', function () {
       const actual = document.documentElement.getAttribute('data-tema');

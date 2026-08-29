@@ -35,6 +35,11 @@
      lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
      Abierta suelta, la página se ve completa y esta regla no hace nada. */
   body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+  /* y además lo compactamos y le damos un poco más de ancho, para que entre
+     entero sin scrollear adentro del marco de la slide. */
+  body.embebido .viz-pagina { grid-template-columns: minmax(0, 1fr) 330px; }
+  body.embebido .panel { font-size: .86em; padding: .5rem .55rem .55rem; }
+  body.embebido .ctrl { margin-bottom: .40rem; }
 </style>
 </head>
 <body class="curso">
@@ -67,7 +72,8 @@
     <div class="aha">
       <strong>Qué mirar.</strong> Apretá <b>«Plantar un caso extremo»</b> y quedate mirando
       las dos rectas. La azul <em>gira</em> para ir a buscar al caso raro; la naranja se
-      queda casi donde estaba: la azul se mueve unas cinco veces más que la naranja. Después
+      queda casi donde estaba: la azul se mueve <b>0,092</b> puntos por década y la naranja
+      <b>0,011</b>, o sea ocho veces menos. Después
       leé el cartel del panel: con el caso extremo puesto, <b>un solo año explica casi la
       mitad</b> de todo el MSE. Ese año es, literalmente, <em>a quién le está haciendo
       caso</em> el modelo azul. Y ojo con lo otro: <b>sin tocar nada</b>, las dos rectas ya

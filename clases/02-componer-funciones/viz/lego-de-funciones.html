@@ -348,8 +348,12 @@ function actualizar() {
 }
 
 construir();
-actualizar();
+// `Viz.botonTema()` aplica el tema guardado y ya recarga la paleta solo
+// (arreglado en `_shared/js/viz.js`). El redibujo de acá es por las dudas.
 Viz.botonTema();
+Viz.recargarColores();
+actualizar();
+for (let i = 0; i < 3; i++) dibujarBloque(i);
 window.addEventListener('resize', () => { for (let i = 0; i < 3; i++) dibujarBloque(i); });
 </script>
 </body>

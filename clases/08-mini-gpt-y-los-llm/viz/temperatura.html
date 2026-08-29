@@ -38,6 +38,11 @@
   .tiradas .fila b { color: var(--c-parametro); }
   .rotulo { font-size: .78rem; color: var(--tinta-3); margin: .7rem 0 0;
             text-transform: uppercase; letter-spacing: .09em; }
+
+  /* --- embebida en la slide: el iframe mide ~560 px de alto, así que apretamos
+     el panel para que los controles entren en lo que se ve sin scrollear. ---- */
+  body.embebido .panel { font-size: .85em; padding: .5rem .6rem .6rem; }
+  body.embebido .ctrl { margin-bottom: .5rem; }
 </style>
 </head>
 <body class="curso">
@@ -122,8 +127,9 @@ function tempActual() { return ctl ? ctl.valores.T : 0.8; }
 function claveT(T) { return T.toFixed(1); }
 
 /* --- 3. el gráfico de barras ------------------------------------------------ */
+const EMBEBIDA = document.body.classList.contains('embebido');
 const p = Viz.plano('#lienzo', {
-  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 340,
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: EMBEBIDA ? 260 : 340,
   titulo: 'las 12 fichas más probables para la próxima letra',
   margen: { i: 18, d: 18, a: 34, b: 14 }
 });
@@ -163,6 +169,7 @@ function mostrarUna() {
   const lista = pr.generaciones[claveT(tempActual())];
   const txt = lista[tirada % lista.length];
   rotSalida.textContent = 'Texto generado con temperatura ' + claveT(tempActual());
+  cajaSalida.hidden = false;
   cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
                          '<span class="cont">' + escapar(txt) + '</span>';
   cajaTiradas.innerHTML = '';
@@ -171,10 +178,9 @@ function mostrarUna() {
 function mostrarCinco() {
   const pr = promptActual();
   const lista = pr.generaciones[claveT(tempActual())];
-  rotSalida.textContent = 'Cinco tiradas con el MISMO prompt y temperatura ' +
-                          claveT(tempActual());
-  cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
-    '<span class="cont">…</span>';
+  rotSalida.textContent = 'Cinco tiradas con el MISMO prompt («' + pr.texto.trim() +
+                          '») y temperatura ' + claveT(tempActual());
+  cajaSalida.hidden = true;              // el prompt ya está en el rótulo: sin caja vacía
   cajaTiradas.innerHTML = lista.map((t, i) =>
     '<div class="fila"><b>tirada ' + (i + 1) + ':</b> ' +
     escapar(t.slice(0, 150)) + '</div>').join('');
@@ -195,16 +201,22 @@ const ctl = Viz.controles('#panel', [
     valor: 0.8, decimales: 1, color: 'parametro' },
   { tipo: 'medidor', id: 'punta', etiqueta: 'probabilidad de la primera' },
   { tipo: 'texto', id: 'lectura', html: '' },
-  { tipo: 'titulo', texto: 'Con qué la arrancamos' },
-  { tipo: 'botones', id: 'prompt', etiqueta: 'el prompt', valor: '2',
-    opciones: PROMPTS.map((pr, i) => ({ valor: String(i), texto: pr.texto.trim() })) },
-  { tipo: 'texto', id: 'porque', html: '' },
+  // Los dos botones de generar van ACÁ ARRIBA a propósito: embebida en la slide,
+  // la viz se ve en una ventana de ~560 px y lo que queda más abajo hay que ir a
+  // buscarlo con la rueda del mouse. Estos dos son los que el docente aprieta
+  // delante de todos, así que tienen que entrar en lo que se ve.
   { tipo: 'titulo', texto: 'Generar' },
   { tipo: 'boton', texto: 'Generar 200 fichas', principal: true,
     alClic: () => { modo = 'una'; tirada++; pintarTexto(); } },
   { tipo: 'boton', texto: '5 veces con el mismo prompt',
     alClic: () => { modo = 'cinco'; pintarTexto(); } },
-  { tipo: 'texto', id: 'lectura2', html: '' }
+  { tipo: 'texto', id: 'lectura2', html:
+    'Apretá <b>«5 veces con el mismo prompt»</b> y mirá si las cinco salidas son ' +
+    'iguales o distintas. Probalo en <b>0,0</b> y después en <b>1,2</b>.' },
+  { tipo: 'titulo', texto: 'Con qué la arrancamos' },
+  { tipo: 'botones', id: 'prompt', etiqueta: 'el prompt', valor: '2',
+    opciones: PROMPTS.map((pr, i) => ({ valor: String(i), texto: pr.texto.trim() })) },
+  { tipo: 'texto', id: 'porque', html: '' }
 ], (v, id) => {
   iPrompt = +v.prompt;
   if (id === 'prompt') { tirada = 0; modo = 'una'; }

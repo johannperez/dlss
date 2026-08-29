@@ -20,22 +20,22 @@
   "densa_normal": {
    "exactitud": 85.8,
    "parametros": 50890,
-   "segundos": 2.3
+   "segundos": 3.5
   },
   "densa_barajada": {
    "exactitud": 85.6,
    "parametros": 50890,
-   "segundos": 2.2
+   "segundos": 3.3
   },
   "cnn_normal": {
    "exactitud": 87.8,
    "parametros": 23946,
-   "segundos": 27.0
+   "segundos": 28.4
   },
   "cnn_barajada": {
    "exactitud": 83.2,
    "parametros": 23946,
-   "segundos": 28.2
+   "segundos": 29.6
   }
  },
  "corrimiento": {
@@ -70,7 +70,7 @@
   "epocas": 10,
   "lado": 32,
   "exactitud": 97.0,
-  "segundos": 1.9,
+  "segundos": 24.5,
   "parametros": 23426,
   "por_tipo": {
    "multitud": {

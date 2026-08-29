@@ -56,7 +56,7 @@
       <li>Clase 4: entrenar de verdad, y la diferencia entre <strong>dibujar</strong> y <strong>calcar</strong>.</li>
       <li>Clase 5-7: la arquitectura son supuestos. Convoluciones, embeddings, attention.</li>
       <li>Clase 8: entrenamos un mini-GPT de <strong>~1,5 millones</strong> de perillas.
-          Tardó diez minutos y escribe castellano reconocible.</li>
+          Tardó entre cuatro y siete minutos y escribe castellano reconocible.</li>
       <li class="fragment"><strong>Y ahí terminó lo que podemos entrenar nosotros.</strong></li>
     </ul>
     <aside class="notes">
@@ -73,8 +73,8 @@
       <div>
         <h4>Tu mini-GPT</h4>
         <p><span class="numero-vivo">~1,5 M</span> de parámetros<br>
-           <strong>10 minutos</strong> en una CPU<br>
-           <strong>1 MB</strong> de texto<br>
+           <strong>4 a 7 minutos</strong> en una CPU<br>
+           <strong>1,1 MB</strong> de texto<br>
            costo: el café que te tomaste mientras entrenaba</p>
       </div>
       <div>
@@ -99,7 +99,7 @@
   <!-- =========================== 4 · LAS TRES LÍNEAS =========================== -->
   <section>
     <h3>Tres líneas</h3>
-    <pre><code class="language-python" data-trim data-line-numbers>
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 from transformers import pipeline
 clasificador = pipeline("sentiment-analysis",
                         model="pysentimiento/robertuito-sentiment-analysis")
@@ -133,13 +133,23 @@ clasificador(titulares[:20])
       <tr><td>Bill Gates reconoce que miles de personas morirán con la vacuna</td>
           <td class="c-error">FALSA</td><td>desinformación, esta vez sí</td></tr>
     </table>
-    <p style="font-size:.82em">Las dos primeras hablan de lo mismo y tienen etiquetas
-      opuestas. Cualquier clasificador de sentimiento les va a poner <b>NEG</b> a las dos.
-      Y bajo la misma etiqueta "falsa" conviven <strong>tres cosas distintas</strong>:
-      sátira, una afirmación desmentida y desinformación de verdad.</p>
+    <p style="font-size:.82em">Las dos primeras hablan de lo mismo —supuestos daños de la
+      vacuna del covid— y tienen etiquetas <strong>opuestas</strong>: la de arriba es el
+      desmentido, la de abajo es la afirmación desmentida, guardada en el corpus con el
+      nombre del <em>chequeador</em> que la desmintió. Cualquier clasificador de sentimiento
+      les va a poner <b>NEG</b> a las dos. Y bajo la misma etiqueta "falsa" conviven
+      <strong>tres cosas distintas</strong>: sátira, una afirmación desmentida y
+      desinformación de verdad.</p>
     <aside class="notes">
       4 min. Esta es la slide del giro, y todos los datos son reales (corpus de prensa
-      del curso, verificables en el CSV).
+      del curso, verificables en el CSV: los cuatro titulares, su etiqueta y su medio están
+      en `datos/muestras/prensa/titulares-prensa-es.csv`).
+      El detalle que más impresiona, si lo querés contar: la segunda fila viene de
+      **AFP Factual**, que es un servicio de chequeo. Lo que el corpus guardó no es el
+      chequeo: es el texto de la afirmación falsa que el chequeo desmiente, etiquetado
+      «falsa» y con el nombre del chequeador en la columna «fuente». Nadie hizo trampa:
+      así se arma un corpus de desinformación. Pero si entrenás sin mirar esto, tu modelo
+      puede terminar aprendiendo «¿esto lo publicó un chequeador?».
       Preguntá: "si entreno un modelo con estas etiquetas, ¿qué le estoy enseñando a
       detectar?" Dejá que se peleen un rato. Van a llegar solos a que la etiqueta mezcla
       constructos.
@@ -238,7 +248,14 @@ clasificador(titulares[:20])
 
   <!-- =========================== 10 · LA METÁFORA =========================== -->
   <section>
+    <span class="marca">callback dibujo</span>
     <h2>El informante clave</h2>
+    <div class="aha compacta">
+      Nueve clases dibujando. Hoy <strong>no dibujamos desde cero</strong>: agarramos a
+      alguien que ya sabe dibujar —le enseñaron castellano durante meses y con millones de
+      dólares— y le corregimos el estilo con cuatro trazos. Las perillas de abajo quedan
+      como estaban; las de arriba, esas pocas, son las tuyas.
+    </div>
     <div class="ss">
       Un modelo pre-entrenado es como un <strong>informante clave</strong>: conoce el
       terreno, habla el idioma, te ahorra meses de trabajo de campo.
@@ -250,7 +267,9 @@ clasificador(titulares[:20])
     <p class="fragment">Nadie publicaría una etnografía diciendo "me lo contó un tipo".
        <strong>Tampoco publiques "usamos BERT".</strong></p>
     <aside class="notes">
-      2 min. Esta metáfora es la que se llevan. Usala cada vez que aparezca un modelo
+      2 min. La caja de arriba es el <b>[CALLBACK DIBUJO]</b> de la clase: decila en voz
+      alta, es lo que engancha el módulo 3 con las nueve clases anteriores.
+      La metáfora del informante es la que se llevan. Usala cada vez que aparezca un modelo
       nuevo en el resto del curso.
       La segunda frase entra fuerte: dejá el fragment para el final y hacé silencio.
     </aside>
@@ -296,13 +315,13 @@ clasificador(titulares[:20])
   <!-- =========================== 12 · ESTRATEGIA A =========================== -->
   <section>
     <h3>A · Embeddings + clasificador simple</h3>
-    <pre><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
 X = vectorizar(titulares)          # texto -> un punto en 100 dimensiones
                                    # (clase 6: el mapa donde viven las palabras)
-modelo = LogisticRegression(max_iter=2000, class_weight="balanced")
-modelo.fit(X[i_train], y[i_train])
-pred  = modelo.predict(X[i_test])
-proba = modelo.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
+modelo_a = LogisticRegression(max_iter=2000, class_weight="balanced")
+modelo_a.fit(X[i_train], y[i_train])
+pred_a  = modelo_a.predict(X[i_test])
+proba_a = modelo_a.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
 </code></pre>
     <div class="intuicion compacta">
       El clasificador es <strong>una regresión logística</strong>. La misma que ya sabés
@@ -351,7 +370,7 @@ proba = modelo.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
   <!-- =========================== 14 · ESTRATEGIA C =========================== -->
   <section>
     <h3>C · Fine-tuning: y adentro no hay magia</h3>
-    <pre><code class="language-python" data-trim data-line-numbers>
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 for epoca in range(3):
     for lote in cargador:
         prediccion = modelo(**lote)      # 1. PREDECIR
@@ -428,9 +447,10 @@ for epoca in range(3):
       <tr><td>RoBERTuito</td><td class="c-ok">70,2</td><td class="c-ok">55,3</td><td class="c-ok">74,1</td></tr>
     </table>
     <div class="ojo compacta">
-      <strong>Mirá los números de verdad: 70, no 95.</strong> El mejor modelo en
-      castellano acierta dos de cada tres en sentimiento. Si usás uno entrenado en inglés
-      sobre texto en castellano <em>va a andar</em> —te devuelve etiquetas con su
+      <strong>Mirá los números de verdad: 70, no 95.</strong> Y ojo con <em>qué</em>
+      número es: <strong>70 de macro-F1</strong>, no de accuracy, en una tarea de
+      <em>tres</em> clases (positivo / negativo / neutro). Si usás un modelo entrenado en
+      inglés sobre texto en castellano <em>va a andar</em> —te devuelve etiquetas con su
       probabilidad y todo— y va a andar <strong>peor que eso</strong>. Y no te vas a
       enterar si no evaluás.
     </div>
@@ -438,9 +458,11 @@ for epoca in range(3):
       3 min. Si tenés red, hacé la demo: la misma oración por un modelo en inglés y uno
       en castellano. Es de las cosas más convincentes de la clase.
       Los números de la tabla salen del repositorio de pysentimiento (docs/TASKS.md,
-      bajado y verificado). Son macro-F1, promedio de varias corridas. Decilos en voz alta:
-      "el mejor modelo en castellano acierta 70 de cada 100 en una tarea de tres clases.
-      Cuando alguien te muestre 0,95, preguntá contra qué."
+      bajado y verificado). Son macro-F1 con su desvío (RoBERTuito en sentimiento:
+      70,2 ± 0,2), promedio de varias corridas. NO son accuracy, y hoy es justamente la
+      clase donde prohibimos confundirlas: no digas "acierta 70 de cada 100". Decí:
+      "el mejor modelo en castellano llega a 70 de macro-F1 en una tarea de tres clases.
+      Cuando alguien te muestre 0,95, preguntá qué métrica, en qué corpus y en qué idioma."
       IMPORTANTE: los nombres de modelo cambian y los modelos se despublican. Antes de dar
       la clase verificá que existan y **anotá la revisión exacta**. El identificador
       `pysentimiento/robertuito-sentiment-analysis` está verificado contra el código
@@ -463,14 +485,15 @@ for epoca in range(3):
             lo que la búsqueda semántica encontró de más (ganancia) y lo que trajo
             de basura (costo). <b>Las dos listas.</b></li>
       </ol>
-      <strong>20 minutos.</strong> Si algo no corre, levantá la mano.
+      <strong>15 minutos.</strong> Si algo no corre, levantá la mano.
     </div>
     <aside class="notes">
-      20 min de práctico. Circulá. Lo que vas a ver:
+      15 min de notebook (del minuto 26 al 42 del plan; los otros 5 de la casilla son las
+      consignas y la puesta en común con la viz de la slide siguiente). Circulá. Lo que vas a ver:
       · Alguien busca una palabra que no está en el vocabulario y se frustra → es un
         hallazgo, no un error: "un modelo sólo conoce lo que vio".
       · Alguien va a mostrarte un resultado buenísimo. Pedile los falsos positivos.
-      A los 15 min avisá "cinco minutos" y pedí que dos o tres compartan su TODO 2.
+      A los 12 min avisá "faltan tres" y pedí que dos o tres compartan su TODO 2.
     </aside>
   </section>
 
@@ -559,10 +582,10 @@ for epoca in range(3):
       </div>
       <div>
         <h4>Como se escribe</h4>
-        <p><strong>74</strong> notas de protesta que el modelo encontró<br>
-           <strong>51</strong> notas que no eran protesta y marcó igual<br>
-           <strong>29</strong> notas de protesta que se le pasaron<br>
-           <strong>214</strong> notas comunes que dejó pasar bien</p>
+        <p><strong>74</strong> notas sobre política que el modelo encontró<br>
+           <strong>51</strong> notas que no eran sobre política y marcó igual<br>
+           <strong>29</strong> notas sobre política que se le pasaron<br>
+           <strong>214</strong> notas de otro tema que dejó pasar bien</p>
       </div>
     </div>
     <p class="fragment"><strong>Cuatro números, y cada uno significa algo distinto para tu
@@ -571,7 +594,10 @@ for epoca in range(3):
       fenómeno. <span style="font-size:.8em">(Los cuatro números son los del notebook de
       hoy, tarea «¿es una nota sobre política?», test de 368 casos.)</span></p>
     <aside class="notes">
-      3 min. Escribí los cuatro casilleros en el pizarrón CON LAS PALABRAS DE ELLOS.
+      3 min. Los cuatro números son los de la corrida de hoy (tarea «¿es una nota sobre
+      política?», test de 368): 74 + 51 + 29 + 214. Si tu aula prefiere el ejemplo de
+      protesta, cambiá el sustantivo Y los números, nunca sólo uno de los dos.
+      Escribí los cuatro casilleros en el pizarrón CON LAS PALABRAS DE ELLOS.
       Pedí un ejemplo del aula: "alguien que tenga un corpus, ¿qué sería un falso
       positivo en su caso?" Que lo digan en su dominio.
     </aside>
@@ -692,19 +718,25 @@ for epoca in range(3):
   <!-- =========================== 29 · EL TECHO HUMANO =========================== -->
   <section>
     <h2>El techo humano</h2>
-    <div class="intuicion">
+    <div class="intuicion compacta">
       Si dos codificadores entrenados coinciden en el <strong>73 %</strong> de los casos
       (kappa 0,46), ese es tu <strong>techo realista</strong>. No hay modelo que pueda
       hacer mejor una distinción que dos personas no saben hacer igual.
     </div>
-    <div class="ojo">
+    <p style="font-size:.72em; color:var(--tinta-2); margin:.2em 0 .4em">
+      <span class="chip sintetico">codificadores simulados</span>
+      el 73 % y el 0,46 salen del archivo del curso, donde las dos codificaciones se
+      generaron con una semilla. Sirven para practicar la cuenta; reportarlos como
+      acuerdo humano real sería fraude.
+    </p>
+    <div class="ojo compacta">
       Y si tu modelo saca <strong>0,95</strong> donde dos humanos coinciden en 0,73:
       <strong>no festejes. Buscá el error.</strong> Casi siempre hay una fuga, o el modelo
       aprendió el estilo de <em>un</em> codificador en particular.
     </div>
-    <p class="fragment"><strong>Este es probablemente el aporte más valioso que un
-      cientista social hace en un equipo de ML</strong>, y hay que decirlo así. El kappa
-      no es un detalle de calidad: es un <em>límite epistemológico</em>.</p>
+    <p class="fragment"><strong>Este es el aporte más valioso que un cientista social
+      hace en un equipo de ML.</strong> El kappa no es un detalle de calidad: es un
+      <em>límite epistemológico</em>.</p>
     <aside class="notes">
       4 min. Terreno conocido: acá ellos saben más que el ingeniero.
       El número 0,73/0,46 sale del archivo del curso, y los dos codificadores son
