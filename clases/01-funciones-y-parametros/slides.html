@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 1 — Una función es una máquina con perillas | Deep Learning para Cientistas Sociales</title>
+
+<!-- ==========================================================================
+     CLASE 1 — Una función es una máquina con perillas
+     35 slides para 120 minutos. El presupuesto de tiempo está en las notas
+     del docente de cada slide y, entero, en notas-docente.md.
+     CERO CDNs: todo sale de _shared/ por ruta relativa y abre con file://
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* la fórmula de hoy, coloreada como la viz: variable en un color, perillas en otro */
+  .reveal .formulon {
+    font-family: var(--f-mono); font-size: 1.9em; letter-spacing: .01em;
+    margin: .3em 0 .1em;
+  }
+  .reveal .formulon .v { color: var(--c-datos); }
+  .reveal .formulon .p { color: var(--c-parametro); font-weight: 700; }
+  .reveal .zoo-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .reveal .zoo-grilla > div { background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .4rem; }
+  .reveal .zoo-grilla h4 { margin: 0 0 .2rem; font-size: .74em; color: var(--c-acento); }
+  .reveal .lado-a-lado { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem;
+    align-items: center; }
+  .reveal .lado-a-lado > * { min-width: 0; }
+  .reveal .abrir-suelta { font-size: .62em; color: var(--tinta-3); margin: .15em 0 0; }
+  .reveal table.dos-tipos td, .reveal table.dos-tipos th { font-size: 1.02em; }
+  .reveal table.dos-tipos td { height: 2.4em; }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ======================== 1 · PORTADA ======================== -->
+<section class="portada">
+  <p class="num-clase">Clase 1</p>
+  <h1>Una función es una máquina con perillas</h1>
+  <div class="franja"></div>
+  <p class="gancho">Tenés unos puntos y querés decir algo general sobre ellos.
+    Ese problema, que es el más viejo de las ciencias sociales cuantitativas,
+    es también la puerta de entrada al deep learning.</p>
+  <aside class="notes">
+    <b>0:00 — 1 min.</b> Arrancá con esto, palabra por palabra:
+    «Antes de que empecemos: nadie acá va a tener que derivar nada. Si en algún momento
+    sentís que se puso matemático de más, es culpa mía y quiero que me lo digas en el
+    momento, no al final de la cursada.»<br>
+    No leas el temario. No prometas nada para dentro de diez clases. Pasá a la siguiente.
+  </aside>
+</section>
+
+<!-- ======================== 2 · DE DÓNDE VENIMOS ======================== -->
+<section>
+  <span class="marca">callback</span>
+  <h2>De dónde venimos</h2>
+  <p class="bajada">Esta es la primera clase, así que «de dónde venimos» es de otro lado:
+    de lo que ya sabés hacer.</p>
+  <ul>
+    <li>Alguna vez miraste una <strong>tabla de regresión</strong> y leíste un coeficiente.</li>
+    <li>Alguna vez dijiste «esto <strong>viene creciendo</strong>» mirando una serie.</li>
+    <li>Alguna vez discutiste si <strong>una medida mide lo que dice medir</strong>.</li>
+    <li class="fragment"><strong>Las tres cosas son esta clase.</strong> Lo único que cambia
+      en las diez semanas que vienen es que las figuras se van a poner más raras que una recta.</li>
+  </ul>
+  <aside class="notes">
+    <b>1:00 — 2 min.</b> Preguntá a mano alzada: «¿quién corrió alguna vez una regresión?».
+    Suele levantar la mano la mitad. Decile a esa mitad que ya estimó parámetros sin llamarlos
+    así, y a la otra mitad que no se perdió nada, que hoy lo hacemos desde cero.<br>
+    <b>Si vas atrasado, esta slide es la primera que se recorta.</b>
+  </aside>
+</section>
+
+<!-- ======================== 3 · LOS PUNTOS MISTERIOSOS ======================== -->
+<section>
+  <h2>¿Qué le pasó a este país?</h2>
+  <div class="viz-frame" style="padding:10px"><div id="fig-misterio"></div></div>
+  <p class="viz-pie">Cuarenta años de algo. Sin ejes, a propósito.</p>
+  <aside class="notes">
+    <b>3:00 — 4 min. Esta es la slide más importante del arranque: no la apures.</b><br>
+    «Tómense un minuto. ¿Qué historia cuenta esto?» Y después <b>callate</b>. Contá hasta
+    quince en silencio antes de volver a hablar. Siempre hay alguien que se anima.<br>
+    Van a decir: «hubo una crisis», «esto es inflación», «esto es delito», «esto sube desde
+    los 90». <b>No corrijas nada, no valides nada.</b> Anotá dos o tres versiones en el
+    pizarrón, tal cual las dicen. Las vas a usar en la slide siguiente.
+  </aside>
+</section>
+
+<!-- ======================== 4 · LOS MISMOS PUNTOS, CON EJES ======================== -->
+<section>
+  <h2>Los mismos puntos, con los ejes puestos</h2>
+  <div class="viz-frame" style="padding:10px"><div id="fig-revelado"></div></div>
+  <p class="viz-pie"><b>Qué es:</b> el porcentaje de palabras del discurso presidencial de
+    apertura de sesiones ordinarias que pertenecen a un léxico de 23 palabras sobre
+    <em>seguridad</em>. Un punto por año, 1984-2019. Datos reales.</p>
+  <aside class="notes">
+    <b>7:00 — 3 min.</b> «Ah. Bueno. ¿Cambia lo que dijeron? ¿Alguien mantiene su historia?»<br>
+    Volvé a las versiones que anotaste y preguntá cuáles sobreviven.<br>
+    Decí <b>esta frase, que se cobra en la clase 10</b>: «Ojo con lo que acabo de hacer.
+    Les mostré un número, pero antes de ese número hay una decisión: qué 23 palabras cuentan
+    como “seguridad”. Esa lista la escribió una persona un martes. Está en el repo, la pueden
+    cambiar, y si la cambian el gráfico cambia.»<br>
+    Mencioná los dos ceros (2002 y 2009) sólo si alguien pregunta: no significan que no hubo
+    inseguridad, significan que ninguna de esas 23 palabras apareció.
+  </aside>
+</section>
+
+<!-- ======================== 5 · LA PREGUNTA DEL CURSO ======================== -->
+<section class="pregunta">
+  <h2>Si tuvieras que resumir esto con <em>una línea</em>,<br>¿cuál dibujarías?</h2>
+  <div class="opciones">
+    <div><b>A</b> una recta que sube</div>
+    <div><b>B</b> una curva suave</div>
+    <div><b>C</b> una línea que pasa por todos los puntos</div>
+  </div>
+  <aside class="notes">
+    <b>10:00 — 2 min.</b> «No con palabras: con una línea. Con el dedo en el aire.»
+    Que lo hagan de verdad, con el brazo. Después votá a mano alzada A, B o C y
+    <b>anotá los tres números en el pizarrón</b>: se vuelven a usar en la clase 4.<br>
+    No digas cuál está bien. No hay una bien todavía.
+  </aside>
+</section>
+
+<!-- ======================== 6 · TRES CANDIDATAS ======================== -->
+<section>
+  <h2>Tres personas dibujaron estas tres</h2>
+  <div class="viz-frame" style="padding:10px"><div id="fig-candidatas"></div></div>
+  <p class="viz-pie"><b>A</b> una recta · <b>B</b> una curva suave · <b>C</b> una que pasa
+    por todos los puntos.</p>
+  <aside class="notes">
+    <b>12:00 — 2 min.</b> «Guarden cuál les gusta más. En la clase 4 vamos a descubrir que
+    una de las tres es una trampa.» No digas cuál. Si alguien dice «la C es tramposa porque
+    es demasiado», felicitalo y no expliques: dejá la deuda abierta.<br>
+    Cerrá con: «hoy vamos por la A, que es la más humilde de las tres. Y vamos a ver que la
+    A ya tiene adentro todo el curso.»
+  </aside>
+</section>
+
+<!-- ======================== 7 · DOS NÚMEROS ======================== -->
+<section>
+  <h2>Para dibujar esa recta hacen falta <span class="c-parametro">dos números</span></h2>
+  <div class="viz-frame" style="padding:10px"><div id="fig-dos-numeros"></div></div>
+  <p class="viz-pie">Dos. Nada más. Toda la información de esa línea infinita entra en dos números.</p>
+  <aside class="notes">
+    <b>14:00 — 2 min.</b> Señalá los dos con el dedo en la pantalla: dónde arranca y qué tan
+    empinada. «Si vos me decís esos dos números por teléfono, yo dibujo exactamente esta recta
+    en mi casa sin haber visto nunca los datos.»<br>
+    Esa frase —«te la puedo dibujar por teléfono»— es la definición operativa de parámetro y
+    la van a recordar mejor que cualquier definición formal.
+  </aside>
+</section>
+
+<!-- ======================== 8 · LA CAJA CON PERILLAS ======================== -->
+<section>
+  <h2>Una función es esto</h2>
+  <div class="viz-frame" style="padding:14px"><div id="fig-caja"></div></div>
+  <p class="viz-pie">Entra algo por un lado, sale algo por el otro, y tiene
+    <span class="c-parametro">perillas</span> al costado.</p>
+  <aside class="notes">
+    <b>16:00 — 3 min.</b> «Esta imagen la vamos a usar durante diez clases. En la clase 8 la
+    caja va a tener un millón y medio de perillas y va a ser exactamente el mismo dibujo.»<br>
+    Aclaración obligatoria, una sola vez y en voz alta: «<b>f(x) no se lee “f por x”.</b>
+    No es una multiplicación. Son los paréntesis de “aplicá f a x”. Es una notación
+    desafortunada y la sufrimos todos.»
+  </aside>
+</section>
+
+<!-- ======================== 9 · LO MISMO, ESCRITO ======================== -->
+<section>
+  <h2>Lo mismo, escrito</h2>
+  <p class="formulon">f(<span class="v">x</span>) = <span class="p">a</span> ·
+    <span class="v">x</span> + <span class="p">b</span></p>
+  <div class="lado-a-lado">
+    <div>
+      <ul>
+        <li><span class="c-datos"><b>x</b></span> — lo que entra. El año, la edad,
+          la cantidad de palabras.</li>
+        <li><span class="c-parametro"><b>a</b> y <b>b</b></span> — las perillas.
+          Las elegís vos (o las va a aprender la máquina).</li>
+      </ul>
+      <div class="intuicion compacta">
+        Esta es la única fórmula de la clase de hoy. Y ya la entendiste mirando el dibujo
+        de la slide anterior: la fórmula es el <em>resumen taquigráfico</em>, no la definición.
+      </div>
+    </div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-caja-chica"></div></div>
+  </div>
+  <aside class="notes">
+    <b>19:00 — 2 min.</b> Leé la fórmula en voz alta señalando el dibujo de al lado:
+    «efe de equis es igual a <i>a</i> por equis más <i>be</i>». Marcá que los colores son
+    los mismos que en la caja y que van a ser los mismos las diez clases:
+    negro lo observado, azul lo que dibuja el modelo, violeta las perillas.
+  </aside>
+</section>
+
+<!-- ======================== 10 · DOS TIPOS DE NÚMEROS ======================== -->
+<section>
+  <h2>Dos tipos de números que se escriben igual</h2>
+  <div class="comparacion">
+    <div>
+      <h4><span class="c-datos">Variable</span> — lo que entra</h4>
+      <p>Cambia <strong>de un caso a otro</strong> de tu base.</p>
+      <p>La elige el mundo, no vos.</p>
+      <p>El año. La edad. El municipio. El largo del discurso.</p>
+      <p>Moverla te <strong>recorre</strong> la figura.</p>
+    </div>
+    <div>
+      <h4><span class="c-parametro">Parámetro</span> — la perilla</h4>
+      <p>Es <strong>el mismo para toda la base</strong>.</p>
+      <p>Lo elegís vos, o lo aprende la máquina.</p>
+      <p>Un coeficiente. Una tasa. Un peso. Un umbral.</p>
+      <p>Moverlo <strong>deforma</strong> la figura entera.</p>
+    </div>
+  </div>
+  <div class="ojo compacta"><b>La regla del dedo:</b> ¿este número cambia de una fila a la
+    otra de mi base? Entonces es variable. ¿Es el mismo para toda la base? Entonces es parámetro.</div>
+  <aside class="notes">
+    <b>21:00 — 3 min.</b> «Esta distinción es el 80 % de la clase de hoy. Si se la llevan,
+    ganamos.»<br>
+    Pedí un ejemplo del aula: «díganme una variable de su propia investigación». Después
+    «díganme un parámetro». El segundo cuesta más, y ese esfuerzo es el contenido.<br>
+    Si alguien dice «el tamaño de la muestra», es una buena confusión: n no es ni una cosa ni
+    la otra, es una propiedad del diseño. Usalo para mostrar que la regla del dedo se aplica
+    a los números que entran al modelo, no a todo número que exista.
+  </aside>
+</section>
+
+<!-- ======================== 11 · USTEDES YA USAN PARÁMETROS ======================== -->
+<section>
+  <h2>Ustedes ya vienen haciendo esto</h2>
+  <div class="tarjetas">
+    <div><h4>«Creció 3 % por año»</h4>Ese <b class="c-parametro">3 %</b> es un parámetro.
+      El año es la variable.</div>
+    <div><h4>«Por cada año de educación, +X de ingreso»</h4>Ese <b class="c-parametro">X</b>
+      es un parámetro. Es <em>el</em> coeficiente del que discute todo el paper.</div>
+    <div><h4>Un peso muestral</h4>Un <b class="c-parametro">número</b> que elegiste vos para
+      que la muestra se parezca a la población.</div>
+  </div>
+  <div class="ss compacta">
+    Cuando reportás un coeficiente en una tabla de regresión, estás reportando una perilla.
+    Lo único nuevo del curso es que las figuras van a ser más raras que una recta, y que las
+    perillas van a ser miles.
+  </div>
+  <aside class="notes">
+    <b>24:00 — 1 min.</b> Rápido. Es una slide de reconocimiento, no de explicación.
+    «Nada de esto es nuevo para ustedes. Lo nuevo es el nombre y la escala.»
+  </aside>
+</section>
+
+<!-- ======================== 12 · MOVELAS VOS (VIZ 1) ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movelas vos</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/maquina-de-perillas.html" title="la máquina con perillas" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> una perilla <em>gira</em> la recta, la otra la
+    <em>sube y baja entera</em>. Las dos mueven el número de desajuste.</p>
+  <p class="abrir-suelta">Para proyectar más grande:
+    <a href="viz/maquina-de-perillas.html" target="_blank">abrir la visualización sola</a>.</p>
+  <aside class="notes">
+    <b>25:00 — 6 min. Movela vos, despacio, narrando.</b><br>
+    Guion sugerido: (1) subí la pendiente al máximo — «¿qué pasó?»; (2) bajala a cero —
+    «¿qué está afirmando ahora este modelo? Que el tema no cambió en 35 años»; (3) movés
+    «dónde arranca» — «esta no gira, sube y baja»; (4) prendé y apagá «mostrar los errores».<br>
+    Preguntá antes de apretar el botón: «¿cuánto creen que se puede bajar el desajuste?».
+    Que tiren números. Después apretá <b>«la mejor recta posible»</b>: 0.0146.<br>
+    Y ahora el golpe: «una raya horizontal en el promedio da 0.0165. La mejor recta apenas
+    le gana. Eso ya es un hallazgo: la tendencia lineal, acá, es débil de verdad.»<br>
+    Cerrá sembrando: «si yo supiera cómo bajar ese número sin tocar los sliders con la mano,
+    no necesitaría los sliders. Eso es la clase 3.»
+  </aside>
+</section>
+
+<!-- ======================== 13 · LA APUESTA ======================== -->
+<section class="pregunta">
+  <h2>Si muevo <code>x</code>, ¿se mueve la curva o se mueve<br>un punto sobre la curva?</h2>
+  <div class="opciones">
+    <div><b>A</b> se mueve la curva entera</div>
+    <div><b>B</b> se mueve un punto sobre la curva</div>
+    <div><b>C</b> las dos cosas</div>
+  </div>
+  <aside class="notes">
+    <b>31:00 — 2 min. Esta slide va ANTES de la viz, siempre.</b><br>
+    «Voten. En serio, levanten la mano. Es importante que se equivoquen ahora y no en la
+    clase 4.» Contá las manos en voz alta y anotá el reparto en el pizarrón.<br>
+    Suele ganar C, que es la respuesta intuitiva y equivocada. No corrijas: pasá a la viz.
+  </aside>
+</section>
+
+<!-- ======================== 14 · LA RESPUESTA (VIZ 2) ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>La respuesta se mira, no se explica</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/variable-vs-parametro.html" title="variable contra parámetro" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el rastro violeta de la derecha son
+    <em>todas las curvas que tu modelo podría dibujar</em>. Elegir el parámetro es elegir una.</p>
+  <p class="abrir-suelta">Para proyectar más grande:
+    <a href="viz/variable-vs-parametro.html" target="_blank">abrir la visualización sola</a>.</p>
+  <aside class="notes">
+    <b>33:00 — 7 min.</b><br>
+    Izquierda primero, sola: «muevo x, la bolita corre, la curva ni se entera».
+    Después derecha, sola: «muevo a, la bolita se queda clavada en x = 2 y la curva se retuerce».
+    Recién al final apretá <b>«animar los dos»</b> para el contraste.<br>
+    Leé en voz alta las dos frases de abajo de los paneles, que son la mitad del valor de la viz:
+    <i>«estoy mirando otro caso de la misma teoría»</i> contra
+    <i>«estoy proponiendo otra teoría»</i>.<br>
+    Y cerrá con el aha: «ese rastro violeta son todas las teorías que tu modelo puede sostener.
+    Aprender, en este curso entero, va a ser elegir una de esas.»
+  </aside>
+</section>
+
+<!-- ======================== 15 · EL MEDIDOR DE DESAJUSTE ======================== -->
+<section>
+  <h2>Un número que dice qué tan mal está</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:10px"><div id="fig-desajuste"></div></div>
+    <div>
+      <p>Cada <span class="c-error"><b>palito rojo</b></span> es lo que le erró el modelo
+        en un año.</p>
+      <p>Si los elevo al cuadrado y los promedio, tengo <strong>un solo número</strong>
+        que resume qué tan mal la estoy dibujando.</p>
+      <p class="numero-vivo c-error">0.0368</p>
+      <div class="intuicion compacta">Ese número va a ser <strong>la estrella de la clase 3</strong>.
+        Hoy lo llamamos <em>desajuste</em> y nada más.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>40:00 — 2 min.</b> «¿Por qué al cuadrado? Por dos razones que hoy no vamos a discutir:
+    para que los errores para arriba no se cancelen con los de para abajo, y para que los
+    errores grandes pesen mucho más que los chicos. Esa segunda razón es una <b>decisión
+    metodológica</b> y en la clase 3 la vamos a discutir en serio, porque no es neutral.»<br>
+    No digas la palabra <i>loss</i>. Se gana en la clase 3, cuando ya duela no tenerla.
+  </aside>
+</section>
+
+<!-- ======================== 16 · BLOQUE PRÁCTICO 1 ======================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1 — el notebook</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code> (en Colab o en tu máquina) y hacé las secciones
+    <b>1, 2 y 3</b>. Veinte minutos. Yo doy vueltas.
+  </div>
+  <pre><code class="language-python" data-trim>
+def recta(x, a, b):
+    """La máquina: entra x, salen a*x + b. `a` y `b` son las perillas."""
+    return a * x + b
+</code></pre>
+  <div class="ojo compacta">
+    <b>Python es maniático con los espacios y no es culpa tuya.</b> Si te tira un error rojo
+    enorme, no rompiste nada: el error rojo no es un reto, es información. Se reinicia el
+    entorno y sigue todo igual.
+  </div>
+  <aside class="notes">
+    <b>42:00 — 18 min de trabajo.</b><br>
+    Antes de soltarlos, <b>rompé algo a propósito adelante de todos</b>: borrá los dos puntos
+    del <code>def</code>, corré la celda, mostrá el error rojo gigante, arreglalo y volvé a
+    correr. Treinta segundos que se pagan solos.<br>
+    Mientras dan vueltas: la pregunta que más va a aparecer es «¿por qué no me anda?» y en el
+    90 % de los casos es que corrieron una celda sin haber corrido la de arriba.<br>
+    Avisá a los 5 minutos del final. <b>La pausa no se recorta.</b>
+  </aside>
+</section>
+
+<!-- ======================== 17 · PAUSA ======================== -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+  <aside class="notes"><b>60:00 — 10 min. En serio, pausa.</b> No la uses para «terminar
+    una cosita»: la segunda mitad de la clase necesita cabezas descansadas.</aside>
+</section>
+
+<!-- ======================== 18 · VOLVIMOS ======================== -->
+<section>
+  <h2>Volvimos</h2>
+  <ul>
+    <li>Escribieron una función y la graficaron. <strong>Eso ya es un modelo.</strong></li>
+    <li>Cambiaron dos números y la figura cambió. Ninguno de esos dos números era un dato.</li>
+    <li>Vieron un número de desajuste subir y bajar según dónde pusieran la recta.</li>
+  </ul>
+  <p class="bajada">¿Qué encontraron? ¿A alguien le pasó algo raro?</p>
+  <aside class="notes">
+    <b>70:00 — 2 min.</b> Preguntá de verdad y esperá. Si alguien dice «me daba error»,
+    pedile que cuente cuál: los errores compartidos bajan la vergüenza del grupo entero.<br>
+    Si nadie habla, tirá vos uno: «a mí me pasó que puse b = 100 y desapareció la recta.
+    ¿Por qué?» (se fue de la escala del gráfico).
+  </aside>
+</section>
+
+<!-- ======================== 19 · EL ZOO ======================== -->
+<section>
+  <h2>El zoo de funciones</h2>
+  <div class="zoo-grilla">
+    <div><h4>Recta</h4><div id="mini-recta"></div></div>
+    <div><h4>Parábola</h4><div id="mini-parabola"></div></div>
+    <div><h4>Exponencial</h4><div id="mini-exponencial"></div></div>
+    <div><h4>Sigmoide</h4><div id="mini-sigmoide"></div></div>
+    <div><h4>Seno</h4><div id="mini-seno"></div></div>
+    <div><h4>Escalón</h4><div id="mini-escalon"></div></div>
+  </div>
+  <p class="viz-pie">Seis formas básicas. Como los ladrillos de un Lego:
+    lo interesante no es cada una, es lo que se puede armar con ellas.</p>
+  <aside class="notes">
+    <b>72:00 — 2 min.</b> «No hay nada que memorizar acá. No quiero que se aprendan las
+    fórmulas: quiero que reconozcan la <b>forma</b>. Si ven una S en un gráfico, quiero que
+    piensen “ah, una sigmoide”, y la fórmula la buscan en Google.»<br>
+    Esa frase desarma a los que ya empezaron a copiar fórmulas en el cuaderno.
+  </aside>
+</section>
+
+<!-- ======================== 20 · LA RECTA ======================== -->
+<section>
+  <h2>La recta</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-recta"></div></div>
+    <div>
+      <p class="formulon" style="font-size:1.2em">f(<span class="v">x</span>) =
+        <span class="p">a</span>·<span class="v">x</span> + <span class="p">b</span></p>
+      <p><strong>Qué afirma:</strong> cambio constante por unidad. Sube lo mismo del año 1
+        al 2 que del 34 al 35.</p>
+      <div class="ss compacta">Cuando escribís «creció linealmente» estás afirmando esto,
+        aunque no lo hayas pensado así.</div>
+    </div>
+  </div>
+  <aside class="notes"><b>74:00 — 1 min.</b> Rápido: es la que ya conocen.
+    Marcá que «constante» es una afirmación fuerte sobre el mundo, no una comodidad.</aside>
+</section>
+
+<!-- ======================== 21 · LA PARÁBOLA ======================== -->
+<section>
+  <h2>La parábola</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-parabola"></div></div>
+    <div>
+      <p><strong>Qué afirma:</strong> sube y después baja (o al revés). Hay un punto de giro
+        y ese punto es lo interesante.</p>
+      <div class="ss compacta">Toda ciencia social tiene su U invertida favorita: la curva de
+        Kuznets, el ciclo de vida del ingreso, la relación entre edad y participación política.</div>
+    </div>
+  </div>
+  <aside class="notes"><b>75:00 — 1,5 min.</b> Preguntá: «¿cuál es la U invertida de su
+    disciplina?». Sale rápido y engancha. Si no sale ninguna, ofrecé la de Kuznets y seguí.</aside>
+</section>
+
+<!-- ======================== 22 · LA EXPONENCIAL ======================== -->
+<section>
+  <h2>La exponencial</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-exponencial"></div></div>
+    <div>
+      <p><strong>Qué afirma:</strong> el crecimiento se acelera solo. Cuanto más grande es,
+        más rápido crece.</p>
+      <div class="ss compacta">La difusión de una noticia en redes las primeras horas.
+        Nuestro cerebro es malísimo para lo exponencial: por eso nos sorprende siempre,
+        y por eso los titulares de «se duplicó en una semana» se leen mal.</div>
+    </div>
+  </div>
+  <aside class="notes"><b>76:30 — 1,5 min.</b> El truco del arroz en el tablero de ajedrez
+    funciona bien acá si tenés 30 segundos. Si vas atrasado, saltealo.</aside>
+</section>
+
+<!-- ======================== 23 · LA SIGMOIDE ======================== -->
+<section>
+  <h2>La sigmoide <span class="c-acento">— guardá esta</span></h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-sigmoide"></div></div>
+    <div>
+      <p><strong>Qué afirma:</strong> empieza lento, se acelera y <strong>se satura</strong>.
+        Hay un techo y se llega.</p>
+      <div class="ss compacta">La adopción de una innovación (Rogers). La saturación de un
+        tema en la agenda mediática: no se puede hablar del 200 % del tiempo.</div>
+      <div class="aha compacta">Márquenla. Esta función vuelve en la clase 2, en la 3 y en la 9.
+        Es la más importante del curso después de la recta.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>78:00 — 3 min. Bajá la velocidad acá.</b><br>
+    Mostrá con el dedo las tres zonas: el arranque lento, la explosión del medio, el techo.
+    «Casi todo lo que en ciencias sociales llamamos “difusión” tiene esta forma.»<br>
+    Y sembrá: «acuérdense del techo. En la clase 9, cuando un modelo les devuelva un número
+    entre 0 y 1 y les diga que es una probabilidad, va a ser por esta función.»
+  </aside>
+</section>
+
+<!-- ======================== 24 · EL SENO ======================== -->
+<section>
+  <h2>El seno</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-seno"></div></div>
+    <div>
+      <p><strong>Qué afirma:</strong> esto ya pasó y va a volver a pasar, cada tanto igual.</p>
+      <div class="ss compacta">El ciclo electoral. La estacionalidad de las noticias
+        (enero es distinto a septiembre en cualquier diario).</div>
+    </div>
+  </div>
+  <aside class="notes"><b>81:00 — 1 min.</b> «Todo lo que se repite.» Una sola frase y seguí:
+    el seno no vuelve a aparecer hasta muy tarde en el curso.</aside>
+</section>
+
+<!-- ======================== 25 · JUGÁ CON EL ZOO (VIZ 3) ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Jugá con el zoo</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/zoo-de-funciones.html" title="el zoo de funciones" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> apostá primero cuántas formas van a poder tapar la
+    curva gris. Después probá. Ojo con el desafío 3.</p>
+  <p class="abrir-suelta">Para proyectar más grande:
+    <a href="viz/zoo-de-funciones.html" target="_blank">abrir la visualización sola</a>.</p>
+  <aside class="notes">
+    <b>82:00 — 3 min. Esta conviene abrirla suelta, a pantalla completa.</b><br>
+    <b>Antes</b> de apretar cada desafío, pedí la apuesta: «¿cuántas de las seis van a poder?».
+    Anotá el número que diga el aula.<br>
+    Desafío 1: la sacan tres (recta, rampa y una sigmoide muy estirada). Punto:
+    <i>varias familias pueden contener la misma figura</i>.<br>
+    Desafío 2: sólo la sigmoide. Insistí con la recta a la vista de todos hasta que se aburran.<br>
+    Desafío 3: no la saca ninguna. Apretá «mostrar el techo de cada forma»: los números están
+    medidos. «No es que no le pusieron ganas. Está demostrado que no se puede.»<br>
+    <b>Esa frustración es el gancho de la clase 2 y no hay que resolverla hoy.</b>
+  </aside>
+</section>
+
+<!-- ======================== 26 · LA MISMA FÓRMULA, OTRA HISTORIA ======================== -->
+<section>
+  <h2>La misma fórmula, tres historias distintas</h2>
+  <div class="lado-a-lado">
+    <div class="viz-frame" style="padding:8px"><div id="fig-familia"></div></div>
+    <div>
+      <ul style="font-size:.88em">
+        <li><b>Lenta y temprana:</b> «el cambio empezó enseguida pero tardó veinte años
+          en completarse».</li>
+        <li><b>Brusca y tardía:</b> «no pasó nada durante años y de golpe, en dos años,
+          cambió todo».</li>
+        <li><b>Lenta y tardía:</b> «arrancó tarde y todavía está a mitad de camino».</li>
+      </ul>
+      <div class="aha compacta">El parámetro no es un detalle técnico: <strong>es la
+        afirmación sustantiva</strong>. Cuando cambiás el parámetro, cambiás la teoría.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>85:00 — 2 min.</b> Esta slide es el corazón sustantivo de la clase.
+    «Las tres curvas son la misma fórmula. Lo único que cambia son dos números. Y las tres
+    dicen cosas completamente distintas sobre lo que pasó. Si en su paper reportan un
+    parámetro sin traducirlo a una de estas oraciones, están reportando la mitad.»
+  </aside>
+</section>
+
+<!-- ======================== 27 · BLOQUE PRÁCTICO 2 ======================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 — ajuste a ojo, de a dos</h2>
+  <div class="manos">
+    De a dos. <b>Uno mueve los números, el otro mira el desajuste y grita.</b>
+    Consigna: bajar el desajuste todo lo que puedan. Anoten los dos números que encontraron.
+  </div>
+  <pre><code class="language-python" data-trim>
+def desajuste(a, b):
+    """El número que dice qué tan mal está la recta. Más chico es mejor."""
+    errores = seguridad - recta(anios - 1984, a, b)
+    return np.mean(errores ** 2)
+</code></pre>
+  <div class="ojo compacta">Está bien correr la misma celda veinte veces.
+    <b>Es exactamente lo que se espera que hagan.</b></div>
+  <aside class="notes">
+    <b>87:00 — 18 min de trabajo.</b><br>
+    Consigna en voz alta: «quien llegue más bajo gana el prestigio eterno y nada más».
+    La competencia funciona: dejala correr.<br>
+    Andá pasando y preguntá <b>cómo</b> están buscando, no cuánto sacaron. La respuesta que
+    querés escuchar es «primero moví una y después la otra»: eso es descenso por coordenadas
+    y se nombra en la clase 3.<br>
+    Si una pareja llega a 0.0146 (el piso), pediles que sigan bajando dos minutos más.
+    Que se choquen con el piso es contenido.
+  </aside>
+</section>
+
+<!-- ======================== 28 · EL RANKING ======================== -->
+<section>
+  <h2>El ranking</h2>
+  <table class="dos-tipos">
+    <tr><th>pareja</th><th>qué tan empinada</th><th>dónde arranca</th><th>desajuste</th></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+  <p class="bajada">El piso medido de la recta sobre estos datos es
+    <span class="c-error"><b>0.0146</b></span>. ¿Alguien llegó?</p>
+  <aside class="notes">
+    <b>105:00 — 3 min.</b> Completá la tabla en vivo (proyectada o en el pizarrón).<br>
+    La pregunta que importa <b>no</b> es cuánto sacaron: es <b>cómo</b> hicieron para bajar.
+    Dejá que dos o tres describan su estrategia. Y después decí:
+    «escuchen lo que acaban de describir: una estrategia de búsqueda. Le pusieron reglas a
+    cómo mover las perillas. Eso, escrito en código, es la clase 3.»
+  </aside>
+</section>
+
+<!-- ======================== 29 · TIENE NOMBRE ======================== -->
+<section>
+  <h2>Lo que acaban de hacer tiene nombre</h2>
+  <div class="intuicion">
+    Mover perillas para minimizar un número se llama
+    <span class="glosario"><span class="en">optimization</span><span class="es">optimización</span></span>.
+    Y hacerlo a mano, con dos perillas, es insoportable.
+  </div>
+  <p>Ustedes acaban de hacer a mano, con <strong>dos</strong> perillas y en diez minutos,
+    lo que una computadora hace con <strong>mil millones</strong> de perillas en dos semanas.
+    La idea es exactamente la misma. Lo único que falta es que la máquina sepa
+    <em>para dónde</em> mover.</p>
+  <aside class="notes">
+    <b>108:00 — 2 min.</b> Marcá la escala con las manos: dos contra mil millones.
+    «No hay ningún salto conceptual entre lo que hicieron ustedes y lo que hace GPT.
+    Hay un salto de tamaño, que es enorme, y una idea sobre cómo elegir la dirección,
+    que vemos en la clase 3. Nada más.»
+  </aside>
+</section>
+
+<!-- ======================== 30 · EL LUNES ======================== -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás para el lunes</h2>
+  <ol>
+    <li>Tomá una serie de <strong>tu</strong> investigación (una variable por año, por mes,
+      por provincia).</li>
+    <li><strong>Graficala.</strong> Puntos, no barras. Mirala un rato antes de modelar nada.</li>
+    <li>Ajustale una recta a ojo y escribí, <strong>en castellano sustantivo</strong>,
+      qué significa cada parámetro.</li>
+  </ol>
+  <div class="ss">
+    Si tu pendiente da 0.4, <b>no</b> escribas «la pendiente es 0.4». Escribí
+    <b>«cada año sube 0.4 puntos»</b>. Esa traducción es tu trabajo, no el del modelo,
+    y es la parte que un revisor va a leer.
+  </div>
+  <aside class="notes">
+    <b>110:00 — 3 min.</b> Insistí en el paso 2: mirar antes de modelar. La mitad de los
+    errores metodológicos de un paper se evitan graficando primero.<br>
+    Si alguien no tiene una serie propia, ofrecele las otras cuatro del corpus del curso
+    (<code>inflacion</code>, <code>educacion</code>, <code>trabajo</code>, <code>salud</code>).
+  </aside>
+</section>
+
+<!-- ======================== 31 · PERO... ======================== -->
+<section>
+  <h2>Pero…</h2>
+  <div class="viz-frame" style="padding:10px"><div id="fig-inflacion"></div></div>
+  <p class="viz-pie">Menciones a <em>inflación</em>, mismos discursos, mismos años,
+    suavizadas con una media móvil de 3 años, con la <b>mejor</b> recta posible encima.
+    Su desajuste es <b>0.0015</b>; el de no hacer absolutamente nada (una raya horizontal
+    en el promedio) es <b>0.0015</b>. Empatan.
+    <br><b>Ojo:</b> suavizar cambia la pregunta. La serie cruda dice «cuánto se habló de
+    esto <em>ese año</em>»; la suavizada dice «en qué parte del período el tema estaba en
+    agenda». Las dos son legítimas; usar una y reportar la otra, no.</p>
+  <aside class="notes">
+    <b>113:00 — 2 min.</b> «Miren qué mal le va a la recta. Y ojo: esta no es una recta
+    cualquiera, es <b>la mejor que existe</b>. La medimos.»<br>
+    «Le empata a no hacer nada. Cuando tu mejor modelo empata con no hacer nada, el problema
+    no es que buscaste mal: el problema es que elegiste una familia de figuras que no
+    contiene la figura que tenés.»
+  </aside>
+</section>
+
+<!-- ======================== 32 · DOS CAMINOS ======================== -->
+<section>
+  <h2>Dos caminos</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Camino A — una fórmula más rara</h4>
+      <p>Buscar, para cada problema, la función que le va bien: una log-normal acá,
+        una Weibull allá, un polinomio de grado 5.</p>
+      <p><em>Es lo que hizo la estadística durante un siglo. Y funciona.</em></p>
+    </div>
+    <div>
+      <h4>Camino B — combinar funciones simples</h4>
+      <p>Quedarse con <strong>una</strong> pieza muy simple y apilarla muchas veces hasta
+        que la suma dibuje lo que sea.</p>
+      <p><em>Es lo que hace el deep learning. Vamos por acá.</em></p>
+    </div>
+  </div>
+  <div class="ojo compacta">Que vayamos por B <b>no</b> quiere decir que A esté mal.
+    Quiere decir que B escala a problemas donde vos no sabés qué fórmula buscar —
+    y que paga ese poder con interpretabilidad. Eso lo discutimos en serio en la clase 10.</div>
+  <aside class="notes">
+    <b>115:00 — 2 min.</b> Si en el aula hay gente con formación estadística, esta slide es
+    para ellos: no vengas a decirles que lo que saben está mal.<br>
+    Si preguntan por la referencia: Breiman (2001), <i>Statistical Modeling: The Two Cultures</i>.
+    Está en <code>referencias.md</code>.
+  </aside>
+</section>
+
+<!-- ======================== 33 · QUÉ TE LLEVÁS ======================== -->
+<section>
+  <h2>Qué te llevás de hoy</h2>
+  <ol style="font-size:1.05em">
+    <li><strong>Una función es una máquina con perillas.</strong> Entra algo, sale algo,
+      y las perillas eligen qué figura dibuja.</li>
+    <li><strong>Variable y parámetro son cosas distintas</strong> aunque los dos sean números:
+      una cambia de caso en caso, la otra es la misma para toda la base.</li>
+    <li><strong>Elegir la forma es una decisión teórica tuya</strong>, no del modelo.
+      La máquina elige el miembro de la familia; la familia la elegís vos.</li>
+  </ol>
+  <aside class="notes">
+    <b>117:00 — 1 min.</b> Tres, no cuatro. Si tenés que recortar, recortá la tercera de la
+    lista oral pero dejala en la slide: es la que desarma la confusión de
+    «entonces la máquina descubre la fórmula».
+  </aside>
+</section>
+
+<!-- ======================== 34 · GLOSARIO ======================== -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista">
+    <li><b>función</b><span>una máquina: le metés un número, sale otro</span></li>
+    <li><b>variable</b><span>lo que entra. Cambia de un caso a otro de tu base</span></li>
+    <li><b>parámetro</b><span>la perilla. Es la misma para toda la base</span></li>
+    <li><b>ajustar</b> <i>(to fit)</i><span>mover las perillas hasta que la figura se parezca
+      a los datos</span></li>
+    <li><b>optimización</b><span>mover perillas para minimizar un número. Nada más místico
+      que eso</span></li>
+    <li><b>desajuste</b><span>el número que dice qué tan mal está tu dibujo. En la clase 3
+      va a tener nombre propio</span></li>
+  </ul>
+  <p style="font-size:.8em">Todo término nuevo va a <code>recursos/glosario.md</code>,
+    que está en el repo y crece con nosotros.</p>
+  <aside class="notes"><b>118:00 — 1 min.</b> «El glosario está online y crece con nosotros.
+    La mitad de la sensación de “no entiendo nada” en deep learning es vocabulario,
+    no conceptos.»</aside>
+</section>
+
+<!-- ======================== 35 · EL PUENTE ======================== -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 2: componer funciones<br>para dibujar lo imposible</h1>
+  <div class="franja"></div>
+  <p class="gancho">Hoy nos chocamos con el techo de una figura sola. La salida no es buscar
+    una fórmula más complicada: es <strong>apilar</strong> muchas piezas tontas.
+    Van a ver algo que a mí todavía me parece magia, y no lo es.</p>
+  <aside class="notes">
+    <b>119:00 — 1 min.</b> Cerrá con la deuda abierta, no con un resumen:
+    «se van con una frustración: ninguna de las seis formas pudo con el desafío 3.
+    La semana que viene la cobramos.»<br>
+    Y la tarea real: el <code>[EL LUNES]</code> de la slide 30.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<!-- ====================== SCRIPTS (todos locales) ====================== -->
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  // --- plugin de matemática: KaTeX local, sin red ---------------------------
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+</script>
+<script>
+/* ===========================================================================
+   LAS FIGURAS DE LA CLASE
+   Todas dibujadas con viz.js sobre canvas: así siguen el tema claro/oscuro y
+   se redibujan solas al cambiar de slide o de tamaño de ventana.
+   Los datos son los mismos que usa el notebook (ssdl.datos.serie_menciones).
+   =========================================================================== */
+(function () {
+
+  // ---------- datos reales, copiados de ssdl.datos.serie_menciones ----------
+  const ANIO0 = 1984;
+  const SEGURIDAD = [0.0782, 0.1166, 0.0382, 0.0082, 0.0660, 0.0324, 0.0522, 0.0516,
+                     0.2441, 0.0765, 0.0578, 0.1120, 0.1044, 0.2250, 0.4357, 0.1468,
+                     0.4138, 0.3873, 0.0000, 0.0246, 0.1958, 0.1645, 0.1645, 0.1006,
+                     0.3806, 0.0000, 0.0928, 0.2338, 0.0750, 0.1626, 0.0535, 0.0488,
+                     0.4267, 0.2496, 0.3112, 0.2453];
+  // «inflación», suavizada con una media móvil de 3 años: es la serie con la que
+  // arranca la clase 2. Suavizar cambia la pregunta y hay que decirlo (datos/README).
+  const INFLACION = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+                     0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
+                     0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
+                     0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
+                     0.1440, 0.1837, 0.1321, 0.1268];
+
+  const seg = SEGURIDAD.map((y, i) => ({ x: ANIO0 + i, y: y }));
+  const inf = INFLACION.map((y, i) => ({ x: ANIO0 + i, y: y }));
+
+  // medias móviles de 3 años: la candidata «curva suave» de la slide 6
+  const suave = seg.map((d, i) => {
+    const a = seg[Math.max(0, i - 1)].y, b = d.y, c = seg[Math.min(seg.length - 1, i + 1)].y;
+    return { x: d.x, y: (a + b + c) / 3 };
+  });
+
+  // números MEDIDOS con medir-referencias.py — no estimados
+  const MEJOR_A = 0.0040, MEJOR_B = 0.085;          // seguridad: MSE 0.01455
+  const INF_A = 0.000432, INF_B = 0.0624;           // inflación suave: MSE 0.00150
+  const mejorRecta = x => MEJOR_A * (x - ANIO0) + MEJOR_B;
+
+  // ---------- ayudante: crea un plano y lo registra para el redibujo --------
+  const planos = [];
+  function figura(sel, op, dibujo) {
+    if (!document.querySelector(sel)) return null;
+    const p = Viz.plano(sel, op);
+    p.alDibujar(() => dibujo(p));
+    planos.push(p);
+    p.redibujar();
+    return p;
+  }
+  const anio = { formatoX: v => String(Math.round(v)) };
+
+  const EJES_SERIE = {
+    xmin: 1982.5, xmax: 2021, ymin: -0.05, ymax: 0.50,
+    ejeX: 'año', ejeY: '% de palabras del discurso'
+  };
+
+  /* ---------- slide 3: los puntos misteriosos (sin ejes) ---------- */
+  figura('#fig-misterio',
+    { xmin: 1982.5, xmax: 2021, ymin: -0.05, ymax: 0.50, alto: 400, margen: { i: 24, d: 24, a: 24, b: 24 } },
+    p => { p.fondo(); p.puntos(seg, { color: 'datos', r: 7 }); });
+
+  /* ---------- slide 4: los mismos, con ejes ---------- */
+  figura('#fig-revelado',
+    Object.assign({}, EJES_SERIE, { alto: 400, titulo: 'menciones a «seguridad» en el discurso de apertura' }),
+    p => {
+      p.fondo(); p.grilla(); p.ejes(anio);
+      p.puntos(seg, { color: 'datos', r: 5.5 });
+    });
+
+  /* ---------- slide 6: tres candidatas ---------- */
+  figura('#fig-candidatas',
+    Object.assign({}, EJES_SERIE, { alto: 400 }),
+    p => {
+      p.fondo(); p.grilla(); p.ejes(anio);
+      p.linea(seg, { color: 'modelo', grosor: 1.4, opacidad: .85 });                 // C
+      p.linea(suave, { color: 'modelo', grosor: 3, punteada: [8, 5], opacidad: .9 }); // B
+      p.curva(mejorRecta, { color: 'modelo', grosor: 4 });                            // A
+      p.puntos(seg, { color: 'datos', r: 4.5 });
+      p.texto(2020.4, mejorRecta(2020.4), 'A', { color: 'modelo', tam: 18, peso: '800', alinear: 'right', caja: true });
+      p.texto(2019, 0.30, 'B', { color: 'modelo', tam: 18, peso: '800', caja: true });
+      p.texto(1998, 0.46, 'C', { color: 'modelo', tam: 18, peso: '800', caja: true });
+    });
+
+  /* ---------- slide 7: dos números ---------- */
+  figura('#fig-dos-numeros',
+    Object.assign({}, EJES_SERIE, { alto: 400 }),
+    p => {
+      p.fondo(); p.grilla(); p.ejes(anio);
+      p.puntos(seg, { color: Viz.alfa('datos', .45), r: 4 });
+      p.curva(mejorRecta, { color: 'modelo', grosor: 4 });
+
+      // 1) dónde arranca
+      p.punto(ANIO0, MEJOR_B, { color: 'parametro', r: 8, halo: true });
+      p.texto(ANIO0, MEJOR_B, 'dónde arranca: 0.085',
+        { color: 'parametro', tam: 14, peso: '700', dx: 12, dy: 22, caja: true });
+
+      // 2) qué tan empinada: el triangulito de subida por año
+      const x1 = 2004, x2 = 2014;
+      p.segmento(x1, mejorRecta(x1), x2, mejorRecta(x1), { color: 'parametro', grosor: 2, punteada: true });
+      p.segmento(x2, mejorRecta(x1), x2, mejorRecta(x2), { color: 'parametro', grosor: 2, punteada: true });
+      p.texto((x1 + x2) / 2, mejorRecta(x1), 'qué tan empinada: 0.0040 por año',
+        { color: 'parametro', tam: 14, peso: '700', alinear: 'center', dy: 22, caja: true });
+    });
+
+  /* ---------- slide 15: el medidor de desajuste ---------- */
+  const MAL_A = -0.010, MAL_B = 0.350;   // la recta mal puesta: desajuste 0.0368 (medido)
+  figura('#fig-desajuste',
+    Object.assign({}, EJES_SERIE, { alto: 360 }),
+    p => {
+      p.fondo(); p.grilla(); p.ejes(anio);
+      for (const d of seg) {
+        p.segmento(d.x, d.y, d.x, MAL_A * (d.x - ANIO0) + MAL_B,
+          { color: 'error', grosor: 2.2, opacidad: .85 });
+      }
+      p.puntos(seg, { color: 'datos', r: 4.5 });
+      p.curva(x => MAL_A * (x - ANIO0) + MAL_B, { color: 'modelo', grosor: 3.5 });
+    });
+
+  /* ---------- slide 19: el zoo en miniatura ---------- */
+  const ZOO = {
+    'mini-recta':       x => 0.55 * x + 1,
+    'mini-parabola':    x => 4 - 0.22 * (x - 5) * (x - 5),
+    'mini-exponencial': x => 0.35 * Math.exp(0.32 * x),
+    'mini-sigmoide':    x => 8 / (1 + Math.exp(-1.6 * (x - 5))),
+    'mini-seno':        x => 4 + 2.4 * Math.sin(2 * Math.PI * x / 5),
+    'mini-escalon':     x => (x < 5 ? 1 : 7)
+  };
+  for (const id in ZOO) {
+    const f = ZOO[id];
+    figura('#' + id,
+      { xmin: 0, xmax: 10, ymin: -1, ymax: 9.5, alto: 155, margen: { i: 12, d: 12, a: 8, b: 12 } },
+      p => { p.fondo(); p.grilla(); p.curva(f, { color: 'modelo', grosor: 3.4 }); });
+  }
+
+  /* ---------- slides 20-24: una por forma ---------- */
+  const SOLAS = {
+    'fig-recta':       x => 0.55 * x + 1,
+    'fig-parabola':    x => 4 - 0.22 * (x - 5) * (x - 5),
+    'fig-exponencial': x => 0.35 * Math.exp(0.32 * x),
+    'fig-sigmoide':    x => 8 / (1 + Math.exp(-1.6 * (x - 5))),
+    'fig-seno':        x => 4 + 2.4 * Math.sin(2 * Math.PI * x / 5)
+  };
+  for (const id in SOLAS) {
+    const f = SOLAS[id];
+    figura('#' + id,
+      { xmin: 0, xmax: 10, ymin: -1, ymax: 9.5, alto: 300, margen: { i: 34, d: 14, a: 12, b: 26 } },
+      p => { p.fondo(); p.grilla(); p.ejes(); p.curva(f, { color: 'modelo', grosor: 4 }); });
+  }
+
+  /* ---------- slide 26: la misma fórmula, tres historias ---------- */
+  const TRES = [
+    { k: 0.45, m: 3.5, t: 'lenta y temprana', lx: 1.6, dx: 10, dy: -14, al: 'left' },
+    { k: 3.00, m: 7.0, t: 'brusca y tardía', lx: 7.0, dx: 12, dy: -6, al: 'left' },
+    { k: 0.45, m: 8.0, t: 'lenta y tardía', lx: 10.6, dx: -6, dy: 20, al: 'right' }
+  ];
+  figura('#fig-familia',
+    { xmin: 0, xmax: 12, ymin: -1, ymax: 9.5, alto: 320, ejeX: 'años desde el arranque',
+      margen: { i: 34, d: 20, a: 12, b: 40 } },
+    p => {
+      p.fondo(); p.grilla(); p.ejes();
+      TRES.forEach((c, i) => {
+        const f = x => 8 / (1 + Math.exp(-c.k * (x - c.m)));
+        p.curva(f, { color: i === 0 ? 'modelo' : 'parametro', grosor: 3.4,
+                     opacidad: i === 0 ? 1 : (i === 1 ? .95 : .6) });
+        p.texto(c.lx, f(c.lx), c.t, { color: i === 0 ? 'modelo' : 'parametro', tam: 13,
+                                      peso: '700', alinear: c.al, dx: c.dx, dy: c.dy,
+                                      caja: true });
+      });
+    });
+
+  /* ---------- slide 31: el fracaso de la recta contra inflación ---------- */
+  figura('#fig-inflacion',
+    { xmin: 1982.5, xmax: 2021, ymin: -0.02, ymax: 0.22, ejeX: 'año',
+      ejeY: '% de palabras del discurso', alto: 400,
+      titulo: 'menciones a «inflación» (media móvil de 3 años), con la MEJOR recta posible' },
+    p => {
+      p.fondo(); p.grilla(); p.ejes(anio);
+      for (const d of inf) {
+        p.segmento(d.x, d.y, d.x, INF_A * (d.x - ANIO0) + INF_B,
+          { color: 'error', grosor: 2, opacidad: .8 });
+      }
+      p.linea(inf, { color: Viz.alfa('datos', .45), grosor: 1.6 });
+      p.puntos(inf, { color: 'datos', r: 4.5 });
+      p.curva(x => INF_A * (x - ANIO0) + INF_B, { color: 'modelo', grosor: 4 });
+    });
+
+  /* ---------- slides 8 y 9: la caja con perillas (SVG) ---------- */
+  function caja(sel, ancho, alto, escala, altoCss) {
+    const cont = document.querySelector(sel);
+    if (!cont) return null;
+    const s = Viz.svg.crear(cont, { ancho: ancho, alto: alto, altoCss: altoCss });
+    function pintar() {
+      Viz.svg.limpiar(s);
+      const c = Viz.colores(), E = Viz.svg.el, F = escala;
+      const cx = ancho / 2, cy = alto - 30 * escala - 20;
+      const bw = 300 * F, bh = 130 * F;
+
+      // la caja
+      E('rect', { x: cx - bw / 2, y: cy - bh / 2, width: bw, height: bh, rx: 16 * F,
+                  fill: c.papel2, stroke: c.borde, 'stroke-width': 2.5 }, s);
+      E('text', { x: cx, y: cy + 6 * F, 'text-anchor': 'middle', fill: c.tinta2,
+                  'font-size': 22 * F, 'font-weight': 700, 'font-family': c.fuente,
+                  texto: 'la máquina' }, s);
+
+      // entrada
+      E('line', { x1: cx - bw / 2 - 150 * F, y1: cy, x2: cx - bw / 2 - 14 * F, y2: cy,
+                  stroke: Viz.color('datos'), 'stroke-width': 3.5 }, s);
+      E('path', { d: 'M ' + (cx - bw / 2 - 2 * F) + ' ' + cy + ' l ' + (-14 * F) + ' ' +
+                     (-8 * F) + ' l 0 ' + (16 * F) + ' z', fill: Viz.color('datos') }, s);
+      E('text', { x: cx - bw / 2 - 150 * F, y: cy - 16 * F, fill: Viz.color('datos'),
+                  'font-size': 19 * F, 'font-weight': 700, 'font-family': c.fuente,
+                  texto: 'entra  x' }, s);
+      E('text', { x: cx - bw / 2 - 150 * F, y: cy + 30 * F, fill: c.tinta3,
+                  'font-size': 15 * F, 'font-family': c.fuente, texto: 'el año' }, s);
+
+      // salida
+      E('line', { x1: cx + bw / 2 + 14 * F, y1: cy, x2: cx + bw / 2 + 140 * F, y2: cy,
+                  stroke: Viz.color('modelo'), 'stroke-width': 3.5 }, s);
+      E('path', { d: 'M ' + (cx + bw / 2 + 152 * F) + ' ' + cy + ' l ' + (-14 * F) + ' ' +
+                     (-8 * F) + ' l 0 ' + (16 * F) + ' z', fill: Viz.color('modelo') }, s);
+      E('text', { x: cx + bw / 2 + 152 * F, y: cy - 16 * F, 'text-anchor': 'end',
+                  fill: Viz.color('modelo'), 'font-size': 19 * F, 'font-weight': 700,
+                  'font-family': c.fuente, texto: 'sale  f(x)' }, s);
+      E('text', { x: cx + bw / 2 + 152 * F, y: cy + 30 * F, 'text-anchor': 'end', fill: c.tinta3,
+                  'font-size': 15 * F, 'font-family': c.fuente, texto: 'el % de palabras' }, s);
+
+      // las dos perillas, arriba
+      [[-1, 'a', 'qué tan empinada', -40], [1, 'b', 'dónde arranca', 40]].forEach(function (q) {
+        const px = cx + q[0] * 80 * F, py = cy - bh / 2 - 52 * F, R = 26 * F;
+        E('line', { x1: px, y1: cy - bh / 2, x2: px, y2: py + R, stroke: c.borde,
+                    'stroke-width': 4 }, s);
+        E('circle', { cx: px, cy: py, r: R + 5, fill: Viz.alfa('parametro', .13) }, s);
+        E('circle', { cx: px, cy: py, r: R, fill: c.papel, stroke: Viz.color('parametro'),
+                      'stroke-width': 3 }, s);
+        E('line', { x1: px, y1: py, x2: px + Math.sin(q[3] * Math.PI / 180) * (R - 6),
+                    y2: py - Math.cos(q[3] * Math.PI / 180) * (R - 6),
+                    stroke: Viz.color('parametro'), 'stroke-width': 4.5,
+                    'stroke-linecap': 'round' }, s);
+        E('text', { x: px, y: py - R - 12 * F, 'text-anchor': 'middle',
+                    fill: Viz.color('parametro'), 'font-size': 22 * F, 'font-weight': 800,
+                    'font-family': c.mono, texto: q[1] }, s);
+        E('text', { x: px, y: py - R - 30 * F, 'text-anchor': 'middle', fill: c.tinta3,
+                    'font-size': 14 * F, 'font-family': c.fuente, texto: q[2] }, s);
+      });
+    }
+    pintar();
+    window.addEventListener('viz:tema', pintar);
+    return pintar;
+  }
+  caja('#fig-caja', 700, 260, 1.0, '400px');
+  caja('#fig-caja-chica', 440, 175, 0.62, '235px');
+
+  /* ---------- reveal esconde las slides: hay que remedir al mostrarlas ------ */
+  function refrescar() {
+    for (const p of planos) { p.redimensionar(); p.redibujarYa(); }
+  }
+  if (window.Reveal) {
+    Reveal.on('ready', refrescar);
+    Reveal.on('slidechanged', refrescar);
+    Reveal.on('resize', refrescar);
+  }
+  window.addEventListener('load', refrescar);
+})();
+</script>
+</body>
+</html>

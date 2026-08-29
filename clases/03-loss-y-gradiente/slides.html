@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 3 — Estar equivocado es un número, y ese número tiene pendiente | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* la cinta del mecanismo: función -> loss -> paisaje -> gradiente -> paso */
+  .escalera { display: flex; align-items: stretch; justify-content: center;
+    gap: .4rem; flex-wrap: wrap; margin: .7em 0; }
+  .escalera .peldano {
+    flex: 1 1 0; min-width: 130px;
+    background: var(--papel-2); border: 2px solid var(--borde);
+    border-radius: var(--r-medio); padding: .55em .6em; text-align: center;
+  }
+  .escalera .peldano b { display: block; font-size: .70em; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--c-acento); margin-bottom: .25em; }
+  .escalera .peldano span { font-size: .82em; line-height: 1.35; display: block; }
+  .escalera .fl { align-self: center; color: var(--c-acento);
+    font-size: 1.4em; font-weight: 700; }
+  .escalera .peldano.hoy { border-color: var(--c-acento); background: var(--c-acento-suave); }
+
+  .enorme { font-size: 1.55em; line-height: 1.2; font-weight: 700; text-align: center;
+    margin: .45em 0; }
+  .enorme small { display: block; font-size: .42em; font-weight: 400; color: var(--tinta-2);
+    margin-top: .5em; }
+
+  .tabla-bruta { font-size: .82em !important; }
+  .tabla-bruta td.muerte { color: var(--c-error); font-weight: 700; }
+
+  .dos-canvas { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .tres-canvas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; }
+
+  /* Los mapas de la loss van en una caja angosta: si el canvas es muy ancho y
+     bajo, un valle redondo se ve como una elipse aplastada y la flecha del
+     gradiente deja de verse perpendicular a las curvas de nivel. */
+  .mapa-angosto { max-width: 620px; margin: .4em auto 0; }
+
+  /* doce términos: entran justo si se los compacta un poco */
+  .glosario-dos li { font-size: .78em; padding: .18em 0;
+                     grid-template-columns: minmax(7.5em, 30%) 1fr; gap: .55em; }
+
+  .cita-aula { font-style: italic; color: var(--tinta-2); font-size: .95em;
+    border-left: 3px solid var(--c-acento); padding-left: .7em; margin: .5em 0; }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ======================== 1. PORTADA ======================== -->
+<section class="portada">
+  <p class="num-clase">Clase 3</p>
+  <h1>Estar equivocado es un número,<br>y ese número tiene pendiente</h1>
+  <div class="franja"></div>
+  <p class="gancho">Hoy la máquina deja de esperar que vos le muevas las perillas.
+     Se las mueve sola, bajando por un valle que nadie puede ver entero.</p>
+  <aside class="notes">
+    <b>0-1 min.</b> Una sola frase: «la clase pasada dejamos una máquina que puede dibujar
+    cualquier cosa y unas perillas que hay que poner a mano. Hoy se las pone sola».
+    No leas objetivos. Pasá.
+  </aside>
+</section>
+
+<!-- ======================== 2. DÓNDE QUEDAMOS ======================== -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">Dos clases, tres ideas.</p>
+  <ul>
+    <li>Una función es una <strong>caja con perillas</strong>. La variable te mueve
+        <em>a lo largo</em> de la figura; el parámetro <em>deforma</em> la figura.</li>
+    <li>Apilando funciones simples con un doblez en el medio se dibuja
+        <strong>cualquier</strong> figura. Eso es una red neuronal, y nada más que eso.</li>
+    <li>Y quedó una bronca: <strong>las perillas las pusimos a mano</strong>.
+        Con ocho ya era un infierno.</li>
+  </ul>
+  <div class="ojo compacta">
+    <strong>El número gris.</strong> En las dos clases hubo un número que decía «qué tan mal
+    está esto» y que nunca nombramos. Hoy le ponemos nombre, y ese nombre va a resultar ser
+    <em>una decisión tuya</em>.
+  </div>
+  <aside class="notes">
+    <b>1-3 min.</b> Preguntá: «¿alguien se acuerda del desajuste más bajo que consiguió a ojo?».
+    Si tenés los números de la clase 2 anotados, escribilos en el pizarrón: se usan hoy.<br>
+    La frase que tenés que dejar picando: <b>«ese número gris tiene nombre y no es inocente»</b>.
+    <b>[CALLBACK DIBUJO]</b>: «hasta ahora nosotros movíamos la mano para dibujar. Hoy le
+    enseñamos a la máquina a mover la mano sola. La figura la sigue eligiendo el que arma
+    el modelo; el pulso lo pone el gradiente.»
+  </aside>
+</section>
+
+<!-- ======================== 3. EL GANCHO: DOS RECTAS ======================== -->
+<section>
+  <h2>¿Cuál de las dos es mejor?</h2>
+  <p class="bajada">Los mismos datos de la clase 1: menciones a «seguridad» en los discursos
+     de apertura de sesiones, 1984-2019. Dos rectas. No hay más información que ésta.</p>
+  <div class="viz-frame" style="padding:8px" id="caja-rectas"></div>
+  <p class="viz-pie"><b>Votá:</b> <span class="c-modelo">azul</span>,
+     <span class="c-val">naranja</span>, o «no se puede decidir». A mano alzada, ahora.</p>
+  <aside class="notes">
+    <b>3-7 min. LA slide del gancho.</b> Proyectá y callate. Después: «¿cuál es mejor? Voten,
+    a mano alzada. Azul, naranja, o no se puede decidir».<br>
+    <b>Contá los votos en voz alta y anotalos en el pizarrón.</b> El aula se divide siempre.
+    Preguntá a alguien de cada bando <i>por qué</i>. Las respuestas típicas:
+    «la azul pasa más por el medio», «la naranja sigue mejor la subida del final»,
+    «depende de qué te importe».<br>
+    Si sale «depende de qué te importe», <b>parala ahí y repetila para todos</b>: acaba de
+    decir la clase entera. Si no sale, no la fuerces: la slide siguiente la dice.
+  </aside>
+</section>
+
+<!-- ======================== 4. ESTÁN TODOS EN LO CIERTO ======================== -->
+<section>
+  <h2>Están todos en lo cierto</h2>
+  <div class="intuicion">
+    La pregunta está mal formulada. No existe «la mejor recta»:
+    existe <strong>la mejor recta según un criterio</strong>. Y el criterio
+    no viene con los datos. Lo escribe alguien.
+  </div>
+  <div class="comparacion">
+    <div>
+      <h4>La azul gana…</h4>
+      <p>…si tu criterio es <strong>el promedio de los errores al cuadrado</strong>.
+         Con ese criterio da <b>0,0146</b>, y la naranja da 0,0152.</p>
+    </div>
+    <div>
+      <h4>La naranja gana…</h4>
+      <p>…si tu criterio es <strong>el promedio de los errores a secas</strong>.
+         Con ese criterio da <b>0,0880</b>, y la azul da 0,0921.</p>
+    </div>
+  </div>
+  <p class="enorme">Cada una gana con su propio criterio.
+    <small>Para que la máquina elija sola, alguien tiene que escribir el criterio.
+      Ese alguien sos vos, no el software.</small></p>
+  <aside class="notes">
+    <b>7-10 min.</b> Los cuatro números están medidos sobre estos datos, no inventados
+    (están en el notebook, sección 1). Decilo: «no les estoy vendiendo una metáfora,
+    éstos son los números».<br>
+    La frase textual: <b>«no hay 'mejor' hasta que alguien escribe qué le importa»</b>.
+    Y la que engancha con lo que ya saben: «esto es exactamente lo mismo que discutir si un
+    índice se pondera por población o por territorio. No hay respuesta técnica».
+  </aside>
+</section>
+
+<!-- ======================== 5. EL NÚMERO GRIS TIENE NOMBRE ======================== -->
+<section>
+  <h2>El número gris de la clase 1</h2>
+  <p class="bajada">Los palitos rojos, otra vez. Ahora con nombre.</p>
+  <div class="viz-frame" style="padding:8px" id="caja-palitos"></div>
+  <p>Ese número —el que resume todos los palitos en uno solo— se llama:</p>
+  <ul class="glosario-lista">
+    <li><b>loss</b><span>pérdida — el nombre que vas a leer en el 95 % de los papers</span></li>
+    <li><b>loss function</b><span>función de pérdida — la receta para calcularlo</span></li>
+    <li><b>cost function</b><span>función de costo — lo mismo, otro nombre</span></li>
+  </ul>
+  <aside class="notes">
+    <b>10-13 min.</b> «Tres nombres para la misma cosa, porque este campo no se pone de
+    acuerdo en nada. Cuando lean <i>loss</i>, <i>pérdida</i> o <i>costo</i>, es esto.»<br>
+    Señalá un palito largo y uno corto en la pantalla. «Cada palito es el error de un año.
+    La loss es una manera de resumir 36 palitos en un número. <b>Hay muchas maneras.</b>»
+  </aside>
+</section>
+
+<!-- ======================== 6. MSE vs MAE ======================== -->
+<section>
+  <h2>Dos maneras de sumar los mismos errores</h2>
+  <div class="dos-canvas">
+    <div class="viz-frame" style="padding:8px" id="caja-castigo-mse"></div>
+    <div class="viz-frame" style="padding:8px" id="caja-castigo-mae"></div>
+  </div>
+  <div class="comparacion">
+    <div>
+      <h4>MSE · error cuadrático medio</h4>
+      <p>$$\text{MSE}=\frac{1}{n}\sum_i \bigl(y_i-\hat{y}_i\bigr)^2$$</p>
+      <p style="font-size:.82em">Un error de 2 pesa 4. Uno de 20 pesa <b>400</b>.</p>
+    </div>
+    <div>
+      <h4>MAE · error absoluto medio</h4>
+      <p>$$\text{MAE}=\frac{1}{n}\sum_i \bigl|y_i-\hat{y}_i\bigr|$$</p>
+      <p style="font-size:.82em">Un error de 2 pesa 2. Uno de 20 pesa <b>20</b>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>13-17 min.</b> No leas las fórmulas: leé <b>las formas</b>. «Miren las dos curvas de
+    arriba: la parábola y la V. Ésa es toda la diferencia».<br>
+    Frase: «el cuadrado no castiga <i>un poco más</i> a los errores grandes: los castiga
+    <b>desproporcionadamente</b> más. Un error de 20 le importa cien veces más que uno de 2».<br>
+    Si alguien pregunta por qué no se comparan los dos números entre sí: porque están en
+    unidades distintas (puntos al cuadrado contra puntos). Cada uno se compara consigo mismo.
+  </aside>
+</section>
+
+<!-- ======================== 7. VIZ: ARRASTRÁ EL OUTLIER ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Arrastrá el outlier</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/comparador-de-losses.html" title="MSE contra MAE, arrastrando un caso" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> apretá «plantar un caso extremo». La recta azul
+     <b>gira</b> para ir a buscar al caso raro; la naranja casi ni se entera.
+     Un solo año pasa a explicar <b>casi la mitad</b> de todo el MSE.</p>
+  <aside class="notes">
+    <b>17-22 min.</b> Movelo vos primero, despacio. Agarrá el punto de 2002 (el que vale
+    cero) y subilo lentísimo mientras hablás. Que vean girar la azul <i>mientras</i> arrastrás.<br>
+    Después apretá <b>«plantar un caso extremo»</b> y leé en voz alta las dos frases del panel:
+    «la azul afirma que sube 0,125 por década; la naranja, 0,103». <b>Dos conclusiones
+    sustantivas distintas, con los mismos datos.</b><br>
+    Pregunta al aula: «¿cuál de los dos investigadores mintió?». Ninguno. Ese es el punto.
+  </aside>
+</section>
+
+<!-- ======================== 8. ES UNA DECISIÓN METODOLÓGICA ======================== -->
+<section>
+  <h2>Esto es una decisión metodológica</h2>
+  <p class="bajada">Tres escenarios. El mismo caso extremo en los tres. Tres respuestas distintas.</p>
+  <div class="comparacion tres">
+    <div>
+      <h4>(a) Es un error de tipeo</h4>
+      <p>Alguien cargó 15 donde iba 1,5. No querés que el modelo se rompa por eso.</p>
+      <p class="c-val"><b>→ MAE</b></p>
+    </div>
+    <div>
+      <h4>(b) Es <em>el</em> caso que te interesa</h4>
+      <p>Es el año excepcional que motivó tu investigación. Un modelo que lo ignora
+         no te sirve para nada.</p>
+      <p class="c-modelo"><b>→ MSE</b></p>
+    </div>
+    <div>
+      <h4>(c) No sabés cuál de las dos</h4>
+      <p>Lo más común. Entonces corrés las dos, comparás, <strong>y lo contás en el paper</strong>.</p>
+      <p class="c-acento"><b>→ las dos</b></p>
+    </div>
+  </div>
+  <div class="ss compacta">
+    La tradición del <em>case study</em> del caso desviado —Lipset, Ragin— es literalmente
+    la decisión de darle peso al outlier. MSE es «el caso raro me importa mucho»; MAE es
+    «quiero la tendencia general». El curso no toma partido: exige que elijas a conciencia.
+  </div>
+  <aside class="notes">
+    <b>22-25 min.</b> «El paquete estadístico tiene un default. <b>El default es una posición
+    teórica que alguien tomó por vos</b>.»<br>
+    Dato histórico útil si tenés medio minuto: el MSE se popularizó en buena medida porque
+    tiene <i>solución cerrada</i> —se podía resolver con lápiz y papel en 1805— y no porque
+    represente mejor el error que a vos te importa. Es una decisión de comodidad de cálculo
+    que quedó como norma. (Legendre y Gauss; está en las referencias.)<br>
+    Pregunta al aula: «¿alguien tiene en su base un caso que es <i>el</i> caso?». Suele haber.
+  </aside>
+</section>
+
+<!-- ======================== 9. Y A VECES ES POLÍTICA ======================== -->
+<section>
+  <h2>Y a veces es una decisión política</h2>
+  <p class="bajada">Un modelo que decide a quién se le asigna un recurso escaso.</p>
+  <div class="comparacion contra">
+    <div>
+      <h4>Dejar afuera a quien lo necesita</h4>
+      <p>El modelo dice «no» y la persona sí lo necesitaba.
+         <em>Falso negativo.</em> El costo lo paga ella.</p>
+    </div>
+    <div>
+      <h4>Dárselo a quien no lo necesita</h4>
+      <p>El modelo dice «sí» y no hacía falta.
+         <em>Falso positivo.</em> El costo lo paga el programa.</p>
+    </div>
+  </div>
+  <p class="enorme">¿Cuál de los dos errores duele más?
+    <small>La respuesta no es técnica. Pero se escribe en el código, en una línea,
+      y casi siempre la escribe una sola persona, sola, un martes.</small></p>
+  <aside class="notes">
+    <b>25-28 min.</b> Dejá la pregunta abierta y <b>no la contestes</b>. Es una siembra:
+    «guarden esto. En la clase 9 lo vamos a ver con números, y en la 10 con consecuencias».<br>
+    Si el aula quiere discutirlo ahora, dale dos minutos y cortá con: «no lo vamos a resolver
+    hoy; lo que quiero que se lleven es <b>dónde</b> queda escrito». Señalá la palabra «loss».
+  </aside>
+</section>
+
+<!-- ======================== 10. BLOQUE PRÁCTICO 1a ======================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1a</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code> y hacé la <strong>sección 1</strong> entera,
+    hasta el <code>TODO 1</code> inclusive. Quince minutos.
+  </div>
+  <ol>
+    <li>Corré las dos funciones de loss y mirá los dos números.</li>
+    <li>Metele el caso extremo y mirá <strong>cuánto creció cada uno</strong>.</li>
+    <li><code>TODO 1</code>: escribí en un comentario cuál creció más y por qué,
+        y cuál elegirías en cada uno de los dos escenarios.</li>
+  </ol>
+  <div class="ojo compacta">
+    Las celdas de verificación <strong>no explotan</strong>: te dicen con palabras si te salió.
+    Si algo no corre, levantá la mano; no te quedes veinte minutos peleando con una coma.
+  </div>
+  <aside class="notes">
+    <b>25-40 min (15 de trabajo).</b> Caminá por el aula. Lo que vas a encontrar:<br>
+    · gente que compara el MSE con el MAE directamente («el MSE es más chico, ¡es mejor!»).
+      <b>Es el error más común.</b> Respuesta: están en unidades distintas, es como comparar
+      metros con metros cuadrados.<br>
+    · gente trabada en que <code>y</code> ya está definida. Recordales el orden de las celdas.<br>
+    A los 12 minutos avisá «tres minutos» y a los 15 cortá aunque no hayan terminado.
+  </aside>
+</section>
+
+<!-- ======================== 11. AHORA, ¿CÓMO LA MINIMIZAMOS? ======================== -->
+<section>
+  <h2>Reformulamos el problema</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Lo que queríamos</h4>
+      <p style="font-size:1.05em">«Encontrar la <strong>mejor recta</strong>.»</p>
+      <p>Vago. No se puede programar.</p>
+    </div>
+    <div>
+      <h4>Lo que queremos ahora</h4>
+      <p style="font-size:1.05em">«Encontrar los <strong>dos números</strong> que hacen
+         la loss lo más chica posible.»</p>
+      <p>Concreto. Esto sí se puede programar.</p>
+    </div>
+  </div>
+  <div class="intuicion compacta">
+    A eso se le dice <span class="glosario"><span class="en">optimization</span><span class="es">optimización</span></span>:
+    buscar los valores de las perillas que minimizan un número. <strong>Todo el aprendizaje
+    automático es esto.</strong> Lo demás son detalles de qué función y qué número.
+  </div>
+  <aside class="notes">
+    <b>40-42 min.</b> Slide corta, dos minutos. La transformación «mejor recta» → «minimizar
+    un número» es el momento en que el problema pasa de ser una discusión a ser un cálculo.
+    Decilo así.
+  </aside>
+</section>
+
+<!-- ======================== 12. EL SALTO CONCEPTUAL ======================== -->
+<section>
+  <h2>El salto: un punto <em>es</em> una recta</h2>
+  <div class="dos-canvas">
+    <div class="viz-frame" style="padding:8px" id="caja-salto-datos"></div>
+    <div class="viz-frame" style="padding:8px" id="caja-salto-mapa"></div>
+  </div>
+  <p class="enorme" style="font-size:1.25em">Cada punto del mapa de la derecha
+    <span class="resaltado">es una recta entera</span> de las de la izquierda.</p>
+  <aside class="notes">
+    <b>42-46 min. LA slide difícil de la clase. Andá despacio.</b><br>
+    Decilo tres veces, con distintas palabras:<br>
+    1. «A la izquierda hay años y porcentajes. A la derecha <b>no hay ningún año y ningún
+       porcentaje</b>: hay rectas.»<br>
+    2. «El punto violeta de la derecha no es un dato. Es <i>toda</i> la recta azul de
+       la izquierda, resumida en dos números.»<br>
+    3. «Si muevo el punto de la derecha un centímetro, allá se mueve la recta entera.»<br>
+    <b>Pregunta de control</b> (hacela, no la saltees): «si agrego un dato nuevo a la nube
+    de la izquierda, ¿aparece un punto nuevo en el mapa de la derecha?». <b>No.</b> Cambia
+    la altura de todo el mapa. Si esa la contestan bien, el salto está dado.
+  </aside>
+</section>
+
+<!-- ======================== 13. EL MAPA COMPLETO ======================== -->
+<section>
+  <h2>El mapa de altura</h2>
+  <p class="bajada">La misma idea, pintada: a cada recta posible le ponemos su loss como altura.</p>
+  <div class="viz-frame mapa-angosto" style="padding:8px" id="caja-mapa"></div>
+  <p class="viz-pie"><b>Qué mirar:</b> es un mapa topográfico, como los de senderismo.
+     Lo <span class="c-ok">claro</span> es hondo, lo <span class="c-error">rojo</span> es alto.
+     Queremos el fondo.</p>
+  <aside class="notes">
+    <b>46-48 min.</b> «Como un mapa de senderismo, pero al revés: acá queremos <b>bajar</b>.»<br>
+    Señalá las curvas de nivel: «cada anillo es un conjunto de rectas que ajustan
+    exactamente igual de mal. Igual de mal <i>según el MSE</i>, que es el criterio que
+    elegimos hace veinte minutos».<br>
+    Ojo con la trampa: alguien va a preguntar si los ejes son «los años». No. Volvé a la
+    slide anterior si hace falta: cuesta menos que arrastrar la confusión toda la clase.
+  </aside>
+</section>
+
+<!-- ======================== 14. VIZ: MOVETE POR EL MAPA ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movete por el mapa</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/valle-de-loss.html" title="el valle de la loss: el mapa y la recta, sincronizados" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> los dos paneles a la vez. Cuando arrastrás el punto
+     violeta <b>no se mueve ningún dato</b>: se mueve la recta.</p>
+  <aside class="notes">
+    <b>48-52 min.</b> Arrastrá vos, lentísimo, y no hables durante los primeros diez segundos:
+    que miren. Después narrá lo que hacés: «me voy para la derecha… la recta se está
+    empinando… me voy para arriba… la recta sube entera».<br>
+    Llevá el punto al fondo verde y quedate ahí: «acá está la mejor recta según el MSE.
+    ¿Alguien nota algo raro en el número de la derecha?» (deja de bajar).<br>
+    <b>No aprietes «soltar la pelota» todavía.</b> Falta la apuesta.
+  </aside>
+</section>
+
+<!-- ======================== 15. APUESTA ======================== -->
+<section class="pregunta">
+  <h2>Estoy parado acá arriba a la izquierda.<br>Si me muevo <em>hacia la derecha</em>,
+     ¿la loss sube o baja?</h2>
+  <div class="opciones">
+    <div><b>A</b> sube</div>
+    <div><b>B</b> baja</div>
+    <div><b>C</b> depende de cuánto me mueva</div>
+  </div>
+  <aside class="notes">
+    <b>52-54 min.</b> Voten a mano alzada, en serio, <b>antes</b> de mostrar nada.
+    Contá los votos.<br>
+    La respuesta es <b>C</b>, y casi nadie la vota: un poquito a la derecha baja
+    (estamos a la izquierda del fondo), pero si me paso de largo vuelve a subir.
+    Ésa es exactamente la razón por la que el tamaño del paso va a importar tanto.<br>
+    Volvé a la viz y hacelo: movete un poco a la derecha (baja), seguí (baja), seguí más
+    (empieza a subir). Sin esta apuesta, la próxima media hora es decoración.
+  </aside>
+</section>
+
+<!-- ======================== 16. FUERZA BRUTA ======================== -->
+<section>
+  <h2>Solución obvia: probar todas</h2>
+  <p class="bajada">Cien valores de inclinación por cien de altura. Diez mil rectas.
+     Nos quedamos con la mejor.</p>
+  <div class="viz-frame mapa-angosto" style="padding:8px" id="caja-grilla"></div>
+  <p class="viz-pie"><b>Y funciona.</b> Con dos perillas, probar todo es una estrategia
+     perfectamente razonable. En el notebook lo hacemos con 14.400 y tarda menos de un segundo.</p>
+  <aside class="notes">
+    <b>54-56 min.</b> «Esto no es una estrategia tonta. Con dos perillas es lo que haría
+    cualquiera y está bien.» Que se sientan cómodos antes de la slide siguiente.
+  </aside>
+</section>
+
+<!-- ======================== 17. FUERZA BRUTA, MUERTA ======================== -->
+<section>
+  <h2>…hasta la tercera línea</h2>
+  <table class="tabla-bruta">
+    <tr><th>modelo</th><th>perillas</th><th>rectas a probar</th><th>cuánto tarda</th></tr>
+    <tr><td>nuestra recta</td><td>2</td><td>10<sup>4</sup></td><td>menos de un parpadeo</td></tr>
+    <tr><td>una recta con 2 variables</td><td>4</td><td>10<sup>8</sup></td><td>una décima de segundo</td></tr>
+    <tr class="muerte"><td>la red de 8 rampas de la clase 2</td><td>8</td><td>10<sup>16</sup></td>
+        <td class="muerte">115 días</td></tr>
+    <tr><td>una red chiquita</td><td>100</td><td>10<sup>200</sup></td>
+        <td class="muerte">10<sup>173</sup> edades del universo</td></tr>
+    <tr><td>el mini-GPT de la clase 8</td><td>1.500.000</td><td>10<sup>3.000.000</sup></td>
+        <td class="muerte">no hay palabras</td></tr>
+  </table>
+  <p style="font-size:.9em">Para comparar: se estima que hay unos <b>10<sup>80</sup></b> átomos
+     en el universo observable. Con cien valores por perilla y ocho perillas ya nos pasamos
+     de todo lo razonable.</p>
+  <aside class="notes">
+    <b>56-58 min.</b> Leé la tercera fila en voz alta y hacé una pausa.
+    «<b>Ocho perillas.</b> La red que armamos la clase pasada con ocho rampas. Ciento quince
+    días de computadora para encontrarle las perillas por fuerza bruta.»<br>
+    Los números salen de la celda 3 del notebook: cien valores por perilla, mil millones de
+    pruebas por segundo. Están calculados, no inventados.<br>
+    «Se acabó la fuerza bruta. Hace falta otra cosa, y esa otra cosa es toda la clase.»
+  </aside>
+</section>
+
+<!-- ======================== 18. LA NIEBLA ======================== -->
+<section>
+  <h2>La niebla</h2>
+  <div class="viz-frame" style="padding:8px;max-width:900px;margin:.4em auto 0" id="caja-niebla"></div>
+  <div class="intuicion compacta">
+    No podés ver el valle entero. Pero sí podés <strong>adelantar un pie</strong> y sentir
+    si el suelo está más alto o más bajo. Con eso alcanza para dar el paso siguiente.
+    Y con el paso siguiente, para dar el otro.
+  </div>
+  <aside class="notes">
+    <b>58-60 min.</b> Contala como una escena, no como un método: «están en una colina, hay
+    niebla cerrada, no ven ni sus manos. ¿Cómo bajan?».<br>
+    Alguien va a decir «tanteando con el pie». Perfecto: «eso es literalmente el algoritmo».<br>
+    <b>[EN CIENCIAS SOCIALES]</b> si tenés medio minuto: esto es racionalidad limitada de
+    Simon. Un agente que no ve el panorama completo, decide con lo que tiene a mano, y
+    <i>igual llega a buen puerto</i>. Le suele gustar mucho a esta audiencia.
+  </aside>
+</section>
+
+<!-- ======================== 19. VIZ: LA PENDIENTE SIN CÁLCULO ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>La pendiente, con una resta</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/loss-1d.html" title="la derivada como una resta" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> con el pasito grande, la línea turquesa está torcida.
+     Achicalo hasta 0,005 y se pega a la curva. <b>Ese número tiene un nombre elegante:
+     derivada.</b> Y lo acabás de calcular con una resta y una división.</p>
+  <aside class="notes">
+    <b>60-64 min. La slide donde se dice «derivada» por primera vez, y recién ahora.</b><br>
+    Guion exacto: «me muevo un poquito a la derecha: ¿subió o bajó? Me muevo un poquito a la
+    izquierda: ¿subió o bajó? Comparo. <b>Esa comparación es la derivada. No hay más.</b>»<br>
+    Movés el pasito de 0,30 a 0,005 delante de ellos y mostrás cómo el número se estaciona.<br>
+    <b>Si el aula viene lenta, ésta es la viz a la que hay que darle más tiempo</b>, más que
+    al valle. Es la que hace que nadie necesite haber estudiado cálculo.
+  </aside>
+</section>
+
+<!-- ======================== PAUSA ======================== -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si el mapa de la loss no te cerró, éste es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+</section>
+
+<!-- ======================== 20. EL GRADIENTE ======================== -->
+<section>
+  <h2>El gradiente</h2>
+  <div class="viz-frame mapa-angosto" style="padding:8px;max-width:520px" id="caja-gradiente"></div>
+  <div class="comparacion">
+    <div>
+      <h4>Qué es</h4>
+      <p>La dirección en la que la loss <strong>sube</strong> más rápido, medida
+         justo donde estás parado. Con dos perillas son dos números: la pendiente
+         en cada una.</p>
+    </div>
+    <div>
+      <h4>Qué hacemos con él</h4>
+      <p class="enorme" style="font-size:1.3em;margin:.1em 0">Ir para el lado contrario.</p>
+      <p style="font-size:.85em">Por eso el signo menos: <code>a = a − paso × pendiente</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>70-73 min.</b> «Todo el nombre pomposo es: <b>para dónde sube</b>. Y nosotros vamos
+    al revés.»<br>
+    <b>El signo menos, en el pizarrón, con un número</b> (esto se hace todos los años y
+    todos los años sirve): «la pendiente da +3, o sea que subir la perilla sube la loss;
+    entonces la bajo. Resto.» Una vez, con un número, alcanza.<br>
+    <b>Ojo con esto:</b> alguien va a decir que la flecha «apunta al mínimo». No. Apunta a la
+    subida más empinada <i>acá nomás</i>. Es local y es ciega. Guardá esa objeción para
+    la slide de la honestidad.
+  </aside>
+</section>
+
+<!-- ======================== 21. VIZ: SOLTÁ LA PELOTA ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Soltá la pelota</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/valle-de-loss.html" title="descenso por gradiente, con rastro" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el rastro. Los puntitos arrancan separados y terminan
+     pegados, <b>sin que nadie los frene</b>.</p>
+  <aside class="notes">
+    <b>73-79 min.</b> Apretá <b>«soltar la pelota»</b> con el paso en 0,15 y no hables hasta
+    que frene.<br>
+    Después, la pregunta: <b>«¿por qué se van acortando los pasos, si nadie los acortó?»</b>.
+    Aguantá el silencio. La respuesta: porque el paso es proporcional a la pendiente, y cerca
+    del fondo el terreno se aplana. La pelota frena sola.<br>
+    Repetilo desde tres lugares distintos con «soltarla desde otro lugar»: siempre llega al
+    mismo fondo. <b>Sembralo</b>: «acuérdense de esto para dentro de diez minutos».<br>
+    Y ahora subí el paso a <b>1.5</b> y volvé a soltarla. Alguien va a decir algo en voz alta.
+    Está bien.
+  </aside>
+</section>
+
+<!-- ======================== 22. VIZ: EL TAMAÑO DEL PASO ======================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>El paso: <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span></h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/tasa-de-aprendizaje.html" title="tres learning rates en paralelo" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>.</p>
+  <aside class="notes">
+    <b>79-85 min.</b> «Izquierda: paso microscópico, no llega nunca. Centro: bien.
+    Derecha: se va del mapa.»<br>
+    <b>Insistí en que miren abajo, no arriba.</b> Repetilo: «nadie puede dibujar un valle de
+    un millón y medio de dimensiones. El mapa es un lujo que tenemos hoy porque el modelo
+    tiene dos perillas. Lo único que van a tener el resto del curso es la curva de loss».<br>
+    Si sobra tiempo, hacé el quiz del panel de a dos: tres curvas sin etiquetar para aparear.
+  </aside>
+</section>
+
+<!-- ======================== 23. LOS DOS SÍNTOMAS ======================== -->
+<section>
+  <h2>Los dos síntomas, para llevar</h2>
+  <div class="tres-canvas">
+    <div class="viz-frame" style="padding:6px" id="caja-sintoma-1"></div>
+    <div class="viz-frame" style="padding:6px" id="caja-sintoma-2"></div>
+    <div class="viz-frame" style="padding:6px" id="caja-sintoma-3"></div>
+  </div>
+  <div class="aha">
+    <b>Casi plana y alta</b> → el paso es muy chico: subilo (×10).
+    <b>Cae y se aplana abajo</b> → así tiene que verse.
+    <b>Sube</b> → el paso es muy grande: bajalo (÷10).
+  </div>
+  <aside class="notes">
+    <b>85-88 min.</b> Ésta es la slide que se van a acordar en la clase 4 y en la 8.
+    Pediles que le saquen una foto: no es una broma, hacelo.<br>
+    «Cuando entrenen y vean una de estas dos formas raras, ya saben qué perilla tocar. Y la
+    regla es una sola: <b>si sube, dividí el learning rate por diez</b>.»<br>
+    Los tres gráficos salen del notebook, sección 6: son corridas reales sobre estos datos.
+  </aside>
+</section>
+
+<!-- ======================== 24. BLOQUE PRÁCTICO 2 ======================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 — de a dos</h2>
+  <div class="manos">
+    Notebook, <strong>secciones 4 a 6</strong>. Veinte minutos. De a dos, y turnándose
+    el teclado cada diez.
+  </div>
+  <ol>
+    <li>Corré el descenso completo (sección 5). Mirá los <strong>tres gráficos</strong>.</li>
+    <li><code>TODO 3</code>: poné <code>lr = 1.5</code>. Rompelo. Mirá el signo de <code>a</code>
+        en los primeros cinco pasos.</li>
+    <li><code>TODO 4</code>: poné <code>lr = 0.000001</code>. ¿Llegó? ¿Cuántas iteraciones
+        harían falta?</li>
+    <li><code>TODO 5</code>: arrancá desde <code>a=-5, b=50</code>. ¿Llega al mismo lugar?</li>
+  </ol>
+  <div class="ojo compacta">
+    Si te sale un número con más de veinte dígitos, <strong>lo rompiste bien</strong>: era eso
+    lo que tenía que pasar. Guardá el gráfico, que lo vamos a proyectar.
+  </div>
+  <aside class="notes">
+    <b>88-108 min (20 de trabajo).</b> Caminá por el aula y buscá dos cosas:<br>
+    · una curva de loss rota bien fea, para proyectar después;<br>
+    · gente que puso <code>lr = 1.5</code> y no entiende por qué el número «se congela» en
+      vez de crecer para siempre. <b>Es un buen hallazgo</b>: la derivada-por-resta se rompe
+      con números gigantescos. Está explicado en el notebook, arriba del TODO 4, y engancha
+      con la slide de backpropagation.<br>
+    A los 17 minutos avisá «tres minutos» y cortá.
+  </aside>
+</section>
+
+<!-- ======================== 25. VOLVIMOS ======================== -->
+<section>
+  <h2>¿Quién lo rompió mejor?</h2>
+  <p class="bajada">Proyectamos dos o tres curvas del aula.</p>
+  <div class="cita-aula">«Puse 1.5 y en el paso cuatro ya tenía un número con nueve dígitos.»</div>
+  <div class="cita-aula">«Con 0.000001 la curva es una raya. Ni se movió.»</div>
+  <div class="cita-aula">«Arranqué desde a=-5 y llegó al mismo lugar. ¿Siempre pasa eso?»</div>
+  <p><strong>Esa última pregunta es la mejor de la clase</strong>, y la contestamos en tres slides.</p>
+  <aside class="notes">
+    <b>108-110 min.</b> Pedí una notebook prestada y proyectá. Que lo cuente quien lo rompió,
+    no vos.<br>
+    Si nadie hizo la pregunta del mínimo global, hacela vos: «¿siempre llega al mismo lugar?».
+    Es la puerta a la slide de la honestidad.
+  </aside>
+</section>
+
+<!-- ======================== 26. BATCH / MINI-BATCH / SGD ======================== -->
+<section>
+  <h2>Censo o muestra</h2>
+  <div class="viz-frame mapa-angosto" style="padding:8px;max-width:560px" id="caja-batch"></div>
+  <div class="comparacion">
+    <div>
+      <h4>Censo (<em>batch</em>)</h4>
+      <p>Cada paso mira <strong>todos</strong> los datos. La pendiente es exacta.
+         Con 36 años es gratis; con 36 millones de titulares, no.</p>
+    </div>
+    <div>
+      <h4>Muestra (<em>mini-batch</em>)</h4>
+      <p>Cada paso mira <strong>unos pocos al azar</strong>. La pendiente sale ruidosa,
+         pero sale muchísimo más barata. Y con suficientes pasos llegás igual.</p>
+    </div>
+  </div>
+  <p style="font-size:.88em">El temblor no es un defecto: encima ayuda a escaparse de pozos
+     malos. De ahí la palabra <b>estocástico</b> de
+     <span class="glosario"><span class="en">SGD</span><span class="es">descenso estocástico</span></span>,
+     que quiere decir «con azar adentro».</p>
+  <aside class="notes">
+    <b>110-112 min.</b> <b>Ésta es la analogía perfecta para esta audiencia, usala.</b>
+    «Calcular el gradiente con todos los datos es un censo. Con un mini-batch es una muestra.
+    La muestra es ruidosa y muchísimo más barata, y con suficientes iteraciones llegás igual.
+    Todo lo que ya saben de muestreo aplica.»<br>
+    Señalá el rastro naranja: «ese temblor es error de muestreo». Se ríen y se acuerdan.
+  </aside>
+</section>
+
+<!-- ======================== 27. BACKPROPAGATION ======================== -->
+<section>
+  <h2>Lo que hace la computadora de verdad</h2>
+  <p class="bajada">Nosotros calculamos las pendientes de a una, con restas. Con dos perillas
+     está bien. Con un millón y medio, no.</p>
+  <div class="intuicion">
+    <span class="glosario"><span class="en">backpropagation</span><span class="es">retropropagación</span></span>
+    es un truco para calcular <strong>todas</strong> las pendientes de una sola pasada,
+    aprovechando que la red es una cadena de funciones. Es la regla de la cadena, aplicada
+    con inteligencia.
+  </div>
+  <p class="enorme" style="font-size:1.15em">No la vamos a derivar.
+    <small>Es importante que exista. No es importante que sepas hacerla a mano.
+      En la clase 4 son dos palabras: <code>loss.backward()</code>.</small></p>
+  <div class="ojo compacta">
+    <strong>Backprop no reemplaza al descenso.</strong> Son dos piezas distintas del mismo
+    mecanismo: el descenso decide <em>hacia dónde y cuánto</em>; backprop es sólo la manera
+    eficiente de <em>calcular</em> el gradiente.
+  </div>
+  <aside class="notes">
+    <b>112-114 min.</b> Una slide, dos minutos, y no más. Si alguien pide la fórmula,
+    la respuesta honesta: «está en el capítulo 6 de Goodfellow y no la necesitás para nada
+    de lo que vamos a hacer».<br>
+    Conectá con lo del práctico: «los que vieron que el número se congelaba con lr=1.5
+    tocaron el límite de calcular derivadas con restas. Backprop no tiene ese problema».
+  </aside>
+</section>
+
+<!-- ======================== 28. LA HONESTIDAD ======================== -->
+<section>
+  <h2>La parte honesta</h2>
+  <ul>
+    <li>Este valle era un pozo redondo y limpio. <strong>Los paisajes reales no son así</strong>:
+        tienen mesetas, valles laterales, sillas de montar y ruido.</li>
+    <li>El descenso <strong>no garantiza</strong> encontrar el fondo del mundo. Encuentra
+        <em>un</em> lugar bajo, cerca de donde arrancaste.</li>
+    <li>Y aun así funciona, sistemáticamente, con modelos de miles de millones de perillas.
+        <strong>Nadie tiene una teoría completa de por qué.</strong></li>
+  </ul>
+  <div class="ss">
+    <strong>Mínimo local = equilibrio subóptimo estable.</strong> El sistema se acomoda en
+    una configuración que nadie elegiría de cero, y salir cuesta. <em>Path dependence</em>,
+    <em>lock-in</em> institucional: la analogía es exacta, no decorativa.
+  </div>
+  <p class="viz-pie">Probalo vos: en <code>viz/valle-de-loss.html</code>, elegí
+     <b>«uno con dos pozos»</b> y soltá la pelota desde dos lugares distintos.</p>
+  <aside class="notes">
+    <b>114-116 min.</b> Abrí la viz y hacelo: dos pozos, dos puntos de partida, dos finales
+    distintos. Treinta segundos y cierra la pregunta que hicieron en la slide 25.<br>
+    La frase para el final: «esto es un campo con muchísima más ingeniería que teoría, y eso
+    hay que tenerlo en la cabeza cuando leen un paper que suena muy seguro de sí mismo».<br>
+    <b>Decirlo genera confianza y vacuna contra la mistificación.</b> No lo saltees ni aunque
+    vayas atrasado.
+  </aside>
+</section>
+
+<!-- ======================== 29. OPTIMIZADORES ======================== -->
+<section>
+  <h2>Los nombres que vas a ver</h2>
+  <div class="tarjetas">
+    <div><h4>SGD</h4>El descenso tal cual lo escribimos hoy, con mini-batches.</div>
+    <div><h4>SGD con momento</h4>La pelota <strong>con inercia</strong>: acumula velocidad
+         y atraviesa mesetas y pocitos chicos.</div>
+    <div><h4>Adam</h4>Inercia <em>más</em> un paso que se autorregula, distinto para cada
+         perilla. Es lo que vas a ver en todos lados.</div>
+  </div>
+  <div class="intuicion compacta">
+    Los tres hacen lo mismo que hicimos hoy: mirar la pendiente y dar un paso al revés.
+    Sólo cambian <strong>cómo dan el paso</strong>. Si sabés qué es el gradiente, ya sabés
+    lo que necesitás saber de los tres.
+  </div>
+  <aside class="notes">
+    <b>116-117 min.</b> Esta slide es de un minuto y no más.<br>
+    «Van a ver <code>Adam</code> en todos lados. Traducción: <i>la pelota con inercia y con
+    paso que se autorregula</i>. Con eso alcanza para leer el 99 % de los papers.»<br>
+    Si alguien pregunta cuál usar: Adam con lr=0.001 como punto de partida, y si la curva
+    hace cosas raras, tocás el lr. Es literalmente lo que hace todo el mundo.
+  </aside>
+</section>
+
+<!-- ======================== 30. EL LUNES ======================== -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás para el lunes</h2>
+  <div class="ss">
+    Cuando leas <em>«el modelo fue optimizado»</em>, anotá al margen una pregunta:
+    <strong>¿optimizado para minimizar qué?</strong>
+  </div>
+  <ol>
+    <li>Si la respuesta es <b>«el default»</b>, ahí hay una decisión escondida que nadie discutió.</li>
+    <li>Si el trabajo tiene casos extremos y usó MSE, preguntá qué pasa con MAE.</li>
+    <li>Y si el modelo asigna un recurso o una sanción, preguntá <b>quién decidió</b> qué error
+        pesaba más, y dónde quedó escrito.</li>
+  </ol>
+  <p class="enorme" style="font-size:1.05em">Es una pregunta de revisor que casi nadie hace
+    <small>y que casi siempre encuentra algo.</small></p>
+  <aside class="notes">
+    <b>117-118 min.</b> Dalo como una herramienta concreta, no como
+    una moraleja. «Esto lo pueden usar el lunes, en el paper que tengan arriba del escritorio.»<br>
+    Si hay tiempo, pediles un ejemplo de su propia área. Sale siempre y suele ser bueno.
+  </aside>
+</section>
+
+<!-- ======================== 31. LA ESCALERA ======================== -->
+<section>
+  <h2>El mecanismo, entero</h2>
+  <div class="escalera">
+    <div class="peldano"><b>función</b><span>una máquina con perillas<br><small>clase 1 y 2</small></span></div>
+    <span class="fl">→</span>
+    <div class="peldano hoy"><b>loss</b><span>un número que dice qué tan mal</span></div>
+    <span class="fl">→</span>
+    <div class="peldano hoy"><b>paisaje</b><span>ese número, sobre todas las perillas posibles</span></div>
+    <span class="fl">→</span>
+    <div class="peldano hoy"><b>gradiente</b><span>para dónde sube, medido con una resta</span></div>
+    <span class="fl">→</span>
+    <div class="peldano hoy"><b>paso</b><span>ir al revés, un poquito</span></div>
+    <span class="fl">→</span>
+    <div class="peldano hoy"><b>repetir</b><span>hasta que se aplane</span></div>
+  </div>
+  <p style="text-align:center;font-size:1.05em">Eso es <strong>todo</strong> el aprendizaje
+     automático. Lo demás son detalles de qué función y qué número.</p>
+  <aside class="notes">
+    <b>118-119 min.</b> Recorré la cinta con el dedo en la pantalla, de izquierda a derecha,
+    diciendo cada palabra. Es la última vez que la ven completa en una sola imagen.<br>
+    «Los cuatro peldaños turquesa son de hoy. El primero era de las dos clases anteriores.»
+  </aside>
+</section>
+
+<!-- ======================== 32. QUÉ TE LLEVÁS ======================== -->
+<section>
+  <h2>Qué te llevás de hoy</h2>
+  <ol style="font-size:1.05em">
+    <li><strong>La loss es una decisión tuya.</strong> MSE y MAE miran los mismos datos y le
+        hacen caso a casos distintos. Elegir una es declarar qué error te duele más.</li>
+    <li><strong>El gradiente es una resta.</strong> «Me muevo un poquito para allá: ¿sube o
+        baja?». No hace falta cálculo para entenderlo ni para calcularlo.</li>
+    <li><strong>La curva de loss se lee.</strong> Plana y alta: paso chico. Cae y se aplana:
+        bien. Sube: paso grande, dividilo por diez.</li>
+  </ol>
+  <div class="aha compacta">
+    Si te llevás sólo una: <b>«¿optimizado para minimizar qué?»</b>.
+  </div>
+  <aside class="notes">
+    <b>119 min.</b> Tres, no cuatro. Decilas mirando al aula, no a la pantalla.
+    Si tuvieras que elegir una sola para que sobreviva a la semana, es la primera.
+  </aside>
+</section>
+
+<!-- ======================== 33. GLOSARIO ======================== -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista glosario-dos">
+    <li><b>loss</b><span>pérdida — el número que dice qué tan mal la estás dibujando</span></li>
+    <li><b>MSE</b><span>error cuadrático medio — el promedio de los errores al cuadrado</span></li>
+    <li><b>MAE</b><span>error absoluto medio — el promedio de los errores, sin signo</span></li>
+    <li><b>optimization</b><span>optimización — buscar las perillas que minimizan un número</span></li>
+    <li><b>gradient</b><span>gradiente — para dónde sube la loss si movés cada perilla</span></li>
+    <li><b>gradient descent</b><span>descenso por gradiente — ir al revés del gradiente, a pasitos</span></li>
+    <li><b>learning rate</b><span>tasa de aprendizaje — de qué tamaño es cada pasito</span></li>
+    <li><b>batch / mini-batch</b><span>lote — cuántos datos mira cada paso: censo o muestra</span></li>
+    <li><b>SGD</b><span>descenso estocástico — el descenso con muestras en vez de censo</span></li>
+    <li><b>backpropagation</b><span>retropropagación — cómo se calculan todos los gradientes de una pasada</span></li>
+    <li><b>Adam</b><span>la pelota con inercia y con paso que se autorregula</span></li>
+    <li><b>local minimum</b><span>mínimo local — un pozo que no es el pozo más hondo</span></li>
+  </ul>
+  <aside class="notes">
+    <b>119 min.</b> No la leas entera: se muestra y se pasa. Señalá tres: <i>loss</i>, <i>learning rate</i> y
+    <i>gradient descent</i>. «Si mañana leen estas tres en un paper, ya saben qué son.»
+    Todos están en <code>recursos/glosario.md</code>.
+  </aside>
+</section>
+
+<!-- ======================== 34. YA TENEMOS TODO ======================== -->
+<section>
+  <h2>Ya tenemos todo</h2>
+  <div class="comparacion tres">
+    <div><h4>Clase 1</h4><p>La máquina: una función con perillas.</p></div>
+    <div><h4>Clase 2</h4><p>La máquina flexible: apilar y doblar para dibujar cualquier cosa.</p></div>
+    <div><h4>Clase 3</h4><p>La máquina se ajusta sola, bajando por el valle.</p></div>
+  </div>
+  <p class="enorme">Falta una sola cosa.
+    <small>Hacerlo bien. Es decir: sin engañarnos.</small></p>
+  <aside class="notes">
+    <b>119-120 min.</b> Pausa dramática después de «falta una sola cosa». Que pregunten.
+  </aside>
+</section>
+
+<!-- ======================== 35. EL PUENTE ======================== -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 4: el ciclo de entrenamiento,<br>y la diferencia entre dibujar y calcar</h1>
+  <div class="franja"></div>
+  <p class="gancho">Entrenamos de verdad, con PyTorch, en cinco líneas.
+     Y descubrimos que un modelo puede sacarse un 99 % y ser un desastre.</p>
+  <aside class="notes">
+    <b>119-120 min.</b> La promesa se tiene que poder cobrar: «las diez líneas que escribieron
+    hoy se van a convertir en tres palabras, y van a sentir que se ganaron la abstracción».<br>
+    Y la pregunta abierta con la que se van: «si el modelo puede bajar la loss todo lo que
+    quiera… ¿qué le impide simplemente <i>memorizar</i> los 36 años?». No la contestes.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<!-- ====================== SCRIPTS (todos locales) ====================== -->
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  // --- plugin de matemática: KaTeX local, sin red ---------------------------
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+  /* =====================================================================
+     LAS VIZ INLINE DE LAS SLIDES
+
+     Todos los números de acá salen del notebook de esta clase (corrido, no
+     estimado) y de las mismas series que usan las viz de viz/.
+     ===================================================================== */
+  const ANIOS = [1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,
+                 1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,
+                 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019];
+  const YS = [0.0782,0.1166,0.0382,0.0082,0.0660,0.0324,0.0522,0.0516,0.2441,0.0765,
+              0.0578,0.1120,0.1044,0.2250,0.4357,0.1468,0.4138,0.3873,0.0000,0.0246,
+              0.1958,0.1645,0.1645,0.1006,0.3806,0.0000,0.0928,0.2338,0.0750,0.1626,
+              0.0535,0.0488,0.4267,0.2496,0.3112,0.2453];
+  const XS = ANIOS.map(t => (t - 2001.5) / 10);
+  const NUBE = ANIOS.map((t, i) => ({ x: t, y: YS[i] }));
+
+  // las dos rectas del gancho, medidas sobre estos datos (notebook, sección 1)
+  const R_MSE = { a: 0.042427, b: 0.154908 };   // minimiza el MSE: 0.01455
+  const R_MAE = { a: 0.061300, b: 0.138100 };   // minimiza el MAE: 0.08797
+  const LOSS_MIN = 0.014547;
+
+  function lossDe(a, b) {
+    let s = 0;
+    for (let i = 0; i < XS.length; i++) { const e = YS[i] - (a * XS[i] + b); s += e * e; }
+    return s / XS.length;
+  }
+  function gradDe(a, b) {
+    let ga = 0, gb = 0;
+    for (let i = 0; i < XS.length; i++) {
+      const e = YS[i] - (a * XS[i] + b);
+      ga += -2 * XS[i] * e; gb += -2 * e;
+    }
+    return [ga / XS.length, gb / XS.length];
+  }
+  function recta(r) { return anio => r.a * ((anio - 2001.5) / 10) + r.b; }
+
+  const planos = [];
+  function nuevoPlano(sel, op) { const p = Viz.plano(sel, op); planos.push(p); return p; }
+
+  /* --- slide 3: el gancho, dos rectas sobre la misma nube ---------------- */
+  (function () {
+    const p = nuevoPlano('#caja-rectas', {
+      xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 400,
+      ejeX: 'año', ejeY: '% de palabras del discurso',
+      titulo: 'menciones a «seguridad» en la apertura de sesiones'
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+      p.curva(recta(R_MSE), { color: 'modelo', grosor: 4.5 });
+      p.curva(recta(R_MAE), { color: 'val', grosor: 4.5 });
+      p.puntos(NUBE, { color: 'datos', r: 5 });
+      p.texto(2020, recta(R_MSE)(2020), 'azul', { color: 'modelo', tam: 15, peso: '700',
+              alinear: 'right', dy: 18, caja: true });
+      p.texto(2020, recta(R_MAE)(2020), 'naranja', { color: 'val', tam: 15, peso: '700',
+              alinear: 'right', dy: -18, caja: true });
+    });
+    p.tooltip(w => {
+      const a = Math.round(w.x);
+      if (a < 1984 || a > 2019) return null;
+      return 'año ' + a + '\n' + Viz.num(YS[a - 1984], 3) + ' % de las palabras';
+    });
+  })();
+
+  /* --- slide 5: los palitos del error ----------------------------------- */
+  (function () {
+    const p = nuevoPlano('#caja-palitos', {
+      xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 300,
+      ejeX: 'año', ejeY: '% de palabras',
+      titulo: 'cada palito rojo es el error de un año'
+    });
+    const f = recta(R_MSE);
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+      for (const d of NUBE) p.segmento(d.x, d.y, d.x, f(d.x), { color: 'error', grosor: 2 });
+      p.curva(f, { color: 'modelo', grosor: 3.5 });
+      p.puntos(NUBE, { color: 'datos', r: 4.5 });
+      p.textoPx(p.R - 10, p.T + 8, 'loss = ' + Viz.num(LOSS_MIN, 4),
+                { color: 'error', tam: 20, peso: '700', alinear: 'right', caja: true });
+    });
+  })();
+
+  /* --- slide 6: las dos formas del castigo ------------------------------ */
+  (function () {
+    const errores = NUBE.map(d => d.y - recta(R_MSE)(d.x));
+    const c1 = nuevoPlano('#caja-castigo-mse', {
+      xmin: -0.35, xmax: 0.35, ymin: 0, ymax: 0.12, alto: 250,
+      ejeX: 'error de un caso', ejeY: 'cuánto lo castigo',
+      titulo: 'MSE: la parábola'
+    });
+    c1.alDibujar(() => {
+      c1.fondo(); c1.grilla();
+      c1.ejes({ formatoX: v => Viz.num(v, 1), formatoY: v => Viz.num(v, 2) });
+      c1.curva(e => e * e, { color: 'modelo', grosor: 4 });
+      c1.puntos(errores.map(e => ({ x: e, y: e * e })), { color: 'error', r: 4 });
+    });
+    const c2 = nuevoPlano('#caja-castigo-mae', {
+      xmin: -0.35, xmax: 0.35, ymin: 0, ymax: 0.35, alto: 250,
+      ejeX: 'error de un caso', ejeY: 'cuánto lo castigo',
+      titulo: 'MAE: la V'
+    });
+    c2.alDibujar(() => {
+      c2.fondo(); c2.grilla();
+      c2.ejes({ formatoX: v => Viz.num(v, 1), formatoY: v => Viz.num(v, 2) });
+      c2.curva(e => Math.abs(e), { color: 'val', grosor: 4 });
+      c2.puntos(errores.map(e => ({ x: e, y: Math.abs(e) })), { color: 'error', r: 4 });
+    });
+  })();
+
+  /* --- slide 12: el salto conceptual, dos paneles ------------------------ */
+  (function () {
+    const izq = nuevoPlano('#caja-salto-datos', {
+      xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 350,
+      ejeX: 'año', ejeY: '% de palabras',
+      titulo: 'el mundo: acá hay años y porcentajes'
+    });
+    izq.alDibujar(() => {
+      izq.fondo(); izq.grilla();
+      izq.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+      izq.puntos(NUBE, { color: 'datos', r: 4.5 });
+      izq.curva(recta(R_MSE), { color: 'modelo', grosor: 4 });
+      izq.texto(1986, 0.44, 'esta recta entera…', { color: 'modelo', tam: 14, peso: '700', caja: true });
+    });
+
+    const der = nuevoPlano('#caja-salto-mapa', {
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 350,
+      ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
+      titulo: 'el mapa: acá hay rectas, y nada más que rectas'
+    });
+    der.alDibujar(() => {
+      der.fondo();
+      der.mapaDeCalor(lossDe, { n: 120, paleta: 'loss', log: true });
+      der.contornos(lossDe, { niveles: 10, color: 'tinta3', opacidad: .3 });
+      der.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
+      der.punto(R_MSE.a, R_MSE.b, { color: 'parametro', r: 9, halo: true });
+      der.texto(R_MSE.a, R_MSE.b, '…es este punto', { color: 'parametro', tam: 14,
+                peso: '700', dx: 14, dy: -18, caja: true });
+    });
+  })();
+
+  /* --- slide 13: el mapa solo, grande ----------------------------------- */
+  (function () {
+    const p = nuevoPlano('#caja-mapa', {
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 430,
+      ejeX: 'qué tan empinada (puntos por década)', ejeY: 'dónde arranca (valor en 2001)',
+      titulo: 'el paisaje de la loss: cada punto es una recta entera'
+    });
+    p.alDibujar(() => {
+      p.fondo();
+      p.mapaDeCalor(lossDe, { n: 150, paleta: 'loss', log: true });
+      p.contornos(lossDe, { niveles: 12, color: 'tinta3', opacidad: .35 });
+      p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
+      p.punto(R_MSE.a, R_MSE.b, { color: 'ok', r: 7 });
+      p.texto(R_MSE.a, R_MSE.b, 'el fondo del valle', { color: 'ok', tam: 14, peso: '700',
+              dx: 14, dy: -16, caja: true });
+      p.texto(-0.36, 0.40, 'acá arriba: rectas horribles', { color: 'tinta2', tam: 13,
+              peso: '700', caja: true });
+    });
+  })();
+
+  /* --- slide 16: la grilla de la fuerza bruta ---------------------------- */
+  (function () {
+    const p = nuevoPlano('#caja-grilla', {
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 400,
+      ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
+      titulo: 'diez mil rectas, probadas una por una'
+    });
+    // la grilla que se dibuja es de 40x26 para que se vea; la del notebook es
+    // de 120x120 y tarda dos segundos
+    const puntos = [];
+    for (let i = 0; i < 40; i++) {
+      for (let j = 0; j < 26; j++) {
+        puntos.push({ x: -0.39 + i * 0.87 / 39, y: -0.12 + j * 0.55 / 25 });
+      }
+    }
+    p.alDibujar(() => {
+      p.fondo();
+      p.mapaDeCalor(lossDe, { n: 120, paleta: 'loss', log: true });
+      p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
+      p.puntos(puntos, { color: 'tinta3', r: 1.6, borde: false });
+      p.punto(R_MSE.a, R_MSE.b, { color: 'ok', r: 8, halo: true });
+      p.texto(R_MSE.a, R_MSE.b, 'la mejor de todas', { color: 'ok', tam: 14, peso: '700',
+              dx: 14, dy: -16, caja: true });
+    });
+  })();
+
+  /* --- slide 18: la niebla ---------------------------------------------- */
+  (function () {
+    const p = nuevoPlano('#caja-niebla', {
+      xmin: 0, xmax: 10, ymin: 0, ymax: 4.2, alto: 340,
+      titulo: 'estás acá, y no ves más allá de tus pies',
+      margen: { i: 20, d: 20, a: 30, b: 20 }
+    });
+    // una colina cualquiera, con dos pozos. Es un dibujo, no un dato.
+    const colina = t => 2.6 - 1.15 * Math.exp(-Math.pow((t - 3.2) / 1.5, 2))
+                            - 1.55 * Math.exp(-Math.pow((t - 7.4) / 1.6, 2))
+                            + 0.11 * Math.sin(t * 2.1);
+    const donde = 6.15;
+    p.alDibujar(() => {
+      p.fondo({ marco: false });
+      // el suelo
+      const suelo = [];
+      for (let i = 0; i <= 120; i++) { const t = i / 12; suelo.push({ x: t, y: colina(t) }); }
+      p.poligono(suelo.concat([{ x: 10, y: 0 }, { x: 0, y: 0 }]),
+                 { relleno: Viz.alfa('tinta3', .18), borde: 'tinta2', grosor: 2.5 });
+      // la persona: un palito
+      const yPie = colina(donde);
+      p.segmento(donde, yPie, donde, yPie + 0.52, { color: 'parametro', grosor: 4 });
+      p.punto(donde, yPie + 0.68, { color: 'parametro', r: 8 });
+      // la ventana de visión: lo único que ve
+      p.segmento(donde - 0.8, colina(donde - 0.8), donde + 0.8, colina(donde + 0.8),
+                 { color: 'acento', grosor: 6 });
+
+      // LA NIEBLA VA ENCIMA de todo lo que no puede ver. Los rótulos van después,
+      // encima de la niebla: si se dibujan antes quedan tapados y se leen mal.
+      p.poligono([{ x: 0, y: 0 }, { x: donde - 0.95, y: 0 },
+                  { x: donde - 0.95, y: 4.2 }, { x: 0, y: 4.2 }],
+                 { relleno: Viz.alfa('papel', .93), borde: false });
+      p.poligono([{ x: donde + 0.95, y: 0 }, { x: 10, y: 0 },
+                  { x: 10, y: 4.2 }, { x: donde + 0.95, y: 4.2 }],
+                 { relleno: Viz.alfa('papel', .93), borde: false });
+
+      p.texto(2.4, 3.2, 'niebla', { color: 'tinta3', tam: 22, peso: '700', alinear: 'center' });
+      p.texto(8.4, 3.2, 'niebla', { color: 'tinta3', tam: 22, peso: '700', alinear: 'center' });
+      p.texto(donde, 3.85, '¿para dónde bajo?',
+              { color: 'tinta', tam: 18, peso: '700', alinear: 'center' });
+      p.texto(donde - 0.78, colina(donde - 0.8), 'más alto',
+              { color: 'tinta2', tam: 12, peso: '700', alinear: 'left', dy: -15, caja: true });
+      p.texto(donde + 0.78, colina(donde + 0.8), 'más bajo',
+              { color: 'tinta2', tam: 12, peso: '700', alinear: 'right', dy: 17, caja: true });
+      p.texto(donde, 0.5, 'esto es todo lo que ve',
+              { color: 'acento', tam: 14, peso: '700', alinear: 'center', caja: true });
+    });
+  })();
+
+  /* --- slide 20: el mapa con la flecha del gradiente --------------------- */
+  (function () {
+    const p = nuevoPlano('#caja-gradiente', {
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 355,
+      ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
+      titulo: 'la flecha, en el mismo mapa de antes'
+    });
+    const pa = -0.30, pb = 0.33;
+    p.alDibujar(() => {
+      p.fondo();
+      p.mapaDeCalor(lossDe, { n: 130, paleta: 'loss', log: true });
+      p.contornos(lossDe, { niveles: 11, color: 'tinta3', opacidad: .35 });
+      p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
+      const gr = gradDe(pa, pb), k = 0.20;
+      p.flecha(pa, pb, pa + k * gr[0] * 0.4, pb + k * gr[1] * 0.4,
+               { color: 'error', grosor: 3, cabeza: 11 });
+      p.texto(-0.385, 0.415, 'el gradiente: para arriba',
+              { color: 'error', tam: 13, peso: '700', alinear: 'left', caja: true });
+      p.flecha(pa, pb, pa - k * gr[0], pb - k * gr[1],
+               { color: 'tinta', grosor: 3.2, cabeza: 12 });
+      p.texto(pa - k * gr[0], pb - k * gr[1], 'nosotros vamos para acá',
+              { color: 'tinta', tam: 13, peso: '700', dx: 10, dy: 14, caja: true });
+      p.punto(pa, pb, { color: 'parametro', r: 8, halo: true });
+      p.punto(R_MSE.a, R_MSE.b, { color: 'ok', r: 6 });
+    });
+  })();
+
+  /* --- slide 23: las tres firmas ---------------------------------------- */
+  (function () {
+    // corridas reales: el mismo descenso del notebook, con tres learning rates
+    function correr(lr, pasos) {
+      let a = -0.30, b = 0.40;
+      const h = [lossDe(a, b)];
+      for (let i = 0; i < pasos; i++) {
+        const gr = gradDe(a, b);
+        a -= lr * gr[0]; b -= lr * gr[1];
+        h.push(lossDe(a, b));
+      }
+      return h;
+    }
+    const casos = [
+      { sel: '#caja-sintoma-1', t: 'paso muy chico (0,000001)', h: correr(0.000001, 200),
+        color: 'val', techo: 0.25, xmax: 200, pie: 'casi plana y ALTA' },
+      { sel: '#caja-sintoma-2', t: 'paso bien (0,05)', h: correr(0.05, 200),
+        color: 'ok', techo: 0.25, xmax: 200, pie: 'cae y se aplana ABAJO' },
+      { sel: '#caja-sintoma-3', t: 'paso muy grande (1,5)', h: correr(1.5, 40),
+        color: 'error', techo: 1.0, xmax: 20, pie: 'se va para ARRIBA' }
+    ];
+    for (const c of casos) {
+      const p = nuevoPlano(c.sel, {
+        xmin: 0, xmax: c.xmax, ymin: 0, ymax: c.techo, alto: 250,
+        ejeX: 'iteración', ejeY: 'loss', titulo: c.t,
+        margen: { i: 64, d: 12, a: 28, b: 34 }
+      });
+      p.alDibujar(() => {
+        p.fondo(); p.grilla();
+        p.ejes({ formatoY: v => Viz.num(v, 2) });
+        p.linea([[0, LOSS_MIN], [c.xmax, LOSS_MIN]], { color: 'ok', grosor: 1.4, punteada: true });
+        const pts = [];
+        let fuga = -1;
+        for (let i = 0; i < c.h.length && i <= c.xmax; i++) {
+          if (fuga < 0 && c.h[i] > c.techo) fuga = i;
+          pts.push({ x: i, y: Math.min(c.h[i], c.techo * 2) });
+        }
+        p.linea(pts, { color: c.color, grosor: 3 });
+        if (fuga >= 0) {
+          p.flecha(fuga, c.techo * 0.55, fuga, c.techo * 0.94,
+                   { color: 'error', grosor: 3, cabeza: 10 });
+        }
+        p.textoPx((p.L + p.R) / 2, p.B - 6, c.pie, { color: c.color, tam: 13, peso: '700',
+                  alinear: 'center', base: 'bottom', caja: true });
+      });
+    }
+  })();
+
+  /* --- slide 26: censo contra muestra ------------------------------------ */
+  (function () {
+    const p = nuevoPlano('#caja-batch', {
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 250,
+      ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
+      titulo: 'los dos rastros llegan al mismo lugar; uno tiembla'
+    });
+    // censo: el gradiente con los 36 años
+    const censo = [];
+    (function () {
+      let a = -0.30, b = 0.40;
+      censo.push({ x: a, y: b });
+      for (let i = 0; i < 60; i++) {
+        const gr = gradDe(a, b);
+        a -= 0.05 * gr[0]; b -= 0.05 * gr[1];
+        censo.push({ x: a, y: b });
+      }
+    })();
+    // muestra: 5 años al azar por paso, con semilla fija
+    const muestra = [];
+    (function () {
+      const rnd = Viz.azar(1983);
+      let a = -0.30, b = 0.40;
+      muestra.push({ x: a, y: b });
+      for (let i = 0; i < 60; i++) {
+        let ga = 0, gb = 0;
+        for (let k = 0; k < 5; k++) {
+          const j = Math.floor(rnd() * XS.length);
+          const e = YS[j] - (a * XS[j] + b);
+          ga += -2 * XS[j] * e; gb += -2 * e;
+        }
+        a -= 0.05 * ga / 5; b -= 0.05 * gb / 5;
+        muestra.push({ x: a, y: b });
+      }
+    })();
+    p.alDibujar(() => {
+      p.fondo();
+      p.mapaDeCalor(lossDe, { n: 130, paleta: 'loss', log: true });
+      p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
+      p.linea(muestra, { color: 'val', grosor: 2.2 });
+      p.linea(censo, { color: 'modelo', grosor: 3 });
+      p.punto(R_MSE.a, R_MSE.b, { color: 'ok', r: 6 });
+      p.leyenda([
+        { color: 'modelo', texto: 'censo: los 36 años en cada paso', forma: 'linea' },
+        { color: 'val', texto: 'muestra: 5 años al azar por paso', forma: 'linea' }
+      ], { pos: 'bd' });
+    });
+  })();
+
+  // Reveal esconde las slides: cuando aparece una, el canvas recién ahí tiene
+  // el ancho bueno y hay que redibujar. Si no, en el proyector sale cortado.
+  Reveal.on('slidechanged', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+  Reveal.on('ready', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+</script>
+</body>
+</html>

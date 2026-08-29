@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sumar rampas — Clase 2</title>
+
+<!-- ==========================================================================
+     LA VISUALIZACIÓN CENTRAL DEL CURSO.
+
+       MOMENTO AHA: "con ocho cosas tontas dibujé algo que ninguna fórmula
+                     que yo conozco dibuja"
+
+       SEGUNDO AHA (sembrado para la clase 4): con 32 rampas la curva azul
+                     pasa por TODOS los puntos, incluidos los que son ruido.
+                     Hoy no se explica. Sólo se dice: "guardá esta imagen".
+
+     DATOS: reales. % de palabras del discurso presidencial de apertura de
+     sesiones dedicadas al léxico de "inflación", 1984-2019, media móvil de
+     3 años (columna `inflacion_suave` de datos/series). Los 36 valores están
+     copiados abajo tal cual los devuelve `ssdl.datos.serie_menciones`.
+
+     NÚMEROS DE REFERENCIA: todos MEDIDOS, ninguno estimado. El script que los
+     mide está transcripto en notas-docente.md §"los números de la viz".
+       · la mejor recta posible sobre estos datos ....... MSE 0.001496 (R² = 1,3 %)
+       · una raya horizontal en el promedio ............. MSE 0.001516
+       · lo mejor con  1 rampa .......................... MSE 0.000843
+       · lo mejor con  2 rampas ......................... MSE 0.000624
+       · lo mejor con  4 rampas ......................... MSE 0.000318
+       · lo mejor con  8 rampas ......................... MSE 0.000144
+       · lo mejor con 32 rampas ......................... MSE 0.000014
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* La columna izquierda lleva el dibujo grande Y el taller de rampas. */
+  .col-izq { display: flex; flex-direction: column; gap: .7rem; min-width: 0; }
+
+  .taller {
+    display: grid; gap: .55rem;
+    grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+    max-height: 260px; overflow-y: auto; padding: .15rem .3rem .3rem 0;
+  }
+  /* adentro de una slide hay menos alto: el taller se achica y scrollea */
+  body.embebido .taller { max-height: 186px; }
+  body.embebido .aviso-taller { font-size: .78rem; padding: .45rem .6rem; }
+  .tarjeta-rampa {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .4rem .5rem .45rem;
+  }
+  .tarjeta-rampa header {
+    display: flex; align-items: center; gap: .35rem; margin-bottom: .2rem;
+  }
+  .tarjeta-rampa .bolita { width: .7em; height: .7em; border-radius: 50%; flex: 0 0 auto; }
+  .tarjeta-rampa .nombre {
+    font-size: .74rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--tinta-2); flex: 1 1 auto;
+  }
+  .tarjeta-rampa .quitar {
+    background: none; border: 0; color: var(--tinta-3); cursor: pointer;
+    font-size: 1rem; line-height: 1; padding: 0 .2em;
+  }
+  .tarjeta-rampa .quitar:hover { color: var(--c-error); }
+  .tarjeta-rampa canvas { display: block; width: 100%; height: 46px; border-radius: 4px; }
+  .tarjeta-rampa .ctrl { margin: .3rem 0 0; }
+  .tarjeta-rampa .ctrl-etiqueta { font-size: .72rem; }
+  .tarjeta-rampa .ctrl-valor { font-size: .68rem; padding: .05em .35em; }
+  .tarjeta-rampa .grupo-botones button { font-size: .7rem; padding: .18em .5em; }
+
+  .aviso-taller {
+    grid-column: 1 / -1; background: var(--c-error-suave);
+    border-left: 4px solid var(--c-error); border-radius: var(--r-medio);
+    padding: .55rem .7rem; font-size: .84rem; line-height: 1.45;
+  }
+  .fila-medidores { display: flex; gap: .5rem; }
+  .fila-medidores > * { flex: 1 1 0; }
+
+  /* Adentro de una slide hay 610 px de alto y nada más: el panel se compacta
+     para que todos los controles entren sin scrollear. */
+  body.embebido .panel { font-size: .9em; padding: .6rem .65rem .7rem; }
+  body.embebido .panel > h2 { margin-bottom: .45rem; }
+  body.embebido .ctrl { margin-bottom: .42rem; }
+  body.embebido .ctrl input[type="range"] { margin-top: .2rem; }
+  body.embebido .ctrl.tipo-checkbox { margin-bottom: .3rem; }
+  body.embebido .lectura { font-size: .76rem; line-height: 1.35; padding: .4rem .55rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .68rem; }
+
+  /* Ventana muy angosta (alguien lo abre en el celular): menos padding y una
+     sola columna, para que no aparezca scroll horizontal. */
+  @media (max-width: 560px) {
+    .viz-pagina { padding: .7rem; }
+    .taller { grid-template-columns: 1fr; max-height: none; }
+    .dos-columnas, .bloques, .par { grid-template-columns: 1fr; }
+  }
+
+  /* curso.css no declara box-sizing global, así que el padding de .viz-pagina
+     se suma al ancho y en una ventana angosta aparece scroll horizontal.
+     Lo arreglamos acá, localmente, para no tocar la hoja compartida. */
+  .viz-pagina, .panel, .viz-frame { box-sizing: border-box; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Sumar rampas</h1>
+    <p>Una rampa es la función más tonta que hay: plana hasta el codo, y después
+       sube (o baja) recto. Por sí sola no sirve para nada. Ahora sumale otra.
+       Y otra. <em>Fijate cuántas necesitás para que la curva azul tape a la negra.</em></p>
+  </header>
+
+  <div class="col-izq">
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="taller" id="taller"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Empezá con <b>una</b> rampa y movele el codo por
+      todos lados: no hay manera de tapar la curva negra, ni cerca. Agregá la
+      segunda y fijate que cada una se hace cargo de <em>un tramo</em>: la que
+      tiene el codo en 1999 no se entera de lo que pasa en 2015. Cuando llegues
+      a ocho, parate un segundo: acabás de dibujar, con ocho cosas tontas
+      sumadas, una figura que ninguna fórmula de las que conocés dibuja. Eso,
+      y nada más que eso, es una red neuronal.
+    </div>
+    <p class="viz-pie">
+      <b>Y una cosa más:</b> apretá <b>32 rampas</b>. La curva azul pasa por
+      <em>todos</em> los puntos, incluidos los que son claramente ruido de
+      medición. Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
+      tener nombre.
+    </p>
+    <p class="viz-pie">
+      Datos <b>reales</b>: porcentaje de palabras del discurso presidencial de
+      apertura de sesiones dedicadas al léxico de «inflación», 1984-2019, media
+      móvil de 3 años. Fuente: <code>datos/series</code> · ver
+      <code>datos/README.md</code>. El léxico lo escribimos nosotros y eso también
+      es una decisión: la serie mide <em>ese</em> léxico, no «la inflación».
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* =========================================================================
+   1. LOS DATOS  (reales, copiados de ssdl.datos.serie_menciones)
+   ========================================================================= */
+const ANIO_0 = 1984, ANIO_1 = 2019;
+const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+               0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
+               0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
+               0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
+               0.1440, 0.1837, 0.1321, 0.1268];
+
+const objetivo = SERIE.map((v, i) => ({ x: ANIO_0 + i, y: v }));
+
+// Números de referencia MEDIDOS (ver el comentario de la cabecera).
+const REF = {
+  recta:  0.001496,   // la mejor recta posible: R² = 1,3 %
+  media:  0.001516,   // una raya horizontal en el promedio
+  mejorN: { 1: 0.000843, 2: 0.000624, 4: 0.000318, 8: 0.000144, 32: 0.000014 }
+};
+
+// Codos de los atajos: el mejor juego de codos para cada N, buscado por
+// barrido con separación mínima de 2 años. Medido, no inventado.
+const ATAJOS = {
+  1:  [2013],
+  2:  [1989, 2012],
+  4:  [1995, 1997, 2014, 2017],
+  8:  [1990, 1992, 1994, 1999, 2007, 2010, 2014, 2017],
+  // 32 codos repartidos parejo, uno casi por año. Con 36 datos, esto ya no
+  // dibuja: calca. Es la siembra del sobreajuste para la clase 4.
+  32: [1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997,
+       1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+       2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
+};
+
+// Lo que el panel muestra encendido o apagado. Vive acá y no en `ctl` porque
+// la función de dibujo se registra antes de que exista el panel.
+const vista = { debajo: 'acumulado', errores: false };
+
+// Adentro de una slide hay menos alto disponible que en la página suelta.
+const EMBEBIDO = document.body.classList.contains('embebido');
+
+/* =========================================================================
+   2. EL ESTADO: las rampas
+   ========================================================================= */
+// Una rampa: { codo (año), altura (>=0, puntos porcentuales por año), signo (±1) }
+let base = 0.06;
+let rampas = [{ codo: 2005, altura: 0.000, signo: 1 }];
+let seleccionada = 0;
+const MAX_ALTURA = 0.15;
+const TOPE_TARJETAS = 12;   // más que esto y el taller no se dibuja: es el punto
+
+function rampaSuelta(r) {
+  return function (x) { return r.signo * r.altura * Math.max(0, x - r.codo); };
+}
+function modelo(x) {
+  let s = base;
+  for (const r of rampas) s += r.signo * r.altura * Math.max(0, x - r.codo);
+  return s;
+}
+function desajuste() {
+  let s = 0;
+  for (const d of objetivo) { const e = d.y - modelo(d.x); s += e * e; }
+  return s / objetivo.length;
+}
+function peorAnio() {
+  let mejor = null, dmax = -1;
+  for (const d of objetivo) {
+    const e = Math.abs(d.y - modelo(d.x));
+    if (e > dmax) { dmax = e; mejor = d; }
+  }
+  return mejor;
+}
+
+/* --- colores de las rampas: siempre tokens del curso, nunca un #hex ------- */
+const BASES_RAMPA = ['parametro', 'acento', 'modelo'];
+function colorRampa(i) {
+  const base = BASES_RAMPA[i % 3];
+  const nivel = Math.floor(i / 3);
+  if (nivel === 0) return Viz.color(base);
+  if (nivel % 2 === 1) return Viz.mezclarColor(base, 'papel', Math.min(.55, .30 * Math.ceil(nivel / 2)));
+  return Viz.mezclarColor(base, 'tinta', Math.min(.5, .26 * (nivel / 2)));
+}
+
+/* =========================================================================
+   3. ACOMODAR SOLO: mínimos cuadrados sobre la base y las alturas,
+      dejando los codos donde estén. Es lo que la clase 3 va a aprender
+      a hacer sin la fórmula cerrada.
+   ========================================================================= */
+function resolver(A, b) {                 // eliminación gaussiana con pivoteo
+  const n = b.length;
+  const M = A.map((f, i) => f.concat([b[i]]));
+  for (let c = 0; c < n; c++) {
+    let piv = c;
+    for (let f = c + 1; f < n; f++) if (Math.abs(M[f][c]) > Math.abs(M[piv][c])) piv = f;
+    if (Math.abs(M[piv][c]) < 1e-14) continue;
+    const t = M[c]; M[c] = M[piv]; M[piv] = t;
+    for (let f = 0; f < n; f++) {
+      if (f === c) continue;
+      const k = M[f][c] / M[c][c];
+      if (!k) continue;
+      for (let j = c; j <= n; j++) M[f][j] -= k * M[c][j];
+    }
+  }
+  const x = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) x[i] = Math.abs(M[i][i]) < 1e-14 ? 0 : M[i][n] / M[i][i];
+  return x;
+}
+
+function acomodar() {
+  const n = rampas.length + 1;
+  // columnas: [1, relu(x-codo1), relu(x-codo2), ...]
+  const cols = objetivo.map(d => {
+    const f = [1];
+    for (const r of rampas) f.push(Math.max(0, d.x - r.codo));
+    return f;
+  });
+  const AtA = [], Atb = [];
+  for (let i = 0; i < n; i++) {
+    const fila = [];
+    for (let j = 0; j < n; j++) {
+      let s = 0;
+      for (let k = 0; k < cols.length; k++) s += cols[k][i] * cols[k][j];
+      fila.push(s + (i === j ? 1e-9 : 0));       // pizca de ridge: nunca singular
+    }
+    AtA.push(fila);
+    let s = 0;
+    for (let k = 0; k < cols.length; k++) s += cols[k][i] * objetivo[k].y;
+    Atb.push(s);
+  }
+  const w = resolver(AtA, Atb);
+  base = w[0];
+  for (let i = 0; i < rampas.length; i++) {
+    const v = w[i + 1];
+    rampas[i].signo = v < 0 ? -1 : 1;
+    rampas[i].altura = Math.min(MAX_ALTURA, Math.abs(v));
+  }
+}
+
+function poner(n) {
+  const codos = ATAJOS[n];
+  rampas = codos.map(c => ({ codo: c, altura: 0.01, signo: 1 }));
+  acomodar();
+  seleccionada = 0;
+  redibujarTodo();
+}
+
+/* =========================================================================
+   4. EL DIBUJO GRANDE
+   ========================================================================= */
+const p = Viz.plano('#lienzo', {
+  xmin: ANIO_0 - 1, xmax: ANIO_1 + 1, ymin: -0.03, ymax: 0.21,
+  ejeX: 'año', ejeY: '% de palabras del discurso',
+  titulo: 'menciones a «inflación» en la apertura de sesiones',
+  alto: EMBEBIDO ? 288 : 330
+});
+
+p.alDibujar(() => {
+  p.fondo();
+  p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+
+  // las piezas, tenues, debajo de todo
+  if (rampas.length <= TOPE_TARJETAS && vista.debajo !== 'nada') {
+    if (vista.debajo === 'sueltas') {
+      // cada rampa SOLA, arrancando en cero. Se van del cuadro, y está bien:
+      // una rampa sola no tiene techo. Sola no sirve para nada.
+      rampas.forEach((r, i) => {
+        const f = rampaSuelta(r);
+        p.curva(f, { color: colorRampa(i), grosor: 1.8, opacidad: .6, punteada: [5, 4] });
+      });
+    } else {
+      // el acumulado: base, base+rampa1, base+rampa1+rampa2, ... Se ve cómo
+      // cada rampa nueva DOBLA la curva anterior en un punto y no toca el resto.
+      for (let k = 0; k < rampas.length; k++) {
+        p.curva(x => {
+          let s = base;
+          for (let j = 0; j <= k; j++) s += rampaSuelta(rampas[j])(x);
+          return s;
+        }, { color: colorRampa(k), grosor: 1.4, opacidad: .45 });
+      }
+    }
+  }
+
+  // los palitos del desajuste
+  if (vista.errores) {
+    for (const d of objetivo) {
+      p.segmento(d.x, d.y, d.x, modelo(d.x), { color: 'error', grosor: 1.8, opacidad: .85 });
+    }
+  }
+
+  // lo observado: negro, grueso. Es el dato, no es del modelo.
+  p.linea(objetivo, { color: 'datos', grosor: 3.2 });
+  p.puntos(objetivo, { color: 'datos', r: 3.2 });
+
+  // lo que dibuja el modelo
+  p.curva(modelo, { color: 'modelo', grosor: 3.6 });
+
+  // los codos, arrastrables
+  if (rampas.length <= TOPE_TARJETAS) {
+    rampas.forEach((r, i) => {
+      p.punto(r.codo, modelo(r.codo), {
+        color: colorRampa(i), r: i === seleccionada ? 7.5 : 5.5,
+        halo: i === seleccionada
+      });
+    });
+  }
+
+  const items = [
+    { color: 'datos', texto: 'lo observado', forma: 'linea' },
+    { color: 'modelo', texto: 'la suma de rampas', forma: 'linea' }
+  ];
+  if (rampas.length <= TOPE_TARJETAS && vista.debajo === 'sueltas') {
+    items.push({ color: 'parametro', texto: 'cada rampa sola', forma: 'linea', punteada: true });
+  } else if (rampas.length <= TOPE_TARJETAS && vista.debajo === 'acumulado') {
+    items.push({ color: 'parametro', texto: 'sumando de a una', forma: 'linea' });
+  }
+  p.leyenda(items, { pos: 'ai' });
+
+  const n = rampas.length;
+  p.textoPx(p.R - 10, p.T + 10,
+    n + (n === 1 ? ' rampa · ' : ' rampas · ') + (3 * n) + ' perillas + la base',
+    { alinear: 'right', caja: true, tam: 12, peso: '700', color: 'tinta2' });
+});
+
+// arrastrar el codo con el dedo: se mueve mientras arrastrás, no al soltar
+const manijas = [];
+p.arrastrables(() => manijas, {
+  radio: 18, fijarY: true, acotarX: [ANIO_0, ANIO_1],
+  alArrastrar: (q) => {
+    const i = q.i;
+    seleccionada = i;
+    rampas[i].codo = Math.round(q.x);
+    q.x = rampas[i].codo;
+    const t = tarjetas[i];
+    if (t) {                                  // el panel se mueve con el dedo
+      t.codo.value = rampas[i].codo;
+      t.valorCodo.textContent = String(rampas[i].codo);
+      miniCanvas(t.lienzo, i);
+    }
+    actualizar();
+  }
+});
+
+p.tooltip(w => {
+  const a = Math.round(w.x);
+  if (a < ANIO_0 || a > ANIO_1) return null;
+  const d = objetivo[a - ANIO_0];
+  return 'año ' + a + '\nobservado ' + Viz.num(d.y, 3) + ' %\nmodelo    ' + Viz.num(modelo(a), 3) + ' %';
+});
+
+function sincronizarManijas() {
+  manijas.length = 0;
+  if (rampas.length > TOPE_TARJETAS) return;
+  rampas.forEach((r, i) => manijas.push({ x: r.codo, y: modelo(r.codo), i: i }));
+}
+
+/* =========================================================================
+   5. EL TALLER: una tarjeta por rampa, con su mini-gráfico y sus 3 perillas
+   ========================================================================= */
+const taller = document.getElementById('taller');
+// Referencias a los controles de cada tarjeta, para poder sincronizarlos
+// MIENTRAS se arrastra el codo en el dibujo. Que el panel se actualice al
+// soltar y no al arrastrar es de las cosas que más molestan de una viz.
+const tarjetas = [];
+
+function miniCanvas(cv, i) {
+  const r = rampas[i];
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 180, h = 46;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, w, h);
+  c.fillStyle = Viz.color('fondo'); c.fillRect(0, 0, w, h);
+
+  // escala propia: la rampa sola, centrada en su rango
+  const f = rampaSuelta(r);
+  let lo = 0, hi = 0;
+  for (let k = 0; k <= 40; k++) {
+    const v = f(ANIO_0 + (ANIO_1 - ANIO_0) * k / 40);
+    if (v < lo) lo = v; if (v > hi) hi = v;
+  }
+  const span = Math.max(hi - lo, 1e-4) * 1.25;
+  const mid = (hi + lo) / 2;
+  const py = v => h / 2 - (v - mid) / span * (h - 12);
+  const px = x => 3 + (x - ANIO_0) / (ANIO_1 - ANIO_0) * (w - 6);
+
+  // el cero
+  c.strokeStyle = Viz.alfa('borde', .95); c.lineWidth = 1;
+  c.beginPath(); c.moveTo(0, Math.round(py(0)) + .5); c.lineTo(w, Math.round(py(0)) + .5); c.stroke();
+
+  c.strokeStyle = colorRampa(i); c.lineWidth = 2.4; c.lineJoin = 'round';
+  c.beginPath();
+  for (let k = 0; k <= 120; k++) {
+    const x = ANIO_0 + (ANIO_1 - ANIO_0) * k / 120;
+    const X = px(x), Y = py(f(x));
+    k === 0 ? c.moveTo(X, Y) : c.lineTo(X, Y);
+  }
+  c.stroke();
+  // el codo
+  c.fillStyle = colorRampa(i);
+  c.beginPath(); c.arc(px(r.codo), py(0), 3.2, 0, 6.2832); c.fill();
+}
+
+function tarjeta(i) {
+  const r = rampas[i];
+  const card = Viz.el('div', { class: 'tarjeta-rampa' });
+  const hd = Viz.el('header', {}, card);
+  const bola = Viz.el('span', { class: 'bolita' }, hd);
+  bola.style.background = colorRampa(i);
+  Viz.el('span', { class: 'nombre', texto: 'rampa ' + (i + 1) }, hd);
+  const x = Viz.el('button', { class: 'quitar', texto: '×' }, hd);
+  x.title = 'quitar esta rampa';
+  x.addEventListener('click', () => {
+    if (rampas.length <= 1) return;
+    rampas.splice(i, 1); seleccionada = 0; redibujarTodo();
+  });
+
+  const cv = Viz.el('canvas', {}, card);
+
+  // --- perilla 1: dónde está el codo ---
+  const c1 = Viz.el('div', { class: 'ctrl tipo-slider' }, card);
+  const f1 = Viz.el('div', { class: 'ctrl-fila' }, c1);
+  Viz.el('span', { class: 'ctrl-etiqueta', texto: 'dónde está el codo' }, f1);
+  const v1 = Viz.el('span', { class: 'ctrl-valor', texto: String(r.codo) }, f1);
+  const s1 = Viz.el('input', { type: 'range' }, c1);
+  s1.min = ANIO_0; s1.max = ANIO_1; s1.step = 1; s1.value = r.codo;
+  s1.style.setProperty('accent-color', colorRampa(i));
+  s1.addEventListener('input', () => {
+    r.codo = +s1.value; v1.textContent = s1.value;
+    seleccionada = i; actualizar(); miniCanvas(cv, i);
+  });
+
+  // --- perilla 2: qué tan empinada ---
+  const c2 = Viz.el('div', { class: 'ctrl tipo-slider' }, card);
+  const f2 = Viz.el('div', { class: 'ctrl-fila' }, c2);
+  Viz.el('span', { class: 'ctrl-etiqueta', texto: 'qué tan empinada' }, f2);
+  const v2 = Viz.el('span', { class: 'ctrl-valor', texto: Viz.num(r.altura, 3) }, f2);
+  const s2 = Viz.el('input', { type: 'range' }, c2);
+  s2.min = 0; s2.max = MAX_ALTURA; s2.step = 0.001; s2.value = r.altura;
+  s2.style.setProperty('accent-color', colorRampa(i));
+  s2.addEventListener('input', () => {
+    r.altura = +s2.value; v2.textContent = Viz.num(r.altura, 3);
+    seleccionada = i; actualizar(); miniCanvas(cv, i);
+  });
+
+  // --- perilla 3: para dónde va ---
+  const c3 = Viz.el('div', { class: 'ctrl' }, card);
+  const g3 = Viz.el('div', { class: 'grupo-botones' }, c3);
+  [['sube', 1], ['baja', -1]].forEach(([txt, sg]) => {
+    const b = Viz.el('button', { texto: txt }, g3);
+    if (r.signo === sg) b.classList.add('activo');
+    b.addEventListener('click', () => {
+      r.signo = sg; seleccionada = i;
+      for (const hb of g3.children) hb.classList.remove('activo');
+      b.classList.add('activo');
+      actualizar(); miniCanvas(cv, i);
+    });
+  });
+
+  taller.appendChild(card);
+  tarjetas[i] = { codo: s1, valorCodo: v1, lienzo: cv };
+  miniCanvas(cv, i);
+}
+
+function construirTaller() {
+  taller.innerHTML = '';
+  tarjetas.length = 0;
+  if (rampas.length > TOPE_TARJETAS) {
+    const d = Viz.el('div', { class: 'aviso-taller' }, taller);
+    d.innerHTML = '<b>' + rampas.length + ' rampas = ' + (rampas.length * 3) +
+      ' perillas.</b> No te las voy a mostrar todas, y ese es exactamente el punto: ' +
+      'yo puse a mano las 24 de ocho rampas y me llevó una tarde. Un modelo de verdad ' +
+      'tiene millones. <em>¿Cómo se encuentran solas?</em> Clase que viene.';
+    return;
+  }
+  for (let i = 0; i < rampas.length; i++) tarjeta(i);
+}
+
+/* =========================================================================
+   6. EL PANEL
+   ========================================================================= */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El taller de rampas' },
+  {
+    tipo: 'botones', etiqueta: 'agregar o sacar', opciones: [
+      { texto: '+ agregar rampa', principal: true, alClic: () => agregar() },
+      { texto: '− quitar la última', alClic: () => { if (rampas.length > 1) { rampas.pop(); seleccionada = 0; redibujarTodo(); } } }
+    ]
+  },
+  {
+    tipo: 'botones', etiqueta: 'atajo: N rampas ya acomodadas', opciones: [
+      { texto: '1', alClic: () => poner(1) }, { texto: '2', alClic: () => poner(2) },
+      { texto: '4', alClic: () => poner(4) }, { texto: '8', alClic: () => poner(8) },
+      { texto: '32', alClic: () => poner(32) }
+    ]
+  },
+  { tipo: 'select', id: 'debajo', etiqueta: 'qué mostrar debajo', valor: 'acumulado',
+    opciones: [
+      { valor: 'acumulado', texto: 'cómo se van sumando' },
+      { valor: 'sueltas', texto: 'cada rampa sola' },
+      { valor: 'nada', texto: 'nada, sólo el resultado' }
+    ] },
+  { tipo: 'checkbox', id: 'errores', etiqueta: 'mostrar los errores', valor: false },
+  { tipo: 'medidor', id: 'des', etiqueta: 'desajuste' },
+  { tipo: 'texto', id: 'comparacion', html: '' },
+  {
+    tipo: 'boton', texto: 'Acomodar automáticamente', principal: true,
+    alClic: () => { acomodar(); redibujarTodo(); }
+  },
+  { tipo: 'boton', texto: 'Empezar de nuevo', alClic: () => reiniciar() },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => actualizar());
+
+function agregar() {
+  const peor = peorAnio();
+  const a = Math.max(ANIO_0 + 1, Math.min(ANIO_1 - 1, peor.x));
+  // altura 0 a propósito: agregar una perilla NO mejora nada por sí solo.
+  rampas.push({ codo: a, altura: 0, signo: peor.y > modelo(peor.x) ? 1 : -1 });
+  seleccionada = rampas.length - 1;
+  redibujarTodo();
+}
+function reiniciar() {
+  base = 0.06;
+  rampas = [{ codo: 2005, altura: 0, signo: 1 }];
+  seleccionada = 0;
+  redibujarTodo();
+}
+
+/* =========================================================================
+   7. EL PEGAMENTO
+   ========================================================================= */
+// Siempre con 5 decimales fijos: Viz.num pasa a notación exponencial abajo de
+// 0,0001 y "1.43e-5" en un aula es una distracción, no un dato.
+function fmt(v) { return v.toFixed(5); }
+
+function actualizar() {
+  vista.debajo = ctl.valores.debajo;
+  vista.errores = ctl.valores.errores;
+  sincronizarManijas();
+  const d = desajuste();
+  const n = rampas.length;
+  ctl.medidor('des', Math.min(1, d / REF.media), fmt(d));
+
+  ctl.texto('comparacion',
+    'La <b>mejor recta posible</b> sobre estos datos da <b>' + fmt(REF.recta) + '</b>.<br>' +
+    'Una raya horizontal en el promedio da <b>' + fmt(REF.media) + '</b>. ' +
+    '<span class="c-error">La recta casi no mejora sobre no hacer nada.</span>');
+
+  let msg;
+  if (d <= REF.recta) {
+    msg = '<b class="c-ok">Ya le ganaste a la mejor recta posible</b> con ' + n +
+      (n === 1 ? ' rampa' : ' rampas') + '. ';
+  } else {
+    msg = 'Todavía estás <b class="c-error">peor que la mejor recta</b>. ';
+  }
+  if (REF.mejorN[n] !== undefined) {
+    msg += 'Con ' + n + (n === 1 ? ' rampa' : ' rampas') + ' bien puestas se puede llegar a <b>' +
+      fmt(REF.mejorN[n]) + '</b>.';
+  } else {
+    msg += 'Movés el codo, movés la altura, y mirás el número.';
+  }
+  if (n >= 24) {
+    msg = '<b>Mirá bien la curva azul:</b> pasa por <em>todos</em> los puntos, ' +
+      'incluidos los que son ruido del instrumento. Está calcando en vez de dibujar. ' +
+      'Guardá esta imagen: en la clase 4 esto tiene nombre.';
+  }
+  ctl.texto('lectura', msg);
+  p.redibujar();
+}
+
+function redibujarTodo() { construirTaller(); actualizar(); }
+
+// primer dibujo
+redibujarTodo();
+Viz.botonTema();
+
+// que los mini-gráficos se reacomoden si cambia el ancho o el tema
+window.addEventListener('resize', () => { construirTaller(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El diagrama es un plano de cableado — Clase 2</title>
+
+<!-- ==========================================================================
+       MOMENTO AHA: "toqué esta flecha de acá y se movió esa parte de la curva
+                     de allá. El diagrama no es un adorno: es un plano de
+                     cableado."
+
+     El diagrama de circulitos y flechas es el ícono que todo el mundo vio mil
+     veces en notas de divulgación. Acá deja de ser un ícono: cada flecha es una
+     perilla con un efecto visible y LOCALIZABLE en la curva.
+
+     La «configuración buena» son 6 rampas ajustadas por mínimos cuadrados a la
+     serie real de menciones a «inflación» (codos en 1995, 1999, 2007, 2010,
+     2014 y 2017). MSE medido = 0.000178. El script está en notas-docente.md.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .par { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: .7rem; min-width: 0; }
+  @media (max-width: 860px) { .par { grid-template-columns: 1fr; } }
+  .rotulo {
+    font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; margin: 0 0 .3rem; color: var(--tinta-3);
+  }
+  #diagrama svg { cursor: default; }
+  #diagrama path.cable { cursor: pointer; }
+  #diagrama path.cable:hover { stroke-opacity: 1 !important; }
+  .perilla-viva {
+    background: var(--papel-3); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .5rem .6rem; margin: .2rem 0 .6rem;
+  }
+  .perilla-viva .cual {
+    font-family: var(--f-mono); font-size: .8rem; font-weight: 700; color: var(--c-acento);
+  }
+
+  /* Adentro de una slide hay 610 px de alto y nada más: el panel se compacta
+     para que todos los controles entren sin scrollear. */
+  body.embebido .panel { font-size: .9em; padding: .6rem .65rem .7rem; }
+  body.embebido .panel > h2 { margin-bottom: .45rem; }
+  body.embebido .ctrl { margin-bottom: .42rem; }
+  body.embebido .ctrl input[type="range"] { margin-top: .2rem; }
+  body.embebido .ctrl.tipo-checkbox { margin-bottom: .3rem; }
+  body.embebido .lectura { font-size: .76rem; line-height: 1.35; padding: .4rem .55rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .68rem; }
+
+  /* Ventana muy angosta (alguien lo abre en el celular): menos padding y una
+     sola columna, para que no aparezca scroll horizontal. */
+  @media (max-width: 560px) {
+    .viz-pagina { padding: .7rem; }
+    .taller { grid-template-columns: 1fr; max-height: none; }
+    .dos-columnas, .bloques, .par { grid-template-columns: 1fr; }
+  }
+
+  /* curso.css no declara box-sizing global, así que el padding de .viz-pagina
+     se suma al ancho y en una ventana angosta aparece scroll horizontal.
+     Lo arreglamos acá, localmente, para no tocar la hoja compartida. */
+  .viz-pagina, .panel, .viz-frame { box-sizing: border-box; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El diagrama de circulitos, por dentro</h1>
+    <p>Éste es <em>el</em> dibujo que sale en todas las notas sobre inteligencia
+       artificial. No tiene nada de místico. <b>Hacé clic en cualquier flecha</b>
+       y movela: vas a ver qué parte de la curva se mueve con ella.</p>
+  </header>
+
+  <div class="par">
+    <div>
+      <p class="rotulo">el plano de cableado</p>
+      <div class="viz-frame" style="padding:8px"><div id="diagrama"></div></div>
+    </div>
+    <div>
+      <p class="rotulo">la figura que dibuja</p>
+      <div class="viz-frame" style="padding:8px"><div id="curva"></div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Pasá el mouse por una bolita del medio: se
+      enciende <em>su</em> rampa en el gráfico de la derecha, y vas a ver que
+      cada una se ocupa de un tramo y de ningún otro. Ahora hacé clic en la
+      flecha que sale de esa bolita y movela: se mueve <b>ese</b> pedazo de la
+      curva y el resto ni se entera. Las seis bolitas del medio son las seis
+      rampas de la visualización anterior. Es la misma cosa escrita en otra
+      notación.
+    </div>
+    <p class="viz-pie">
+      <b>La entrada está normalizada:</b> el año se lleva a la escala 0–1
+      (0 = 1984, 1 = 2019) antes de entrar. No es un truco: es lo que se hace
+      siempre, porque si no las perillas quedan con escalas muy distintas entre
+      sí y todo se vuelve más difícil de mover. Volvemos sobre esto en la clase 3.
+    </p>
+    <p class="viz-pie">
+      Datos <b>reales</b>: menciones a «inflación» en el discurso de apertura de
+      sesiones, 1984-2019, media móvil de 3 años. Ver <code>datos/README.md</code>.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ============================================================== los datos */
+const ANIO_0 = 1984, ANIO_1 = 2019;
+const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+               0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
+               0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
+               0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
+               0.1440, 0.1837, 0.1321, 0.1268];
+const objetivo = SERIE.map((v, i) => ({ x: ANIO_0 + i, y: v }));
+const aT = anio => (anio - ANIO_0) / (ANIO_1 - ANIO_0);
+
+const H = 6;   // neuronas ocultas
+
+// La configuración buena: seis rampas ajustadas por mínimos cuadrados.
+// MSE medido sobre estos datos = 0.000178.
+const BUENA = {
+  w1: [1.60, 0.90, 2.20, 1.20, 0.70, 1.90],
+  b1: [-0.5029, -0.3857, -1.4457, -0.8914, -0.6000, -1.7914],
+  w2: [-0.3629, 0.9476, -0.4494, 0.7993, 1.9833, -1.4843],
+  b2: 0.08319
+};
+let red = JSON.parse(JSON.stringify(BUENA));
+
+let seleccion = null;      // { capa:'w1'|'b1'|'w2'|'b2', j }
+let resaltada = null;      // índice de la neurona con el mouse encima
+
+/* ============================================================== la cuenta */
+function activacion(j, t) { return Math.max(0, red.w1[j] * t + red.b1[j]); }
+function aporte(j, t) { return red.w2[j] * activacion(j, t); }     // la rampa j, sola
+function salida(t) { let s = red.b2; for (let j = 0; j < H; j++) s += aporte(j, t); return s; }
+function modelo(anio) { return salida(aT(anio)); }
+
+function desajuste() {
+  let s = 0;
+  for (const d of objetivo) { const e = d.y - modelo(d.x); s += e * e; }
+  return s / objetivo.length;
+}
+
+const BASES = ['parametro', 'acento', 'modelo'];
+function colorNeurona(j) {
+  const base = BASES[j % 3];
+  const nivel = Math.floor(j / 3);
+  return nivel === 0 ? Viz.color(base) : Viz.mezclarColor(base, 'papel', 0.34);
+}
+
+/* ================================================================ la curva */
+const p = Viz.plano('#curva', {
+  xmin: ANIO_0 - 1, xmax: ANIO_1 + 1, ymin: -0.03, ymax: 0.21,
+  ejeX: 'año', ejeY: '% de palabras', titulo: 'lo que la red dibuja', alto: 290
+});
+
+p.alDibujar(() => {
+  p.fondo(); p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+
+  p.linea(objetivo, { color: 'datos', grosor: 2.6 });
+  p.puntos(objetivo, { color: 'datos', r: 2.6 });
+
+  // la rampa de la neurona resaltada, con halo
+  if (resaltada !== null) {
+    const j = resaltada;
+    p.curva(a => red.b2 + aporte(j, aT(a)),
+      { color: colorNeurona(j), grosor: 9, opacidad: .22 });
+    p.curva(a => red.b2 + aporte(j, aT(a)),
+      { color: colorNeurona(j), grosor: 2.4, punteada: [6, 4] });
+    // dónde está su codo
+    const codo = -red.b1[j] / (red.w1[j] || 1e-9);
+    if (codo > 0 && codo < 1) {
+      const anio = ANIO_0 + codo * (ANIO_1 - ANIO_0);
+      p.punto(anio, modelo(anio), { color: colorNeurona(j), r: 6 });
+      p.texto(anio, modelo(anio), 'el codo de la bolita ' + (j + 1),
+        { color: colorNeurona(j), tam: 11, peso: '700', dy: -20, caja: true, alinear: 'center' });
+    }
+  }
+
+  p.curva(modelo, { color: 'modelo', grosor: 3.4 });
+
+  p.leyenda([
+    { color: 'datos', texto: 'lo observado', forma: 'linea' },
+    { color: 'modelo', texto: 'lo que dibuja la red', forma: 'linea' }
+  ], { pos: 'ai' });
+});
+
+/* ============================================================= el diagrama */
+/* El SVG se construye UNA sola vez y después sólo se le cambian atributos.
+   Si lo reconstruyéramos en cada refresco, el `mouseenter` de un cable borraría
+   ese mismo cable antes de que llegara el `click`, y los cables serían
+   imposibles de seleccionar. Pasó. */
+const ANCHO_SVG = 430, ALTO_SVG = 290;
+let svgRed = null;
+const cables = [];     // { path, capa, j }
+const bolitas = [];    // { circulo, j }
+
+function pos(capa, j) {
+  if (capa === 'entrada') return { x: 52, y: ALTO_SVG / 2 };
+  if (capa === 'salida') return { x: ANCHO_SVG - 52, y: ALTO_SVG / 2 };
+  const arriba = 32, abajo = ALTO_SVG - 32;
+  return { x: ANCHO_SVG / 2, y: arriba + (abajo - arriba) * j / (H - 1) };
+}
+function grosor(w) { return 1 + Math.min(9, Math.abs(w) * 3.4); }
+function colorPeso(w) { return w >= 0 ? Viz.color('modelo') : Viz.color('error'); }
+function valorDe(capa, j) { return capa === 'b2' ? red.b2 : red[capa][j]; }
+
+function construirDiagrama() {
+  svgRed = Viz.svg.crear('#diagrama', { ancho: ANCHO_SVG, alto: ALTO_SVG, altoCss: '290px' });
+
+  const cable = (x1, y1, x2, y2, capa, j, recto) => {
+    const d = recto
+      ? 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2
+      : 'M ' + x1 + ' ' + y1 + ' C ' + ((x1 + x2) / 2) + ' ' + y1 + ', ' +
+        ((x1 + x2) / 2) + ' ' + y2 + ', ' + x2 + ' ' + y2;
+    const path = Viz.svg.el('path', {
+      class: 'cable', d: d, fill: 'none', 'stroke-linecap': 'round'
+    }, svgRed);
+    path.addEventListener('click', () => { seleccion = { capa: capa, j: j }; refrescar(); });
+    path.addEventListener('mouseenter', () => {
+      if (capa !== 'b2') { resaltada = j; refrescar(); }
+    });
+    path.addEventListener('mouseleave', () => { resaltada = null; refrescar(); });
+    cables.push({ path: path, capa: capa, j: j });
+  };
+
+  const ent = pos('entrada'), sal = pos('salida');
+  for (let j = 0; j < H; j++) {
+    const q = pos('oculta', j);
+    cable(ent.x + 20, ent.y, q.x - 17, q.y, 'w1', j, false);
+  }
+  for (let j = 0; j < H; j++) {           // los sesgos: un cabito recto que entra desde abajo
+    const q = pos('oculta', j);
+    cable(q.x - 30, q.y + 24, q.x - 11, q.y + 9, 'b1', j, true);
+  }
+  for (let j = 0; j < H; j++) {
+    const q = pos('oculta', j);
+    cable(q.x + 17, q.y, sal.x - 20, sal.y, 'w2', j, false);
+  }
+  cable(sal.x - 30, sal.y + 30, sal.x - 11, sal.y + 13, 'b2', 0, true);
+
+  const bolita = (q, r, relleno, texto, capa, j) => {
+    const g = Viz.svg.el('g', {}, svgRed);
+    const c = Viz.svg.el('circle', {
+      cx: q.x, cy: q.y, r: r, fill: relleno,
+      stroke: Viz.color('fondo'), 'stroke-width': 2.4
+    }, g);
+    Viz.svg.el('text', {
+      x: q.x, y: q.y + 4, 'text-anchor': 'middle', 'font-size': 11,
+      'font-family': Viz.colores().fuente, 'font-weight': 700,
+      fill: Viz.color('fondo'), 'pointer-events': 'none', texto: texto
+    }, g);
+    if (capa === 'oculta') {
+      g.style.cursor = 'pointer';
+      g.addEventListener('mouseenter', () => { resaltada = j; refrescar(); });
+      g.addEventListener('mouseleave', () => { resaltada = null; refrescar(); });
+      bolitas.push({ circulo: c, j: j });
+    }
+    return g;
+  };
+
+  bolita(ent, 17, Viz.color('acento'), 'año', 'entrada');
+  for (let j = 0; j < H; j++) bolita(pos('oculta', j), 13, colorNeurona(j), String(j + 1), 'oculta', j);
+  bolita(sal, 17, Viz.color('modelo'), '%', 'salida');
+
+  const rot = (x, y, t) => Viz.svg.el('text', {
+    x: x, y: y, 'text-anchor': 'middle', 'font-size': 10, 'letter-spacing': 1.4,
+    'font-family': Viz.colores().fuente, 'font-weight': 700,
+    fill: Viz.color('tinta3'), 'pointer-events': 'none', texto: t
+  }, svgRed);
+  rot(ent.x, 18, 'ENTRADA');
+  rot(ANCHO_SVG / 2, 14, 'LA CAPA OCULTA · 6 RAMPAS');
+  rot(sal.x, 18, 'SALIDA');
+}
+
+function actualizarDiagrama() {
+  for (const c of cables) {
+    const w = valorDe(c.capa, c.j);
+    const elegido = seleccion && seleccion.capa === c.capa && seleccion.j === c.j;
+    c.path.setAttribute('stroke', elegido ? Viz.color('acento') : colorPeso(w));
+    c.path.setAttribute('stroke-width', elegido ? grosor(w) + 2 : grosor(w));
+    c.path.setAttribute('stroke-opacity',
+      elegido ? 1 : (resaltada === c.j && c.capa !== 'b2' ? .95 : .5));
+  }
+  for (const b of bolitas) {
+    b.circulo.setAttribute('r', resaltada === b.j ? 16 : 13);
+    b.circulo.setAttribute('stroke', resaltada === b.j ? Viz.color('tinta') : Viz.color('fondo'));
+  }
+}
+
+/* ================================================================== panel */
+const NOMBRES = {
+  w1: j => 'peso de la entrada a la bolita ' + (j + 1),
+  b1: j => 'sesgo de la bolita ' + (j + 1),
+  w2: j => 'peso de la bolita ' + (j + 1) + ' a la salida',
+  b2: () => 'sesgo de la salida'
+};
+const RANGOS = { w1: [-4, 4, 0.05], b1: [-4, 4, 0.05], w2: [-4, 4, 0.05], b2: [-0.1, 0.25, 0.005] };
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La perilla que estás tocando' },
+  { tipo: 'texto', id: 'perilla', html: '' },
+  { tipo: 'medidor', id: 'des', etiqueta: 'desajuste' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'boton', texto: 'Randomizar toda la red', alClic: () => randomizar() },
+  { tipo: 'boton', texto: 'Volver a la configuración buena', principal: true, alClic: () => volver() },
+  { tipo: 'texto', id: 'cuenta', html: '' }
+], () => refrescar());
+
+// el slider vivo se arma a mano, porque cambia de perilla en cada clic
+const cajaPerilla = ctl.nodos['perilla'];
+
+let semillaRnd = 3;
+function randomizar() {
+  semillaRnd++;
+  const r = Viz.azar(semillaRnd * 7919);
+  for (let j = 0; j < H; j++) {
+    red.w1[j] = +((r() * 2 - 1) * 3).toFixed(2);
+    red.b1[j] = +((r() * 2 - 1) * 2).toFixed(2);
+    red.w2[j] = +((r() * 2 - 1) * 2).toFixed(2);
+  }
+  red.b2 = +(r() * 0.16).toFixed(3);
+  seleccion = null; clavePerilla = null;
+  refrescar();
+}
+function volver() {
+  red = JSON.parse(JSON.stringify(BUENA));
+  seleccion = null; clavePerilla = null;
+  refrescar();
+}
+
+// La caja de la perilla se REARMA sólo cuando cambia la selección. Si la
+// rearmáramos en cada refresco, el slider se destruiría en medio del arrastre
+// y no se podría mover: un clásico.
+let clavePerilla = null;
+let nodoValor = null;
+function pintarPerilla() {
+  const clave = seleccion ? seleccion.capa + ':' + seleccion.j : 'nada';
+  if (clave === clavePerilla) {
+    if (nodoValor && seleccion) {
+      const v = seleccion.capa === 'b2' ? red.b2 : red[seleccion.capa][seleccion.j];
+      nodoValor.textContent = Viz.num(v, seleccion.capa === 'b2' ? 3 : 2);
+    }
+    return;
+  }
+  clavePerilla = clave;
+  nodoValor = null;
+  cajaPerilla.innerHTML = '';
+  if (!seleccion) {
+    cajaPerilla.innerHTML =
+      '<div class="perilla-viva">Hacé <b>clic en una flecha</b> del diagrama. ' +
+      'Cada flecha es una perilla, y cada perilla tiene su territorio en la curva.</div>';
+    return;
+  }
+  const { capa, j } = seleccion;
+  const valor = capa === 'b2' ? red.b2 : red[capa][j];
+  const [min, max, paso] = RANGOS[capa];
+
+  const w = Viz.el('div', { class: 'perilla-viva' }, cajaPerilla);
+  Viz.el('div', { class: 'cual', texto: NOMBRES[capa](j) }, w);
+  const c = Viz.el('div', { class: 'ctrl tipo-slider' }, w);
+  const fila = Viz.el('div', { class: 'ctrl-fila' }, c);
+  Viz.el('span', { class: 'ctrl-etiqueta', texto: 'cuánto vale' }, fila);
+  const val = Viz.el('span', { class: 'ctrl-valor', texto: Viz.num(valor, capa === 'b2' ? 3 : 2) }, fila);
+  nodoValor = val;
+  const inp = Viz.el('input', { type: 'range' }, c);
+  inp.min = min; inp.max = max; inp.step = paso; inp.value = valor;
+  inp.style.setProperty('accent-color', Viz.color('acento'));
+  inp.addEventListener('input', () => {
+    const v = +inp.value;
+    if (capa === 'b2') red.b2 = v; else red[capa][j] = v;
+    val.textContent = Viz.num(v, capa === 'b2' ? 3 : 2);
+    resaltada = capa === 'b2' ? null : j;
+    refrescar();
+  });
+}
+
+/* ============================================================== refrescar */
+function refrescar() {
+  const d = desajuste();
+  ctl.medidor('des', Math.min(1, d / 0.0016), d.toFixed(5));
+  pintarPerilla();
+
+  let msg;
+  if (resaltada !== null) {
+    const j = resaltada;
+    const codo = -red.b1[j] / (red.w1[j] || 1e-9);
+    const anio = ANIO_0 + codo * (ANIO_1 - ANIO_0);
+    msg = 'La <b>bolita ' + (j + 1) + '</b> es una rampa. Su codo cae en ' +
+      (codo > 0 && codo < 1 ? '<b>' + Math.round(anio) + '</b>, así que ' +
+        'sólo puede tocar la curva <b>de ahí en adelante</b>.'
+        : '<b>fuera del rango</b>, así que esta rampa está apagada o es una recta en todo el tramo.');
+  } else {
+    msg = 'La red tiene <b>' + (3 * H + 1) + ' perillas</b>: ' + H + ' pesos de entrada, ' +
+      H + ' sesgos, ' + H + ' pesos de salida y 1 sesgo de salida. ' +
+      'Con esas 19 dibuja todo lo que ves.';
+  }
+  ctl.texto('lectura', msg);
+  ctl.texto('cuenta',
+    'La mejor recta posible sobre estos datos da <b>0.00150</b>. ' +
+    'La configuración buena de esta red da <b>0.00018</b>.');
+
+  actualizarDiagrama();
+  p.redibujar();
+}
+
+construirDiagrama();
+refrescar();
+Viz.botonTema();
+</script>
+</body>
+</html>

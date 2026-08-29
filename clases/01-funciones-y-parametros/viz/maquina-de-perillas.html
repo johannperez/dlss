@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La máquina con perillas — Clase 1</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA:
+       "El número de abajo baja cuando la línea se acerca a los puntos.
+        Entonces, si yo supiera cómo bajar ese número automáticamente,
+        no necesitaría los sliders."
+
+     Segundo aha, escondido y honesto:
+       "La mejor recta apenas le gana a una raya horizontal en el promedio."
+       (0,0145 contra 0,0165: los dos números están medidos, no estimados.)
+
+     Datos REALES: % de palabras del discurso presidencial de apertura de
+     sesiones dedicadas al léxico de "seguridad", 1984-2019.
+     Vienen de ssdl.datos.serie_menciones("seguridad"), copiados acá con
+     4 decimales porque una viz no puede importar Python.
+     OJO CON LA ESCALA: son PORCENTAJES y son números chicos (0 a 0,44 %).
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La máquina con perillas</h1>
+    <p>Dos números —dos perillas— y ya tenés una línea. Movelas y mirá dos cosas al mismo
+       tiempo: <em>qué le pasa a la línea azul</em> y <em>qué le pasa al número de desajuste</em>.
+       La pregunta que nos vamos a hacer todo el curso es cómo bajar ese número sin tocar
+       los sliders con la mano.</p>
+  </header>
+
+  <!-- ---------- columna izquierda: el dibujo ---------- -->
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="lectura" id="formula" style="margin-top:.7rem"></div>
+  </div>
+
+  <!-- ---------- columna derecha: la máquina + las perillas ---------- -->
+  <div>
+    <div class="viz-frame" id="maquina" style="padding:6px;margin-bottom:.8rem"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <!-- ---------- qué mirar ---------- -->
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Movés <b>«qué tan empinada»</b> y la recta <em>gira</em>.
+      Movés <b>«dónde arranca»</b> y la recta <em>sube y baja entera, sin girar</em>.
+      Son dos movimientos distintos y las dos perillas mueven el mismo número de abajo.
+      Bajalo todo lo que puedas: vas a llegar a un piso y no vas a poder pasarlo.
+      Ese piso tiene un nombre que todavía no vamos a decir.
+    </div>
+    <p class="viz-pie">
+      Datos <b>reales</b>: porcentaje de palabras del discurso presidencial de apertura de
+      sesiones ordinarias dedicadas al léxico de «seguridad», 1984-2019 (36 años).
+      Recopilación de discursos: Lucas Ariel. El léxico de 23 palabras lo escribimos nosotros
+      y está a la vista en <code>datos/preparar_corpus.py</code>: si le sacás «policía», la
+      serie cambia. <b>Los dos ceros (2002 y 2009) no dicen que no hubo inseguridad</b>: dicen
+      que ese año, con ese léxico, no apareció ninguna de esas 23 palabras.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. LOS DATOS
+   =========================================================================== */
+const SEGURIDAD = [0.0782, 0.1166, 0.0382, 0.0082, 0.0660, 0.0324, 0.0522, 0.0516,
+                   0.2441, 0.0765, 0.0578, 0.1120, 0.1044, 0.2250, 0.4357, 0.1468,
+                   0.4138, 0.3873, 0.0000, 0.0246, 0.1958, 0.1645, 0.1645, 0.1006,
+                   0.3806, 0.0000, 0.0928, 0.2338, 0.0750, 0.1626, 0.0535, 0.0488,
+                   0.4267, 0.2496, 0.3112, 0.2453];
+const ANIO0 = 1984;
+const datos = SEGURIDAD.map((v, i) => ({ x: ANIO0 + i, y: v }));
+
+// Números MEDIDOS (barrido sobre la misma grilla que usan los sliders, en
+// medir-referencias.py). No estimados: si cambiás los datos, volvé a medirlos.
+const MEJOR_RECTA   = 0.01455;   // a = 0.0040 , b = 0.085
+const MEJOR_A       = 0.0040;
+const MEJOR_B       = 0.085;
+const RAYA_PROMEDIO = 0.01649;   // una recta horizontal en el promedio (a = 0)
+const ARRANQUE      = { a: -0.010, b: 0.350 };
+
+/* ===========================================================================
+   2. EL MODELO: dos perillas y nada más
+   =========================================================================== */
+let a = ARRANQUE.a, b = ARRANQUE.b;
+
+// f(año) = a · (año − 1984) + b
+function modelo(anio) { return a * (anio - ANIO0) + b; }
+
+function desajuste() {
+  let s = 0;
+  for (const d of datos) { const e = d.y - modelo(d.x); s += e * e; }
+  return s / datos.length;
+}
+function peorCaso() {
+  let peor = datos[0], m = -1;
+  for (const d of datos) { const e = Math.abs(d.y - modelo(d.x)); if (e > m) { m = e; peor = d; } }
+  return { d: peor, e: m };
+}
+
+/* ===========================================================================
+   3. EL PLANO
+   =========================================================================== */
+const p = Viz.plano('#lienzo', {
+  xmin: 1982.5, xmax: 2021, ymin: -0.06, ymax: 0.50,
+  ejeX: 'año', ejeY: '% de palabras del discurso',
+  titulo: 'menciones a «seguridad» en el discurso de apertura',
+  alto: 400
+});
+
+p.alDibujar(() => {
+  p.fondo();
+  p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)) });
+
+  // los palitos del desajuste: van primero para que no tapen los puntos
+  if (ctl.valores.errores) {
+    for (const d of datos) {
+      p.segmento(d.x, d.y, d.x, modelo(d.x), { color: 'error', grosor: 2, opacidad: .8 });
+    }
+  }
+
+  p.puntos(datos, { color: 'datos', r: 4.5 });
+  p.curva(modelo, { color: 'modelo', grosor: 3.4 });
+
+  // el punto de arranque de la recta: la perilla «dónde arranca», visible
+  p.punto(ANIO0, b, { color: 'parametro', r: 6 });
+  p.texto(ANIO0, b, 'dónde arranca', { color: 'parametro', tam: 11, peso: '700',
+                                       dx: 10, dy: 20, caja: true });
+
+  p.leyenda([
+    { color: 'datos',  texto: 'lo observado' },
+    { color: 'modelo', texto: 'lo que dibuja el modelo', forma: 'linea' },
+    { color: 'error',  texto: 'el desajuste, caso por caso', forma: 'linea' }
+  ], { pos: 'ai' });
+});
+
+p.tooltip(w => {
+  const anio = Math.round(w.x);
+  const i = anio - ANIO0;
+  if (i < 0 || i >= datos.length) return null;
+  return 'año ' + anio +
+         '\nobservado ' + Viz.num(datos[i].y, 3) + ' %' +
+         '\nel modelo dice ' + Viz.num(modelo(anio), 3) + ' %' +
+         '\nse equivoca por ' + Viz.num(Math.abs(datos[i].y - modelo(anio)), 3);
+});
+
+/* ===========================================================================
+   4. EL DIBUJO DE LA MÁQUINA (SVG): las perillas giran de verdad
+   =========================================================================== */
+const svgMaquina = Viz.svg.crear('#maquina', { ancho: 280, alto: 200 });
+
+function perilla(cx, cy, t, rotulo, valor) {
+  const R = 24;
+  const ang = (-135 + 270 * t) * Math.PI / 180;   // 0..1 -> -135°..135°
+  Viz.svg.el('circle', { cx: cx, cy: cy, r: R + 4, fill: Viz.alfa('parametro', .12) }, svgMaquina);
+  Viz.svg.el('circle', {
+    cx: cx, cy: cy, r: R, fill: Viz.color('papel'),
+    stroke: Viz.color('parametro'), 'stroke-width': 2.5
+  }, svgMaquina);
+  Viz.svg.el('line', {
+    x1: cx, y1: cy, x2: cx + Math.sin(ang) * (R - 5), y2: cy - Math.cos(ang) * (R - 5),
+    stroke: Viz.color('parametro'), 'stroke-width': 4, 'stroke-linecap': 'round'
+  }, svgMaquina);
+  Viz.svg.el('text', {
+    x: cx, y: cy + R + 15, 'text-anchor': 'middle', fill: Viz.color('parametro'),
+    'font-size': 11, 'font-weight': 700, 'font-family': Viz.colores().fuente, texto: rotulo
+  }, svgMaquina);
+  Viz.svg.el('text', {
+    x: cx, y: cy + R + 28, 'text-anchor': 'middle', fill: Viz.colores().tinta3,
+    'font-size': 11, 'font-family': Viz.colores().mono, texto: valor
+  }, svgMaquina);
+}
+
+function dibujarMaquina() {
+  Viz.svg.limpiar(svgMaquina);
+  const S = Viz.svg, c = Viz.colores();
+
+  // la caja
+  S.el('rect', { x: 70, y: 78, width: 140, height: 74, rx: 12,
+                 fill: c.papel2, stroke: c.borde, 'stroke-width': 2 }, svgMaquina);
+  S.el('text', { x: 140, y: 120, 'text-anchor': 'middle', fill: c.tinta2,
+                 'font-size': 13, 'font-weight': 700, 'font-family': c.fuente,
+                 texto: 'la máquina' }, svgMaquina);
+
+  // flecha de entrada
+  S.el('line', { x1: 8, y1: 115, x2: 62, y2: 115, stroke: Viz.color('datos'),
+                 'stroke-width': 2.5 }, svgMaquina);
+  S.el('path', { d: 'M 62 115 l -9 -5 l 0 10 z', fill: Viz.color('datos') }, svgMaquina);
+  S.el('text', { x: 8, y: 104, fill: Viz.color('datos'), 'font-size': 11,
+                 'font-weight': 700, 'font-family': c.fuente, texto: 'entra: el año' }, svgMaquina);
+
+  // flecha de salida
+  S.el('line', { x1: 210, y1: 115, x2: 264, y2: 115, stroke: Viz.color('modelo'),
+                 'stroke-width': 2.5 }, svgMaquina);
+  S.el('path', { d: 'M 272 115 l -10 -5 l 0 10 z', fill: Viz.color('modelo') }, svgMaquina);
+  S.el('text', { x: 272, y: 104, 'text-anchor': 'end', fill: Viz.color('modelo'),
+                 'font-size': 11, 'font-weight': 700, 'font-family': c.fuente,
+                 texto: 'sale: el %' }, svgMaquina);
+
+  // los dos tallos de las perillas
+  S.el('line', { x1: 105, y1: 78, x2: 105, y2: 58, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
+  S.el('line', { x1: 175, y1: 78, x2: 175, y2: 58, stroke: c.borde, 'stroke-width': 3 }, svgMaquina);
+
+  perilla(105, 34, (a + 0.02) / 0.04, 'empinada', Viz.num(a, 4));
+  perilla(175, 34, b / 0.40,          'arranca',  Viz.num(b, 3));
+}
+window.addEventListener('viz:tema', dibujarMaquina);
+
+/* ===========================================================================
+   5. EL PANEL
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Las dos perillas' },
+  { tipo: 'slider', id: 'a', etiqueta: 'qué tan empinada',
+    sub: 'cuánto sube (o baja) por año',
+    min: -0.02, max: 0.02, paso: 0.0005, valor: ARRANQUE.a, decimales: 4, color: 'parametro' },
+  { tipo: 'slider', id: 'b', etiqueta: 'dónde arranca',
+    sub: 'cuánto vale en 1984',
+    min: 0, max: 0.40, paso: 0.005, valor: ARRANQUE.b, decimales: 3, color: 'parametro' },
+  { tipo: 'checkbox', id: 'errores', etiqueta: 'mostrar los errores', valor: true },
+  { tipo: 'medidor', id: 'des', etiqueta: 'desajuste' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => {
+      ctl.set('a', ARRANQUE.a, true); ctl.set('b', ARRANQUE.b, true); actualizar();
+    } },
+  { tipo: 'boton', texto: 'La mejor recta posible', principal: true, alClic: () => {
+      ctl.set('a', MEJOR_A, true); ctl.set('b', MEJOR_B, true); actualizar();
+    } }
+], () => actualizar());
+
+/* ===========================================================================
+   6. ACTUALIZAR: la traducción del parámetro a afirmación sustantiva
+   =========================================================================== */
+const fmla = document.getElementById('formula');
+
+function actualizar() {
+  a = ctl.valores.a;
+  b = ctl.valores.b;
+
+  const d = desajuste();
+  const peor = peorCaso();
+
+  ctl.medidor('des', Math.min(1, d / 0.06), Viz.num(d, 4));
+
+  // el número de referencia está MEDIDO, no inventado
+  let veredicto;
+  if (d <= MEJOR_RECTA * 1.02) {
+    veredicto = 'Llegaste al <b>piso</b> de la recta. Con dos perillas no hay más.';
+  } else if (d < RAYA_PROMEDIO) {
+    veredicto = 'Vas bien: ya le ganás a una raya horizontal.';
+  } else {
+    veredicto = 'Todavía estás peor que una raya horizontal en el promedio.';
+  }
+  ctl.texto('lectura',
+    'Lo mejor que se consigue con una recta sobre estos datos es <b>' +
+    Viz.num(MEJOR_RECTA, 4) + '</b> (lo medimos, no lo estimamos).<br>' +
+    'Una raya horizontal en el promedio da <b>' + Viz.num(RAYA_PROMEDIO, 4) + '</b>.<br>' +
+    veredicto + '<br>' +
+    'El año peor dibujado es <b>' + peor.d.x + '</b>, con ' + Viz.num(peor.e, 3) + ' de error.');
+
+  // la fórmula con los valores puestos, y su traducción al castellano
+  const subeBaja = a >= 0 ? 'sube' : 'baja';
+  fmla.innerHTML =
+    '<span style="font-family:var(--f-mono);font-size:1.15rem">' +
+      'f(<b class="c-datos">año</b>) = ' +
+      '<b class="c-parametro">' + Viz.num(a, 4) + '</b> · (<b class="c-datos">año</b> − 1984) + ' +
+      '<b class="c-parametro">' + Viz.num(b, 3) + '</b>' +
+    '</span><br><br>' +
+    'Y esto, dicho en castellano: <b>en 1984 el modelo dice ' + Viz.num(b, 3) +
+    ' % y de ahí ' + subeBaja + ' ' + Viz.num(Math.abs(a), 4) +
+    ' puntos por año</b>. Esa oración, y no el número suelto, es lo que se escribe en un paper.';
+
+  dibujarMaquina();
+  p.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

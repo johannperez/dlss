@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apilar rectas no alcanza — Clase 2</title>
+
+<!-- ==========================================================================
+       MOMENTO AHA: "aprieto randomizar veinte veces y siempre sale una recta.
+                     Ah: es IMPOSIBLE, no es que tengo mala suerte."
+
+     La evidencia se construye por repetición, no por argumento. Por eso el
+     contador ("randomizaste 14 veces, salieron 14 rectas") es el corazón de
+     esta viz: sin él es un dibujito lindo.
+
+     Segunda evidencia, para quien quiera el número y no el dibujo: el panel
+     colapsa las N cajas encadenadas a UNA sola recta `y = a·x + b` y muestra
+     cuánto se desvía la cadena de esa recta. Siempre da 0.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .dos-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; min-width: 0; }
+  @media (max-width: 780px) { .dos-columnas { grid-template-columns: 1fr; } }
+  .rotulo {
+    font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; margin: 0 0 .3rem; color: var(--tinta-3);
+  }
+  .veredicto {
+    margin: .35rem 0 0; padding: .45rem .6rem; border-radius: var(--r-medio);
+    font-size: .86rem; line-height: 1.35; font-weight: 600;
+  }
+  .veredicto.mal { background: var(--c-error-suave); color: var(--c-error); }
+  .veredicto.bien { background: var(--c-acento-suave); color: var(--c-acento); }
+  .contador {
+    font-family: var(--f-mono); font-size: 1.5rem; font-weight: 700;
+    color: var(--c-error); line-height: 1.1;
+  }
+  .contador small { display: block; font-family: var(--f-texto); font-size: .74rem;
+    font-weight: 400; color: var(--tinta-3); letter-spacing: .04em; }
+  .cadena { font-family: var(--f-mono); font-size: .76rem; line-height: 1.6; color: var(--tinta-2); }
+  .cadena b { color: var(--tinta); }
+
+  /* Adentro de una slide hay 610 px de alto y nada más: el panel se compacta
+     para que todos los controles entren sin scrollear. */
+  body.embebido .panel { font-size: .9em; padding: .6rem .65rem .7rem; }
+  body.embebido .panel > h2 { margin-bottom: .45rem; }
+  body.embebido .ctrl { margin-bottom: .42rem; }
+  body.embebido .ctrl input[type="range"] { margin-top: .2rem; }
+  body.embebido .ctrl.tipo-checkbox { margin-bottom: .3rem; }
+  body.embebido .lectura { font-size: .76rem; line-height: 1.35; padding: .4rem .55rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .68rem; }
+
+  /* Ventana muy angosta (alguien lo abre en el celular): menos padding y una
+     sola columna, para que no aparezca scroll horizontal. */
+  @media (max-width: 560px) {
+    .viz-pagina { padding: .7rem; }
+    .taller { grid-template-columns: 1fr; max-height: none; }
+    .dos-columnas, .bloques, .par { grid-template-columns: 1fr; }
+  }
+
+  /* curso.css no declara box-sizing global, así que el padding de .viz-pagina
+     se suma al ancho y en una ventana angosta aparece scroll horizontal.
+     Lo arreglamos acá, localmente, para no tocar la hoja compartida. */
+  .viz-pagina, .panel, .viz-frame { box-sizing: border-box; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Encadenar rectas: el baldazo</h1>
+    <p>A la izquierda, <b>N cajas lineales</b> una atrás de la otra: la salida de
+       cada una entra a la siguiente. A la derecha, <b>las mismas cajas</b> pero con
+       una ReLU entre par y par. Apretá <em>randomizar</em> todas las veces que
+       quieras y mirá el contador.</p>
+  </header>
+
+  <div class="dos-columnas">
+    <div>
+      <p class="rotulo">Sin doblez · sólo rectas encadenadas</p>
+      <div class="viz-frame" style="padding:8px"><div id="izq"></div></div>
+      <div class="veredicto mal" id="ver-izq">—</div>
+    </div>
+    <div>
+      <p class="rotulo">Con doblez · una ReLU entre caja y caja</p>
+      <div class="viz-frame" style="padding:8px"><div id="der"></div></div>
+      <div class="veredicto bien" id="ver-der">—</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> No mires las curvas: mirá el <b>contador</b>.
+      Después de quince randomizaciones, la columna de la izquierda sacó quince
+      rectas. No es mala suerte: es que <em>no puede</em> salir otra cosa.
+      Estirar y volver a estirar sigue siendo estirar. La cuenta está abajo del
+      todo, en el panel: las cinco cajas se colapsan a <b>una sola</b>
+      <code>y = a·x + b</code>, y la cadena entera se desvía de esa recta en
+      exactamente 0. Cinco cajas, dos números.
+    </div>
+    <p class="viz-pie">
+      <b>Detalle honesto:</b> los números de las cajas no son <em>del todo</em> al
+      azar. El corte de cada ReLU se sortea de manera que caiga adentro del rango
+      que efectivamente le llega a esa caja. Sin esa precaución, en cadenas largas
+      la ReLU se apaga —da cero en todo el rango— y la curva de la derecha sale
+      plana: es un problema real y tiene nombre, <em>dying ReLU</em>.
+      La columna de la izquierda usa <b>exactamente los mismos números</b> y no
+      tiene ninguna ayuda: igual siempre sale una recta.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ------------------------------------------------------------------ estado */
+const XMIN = -3, XMAX = 3;
+let N = 4;
+let semilla = 7;
+let cajas = [];          // [{a, b}]
+let randomizaciones = 1;
+let rectasSeguidas = 0;
+
+function generar() {
+  const r = Viz.azar(semilla);
+  cajas = [];
+  // El rango de lo que entra a la caja 1 es el eje x que se ve.
+  let lo = XMIN, hi = XMAX;
+  for (let i = 0; i < 6; i++) {
+    // pendiente al azar, con signo al azar, pero nunca casi-cero (aplastaría todo)
+    const mag = 0.8 + r() * 1.4;
+    const a = +((r() < 0.5 ? -1 : 1) * mag).toFixed(2);
+    // El corte se sortea DENTRO del rango que efectivamente entra a esta caja.
+    // Sin esta precaución la ReLU se apaga en cadenas largas (dying ReLU) y la
+    // demostración se arruina. Está contado en el pie de la página.
+    // Del lado que la ReLU deja vivo queremos que quede la MAYOR parte del
+    // rango: si no, cada doblez recorta tanto que los codos se amontonan todos
+    // en un rincón del gráfico. Si a>0 sobrevive lo que está por encima del
+    // corte, así que el corte va abajo; si a<0, al revés.
+    const f = a > 0 ? (0.12 + r() * 0.26) : (0.62 + r() * 0.26);
+    const u = lo + (hi - lo) * f;
+    const b = +(-a * u).toFixed(2);
+    cajas.push({ a: a, b: b });
+    // rango de lo que sale, después del doblez
+    const s1 = a * lo + b, s2 = a * hi + b;
+    let nlo = Math.max(0, Math.min(s1, s2)), nhi = Math.max(0, Math.max(s1, s2));
+    if (nhi - nlo < 1e-9) nhi = nlo + 1;
+    lo = nlo; hi = nhi;
+  }
+}
+generar();
+
+/* --------------------------------------------------------------- las cadenas */
+function sinDoblez(x) {
+  let z = x;
+  for (let i = 0; i < N; i++) z = cajas[i].a * z + cajas[i].b;
+  return z;
+}
+function conDoblez(x) {
+  let z = x;
+  for (let i = 0; i < N; i++) {
+    z = cajas[i].a * z + cajas[i].b;
+    if (i < N - 1) z = Math.max(0, z);      // el doblez va ENTRE caja y caja
+  }
+  return z;
+}
+
+// Las N cajas lineales colapsadas a UNA sola: a_total = producto, b_total = arrastre
+function colapsar() {
+  let a = 1, b = 0;
+  for (let i = 0; i < N; i++) { a = a * cajas[i].a; b = cajas[i].a * b + cajas[i].b; }
+  return { a: a, b: b };
+}
+
+// ¿Cuánto se desvía la cadena de esa única recta? (spoiler: cero)
+function desviacionDeLaRecta() {
+  const c = colapsar();
+  let m = 0;
+  for (let k = 0; k <= 400; k++) {
+    const x = XMIN + (XMAX - XMIN) * k / 400;
+    m = Math.max(m, Math.abs(sinDoblez(x) - (c.a * x + c.b)));
+  }
+  return m;
+}
+
+// Codos visibles: dónde cambia la pendiente de la cadena con dobleces. Dos
+// codos más cerca que un 1,5 % del ancho se cuentan como uno solo: a ojo se ven
+// como un codo, y prometer cuatro donde se ven dos es hacer trampa.
+function codos() {
+  const h = (XMAX - XMIN) / 1200;
+  const xs = [];
+  let prev = null;
+  for (let k = 1; k < 1200; k++) {
+    const x = XMIN + h * k;
+    const p = (conDoblez(x + h) - conDoblez(x)) / h;
+    if (prev !== null && Math.abs(p - prev) > 1e-7 * Math.max(1, Math.abs(p) + Math.abs(prev))) {
+      if (!xs.length || x - xs[xs.length - 1] > (XMAX - XMIN) * 0.015) xs.push(x);
+    }
+    prev = p;
+  }
+  return xs;
+}
+
+/* ------------------------------------------------------------------ planos */
+function armar(sel, f, titulo) {
+  const p = Viz.plano(sel, {
+    xmin: XMIN, xmax: XMAX, ymin: -6, ymax: 6,
+    ejeX: 'lo que entra', ejeY: 'lo que sale', titulo: titulo, alto: 330
+  });
+  p.alDibujar(() => {
+    // el encuadre se ajusta a lo que la cadena efectivamente dibuja: si no, con
+    // pendientes grandes se ve una raya vertical y no se entiende nada
+    let lo = Infinity, hi = -Infinity;
+    for (let k = 0; k <= 200; k++) {
+      const v = f(XMIN + (XMAX - XMIN) * k / 200);
+      if (v < lo) lo = v; if (v > hi) hi = v;
+    }
+    const m = Math.max((hi - lo) * 0.15, 0.5);
+    p.limites(XMIN, XMAX, lo - m, hi + m);
+    p.fondo(); p.grilla(); p.ejes();
+    p.curva(f, { color: 'modelo', grosor: 3.4 });
+  });
+  return p;
+}
+const pIzq = armar('#izq', sinDoblez, 'la cadena sin ningún doblez');
+const pDer = armar('#der', conDoblez, 'la misma cadena, con ReLU en el medio');
+// los codos, marcados: el aha es que se puedan contar con el dedo
+pDer.alDibujar((function (dibujoBase) {
+  return function () {
+    dibujoBase();
+    for (const x of codos()) {
+      pDer.punto(x, conDoblez(x), { color: 'acento', r: 5 });
+    }
+  };
+})(pDer._dibujo));
+
+/* ------------------------------------------------------------------ panel */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La cadena' },
+  { tipo: 'slider', id: 'n', etiqueta: 'cuántas cajas encadenadas', sub: 'la salida de una entra a la siguiente',
+    min: 1, max: 6, paso: 1, valor: N, decimales: 0, color: 'parametro' },
+  { tipo: 'boton', texto: 'Randomizar las perillas', principal: true, alClic: () => {
+      semilla = (semilla * 1103515245 + 12345) % 2147483647;
+      randomizaciones++; generar(); actualizar();
+    } },
+  { tipo: 'texto', id: 'contador', html: '' },
+  { tipo: 'checkbox', id: 'numeros', etiqueta: 'mostrar los números de cada caja', valor: true },
+  { tipo: 'texto', id: 'cajas', html: '' },
+  { tipo: 'texto', id: 'prueba', html: '' }
+], () => actualizar());
+
+/* --------------------------------------------------------------- actualizar */
+function actualizar() {
+  N = ctl.valores.n;
+  const c = colapsar();
+  const desv = desviacionDeLaRecta();
+  const xsCodos = codos();
+  const nCodos = xsCodos.length;
+  rectasSeguidas = randomizaciones;
+
+  document.getElementById('ver-izq').innerHTML =
+    'Sigue siendo una recta. <b>Siempre.</b>';
+  const der = document.getElementById('ver-der');
+  if (nCodos === 0) {
+    der.className = 'veredicto mal';
+    der.innerHTML = N === 1
+      ? 'Con <b>una sola</b> caja no hay ningún «entre»: no hay dónde poner el doblez. Subí el slider.'
+      : 'Los dobleces quedaron fuera de lo que se ve. Randomizá otra vez.';
+  } else {
+    der.className = 'veredicto bien';
+    der.innerHTML = '<b>' + nCodos + (nCodos === 1 ? ' codo.</b> ' : ' codos.</b> ') +
+      'Esto ya no es una recta.';
+  }
+
+  ctl.texto('contador',
+    '<span class="contador">' + randomizaciones +
+    '<small>cadenas que probaste</small></span>' +
+    '<span class="contador">' + rectasSeguidas +
+    '<small>rectas que salieron a la izquierda</small></span>');
+
+  if (ctl.valores.numeros) {
+    let h = '<div class="cadena">';
+    for (let i = 0; i < N; i++) {
+      h += 'caja ' + (i + 1) + ': &nbsp;<b>' + Viz.num(cajas[i].a, 2) + '</b>·z ' +
+        (cajas[i].b >= 0 ? '+ ' : '− ') + '<b>' + Viz.num(Math.abs(cajas[i].b), 2) + '</b><br>';
+    }
+    h += '</div>';
+    ctl.texto('cajas', h);
+  } else { ctl.texto('cajas', ''); }
+
+  ctl.texto('prueba',
+    'Las <b>' + N + (N === 1 ? ' caja</b> es' : ' cajas</b> juntas son') +
+    ' una sola recta:<br><span class="cadena"><b>y = ' + Viz.num(c.a, 3) + '·x ' +
+    (c.b >= 0 ? '+ ' : '− ') + Viz.num(Math.abs(c.b), 3) + '</b></span><br>' +
+    'La cadena entera se desvía de esa recta en <b>' + desv.toFixed(6) + '</b>. ' +
+    (N > 1
+      ? '<span class="c-error">' + N + ' cajas, ' + (2 * N) + ' perillas, y terminan siendo 2 números.</span>'
+      : ''));
+
+  pIzq.redibujar(); pDer.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

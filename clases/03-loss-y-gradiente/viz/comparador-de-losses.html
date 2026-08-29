@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrastrá el outlier: MSE contra MAE — Clase 3</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "moví UN punto y la recta azul giró. La naranja ni se enteró.
+     La diferencia no es técnica: es qué caso decidís que importa."
+
+     El objetivo NO es que vean que los decimales cambian. Es que vean que la
+     conclusión sustantiva cambia: dos personas con los mismos datos publican
+     tendencias distintas por una decisión que ninguna de las dos discutió.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .fila-castigos { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  @media (max-width: 640px) { .fila-castigos { grid-template-columns: 1fr; } }
+  .dos-losses { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .1rem 0 .3rem; }
+  .dos-losses > div {
+    background: var(--papel); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .45em .5em; text-align: center;
+  }
+  .dos-losses .cab { font-size: .66rem; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; display: block; margin-bottom: .1em; }
+  .dos-losses .n { font-family: var(--f-mono); font-size: 1.05rem; font-weight: 700;
+    font-variant-numeric: tabular-nums; }
+  .dos-losses .q { display: block; font-size: .68rem; color: var(--tinta-2); margin-top: .2em;
+    line-height: 1.3; }
+  .frase-caso { font-size: .82rem; line-height: 1.5; margin-top: .3rem; }
+
+  /* Adentro de la slide el marco mide 610 px y el panel no entra entero:
+     lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
+     Abierta suelta, la página se ve completa y esta regla no hace nada. */
+  body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Arrastrá el outlier</h1>
+    <p>Quince años de la serie de «seguridad». Dos rectas, calculadas en vivo sobre
+       <em>los mismos</em> datos: la <span class="c-modelo"><b>azul</b></span> es la que
+       minimiza el <b>MSE</b> (los errores al cuadrado) y la
+       <span class="c-val"><b>naranja</b></span> es la que minimiza el <b>MAE</b>
+       (los errores en valor absoluto). Agarrá cualquier punto con el mouse y subilo
+       o bajalo. Ninguna de las dos rectas es «la correcta»: son dos criterios distintos.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="fila-castigos">
+      <div class="viz-frame" style="padding:8px"><div id="castigo-mse"></div></div>
+      <div class="viz-frame" style="padding:8px"><div id="castigo-mae"></div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Apretá <b>«Plantar un caso extremo»</b> y quedate mirando
+      las dos rectas. La azul <em>gira</em> para ir a buscar al caso raro; la naranja se
+      queda casi donde estaba: la azul se mueve unas cinco veces más que la naranja. Después
+      leé el cartel del panel: con el caso extremo puesto, <b>un solo año explica casi la
+      mitad</b> de todo el MSE. Ese año es, literalmente, <em>a quién le está haciendo
+      caso</em> el modelo azul. Y ojo con lo otro: <b>sin tocar nada</b>, las dos rectas ya
+      afirman cosas distintas sobre los mismos datos reales.
+    </div>
+    <p class="viz-pie">
+      Datos: menciones a «seguridad» en los discursos presidenciales de apertura de
+      sesiones, Argentina, un año de cada dos entre 1990 y 2018 (% de palabras del
+      discurso). <b>Datos reales</b>; ver <code>datos/README.md</code>. Moverlos con el
+      mouse es un experimento mental —«¿y si este caso hubiera sido distinto?»—, no una
+      corrección de los datos.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   1. LOS DATOS: un año de cada dos, para que la nube se lea de lejos
+   --------------------------------------------------------------------------- */
+const ORIGINAL = [
+  { anio: 1990, y: 0.0522 }, { anio: 1992, y: 0.2441 }, { anio: 1994, y: 0.0578 },
+  { anio: 1996, y: 0.1044 }, { anio: 1998, y: 0.4357 }, { anio: 2000, y: 0.4138 },
+  { anio: 2002, y: 0.0000 }, { anio: 2004, y: 0.1958 }, { anio: 2006, y: 0.1645 },
+  { anio: 2008, y: 0.3806 }, { anio: 2010, y: 0.0928 }, { anio: 2012, y: 0.0750 },
+  { anio: 2014, y: 0.0535 }, { anio: 2016, y: 0.4267 }, { anio: 2018, y: 0.3112 }
+];
+// el año centrado y en décadas: así "la pendiente" se lee como puntos por década
+function aX(anio) { return (anio - 2004) / 10; }
+
+// la nube viva (la que se arrastra). x = año, y = % de palabras
+const nube = ORIGINAL.map(function (d) { return { x: d.anio, y: d.y }; });
+
+/* ---------------------------------------------------------------------------
+   2. LAS DOS LOSSES Y LAS DOS RECTAS
+   --------------------------------------------------------------------------- */
+function mse(a, b) {
+  let s = 0;
+  for (const d of nube) { const e = d.y - (a * aX(d.x) + b); s += e * e; }
+  return s / nube.length;
+}
+function mae(a, b) {
+  let s = 0;
+  for (const d of nube) { s += Math.abs(d.y - (a * aX(d.x) + b)); }
+  return s / nube.length;
+}
+
+/* La recta que minimiza el MSE sale de una fórmula cerrada (por eso el MSE se
+   hizo popular en el siglo XIX: se podía resolver con lápiz). */
+function rectaMSE() {
+  let sx = 0, sy = 0;
+  for (const d of nube) { sx += aX(d.x); sy += d.y; }
+  const mx = sx / nube.length, my = sy / nube.length;
+  let num = 0, den = 0;
+  for (const d of nube) { const dx = aX(d.x) - mx; num += dx * (d.y - my); den += dx * dx; }
+  const a = den ? num / den : 0;
+  return { a: a, b: my - a * mx };
+}
+
+/* La del MAE no tiene fórmula cerrada: se busca. Grilla gruesa y después zoom,
+   cuatro veces. Es fuerza bruta, y con dos parámetros la fuerza bruta alcanza
+   (guardá esta frase para dentro de veinte minutos). */
+function rectaMAE() {
+  let a0 = -2.0, a1 = 2.0, b0 = -0.6, b1 = 1.6;
+  let mejor = { a: 0, b: 0, v: Infinity };
+  for (let ronda = 0; ronda < 5; ronda++) {
+    const N = 24;
+    for (let i = 0; i <= N; i++) {
+      const a = a0 + (a1 - a0) * i / N;
+      for (let j = 0; j <= N; j++) {
+        const b = b0 + (b1 - b0) * j / N;
+        const v = mae(a, b);
+        if (v < mejor.v) mejor = { a: a, b: b, v: v };
+      }
+    }
+    const da = (a1 - a0) / N * 1.8, db = (b1 - b0) / N * 1.8;
+    a0 = mejor.a - da; a1 = mejor.a + da; b0 = mejor.b - db; b1 = mejor.b + db;
+  }
+  return mejor;
+}
+
+let RMSE = rectaMSE(), RMAE = rectaMAE();
+// las dos pendientes con los datos tal cual vinieron, para poder medir el movimiento
+const REAL_MSE = RMSE.a, REAL_MAE = RMAE.a;
+let resaltado = null;      // el año que más pesa en el MSE
+const opciones = { errores: true };
+
+/* ---------------------------------------------------------------------------
+   3. EL DIBUJO PRINCIPAL
+   --------------------------------------------------------------------------- */
+const p = Viz.plano('#lienzo', {
+  xmin: 1988, xmax: 2020, ymin: -0.08, ymax: 0.56,
+  ejeX: 'año', ejeY: '% de palabras del discurso',
+  titulo: 'menciones a "seguridad" — dos criterios, dos rectas',
+  alto: 300
+});
+
+p.alDibujar(function () {
+  p.fondo(); p.grilla();
+  p.ejes({ formatoX: function (v) { return String(Math.round(v)); },
+           formatoY: function (v) { return Viz.num(v, 2); } });
+
+  // los palitos del error contra la recta azul: el desajuste que el MSE suma
+  if (opciones.errores) {
+    for (const d of nube) {
+      p.segmento(d.x, d.y, d.x, RMSE.a * aX(d.x) + RMSE.b,
+                 { color: 'error', grosor: 1.6, opacidad: .75 });
+    }
+  }
+
+  p.curva(function (x) { return RMSE.a * aX(x) + RMSE.b; }, { color: 'modelo', grosor: 3.5 });
+  p.curva(function (x) { return RMAE.a * aX(x) + RMAE.b; }, { color: 'val', grosor: 3.5 });
+
+  p.puntos(nube, { color: 'datos', r: 6 });
+  if (resaltado !== null) {
+    const d = nube[resaltado];
+    p.punto(d.x, d.y, { color: 'acento', r: 8, halo: true });
+    p.texto(d.x, d.y, String(d.x), { color: 'acento', tam: 12, peso: '700',
+                                     dy: -20, alinear: 'center', caja: true });
+  }
+
+  p.leyenda([
+    { color: 'datos', texto: 'los años (arrastrables)' },
+    { color: 'modelo', texto: 'la recta del MSE', forma: 'linea' },
+    { color: 'val', texto: 'la recta del MAE', forma: 'linea' },
+    { color: 'error', texto: 'el desajuste contra la azul', forma: 'linea' }
+  ], { pos: 'ai' });
+});
+
+p.arrastrables(nube, {
+  radio: 18, fijarX: true,
+  alArrastrar: function () { recalcular(); },     // EN VIVO, no al soltar
+  alSoltar: function () { recalcular(); }
+});
+p.tooltip(function (w) {
+  let mejor = null, dm = 1e9;
+  for (const d of nube) { const dd = Math.abs(d.x - w.x); if (dd < dm) { dm = dd; mejor = d; } }
+  if (dm > 1.2) return null;
+  return mejor.x + '\n' + Viz.num(mejor.y, 3) + '% de las palabras\n(arrastralo para arriba o para abajo)';
+});
+
+/* ---------------------------------------------------------------------------
+   4. LOS DOS CASTIGOS: la parábola y la V
+   --------------------------------------------------------------------------- */
+const pc1 = Viz.plano('#castigo-mse', {
+  xmin: -0.65, xmax: 0.65, ymin: 0, ymax: 0.42,
+  ejeX: 'error de un caso', ejeY: 'castigo',
+  titulo: 'MSE: el castigo es el error AL CUADRADO', alto: 165
+});
+const pc2 = Viz.plano('#castigo-mae', {
+  xmin: -0.65, xmax: 0.65, ymin: 0, ymax: 0.65,
+  ejeX: 'error de un caso', ejeY: 'castigo',
+  titulo: 'MAE: el castigo es el error, y nada más', alto: 165
+});
+
+pc1.alDibujar(function () {
+  pc1.fondo(); pc1.grilla();
+  pc1.ejes({ formatoX: function (v) { return Viz.num(v, 1); },
+             formatoY: function (v) { return Viz.num(v, 2); } });
+  pc1.curva(function (e) { return e * e; }, { color: 'modelo', grosor: 3 });
+  const pts = [];
+  for (const d of nube) { const e = d.y - (RMSE.a * aX(d.x) + RMSE.b); pts.push({ x: e, y: e * e }); }
+  pc1.puntos(pts, { color: 'error', r: 4 });
+});
+
+pc2.alDibujar(function () {
+  pc2.fondo(); pc2.grilla();
+  pc2.ejes({ formatoX: function (v) { return Viz.num(v, 1); },
+             formatoY: function (v) { return Viz.num(v, 2); } });
+  pc2.curva(function (e) { return Math.abs(e); }, { color: 'val', grosor: 3 });
+  const pts = [];
+  for (const d of nube) { const e = d.y - (RMAE.a * aX(d.x) + RMAE.b); pts.push({ x: e, y: Math.abs(e) }); }
+  pc2.puntos(pts, { color: 'error', r: 4 });
+});
+
+/* ---------------------------------------------------------------------------
+   5. EL PANEL
+   --------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Los dos criterios' },
+  { tipo: 'texto', id: 'losses', html: '' },
+  { tipo: 'texto', id: 'pendientes', html: '' },
+  { tipo: 'texto', id: 'caso', html: '' },
+  { tipo: 'checkbox', id: 'errores', etiqueta: 'mostrar los palitos del error', valor: true },
+  { tipo: 'boton', texto: 'Plantar un caso extremo', principal: true, alClic: function () {
+      // 2018 se dispara: un año con muchísimas más menciones que el resto
+      nube[14].y = 1.05;
+      recalcular();
+    } },
+  { tipo: 'boton', texto: 'Volver a los datos reales', alClic: function () {
+      for (let i = 0; i < nube.length; i++) nube[i].y = ORIGINAL[i].y;
+      recalcular();
+    } },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], function () { opciones.errores = ctl.valores.errores; p.redibujar(); });
+
+function recalcular() {
+  RMSE = rectaMSE();
+  RMAE = rectaMAE();
+
+  // ¿cuánto de todo el MSE lo aporta un solo caso?
+  let peor = 0, total2 = 0, total1 = 0, peorVal = -1;
+  for (let i = 0; i < nube.length; i++) {
+    const e = nube[i].y - (RMSE.a * aX(nube[i].x) + RMSE.b);
+    total2 += e * e;
+    if (e * e > peorVal) { peorVal = e * e; peor = i; }
+  }
+  for (const d of nube) total1 += Math.abs(d.y - (RMAE.a * aX(d.x) + RMAE.b));
+  resaltado = peor;
+  const cuotaMSE = total2 ? peorVal / total2 : 0;
+  const ePeorMAE = Math.abs(nube[peor].y - (RMAE.a * aX(nube[peor].x) + RMAE.b));
+  const cuotaMAE = total1 ? ePeorMAE / total1 : 0;
+
+  const vMSE = mse(RMSE.a, RMSE.b), vMAE = mae(RMAE.a, RMAE.b);
+
+  ctl.texto('losses',
+    '<div class="dos-losses">' +
+      '<div><span class="cab c-modelo">MSE</span>' +
+        '<span class="n c-modelo">' + Viz.num(vMSE, 4) + '</span>' +
+        '<span class="q">promedio de los errores al cuadrado</span></div>' +
+      '<div><span class="cab c-val">MAE</span>' +
+        '<span class="n c-val">' + Viz.num(vMAE, 4) + '</span>' +
+        '<span class="q">promedio de los errores a secas</span></div>' +
+    '</div>');
+
+  ctl.texto('pendientes',
+    '<div class="frase-caso">Lo que <b>afirmaría</b> cada una:<br>' +
+      '<span class="c-modelo">azul (MSE)</span>: «cada década ' +
+      (RMSE.a >= 0 ? 'sube' : 'baja') + ' <b>' + Viz.num(Math.abs(RMSE.a), 3) + '</b> puntos».<br>' +
+      '<span class="c-val">naranja (MAE)</span>: «cada década ' +
+      (RMAE.a >= 0 ? 'sube' : 'baja') + ' <b>' + Viz.num(Math.abs(RMAE.a), 3) + '</b> puntos».' +
+    '</div>');
+
+  ctl.texto('caso',
+    '<div class="frase-caso">El MSE está mirando principalmente al caso ' +
+      '<b class="c-acento">' + nube[peor].x + '</b>: ese año solo aporta el ' +
+      '<b>' + Math.round(cuotaMSE * 100) + '%</b> de todo el MSE. ' +
+      'Para el MAE, ese mismo año pesa <b>' + Math.round(cuotaMAE * 100) + '%</b>.</div>');
+
+  // ¿cuánto se movió cada recta respecto de los datos reales? ESE es el punto.
+  const movioMSE = Math.abs(RMSE.a - REAL_MSE);
+  const movioMAE = Math.abs(RMAE.a - REAL_MAE);
+  const brecha = Math.abs(RMSE.a - RMAE.a);
+  let tocado = false;
+  for (let i = 0; i < nube.length; i++) if (Math.abs(nube[i].y - ORIGINAL[i].y) > 1e-9) tocado = true;
+
+  if (!tocado) {
+    ctl.texto('lectura',
+      'Con los datos tal cual son, las dos rectas <b>ya afirman cosas distintas</b>: se llevan ' +
+      Viz.num(brecha, 3) + ' puntos por década. Y todavía no tocaste nada. Ahora movés ' +
+      '<b>un</b> punto y mirás cuál de las dos se mueve.');
+  } else {
+    ctl.texto('lectura',
+      'Comparado con los datos reales, la <span class="c-modelo">azul</span> se movió ' +
+      '<b>' + Viz.num(movioMSE, 3) + '</b> puntos por década y la ' +
+      '<span class="c-val">naranja</span> se movió <b>' + Viz.num(movioMAE, 3) + '</b>. ' +
+      (movioMSE > movioMAE * 1.8
+        ? 'La azul <b>persigue</b> al caso extremo; la naranja casi ni se entera. ' +
+          'Esa diferencia no es de precisión: es de <em>a quién le hace caso el modelo</em>.'
+        : 'Movelo más lejos todavía y volvé a mirar estos dos números.'));
+  }
+
+  // que los dos castigos entren en su cuadro (los ejes se acomodan al error mayor)
+  let emax = 0.25;
+  for (const d of nube) {
+    emax = Math.max(emax, Math.abs(d.y - (RMSE.a * aX(d.x) + RMSE.b)),
+                          Math.abs(d.y - (RMAE.a * aX(d.x) + RMAE.b)));
+  }
+  emax *= 1.15;
+  pc1.limites(-emax, emax, 0, emax * emax * 1.05);
+  pc2.limites(-emax, emax, 0, emax * 1.05);
+
+  // que el caso extremo entre en el cuadro
+  let ymax = 0.56;
+  for (const d of nube) if (d.y * 1.15 > ymax) ymax = d.y * 1.15;
+  p.limites(1988, 2020, -0.08, ymax);
+
+  p.redibujar(); pc1.redibujar(); pc2.redibujar();
+}
+
+recalcular();
+Viz.botonTema();
+</script>
+</body>
+</html>
