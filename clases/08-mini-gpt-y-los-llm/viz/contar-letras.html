@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Por qué cuenta mal las letras — Clase 8</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "Le estoy pidiendo que cuente algo que no puede ver. Para el
+     modelo, «ferrocarril» no es una fila de once letras: son tres o cuatro
+     números. La R no está en ningún lado."
+
+     COSECHA DE LA SIEMBRA DE LA CLASE 6: esta viz usa EL MISMO tokenizador BPE
+     entrenado en `medir-embeddings.py` para `viz/tokenizador.html` de la clase 6,
+     donde el panel de abajo preguntaba cuántas erres tenía la palabra y NO lo
+     contestaba. Acá se contesta.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .entrada {
+    width: 100%; box-sizing: border-box;
+    font-family: var(--f-mono); font-size: 1.05rem;
+    color: var(--tinta); background: var(--papel-2);
+    border: 1px solid var(--borde); border-radius: var(--r-medio);
+    padding: .5rem .7rem;
+  }
+  .entrada:focus { outline: 2px solid var(--c-acento); outline-offset: 2px; }
+
+  .fila { margin-top: .8rem; }
+  .fila > h3 {
+    font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--tinta-3); margin: 0 0 .35rem;
+  }
+  .caja {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .7rem;
+    display: flex; flex-wrap: wrap; gap: .3rem; align-items: flex-start;
+    min-height: 2.4em;
+  }
+  .letra {
+    font-family: var(--f-mono); font-size: 1.25rem; line-height: 1.1;
+    padding: .18em .3em; border-radius: 5px; border: 1px solid var(--borde);
+    background: var(--papel);
+  }
+  .letra.marcada { background: var(--c-error-suave); border-color: var(--c-error);
+                   color: var(--c-error); font-weight: 700; }
+  .ficha {
+    text-align: center; border-radius: 6px; padding: .2em .42em .12em;
+    border: 1px solid transparent;
+  }
+  .ficha .t { font-family: var(--f-mono); font-size: 1.05rem; white-space: pre; }
+  .ficha .id { display: block; font-family: var(--f-mono); font-size: .62rem;
+               color: var(--tinta-3); margin-top: .12em; }
+  .ficha .fin { opacity: .4; }
+  .conteo { font-size: .86rem; color: var(--tinta-2); margin-top: .45rem; }
+  .conteo b { font-family: var(--f-mono); color: var(--tinta); }
+  .cumplido {
+    border: 1px dashed var(--c-ok); background: var(--c-ok-suave);
+    border-radius: var(--r-medio); padding: .6rem .8rem; margin-top: .8rem;
+  }
+  .cumplido h4 { margin: 0 0 .3em; font-size: .74rem; letter-spacing: .1em;
+                 text-transform: uppercase; color: var(--c-ok); }
+  .cumplido p { margin: 0; font-size: .9rem; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>¿Cuántas R tiene «ferrocarril»?</h1>
+    <p>Vos las contás mirando las letras. El modelo no ve letras: ve <b>fichas</b>,
+       y las fichas son números. Escribí una palabra y compará las dos filas de
+       abajo: la tuya y la de él.</p>
+  </header>
+
+  <div>
+    <input class="entrada" id="entrada" spellcheck="false" value="ferrocarril">
+
+    <div class="fila">
+      <h3>1 &middot; Como la ves vos: letras, y la que buscás salta a la vista</h3>
+      <div class="caja" id="humano"></div>
+      <p class="conteo" id="conteo-humano"></p>
+    </div>
+
+    <div class="fila">
+      <h3>2 &middot; Como la ve un modelo de verdad: fichas de sub-palabra, con sus números</h3>
+      <div class="caja" id="modelo"></div>
+      <p class="conteo" id="conteo-modelo"></p>
+    </div>
+
+    <div class="fila">
+      <h3>3 &middot; Y entonces</h3>
+      <div class="viz-frame" style="padding:10px">
+        <div id="lienzo"></div>
+      </div>
+    </div>
+
+    <div class="cumplido">
+      <h4>Prometido en la clase 6, cumplido</h4>
+      <p>En <code>viz/tokenizador.html</code> de la clase 6 este mismo panel te
+         preguntaba cuántas erres tenía la palabra y se iba sin contestar.
+         Acá está la respuesta: <b>el modelo no puede contarlas porque nunca las
+         vio por separado</b>. Es el mismo tokenizador, entrenado sobre el mismo
+         corpus de discursos reales.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Escribí <b>carro</b>: la doble R queda escondida
+      adentro de una sola ficha. Ahora escribí <b>irresponsabilidad</b>: varias
+      fichas, y ninguna coincide con una unidad de significado. La pregunta
+      «¿cuántas R tiene?» es, para el modelo, una pregunta sobre algo
+      <em>que no está en su representación</em>. Cuando acierta es porque vio la
+      respuesta escrita muchas veces, no porque contó. Lo mismo pasa con las rimas,
+      los anagramas y la aritmética.
+    </div>
+    <p class="viz-pie">
+      Tokenizador BPE entrenado sobre el corpus real de <b>discursos de apertura de
+      sesiones (Argentina, 1984-2019)</b>, el mismo de la clase 6
+      (<code>medir-embeddings.py</code>). No es el tokenizador de GPT: es uno
+      chiquito, con el mismo algoritmo.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../06-texto-secuencias-embeddings/datos-texto.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* --- 1. el tokenizador de la clase 6, tal cual ------------------------------ */
+const T6 = window.DATOS_TEXTO;
+const FUSIONES = T6.bpe.fusiones;
+const VOC_BPE = T6.bpe.vocabulario;
+const idBpe = new Map(VOC_BPE.map(function (t, i) { return [t, i + 1]; }));
+const rango = new Map(FUSIONES.map(function (f, i) { return [f[0] + ' ' + f[1], i]; }));
+
+function bpePalabra(palabra) {
+  var fichas = Array.from(palabra).concat(['</w>']);
+  for (;;) {
+    var mejor = Infinity, iMejor = -1;
+    for (var i = 0; i < fichas.length - 1; i++) {
+      var r = rango.get(fichas[i] + ' ' + fichas[i + 1]);
+      if (r !== undefined && r < mejor) { mejor = r; iMejor = i; }
+    }
+    if (iMejor < 0) break;
+    fichas.splice(iMejor, 2, fichas[iMejor] + fichas[iMejor + 1]);
+  }
+  return fichas;
+}
+
+/* --- 2. estado -------------------------------------------------------------- */
+const entrada = document.getElementById('entrada');
+function palabra() {
+  return (entrada.value || '').toLowerCase().replace(/[^\p{L}\p{M}]/gu, '');
+}
+function letraBuscada() { return ctl ? ctl.valores.letra : 'r'; }
+
+/* --- 3. pintar --------------------------------------------------------------- */
+function pintar() {
+  const pal = palabra();
+  const L = letraBuscada();
+
+  // fila 1: la palabra como la ve una persona
+  const cajaH = document.getElementById('humano');
+  cajaH.innerHTML = '';
+  let cuantas = 0;
+  for (const ch of pal) {
+    const es = ch === L;
+    if (es) cuantas++;
+    const d = document.createElement('span');
+    d.className = 'letra' + (es ? ' marcada' : '');
+    d.textContent = ch;
+    cajaH.appendChild(d);
+  }
+  document.getElementById('conteo-humano').innerHTML =
+    '<b>' + pal.length + '</b> letras &middot; la <b>' + L.toUpperCase() +
+    '</b> aparece <b>' + cuantas + '</b> ' + (cuantas === 1 ? 'vez' : 'veces') +
+    '. Lo contaste en un segundo, mirando.';
+
+  // fila 2: la palabra como la ve el modelo
+  const piezas = pal ? bpePalabra(pal) : [];
+  const cajaM = document.getElementById('modelo');
+  cajaM.innerHTML = '';
+  piezas.forEach(function (f, i) {
+    const limpio = f.replace('</w>', '');
+    const d = document.createElement('span');
+    d.className = 'ficha';
+    d.style.background = Viz.alfa(i % 2 ? 'modelo' : 'acento', .16);
+    const t = document.createElement('span');
+    t.className = 't';
+    t.textContent = limpio === '' ? '.' : limpio;
+    if (f.endsWith('</w>')) {
+      const s = document.createElement('span');
+      s.className = 'fin';
+      s.textContent = '⏎';
+      t.appendChild(s);
+    }
+    d.appendChild(t);
+    const id = document.createElement('span');
+    id.className = 'id';
+    id.textContent = idBpe.has(f) ? idBpe.get(f) : 0;
+    d.appendChild(id);
+    cajaM.appendChild(d);
+  });
+  const ids = piezas.map(function (f) { return idBpe.has(f) ? idBpe.get(f) : 0; });
+  document.getElementById('conteo-modelo').innerHTML =
+    '<b>' + piezas.length + '</b> ficha' + (piezas.length === 1 ? '' : 's') +
+    '. Para el modelo, esta palabra <b>es</b> esta lista: <b>[' + ids.join(', ') +
+    ']</b>. Son números: no tienen letras adentro.';
+
+  ctl.texto('lectura',
+    'Vos ves <b>' + pal.length + '</b> letras. El modelo ve <b>' + piezas.length +
+    '</b> ficha' + (piezas.length === 1 ? '' : 's') + '. ' +
+    (piezas.length <= 1
+      ? 'Es <b>una sola ficha</b>: para contestar tendría que haber memorizado la ' +
+        'respuesta, porque adentro de un número no hay letras.'
+      : 'Para contestar tendría que abrir cada ficha y mirar de qué letras está ' +
+        'hecha, y eso es exactamente lo que su representación no le permite.'));
+
+  p.redibujar();
+}
+
+/* --- 4. el gráfico: lo que ve una y lo que ve el otro ------------------------ */
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 200,
+  titulo: 'cuántas unidades tiene la palabra para cada uno',
+  margen: { i: 16, d: 16, a: 30, b: 28 }
+});
+p.alDibujar(function () {
+  p.fondo();
+  const pal = palabra();
+  const piezas = pal ? bpePalabra(pal) : [];
+  const L = letraBuscada();
+  const cuantas = Array.from(pal).filter(function (c) { return c === L; }).length;
+  p.barras([
+    { etiqueta: 'letras (las ves vos)', valor: pal.length, color: 'datos' },
+    { etiqueta: 'fichas (las ve el modelo)', valor: piezas.length, color: 'modelo' },
+    { etiqueta: 'la respuesta correcta', valor: cuantas, color: 'ok' }
+  ], { horizontal: false, max: Math.max(pal.length, 1),
+       formato: function (v) { return String(Math.round(v)); } });
+});
+
+/* --- 5. el panel ------------------------------------------------------------- */
+const EJEMPLOS = ['ferrocarril', 'arroz', 'carro', 'irresponsabilidad',
+                  'inconstitucionalidad', 'reglamentaria', 'sol'];
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué contamos' },
+  { tipo: 'select', id: 'letra', etiqueta: 'la letra a contar', valor: 'r',
+    opciones: ['r', 'a', 'e', 's', 'i', 'o', 'n', 'l', 'c', 't']
+      .map(function (c) { return { valor: c, texto: c.toUpperCase() }; }) },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Palabras para probar' }
+].concat(EJEMPLOS.map(function (e) {
+  return { tipo: 'boton', texto: e,
+           alClic: function () { entrada.value = e; pintar(); } };
+})).concat([
+  { tipo: 'titulo', texto: 'Un detalle honesto' },
+  { tipo: 'texto', id: 'honesto', html:
+    'Ojo: <b>el mini-GPT que entrenaste hoy es de caracteres</b>, así que él sí ' +
+    've las letras. No sufre <em>este</em> problema; sufre otro (nunca vio a nadie ' +
+    'contar nada, así que igual contesta cualquier cosa). Los modelos grandes usan ' +
+    'sub-palabras, como la fila 2, porque con caracteres las secuencias se vuelven ' +
+    'larguísimas y la ventana no alcanza. <b>Es un compromiso, y el conteo de ' +
+    'letras es una de las cosas que se pagan.</b>' }
+]), function () { pintar(); });
+
+entrada.addEventListener('input', pintar);
+pintar();
+Viz.botonTema();
+</script>
+</body>
+</html>

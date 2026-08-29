@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 8 — Un mini-GPT propio, y la traducción a ChatGPT | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* --- el párrafo generado del gancho ------------------------------------ */
+  .reveal .parrafo {
+    font-family: var(--f-texto); font-size: .78em; line-height: 1.6;
+    text-align: left; background: var(--papel-2);
+    border: 1px solid var(--borde); border-left: 4px solid var(--c-datos);
+    border-radius: var(--r-medio); padding: .8em 1em; margin: .3em 0;
+  }
+  .reveal .parrafo.gen { border-left-color: var(--c-modelo); }
+  .reveal .parrafo .inventado {
+    background: var(--c-error-suave); color: var(--c-error);
+    font-weight: 700; border-radius: 4px; padding: 0 .15em;
+  }
+  /* --- las muestras del entrenamiento ------------------------------------- */
+  .reveal .muestra {
+    font-family: var(--f-mono); font-size: .62em; line-height: 1.55;
+    text-align: left; background: var(--papel-2);
+    border: 1px solid var(--borde); border-radius: var(--r-medio);
+    padding: .6em .8em; white-space: pre-wrap; word-break: break-word;
+  }
+  .reveal .muestra .prompt { color: var(--c-acento); font-weight: 700; }
+  .reveal .paso-etiq {
+    display: inline-block; font-family: var(--f-mono); font-weight: 700;
+    background: var(--c-parametro); color: var(--papel);
+    border-radius: 999px; padding: .1em .7em; font-size: .62em;
+    letter-spacing: .05em; margin-bottom: .3em;
+  }
+  /* --- la cadena de la arquitectura --------------------------------------- */
+  .reveal .cadena {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: .35em; flex-wrap: wrap; margin: .5em 0;
+  }
+  .reveal .cadena .paso {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .45em .6em;
+    font-size: .56em; line-height: 1.35; min-width: 8.2em; max-width: 10em;
+  }
+  .reveal .cadena .paso b { display: block; font-size: 1.08em; }
+  .reveal .cadena .paso .de { display: block; color: var(--tinta-3);
+                              font-size: .82em; margin-top: .25em; }
+  .reveal .cadena .paso.salida { border-color: var(--c-modelo);
+                                 background: var(--c-modelo-suave); }
+  .reveal .cadena .flecha { align-self: center; color: var(--tinta-3);
+                            font-size: .8em; }
+  /* --- tabla de traducción compacta --------------------------------------- */
+  .reveal table.traduccion { font-size: .52em; }
+  .reveal table.traduccion td:first-child { width: 42%; }
+  .reveal .numerito {
+    font-family: var(--f-mono); font-weight: 700; color: var(--c-acento);
+  }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ======================= 1. PORTADA ======================= -->
+<section class="portada">
+  <p class="num-clase">Clase 8</p>
+  <h1>Un mini-GPT propio,<br>y la traducción a ChatGPT</h1>
+  <div class="franja"></div>
+  <p class="gancho">Hoy entrenás un modelo de lenguaje desde cero, en tu compu, en cuatro
+    minutos. Y al final vas a poder explicar por qué ChatGPT alucina, por qué se olvida
+    del principio de tu prompt y por qué no sabe cuántas erres tiene «ferrocarril».</p>
+  <aside class="notes">
+    No leas el título. Arrancá con el párrafo de la slide siguiente, en voz alta y con
+    tono de sesión. Los primeros tres minutos deciden la clase.
+    (30 segundos.)
+  </aside>
+</section>
+
+<!-- ======================= 2. EL GANCHO ======================= -->
+<section class="pregunta">
+  <h2>¿Lo dijo alguien, o lo escribió una máquina?</h2>
+  <div class="parrafo">
+    Señor presidente, señores diputados: Los intendentes de Valle Hondo nos mandaron una
+    nota. Dice, textual: «la transferencia de la competencia sin la transferencia de los
+    recursos convierte una política pública en un problema municipal». Y acá está el
+    punto: esa frase resume el debate de hoy. Quiero reconocer el trabajo de la diputada
+    preopinante. Discrepamos en el diagnóstico, pero no en la honestidad del planteo.
+  </div>
+  <div class="opciones">
+    <div><b>A</b> lo dijo una persona</div>
+    <div><b>B</b> lo escribió una máquina</div>
+  </div>
+  <aside class="notes">
+    <b>Leelo en voz alta ANTES de proyectarlo.</b> Con tono de sesión, sin apuro.
+    Después lo proyectás y votan a mano alzada. En serio: sin la apuesta, la revelación
+    no vale nada.
+    <br><br>
+    Segunda pregunta, después de la votación: <b>«¿qué les hizo sospechar?»</b>
+    Casi siempre sale «se nota que no dice nada concreto».
+    <b>ESCRIBÍ ESA FRASE EN EL PIZARRÓN.</b> La vas a cobrar en el minuto 45: es el
+    hallazgo entero de la primera mitad de la clase.
+    (4 minutos con la discusión.)
+  </aside>
+</section>
+
+<!-- ======================= 3. LO ESCRIBIÓ ESTO ======================= -->
+<section>
+  <h2>Lo escribió esto</h2>
+  <div class="tarjetas">
+    <div><h4><span class="numerito">1.541.056</span></h4>perillas. Un millón y medio.
+      GPT-4 tiene, según las estimaciones públicas, unas cien mil veces más.</div>
+    <div><h4><span class="numerito">4,1 min</span></h4>de entrenamiento.
+      En una CPU con cuatro hilos. Sin GPU, sin nube, sin plata.</div>
+    <div><h4><span class="numerito">1,1 MB</span></h4>de corpus: debates parlamentarios
+      de un país que no existe. <span class="chip sintetico">sintético</span></div>
+  </div>
+  <div class="intuicion">
+    Y hoy lo vas a entrenar vos, mirando cada pieza por dentro. No es una demo:
+    es <em>tu</em> modelo.
+  </div>
+  <aside class="notes">
+    Revelación. Dejá que se acomode un segundo antes de seguir.
+    <br><br>
+    Si preguntan por el corpus sintético, la respuesta corta: «porque tenemos el padrón
+    de la verdad y en la segunda mitad vamos a poder mostrar, en cinco segundos, que un
+    diputado que el modelo nombró no existe». La respuesta larga está en
+    <code>datos/README.md</code> §1.5.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 4. LA PROMESA ======================= -->
+<section>
+  <h2>Lo que vas a poder explicar en dos horas</h2>
+  <p class="bajada">No con una metáfora. Con el mecanismo, mirando el modelo que vos entrenaste.</p>
+  <div class="tarjetas">
+    <div><h4>Por qué alucina</h4>Y por qué suena igual de seguro cuando acierta.</div>
+    <div><h4>Por qué le importa el prompt</h4>Y por qué el prompt es tu instrumento de medición.</div>
+    <div><h4>Qué es la ventana de contexto</h4>Y por qué tu prompt largo se olvidó de la primera instrucción.</div>
+    <div><h4>Qué hace la temperatura</h4>Y por qué el mismo prompt da respuestas distintas.</div>
+    <div><h4>Por qué cuenta mal las letras</h4>Y por qué es malo con la aritmética.</div>
+    <div><h4>Por qué se contradice</h4>Y por qué, si arrancó mal, sigue por ahí.</div>
+  </div>
+  <aside class="notes">
+    Leé las seis en voz alta, rápido. Es un contrato: al final de la clase te lo van a
+    cobrar, y está bien que sea así.
+    <br><br>
+    Frase: «todo esto se sigue del mecanismo. Nada de esto es un bug misterioso.»
+    (1,5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 5. DÓNDE QUEDAMOS ======================= -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos, y por qué hoy no hay ninguna pieza nueva</h2>
+  <ul>
+    <li><b>Clase 1-2:</b> una función es una máquina con perillas, y apilando rampas se
+      dibuja cualquier figura.</li>
+    <li><b>Clase 3:</b> estar equivocado es un número, y ese número tiene pendiente.</li>
+    <li><b>Clase 4:</b> el ciclo de entrenamiento, y la diferencia entre dibujar y calcar.</li>
+    <li><b>Clase 6:</b> el texto se parte en <b>fichas</b> y cada ficha vive en un lugar
+      del espacio.</li>
+    <li><b>Clase 7:</b> el <b>bloque transformer</b>: cada ficha arma su propio resumen
+      del contexto. Lo construimos y lo dejamos <em>apagado</em>.</li>
+    <li class="fragment"><b>Hoy:</b> lo apilamos cuatro veces, lo prendemos, y lo miramos
+      aprender.</li>
+  </ul>
+  <div class="aha">
+    En la clase 1 dibujábamos una recta con <b>2</b> perillas sobre 40 puntos.
+    Hoy dibujamos, en cada posición del texto, <b>una distribución de probabilidad sobre
+    todas las fichas posibles</b>, con un millón y medio de perillas.
+    <b>Es la misma máquina.</b>
+  </div>
+  <aside class="notes">
+    Esta slide es el cierre intelectual del curso y hay que decirla despacio.
+    <br><br>
+    El punto: <b>hoy no hay ninguna pieza nueva.</b> Misma loss, mismo descenso, mismo
+    ciclo, mismos embeddings, mismo bloque. Lo único que cambia es que se apilan y se
+    entrenan con datos de verdad.
+    <br><br>
+    Preguntá: «¿alguien se acuerda cuántas perillas tenía el modelo de la clase 1?»
+    (Dos: una pendiente y una altura.)
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 6. EL OBJETIVO ======================= -->
+<section>
+  <h2>El objetivo de entrenamiento más tonto del mundo</h2>
+  <div class="parrafo" style="font-size:1.05em;text-align:center">
+    El señor diputado pidió la <span class="resaltado">_____</span>
+  </div>
+  <div class="intuicion">
+    <b>Predecir la próxima ficha.</b> Eso es todo lo que hace un modelo de lenguaje.
+    Todo lo demás —escribir, resumir, traducir, contestarte— sale de ahí, y de nada más.
+  </div>
+  <p>No hay un módulo de razonamiento. No hay una base de datos de hechos. No hay un
+    verificador de verdad. Hay una función con perillas que, para cada posición del texto,
+    <b>dibuja una distribución de probabilidad</b>.</p>
+  <aside class="notes">
+    Preguntá al aula qué palabra sigue. Van a decir «palabra». Perfecto: eso que
+    acaban de hacer es exactamente la tarea.
+    <br><br>
+    Y el énfasis que hay que dejar: <b>«y de nada más»</b>. Toda la segunda mitad de la
+    clase se sostiene en que esto es literal.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 7. EL DATASET SE ARMA SOLO ======================= -->
+<section>
+  <h2>Y por eso el dataset se arma solo</h2>
+  <p class="bajada">Una ventana de 8 fichas no es <em>un</em> ejemplo de entrenamiento. Son ocho.</p>
+  <pre><code class="language-text" data-trim>
+  cuando ve «S»         ->  la respuesta correcta es «e»
+  cuando ve «Se»        ->  la respuesta correcta es «ñ»
+  cuando ve «Señ»       ->  la respuesta correcta es «o»
+  cuando ve «Seño»      ->  la respuesta correcta es «r»
+  cuando ve «Señor»     ->  la respuesta correcta es «␣»
+  cuando ve «Señor »    ->  la respuesta correcta es «p»
+  cuando ve «Señor p»   ->  la respuesta correcta es «r»
+  cuando ve «Señor pr»  ->  la respuesta correcta es «e»
+  </code></pre>
+  <div class="ss compacta">
+    Para entrenar un clasificador de titulares, alguien tiene que etiquetar titulares de
+    a uno. Para entrenar esto sólo hace falta <b>texto</b>: el texto es su propia etiqueta.
+    <b>Por eso se puede entrenar con internet entero</b>, y por eso un clasificador bueno
+    para tu problema sigue siendo caro.
+  </div>
+  <aside class="notes">
+    Pregunta al aula, antes de mostrar el bloque de código:
+    <b>«¿cuántos ejemplos de entrenamiento hay en una ventana de 8 fichas?»</b>
+    Casi todos dicen «uno». Son ocho. Ese es el momento de la slide.
+    <br><br>
+    La caja de abajo es la que le importa a un cientista social: explica la asimetría
+    económica entre datos etiquetados y texto crudo. Vale medio minuto.
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 8. EL BIGRAMA ======================= -->
+<section>
+  <h3>Antes del transformer: el modelo más tonto que ya escribe algo</h3>
+  <p class="bajada">Mirar <em>sólo</em> la ficha anterior. Cero perillas aprendidas: son conteos.</p>
+  <div class="muestra">etar qundoy contextioniseplino, prmecortes lioior tase tebespro 4 nasomeltonse llderengray Te. a delire 20 ra de ques l</div>
+  <div class="comparacion">
+    <div><h4>Lo que ya sabe</h4><p>Que existen los espacios. Que hay sílabas del
+      castellano. Que las comas van después de una letra y no antes.</p></div>
+    <div><h4>Lo que no puede saber</h4><p>De qué se estaba hablando. Quién habla.
+      Si está en el medio de una palabra. <b>No tiene contexto: tiene una letra.</b></p></div>
+  </div>
+  <p style="font-size:.8em">Su <span class="glosario"><span class="en">loss</span><span class="es">pérdida</span></span>
+    en validación: <span class="numerito">2,24</span>. Guardate ese número.</p>
+  <aside class="notes">
+    Esta slide baja el misticismo, que es media clase. Con una tabla de conteos ya salen
+    sílabas del castellano.
+    <br><br>
+    <b>Si vas atrasado, ésta es la primera slide que se recorta</b> (se cuenta en dos
+    frases sin mostrar nada).
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 9. LA ARQUITECTURA ======================= -->
+<section>
+  <h2>La arquitectura completa</h2>
+  <div class="cadena">
+    <div class="paso"><b>fichas</b>«Señor pr» → [17, 45, ...]<span class="de">clase 6</span></div>
+    <div class="flecha">→</div>
+    <div class="paso"><b>embeddings</b>cada ficha, un lugar en el espacio<span class="de">clase 6</span></div>
+    <div class="flecha">+</div>
+    <div class="paso"><b>posición</b>una fila por lugar en la ventana<span class="de">clase 7</span></div>
+    <div class="flecha">→</div>
+    <div class="paso"><b>4 bloques transformer</b>attention + MLP + residual + norma<span class="de">clase 7</span></div>
+    <div class="flecha">→</div>
+    <div class="paso salida"><b>capa final</b>un puntaje por cada ficha del vocabulario<span class="de">lo único de hoy</span></div>
+  </div>
+  <div class="aha compacta">
+    <b>No hay ni una pieza nueva.</b> Todas las vimos. Hoy las apilamos y las prendemos.
+    Lo único que se agrega es la última caja: la que convierte «un vector por posición»
+    en «una probabilidad para cada ficha posible».
+  </div>
+  <aside class="notes">
+    Recorré la cadena con el dedo en la pantalla, nombrando la clase de la que sale cada
+    pieza. El efecto que buscás es «ah, ya sé todo esto».
+    <br><br>
+    Si alguien pregunta por qué 4 bloques y no 96: por tiempo de CPU, nada más. GPT-2
+    tiene 12 a 48. La arquitectura no cambia.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 10. LA SALIDA ES UNA DISTRIBUCIÓN ======================= -->
+<section>
+  <span class="marca">callback dibujo</span>
+  <h3>Esto es lo que el modelo dibuja</h3>
+  <div class="viz-con-panel angosto">
+    <div class="viz-frame" style="padding:8px" id="caja-dist"></div>
+    <div class="panel" id="panel-dist"></div>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> son las 12 fichas más probables después de
+    «El bloque del », según el modelo entrenado hoy. Suman 1 con todas las demás.
+    <b>Esta figura es la que el modelo dibuja, en cada posición del texto.</b></p>
+  <aside class="notes">
+    <b>La slide del callback grande.</b> Decila así:
+    «En la clase 1 dibujábamos una recta. En la 2, una curva con codos. En la 5, un mapa
+    sobre una imagen. Hoy dibujamos <i>esto</i>: una distribución de probabilidad, en
+    cada una de las posiciones del texto. Es la misma máquina de dibujar.»
+    <br><br>
+    Los números son reales, salen de la corrida del notebook.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 11. LA LOSS ======================= -->
+<section>
+  <h3>La loss de hoy: <span class="glosario"><span class="en">cross-entropy</span><span class="es">entropía cruzada</span></span></h3>
+  <div class="comparacion">
+    <div>
+      <h4>En castellano</h4>
+      <p><b>Qué probabilidad le diste a la respuesta que efectivamente vino.</b>
+        Se le toma logaritmo y se le da vuelta el signo. Nada más.</p>
+      <p>$$\mathcal{L} = -\log p(\text{la ficha correcta})$$</p>
+      <p style="font-size:.78em">Castiga <b>muchísimo más</b> estar confiadamente
+        equivocado que estar dudando. Con 71 fichas, «no tengo idea» vale
+        $\log 71 = 4{,}26$: ese es el número del paso 0.</p>
+    </div>
+    <div>
+      <div class="viz-frame" style="padding:6px" id="caja-ce"></div>
+    </div>
+  </div>
+  <aside class="notes">
+    Mostrá la curva mientras decís los tres números: 0,9 → 0,11; 0,1 → 2,30; 0,01 → 4,61.
+    La forma de la curva <i>es</i> el argumento: se dispara cerca de cero.
+    <br><br>
+    Y el puente a la clase 3: «es el mismo rol que el MSE. Cambia la fórmula porque
+    cambió lo que se dibuja, no cambia la idea.»
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 12. MANOS 1 ======================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1: a entrenar</h2>
+  <div class="manos">
+    <b>1.</b> Abrí <code>notebook.ipynb</code> y corré hasta la celda del entrenamiento
+    (sección 5).<br>
+    <b>2.</b> <b>Arrancala.</b><br>
+    <b>3.</b> <b>No la mires.</b> Seguí leyendo la sección 6 mientras corre.
+  </div>
+  <div class="ojo compacta">
+    <b>Tarda 4 minutos y medio en CPU</b> (medido: 243 s, 1200 pasos, 4 hilos) y unos
+    pocos minutos en GPU con 3000 pasos. El notebook detecta cuál tenés y ajusta solo.
+    Si te dio CPU, está perfecto: la clase está calibrada para eso.
+  </div>
+  <p style="font-size:.85em">Cada tanto imprime una muestra de lo que escribiría.
+    <b>Volvé a mirarla tres o cuatro veces.</b> Es el momento más lindo del curso.</p>
+  <aside class="notes">
+    <b>ESTE ES EL HITO QUE NO SE NEGOCIA: el entrenamiento arranca en el minuto 20.</b>
+    Si a las 20 no arrancó, saltá lo que sea y arrancalo.
+    <br><br>
+    Escribí las tres consignas en el pizarrón, grandes. Después recorré el aula. Los
+    problemas, en orden de frecuencia: no corrieron el bootstrap; corrieron celdas
+    salteadas; Colab les dio CPU y se asustan. Está todo en las notas del docente §3.
+    <br><br>
+    Volvé al proyector con tu propia corrida en el paso 50, el 400 y el 800, y leé las
+    muestras en voz alta. Es teatro y hay que actuarlo.
+    (20 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 13. PAUSA ======================= -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    El modelo entrena solo, no hace falta que lo mires. Estirá las piernas.
+    Si algo del bloque anterior no cerró, este es el momento de preguntarlo sin levantar
+    la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    <b>No la negocies.</b> Si te la comés, la segunda mitad se atropella, y la segunda
+    mitad es la clase. Quedate cerca del escritorio: acá es donde se acercan los que no
+    preguntan en público.
+    (10 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 14-17. LAS MUESTRAS ======================= -->
+<section>
+  <span class="paso-etiq">paso 0</span>
+  <h3>Antes de entrenar: ruido puro</h3>
+  <div class="muestra"><span class="prompt">Señor presidente, </span>xoé8y,2A6OF.cN2JG—"=BRi6CpVHJO,BHV4
+ZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,jqñ6O(OéO=a;=N—:—,V9,l6Hi3cY6.BslbtnLR4nT(c1;b4iQq IéSTenaCéoFydV—iOt(;1KxDA=IfdHD8vPNDLtluEn8;c2Yt;ebVK::27a0,yc7r Ji4</div>
+  <p>Las perillas están en posiciones al azar. Cada ficha tiene la misma probabilidad que
+    cualquier otra. <span class="numerito">loss = 4,23</span></p>
+  <aside class="notes">
+    Mostralo rápido. Lo importante es el contraste con las tres slides siguientes.
+    Decí el número: 4,23 es prácticamente log(71) = 4,26, o sea «no tengo ni idea».
+    (30 segundos.)
+  </aside>
+</section>
+
+<section>
+  <span class="paso-etiq">paso 50</span>
+  <h3>Aprendió que existen los espacios</h3>
+  <div class="muestra"><span class="prompt">Señor presidente, </span>da0 ta. de de a dereto r do a lictentr eleben gren po lalo la die Labirenlecolo ue de r es lo cosetesio e soncis con endode en enacio r icalie larer cta sioracida nuantr prtue die deontiaren dir e varicir des men da ue Varo el lesay ude din era Ntrielassa har</div>
+  <p>Todavía no hay palabras, pero ya hay <b>palabras del largo correcto</b>, y aparecen
+    «de», «la», «el». <span class="numerito">loss = 2,34</span> — ya empató al bigrama.</p>
+  <aside class="notes">
+    Cincuenta pasos. Doce segundos de CPU. Ya sabe el ritmo del castellano escrito.
+    Preguntá: «¿qué aprendió acá que no tenía en el paso 0?». Sale «los espacios».
+    (1 minuto.)
+  </aside>
+</section>
+
+<section>
+  <span class="paso-etiq">paso 400</span>
+  <h3>Ahora hay palabras. Nadie le dio un diccionario</h3>
+  <div class="muestra"><span class="prompt">Señor presidente, </span>pior sin interme presental interior que dice el dictamen y lo que dice el articulado del Mes nosumeros del menos de enurstencia de primemeneranto reluctia habera desde Preransidad de Cerrriteries grentes iendentes general.
+Diputada Analialiarislles.</div>
+  <p>«que dice el dictamen y lo que dice el articulado» es castellano correcto. También
+    aparecieron los <b>saltos de renglón</b> y el formato «Diputada Fulana.»
+    <span class="numerito">loss = 0,42</span></p>
+  <aside class="notes">
+    <b>Frase para decir acá:</b> «nadie le dio un diccionario, nadie le dijo qué es una
+    palabra. Todo lo que hizo fue tratar de adivinar la próxima letra, un millón de
+    veces.»
+    <br><br>
+    Mostrá también lo que TODAVÍA no anda: «Analialiarislles» no es un nombre. Está
+    aprendiendo la forma de un nombre sin saber cuáles existen. Sembrá: «acordate de
+    esto para el bloque de la alucinación».
+    (1,5 minutos.)
+  </aside>
+</section>
+
+<section>
+  <span class="paso-etiq">paso 800</span>
+  <h3>Y ahí está el género discursivo</h3>
+  <div class="muestra"><span class="prompt">Señor presidente, </span>so discutir los medios sin discutir el objetivo. Es cuanto tengo para decir. Muchas gracias.
+
+Por Secretaria se dara lectura al dictamen.
+Diputada <span class="inventado">Nelida Falcon</span> (UAP — Costa Azul).
+Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la</div>
+  <div class="ojo compacta">
+    Fórmulas de cortesía, cierre de intervención, fórmula de secretaría, encabezado de
+    orador con bloque y provincia. <b>Aprendió el género discursivo.</b>
+    Y de paso se inventó una diputada: <b>Nélida Falcón no existe</b> en el padrón.
+    Nadie lo notó. Volvemos a esto en veinte minutos.
+  </div>
+  <aside class="notes">
+    <b>La slide más importante de la primera mitad.</b> Acá cobrás la apuesta del
+    minuto 8: «alguien dijo que se notaba porque no dice nada concreto. Tenían razón,
+    y eso es exactamente el hallazgo: <b>la forma se aprende antes que el contenido</b>,
+    y con mucho menos esfuerzo.»
+    <br><br>
+    Y NO te saltees lo de Nélida Falcón. Preguntá: «¿alguien lo había notado?».
+    Nadie. Ése es el gancho del bloque de la alucinación.
+    (3 minutos.)
+  </aside>
+</section>
+
+<section>
+  <span class="paso-etiq">paso 1200 · final</span>
+  <h3>Cuatro minutos de CPU</h3>
+  <div class="muestra"><span class="prompt">Señor presidente, </span>señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: "la transferencia de la competencia sin la transferencia de los recursos convierte una politica publica en un problema municipal". Y aca esta el punto: esa frase resume el</div>
+  <p><b>Es el párrafo del principio de la clase.</b>
+    <span class="numerito">loss 4,23 → 0,19</span></p>
+  <aside class="notes">
+    Cerrá el círculo: es literalmente el texto del gancho. Que lo vean.
+    (1 minuto.)
+  </aside>
+</section>
+
+<!-- ======================= 18. LA CURVA ======================= -->
+<section>
+  <h3>La curva de loss: la misma figura de la clase 4</h3>
+  <div class="viz-con-panel angosto">
+    <div class="viz-frame" style="padding:8px" id="caja-loss"></div>
+    <div class="panel" id="panel-loss"></div>
+  </div>
+  <div class="ojo compacta">
+    <b>0,19 es demasiado bueno, y eso es contenido, no un logro.</b> Aguasclaras sale de
+    plantillas y tiene 849 palabras distintas; un corpus real de ese tamaño tendría diez
+    o veinte veces más. <b>Este modelo aprendió mucho mejor de lo que aprendería con
+    texto real.</b> No te lleves de acá la impresión de que esto es fácil.
+  </div>
+  <aside class="notes">
+    Lectura de la curva, igual que la clase 4: azul lo que vio, naranja lo que no.
+    Preguntá: <b>«¿hay tijera? ¿estamos calcando?»</b> No: bajan juntas.
+    <br><br>
+    Y después la caja de abajo, que es lo que hay que decir sí o sí. Un aula que se va
+    creyendo que entrenar un modelo de lenguaje es fácil es un aula a la que le mentimos.
+    (2,5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 19. LA TRADUCCIÓN (portada) ======================= -->
+<section class="portada">
+  <p class="num-clase">Segunda parte</p>
+  <h1>La traducción</h1>
+  <div class="franja"></div>
+  <p class="gancho">Todo lo que te vuelve loco de ChatGPT, explicado desde el modelo que
+    acabás de entrenar.</p>
+  <aside class="notes">
+    Frase de apertura: «este es el bloque por el que hicimos las siete clases anteriores».
+    <br><br>
+    Ritmo del bloque: cada pieza es un mecanismo + una demostración, y
+    <b>cada una termina en una frase que empieza con "por eso"</b>. Si una no termina
+    en un "por eso", sacala.
+    (25 minutos para todo el bloque.)
+  </aside>
+</section>
+
+<!-- ======================= 20. ALUCINA ======================= -->
+<section>
+  <h2>1 · Por qué <span class="c-error">alucina</span></h2>
+  <div class="intuicion">
+    La salida es <b>siempre</b> una distribución de probabilidad sobre la próxima ficha.
+    Siempre. No hay ningún estado en el que el modelo produzca «no sé»: «no sé» tendría
+    que ser una ficha más, y no lo es.
+  </div>
+  <p>Entonces, cuando le preguntás por algo que no está en el corpus, <b>no puede no
+    contestar</b>. Contesta lo plausible.</p>
+  <div class="aha compacta">
+    Y acá está lo que lo hace peligroso: <b>lo plausible y lo verdadero coinciden la
+    mayoría de las veces.</b> Por eso la excepción es tan difícil de detectar — y por eso
+    no sirve el olfato.
+  </div>
+  <p style="font-size:.82em"><b>No miente.</b> Mentir requiere saber la verdad. Produce
+    texto plausible, y eso es lo único que hace <em>siempre</em>: también cuando acierta.</p>
+  <aside class="notes">
+    Decí la frase de «no miente» despacio. Es la que se llevan.
+    <br><br>
+    Ojo con la confusión típica: «alucina porque le faltan datos». No: alucina
+    <b>por diseño</b>. Con más datos alucina menos seguido, no cualitativamente distinto.
+    Eso se paga dos slides más adelante.
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 21. VIZ ALUCINA ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Hacelo alucinar</h3>
+  <div class="viz-frame" data-alto="grande" style="height:600px">
+    <iframe src="viz/por-que-alucina.html" title="por qué alucina" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> alterná entre el primer prompt (un diputado que
+    existe) y el segundo (una que nos inventamos). Las dos distribuciones se ven iguales,
+    y las cuatro barras de seguridad miden lo mismo.</p>
+  <aside class="notes">
+    <b>El momento clave de todo el módulo.</b> Hacelo así:
+    <br>1. Prompt 1 (existe). El modelo contesta. Mostrás el padrón: está.
+    <br>2. Prompt 2 (inventada). Contesta con la misma soltura. Mostrás el padrón: NO está.
+    <br>3. Pregunta, con pausa, y <b>no la contestes vos</b>:
+    <b>«¿cuál de las dos salidas se veía distinta?»</b> Que conteste alguien: ninguna.
+    <br><br>
+    Después el prompt de la ley inventada (le pone título, tema y año) y el de la cita
+    (formato impecable, provincia que no existe). Ese último es letal con esta audiencia.
+    (6 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 22. LA CONFIANZA ======================= -->
+<section>
+  <h3>La confianza no es conocimiento</h3>
+  <div class="comparacion contra">
+    <div><h4>El modelo sabe cosas</h4>
+      <p>De los <b>60</b> diputados que existen en el padrón, le acierta el bloque a
+        <span class="numerito">54</span>. No es que no sepa nada: sabe bastante.</p></div>
+    <div><h4>Y no podés saber cuál es cuál</h4>
+      <p>Mirando la salida, <b>no hay ninguna señal</b> que separe los 54 que sabe de los
+        6 que erra, ni de las diputadas que se inventa enteras.</p></div>
+  </div>
+  <div class="aha">
+    Si no puedo distinguirlas mirando, entonces <b>no puedo usar la seguridad del modelo
+    como señal de verdad. Nunca.</b> Ni la suya, ni la de un modelo cien mil veces más
+    grande.
+  </div>
+  <aside class="notes">
+    Esta slide ataja la sobrecorrección («entonces no sirve para nada»). El modelo sabe
+    cosas. El problema es epistemológico, no de capacidad: <b>no hay señal observable</b>.
+    <br><br>
+    Analogía que funciona: el informante que nunca dice «no sé». Completa, redondea, arma
+    una historia coherente. No miente por maldad. Las técnicas de manejo son las mismas:
+    triangular, pedir fuentes, chequear contra otro registro.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 23. EL PROMPT ======================= -->
+<section>
+  <h2>2 · Por qué le importa tanto el <span class="c-acento">prompt</span></h2>
+  <div class="intuicion">
+    El prompt es, literalmente, <b>lo que condiciona la distribución</b>. No es una
+    instrucción que el modelo obedece: es el punto de partida de la máquina de completar.
+  </div>
+  <div class="comparacion">
+    <div><h4>«Señor presidente, »</h4>
+      <div class="muestra" style="font-size:.55em">señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: "la transferencia de la competencia…</div></div>
+    <div><h4>«Quiero ser cl»</h4>
+      <div class="muestra" style="font-size:.55em">aro: el articulo 10 de la Constitucion no es una sugerencia: es una obligacion del Pra…</div></div>
+  </div>
+  <p style="font-size:.85em"><b>Mismo modelo. Mismas perillas. Mismo sorteo.</b>
+    Lo único que cambió fue el punto de partida, y el registro cambió entero.</p>
+  <div class="ss compacta">
+    <b>Por eso el prompt es tu instrumento de medición.</b> Si usaste un LLM para
+    codificar tu corpus, el prompt es tu libro de códigos y va en el apéndice.
+    Cambiar el prompt es cambiar el instrumento: los resultados dejan de ser comparables.
+  </div>
+  <aside class="notes">
+    El error a desarmar: «entiende mejor la instrucción». No. Le cambiaste el
+    condicionante a la distribución.
+    <br><br>
+    La caja de abajo es el <code>[EL LUNES]</code> adelantado, y conviene sembrarla acá
+    para poder cobrarla en el cierre.
+    <br><br>
+    Si preguntan «¿y si le digo que no invente?»: probalo en vivo con la celda del
+    notebook. Baja la tasa, no saca el mecanismo.
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 24. LA VENTANA ======================= -->
+<section>
+  <h2>3 · Qué es la <span class="c-parametro">ventana de contexto</span></h2>
+  <pre><code class="language-python" data-trim>
+recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
+  </code></pre>
+  <div class="intuicion">
+    Esa línea es <b>toda</b> la ventana de contexto. Lo que quedó afuera no se le pasa al
+    modelo. Y no hay ningún otro lugar donde el modelo guarde nada entre una ficha y la
+    siguiente.
+  </div>
+  <div class="aha compacta">
+    Lo que se cayó de la ventana <b>no existe</b>. No es que le presta poca atención:
+    <b>no está</b>. La RNN de la clase 6 olvidaba de a poco; el transformer tiene un
+    <b>corte duro</b>.
+  </div>
+  <aside class="notes">
+    Es la misma línea que está en el notebook, en <code>generar()</code>. Señalala:
+    «esto que parece plomería es el mecanismo entero».
+    <br><br>
+    Antes de pasar a la viz, la apuesta:
+    <b>«¿en qué tamaño de ventana creen que se va a romper?»</b>
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 25. VIZ VENTANA ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Perdé el contexto</h3>
+  <div class="viz-frame" data-alto="grande" style="height:600px">
+    <iframe src="viz/ventana-de-contexto.html" title="la ventana de contexto" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el texto gris. Mientras el pedacito resaltado siga
+    en color, la respuesta aguanta; en cuanto se pone gris y tachado, se cae. Y la curva
+    de abajo es la medición sobre 16 diputados, no sobre un caso elegido a dedo.</p>
+  <aside class="notes">
+    Movés el slider vos, despacio, de 128 hacia abajo, y mirás el cartel rojo aparecer.
+    Después dejás que lo toquen.
+    <br><br>
+    <b>La frase:</b> «esto es, exactamente, por qué tu prompt larguísimo se olvidó de la
+    primera instrucción».
+    <br><br>
+    El panel de la derecha traduce a práctica: poné lo importante <b>al final</b>.
+    Aclaración honesta: en modelos grandes el fenómeno es más sutil (<i>lost in the
+    middle</i>) pero de la misma naturaleza.
+    (5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 26. COSTO CUADRÁTICO ======================= -->
+<section>
+  <h3>Y por qué la ventana no es infinita</h3>
+  <div class="comparacion">
+    <div>
+      <h4>Attention compara todo con todo</h4>
+      <p>Con $n$ fichas hay $n^2$ comparaciones. <b>El doble de texto son cuatro veces el
+        cómputo.</b></p>
+      <p style="font-size:.82em">Es el problema nuevo que introdujo attention, y es el que
+        quedó anotado en el cuestionario de la clase pasada. Ésta es la respuesta.</p>
+      <p style="font-size:.82em">También es por qué un prompt largo <b>te sale más caro</b>
+        cuando pagás por uso.</p>
+    </div>
+    <div>
+      <div class="viz-frame" style="padding:6px" id="caja-n2"></div>
+    </div>
+  </div>
+  <aside class="notes">
+    Curva al lado de la fórmula, como manda la casa. Mostrá que a 4× el largo, el costo
+    es 16×.
+    <br><br>
+    Aclaración honesta si alguien pregunta: hoy hay técnicas para achicar ese costo
+    (atención con ventanas, aproximaciones), y por eso las ventanas crecieron mucho. La
+    naturaleza del problema no cambió: sigue habiendo un límite.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 27. LA TEMPERATURA ======================= -->
+<section>
+  <h2>4 · Qué hace la <span class="c-parametro">temperatura</span></h2>
+  <div class="intuicion">
+    Antes de elegir la próxima ficha hay un <b>sorteo</b>. La temperatura decide qué tan
+    cargado está: a temperatura baja la distribución se <b>afila</b> y gana casi siempre
+    la primera; a temperatura alta se <b>aplana</b> y las opciones raras tienen chance.
+  </div>
+  <p><b>Lo que casi todo el mundo entiende mal:</b> la temperatura
+    <span class="c-error">no cambia lo que el modelo sabe</span>.
+    El <b>orden</b> de las opciones no se mueve nunca. Sólo cambia cuánto se arriesga.</p>
+  <div class="ss compacta">
+    Un codificador humano cansado es de <b>alta temperatura</b>: más variable, menos
+    predecible. Uno rígido codifica siempre igual y pierde matices. Ni un extremo ni el
+    otro es «el correcto»: depende de la tarea. Y si tu instrumento tiene variabilidad,
+    <b>tenés que reportarla</b>.
+  </div>
+  <aside class="notes">
+    <b>La apuesta va acá, antes de abrir la viz:</b>
+    «antes de que mueva el slider: ¿qué le va a pasar al ORDEN de las barras?»
+    Casi todos dicen «va a cambiar». No cambia nunca. Sin esa predicción fallida, la viz
+    es un dibujito lindo.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 28. VIZ TEMPERATURA ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movela</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/temperatura.html" title="la temperatura" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> las barras se aplastan pero <b>el orden no se
+    mueve</b>. Después apretá «5 veces con el mismo prompt»: en 0,0 son idénticas, en 1,2
+    son cinco textos distintos.</p>
+  <aside class="notes">
+    Primero movés el slider vos, de 0,2 a 1,8 y de vuelta, señalando con el dedo que la
+    primera barra sigue siendo la primera.
+    <br><br>
+    Después el botón de las cinco tiradas, a T=0 y a T=1,2. Ése es el botón que explica
+    la irreproducibilidad y es el que hay que apretar delante de todos.
+    <br><br>
+    Probá también el prompt «Quiero ser cl»: 100% en una sola ficha. Sirve para mostrar
+    que la distribución no siempre es ancha.
+    (5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 29. REPRODUCIBILIDAD ======================= -->
+<section>
+  <h3>Por qué el mismo prompt da respuestas distintas</h3>
+  <div class="intuicion">
+    Porque hay un <b>sorteo</b>. No es que el modelo «cambió de opinión»: la distribución
+    fue la misma y salió otro número.
+  </div>
+  <div class="comparacion contra">
+    <div><h4>Si querés reproducibilidad</h4>
+      <p>Temperatura <b>0</b> y semilla fija, si el proveedor te deja fijarla.
+        Y lo reportás.</p></div>
+    <div><h4>Y aun así no alcanza</h4>
+      <p>La versión del modelo cambia sin aviso, el hardware cambia, y hay no
+        determinismo en la infraestructura. <b>Un modelo cerrado no es reproducible.</b></p></div>
+  </div>
+  <div class="ss compacta">
+    Si en tu metodología usaste un LLM y no reportaste <b>modelo, versión, fecha,
+    temperatura y prompt exacto</b>, tu análisis no es reproducible. Anotalo: se cobra
+    entero en la clase 10.
+  </div>
+  <aside class="notes">
+    Acá se siembra media clase 10. Decilo como un requisito, no como una recomendación.
+    <br><br>
+    Si preguntan si T=0 alcanza: ayuda mucho, no alcanza. Es una confusión frecuente y
+    está en el cuestionario.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 30. CONTAR LETRAS ======================= -->
+<section>
+  <h2>5 · Por qué <span class="c-error">cuenta mal las letras</span></h2>
+  <div class="intuicion">
+    Un modelo grande no ve letras: ve <b>fichas de sub-palabra</b>. «ferrocarril» no es
+    una fila de once letras — son tres o cuatro números.
+  </div>
+  <p>Preguntarle cuántas erres tiene es pedirle que cuente algo que
+    <b>no está en su representación</b>. Cuando acierta es porque vio la respuesta escrita
+    muchas veces, no porque contó.</p>
+  <div class="aha compacta">
+    <b>Prometido en la clase 6, cumplido.</b> Aquel panel del tokenizador que preguntaba
+    cuántas erres tenía la palabra y se iba sin contestar: acá está la respuesta.
+  </div>
+  <aside class="notes">
+    Analogía: «es como preguntarle a alguien que sólo escuchó una palabra cómo se
+    escribe».
+    <br><br>
+    Y la honestidad obligatoria: <b>nuestro mini-GPT es de caracteres</b>, así que él sí
+    ve las letras y no sufre <i>este</i> problema (sufre otro: nunca vio a nadie contar).
+    Usamos caracteres porque con 1 MB de corpus es lo que funciona. Los modelos grandes
+    usan sub-palabras porque con caracteres las secuencias se vuelven larguísimas.
+    <b>Es un compromiso, y el conteo de letras es lo que se paga.</b>
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 31. VIZ CONTAR LETRAS ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>¿Cuántas R tiene «ferrocarril»?</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/contar-letras.html" title="por qué cuenta mal las letras" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> la fila 1 y la fila 2 del mismo texto. Probá
+    «carro»: la doble R queda escondida adentro de una sola ficha.</p>
+  <aside class="notes">
+    Si vas bien de tiempo, abrí al lado <code>viz/tokenizador.html</code> de la clase 6:
+    el guiño «prometido en la clase 6, cumplido» funciona mejor con las dos abiertas.
+    <br><br>
+    Y aprovechá para el dato del lunes: el castellano se parte en más fichas que el
+    inglés. Consecuencia concreta: más costo por texto, ventana efectiva más chica, peor
+    desempeño. Es una buena nota al pie para un paper.
+    <br><br>
+    <b>Si vas atrasado, ésta es la cuarta cosa que se recorta</b>: se cuenta con la slide
+    anterior sola.
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 32. CONTRADICE Y REPITE ======================= -->
+<section>
+  <h2>6 y 7 · Por qué se <span class="c-error">contradice</span> y por qué <span class="c-error">repite</span></h2>
+  <div class="comparacion">
+    <div>
+      <h4>Se contradice</h4>
+      <p>No hay un estado interno de creencias que se sostenga. Cada ficha se genera
+        <b>condicionada al texto anterior</b>, y nada más.</p>
+      <p>Y como lo que ya dijo condiciona lo que sigue: <b>una vez que arrancó por un
+        camino equivocado, sigue por ahí</b>. Por eso se lo puede «convencer» de casi
+        cualquier cosa.</p>
+      <p style="font-size:.8em">No tiene opiniones que sostener. Tiene una distribución
+        que actualizar.</p>
+    </div>
+    <div>
+      <h4>Repite con temperatura baja</h4>
+      <p>Bucles de alta probabilidad: la ficha más probable después de X es Y, y la más
+        probable después de Y es X. Sin sorteo, no sale nunca.</p>
+      <p style="font-size:.8em">Es un pozo de probabilidad. Como un mínimo local
+        (clase 3), pero de texto.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    Estas dos van rápido y sin viz. Son las dos primeras que se recortan después del
+    bigrama si vas atrasado.
+    <br><br>
+    Lo de «se lo puede convencer» conviene decirlo con cuidado: no es que el modelo
+    cambie de opinión, es que le cambiaste el condicionante.
+    (2 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 33. MANOS 2 ======================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2: rompan el modelo</h2>
+  <div class="manos">
+    <b>25 minutos, de a dos.</b> En el notebook, secciones 7 a 11:
+    <ol style="margin:.3em 0 0">
+      <li>Jugá con la <b>temperatura</b> y encontrá el techo de lo legible (TODO 2).</li>
+      <li>Generá 5 veces con el mismo prompt, a T=0,8 y a T=0,01 (TODO 3).</li>
+      <li><b>Rompé la ventana</b>: poné la pista a más de 128 fichas (TODO 4).</li>
+      <li>Hacelo <b>alucinar</b> y mirá la seguridad que le pone (TODO 5).</li>
+    </ol>
+  </div>
+  <div class="aha compacta">
+    <b>El desafío:</b> escribí <b>el prompt que rompe el modelo</b> de la manera más
+    interesante. Y después explicá <b>por qué</b> se rompió, en términos de las piezas
+    que vimos hoy. Esa segunda parte es la que vale.
+  </div>
+  <aside class="notes">
+    Recorré y andá juntando los mejores hallazgos.
+    <br><br>
+    <b>Guardá 5 minutos para la puesta en común</b> (minuto 95). Es la mejor parte y es
+    la que siempre se come el reloj. Elegí dos o tres pares y que cuenten qué rompieron
+    y por qué se rompió.
+    <br><br>
+    Si vas muy atrasado: bajá a 15 minutos y salteá el desafío. Pero avisales que se lo
+    lleven de tarea.
+    (25 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 34. QUÉ LE FALTA ======================= -->
+<section>
+  <h2>Qué le falta a esto para ser ChatGPT</h2>
+  <div class="tarjetas">
+    <div><h4>1 · Escala</h4>1,5 millones de perillas contra cientos de miles de
+      millones. 1 MB de texto contra billones de fichas. Es la diferencia obvia
+      y la <b>menos</b> interesante.</div>
+    <div><h4>2 · <code>instruction tuning</code></h4>
+      <em>Ajuste por instrucciones.</em> Enseñarle a <b>responder consignas</b> en vez de
+      sólo completar texto, con ejemplos de instrucción-respuesta escritos por personas.</div>
+    <div><h4>3 · <code>RLHF</code></h4>
+      <em>Ajuste con preferencias humanas.</em> Personas ordenan respuestas de mejor a
+      peor, y el modelo se mueve hacia las preferidas.</div>
+  </div>
+  <div class="aha compacta">
+    <b>El 2 y el 3 son los que lo convierten de autocompletador en asistente.</b>
+    Y son también los que introducen otras cosas: la amabilidad, la verborragia y
+    <b>la adulación</b> salen de ahí. Son una decisión de producto, no una propiedad del
+    lenguaje.
+  </div>
+  <aside class="notes">
+    Dos líneas cada una, sin entrar en PPO ni en modelos de recompensa.
+    <br><br>
+    Lo de la adulación es el dato que más les sorprende y el que más les sirve: explica
+    por qué el modelo les da la razón cuando insisten. Es un comportamiento
+    <b>entrenado</b>, no emergente.
+    (4 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 35. QUÉ NO CAMBIA ======================= -->
+<section>
+  <h2>Y qué <span class="c-error">no</span> cambia con la escala</h2>
+  <ul>
+    <li>Sigue sin haber casillero para <b>«no sé»</b>.</li>
+    <li>Sigue habiendo <b>tokenización</b>: sigue sin ver letras.</li>
+    <li>Sigue habiendo una <b>ventana finita</b>.</li>
+    <li>Sigue siendo un <b>sorteo</b>.</li>
+    <li>Sigue sin haber un <b>mecanismo de verdad</b> adentro.</li>
+  </ul>
+  <div class="aha">
+    Los modelos de 2030 van a ser muchísimo mejores que los de hoy y van a seguir
+    teniendo <b>todas</b> estas propiedades. <b>La escala mejora la calidad; no cambia la
+    naturaleza.</b>
+  </div>
+  <aside class="notes">
+    <b>La slide más importante de la clase.</b> Si sólo te quedan tres minutos, ésta y el
+    [EL LUNES]. Todo lo demás es prescindible antes que esto.
+    <br><br>
+    Preguntá: <b>«si mañana los modelos son diez veces más grandes, ¿cuál de estas cosas
+    se arregla?»</b> Ninguna. Dejá que lo digan ellos.
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 36. LA TABLA DE TRADUCCIÓN ======================= -->
+<section>
+  <h3>La tabla de traducción, entera</h3>
+  <table class="traduccion">
+    <tr><th>Pieza del mini-GPT que entrenaste</th><th>Comportamiento de ChatGPT que explica</th></tr>
+    <tr><td>La salida es <b>siempre</b> una distribución</td><td>Alucina; nunca dice «no sé»; suena igual de seguro cuando acierta que cuando inventa</td></tr>
+    <tr><td>Condicionada por el texto previo</td><td>El prompt cambia todo; el rol asignado cambia el registro; el prompt es un instrumento</td></tr>
+    <tr><td>Ventana de atención finita</td><td>Se olvida del principio; ignora instrucciones lejanas; repetí lo importante al final</td></tr>
+    <tr><td>Costo cuadrático de attention</td><td>Por qué hay un límite de ventana y por qué un prompt largo cuesta más</td></tr>
+    <tr><td>Hay un sorteo (temperatura)</td><td>Respuestas distintas al mismo prompt; T=0 repetitivo; T alta delirante; sin semilla no hay reproducibilidad</td></tr>
+    <tr><td>Trabaja con fichas, no con letras</td><td>Cuenta mal las letras; falla con rimas y aritmética; peor en idiomas poco representados</td></tr>
+    <tr><td>No hay estado de creencias</td><td>Se contradice; si arrancó mal sigue por ahí; se lo puede «convencer»</td></tr>
+    <tr><td>Entrenado para texto plausible</td><td>Referencias bibliográficas con formato perfecto y datos inventados</td></tr>
+    <tr><td>Instruction tuning + RLHF encima</td><td>Responde consignas; es amable; a veces adula y te da la razón</td></tr>
+    <tr><td>Aprendió del corpus</td><td>Reproduce los sesgos del corpus; sabe de lo que abunda y poco de lo que no</td></tr>
+  </table>
+  <aside class="notes">
+    No la leas entera. Señalá dos filas que no hayan tenido su slide propia (la última:
+    los sesgos del corpus, que es el puente a la clase 10) y decí que la tabla está en el
+    notebook para llevársela.
+    (1,5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 37. GLOSARIO ======================= -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista">
+    <li><b>token</b><span>ficha — el pedacito en el que se parte el texto; no es una palabra</span></li>
+    <li><b>cross-entropy</b><span>entropía cruzada — qué probabilidad le diste a la respuesta que vino</span></li>
+    <li><b>temperature</b><span>temperatura — cuánto se arriesga al sortear la próxima ficha</span></li>
+    <li><b>context window</b><span>ventana de contexto — cuántas fichas puede mirar hacia atrás; afuera, nada existe</span></li>
+    <li><b>hallucination</b><span>alucinación — fabricar una entidad con total confianza, porque es lo plausible</span></li>
+    <li><b>autoregressive</b><span>autorregresivo — genera de a una ficha, y cada una condiciona a la siguiente</span></li>
+    <li><b>instruction tuning</b><span>ajuste por instrucciones — lo que lo convierte de autocompletador en asistente</span></li>
+    <li><b>RLHF</b><span>ajuste con preferencias humanas — de acá sale también la adulación</span></li>
+  </ul>
+  <aside class="notes">
+    Rápido. Están todos en <code>recursos/glosario.md</code> con la clase donde
+    aparecieron. El que más conviene repetir es <b>ficha</b>: la mitad de los
+    malentendidos con LLMs vienen de creer que la unidad es la palabra.
+    (1 minuto.)
+  </aside>
+</section>
+
+<!-- ======================= 38. QUÉ TE LLEVÁS ======================= -->
+<section>
+  <h2>Qué te llevás de hoy</h2>
+  <div class="tarjetas">
+    <div><h4>1</h4>Un LLM <b>dibuja la probabilidad de la próxima ficha</b>, y nada más.
+      Es la misma máquina de la clase 1 con un millón y medio de perillas.</div>
+    <div><h4>2</h4><b>No hay casillero para «no sé».</b> Suena igual de seguro cuando
+      acierta que cuando fabrica. La confianza de un LLM no es evidencia de nada.</div>
+    <div><h4>3</h4><b>El prompt es tu instrumento de medición.</b> Si produjo un dato de
+      tu investigación, va en el apéndice con modelo, versión, fecha y temperatura.</div>
+  </div>
+  <aside class="notes">
+    Tres, no más. Decilas mirando al aula.
+    <br><br>
+    Si tuvieras que dejar una sola: la 2.
+    (1,5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 39. EL LUNES ======================= -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>El lunes, en tu investigación</h2>
+  <div class="comparacion contra">
+    <div>
+      <h4>Para qué SÍ</h4>
+      <ul style="font-size:.85em">
+        <li>Primer pase de codificación, <b>con validación humana obligatoria</b>.</li>
+        <li>Generar variantes de un instrumento (preguntas, viñetas).</li>
+        <li>Resumir <b>con el texto fuente a la vista</b>.</li>
+        <li>Explorar un corpus que no conocés todavía.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Para qué NO</h4>
+      <ul style="font-size:.85em">
+        <li>Como <b>fuente de hechos</b>, citas o referencias bibliográficas.</li>
+        <li>Para codificar <b>sin validar</b> una muestra a mano.</li>
+        <li>Como sustituto de <b>leer</b> tu corpus.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ss">
+    La regla que ordena todo: <b>sirve donde el error es visible y verificar es barato;
+    es pésimo donde verificar cuesta tanto como hacer el trabajo.</b>
+    Y siempre: modelo, versión, fecha, temperatura y <b>prompt exacto en el apéndice</b>.
+  </div>
+  <aside class="notes">
+    <b>Acá hay que atajar la sobrecorrección</b>, que aparece siempre después de esta
+    clase: «entonces son inútiles». No. El objetivo del curso es criterio, no rechazo.
+    <br><br>
+    Frase para cerrar: «el prompt exacto va en el apéndice del paper. Es su instrumento
+    de medición, igual que el cuestionario de una encuesta.»
+    (3 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 40. EL PUENTE ======================= -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 9: usar modelos que ya existen, sin creerles</h1>
+  <div class="franja"></div>
+  <p class="gancho">Entrenar uno desde cero cuesta una fortuna y casi nunca es lo que
+    necesitás. Lo que vas a hacer de verdad es agarrar uno que ya entrenó otro y
+    adaptarlo a tu problema. Y después, la pregunta que hace la diferencia entre tu paper
+    y un blog post: <b>¿cómo sabés que está bien?</b></p>
+  <aside class="notes">
+    Cerrá con el costo: nuestro modelo son 4 minutos de CPU; reproducir GPT-2 son horas
+    de GPU y decenas de miles de millones de fichas. Ése es el argumento del transfer
+    learning, y es cuantitativo.
+    <br><br>
+    Mandales el puente por escrito el mismo día.
+    (1 minuto.)
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="datos-mini-gpt.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  // --- plugin de matemática: KaTeX local, sin red ---------------------------
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+  const D = window.DATOS_MINIGPT;
+  const coma = (v) => Viz.num(v, 2).replace('.', ',');
+
+  /* ================================================================
+     Slide 10 — la distribución que dibuja el modelo (datos reales)
+     ================================================================ */
+  (function () {
+    const pr = D.temperatura.prompts.find(p => p.id === 'bloque');
+    const top = pr.distribucion.slice(0, 12);
+    const rot = f => f === ' ' ? '␣' : (f === '\n' ? '⏎' : '«' + f + '»');
+
+    const p = Viz.plano('#caja-dist', {
+      xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 300,
+      titulo: 'p(próxima ficha)  después de  «' + pr.texto + '»',
+      margen: { i: 14, d: 16, a: 30, b: 26 }
+    });
+    p.alDibujar(() => {
+      p.fondo();
+      p.barras(top.map((d, i) => ({
+        etiqueta: rot(d.ficha), valor: d.prob,
+        color: i === 0 ? 'modelo' : 'acento'
+      })), { horizontal: false, max: top[0].prob * 1.12,
+             formato: v => (v * 100).toFixed(0) + '%' });
+    });
+    p.redibujar();
+
+    const nombres = { P: 'Partido de la Unión Nacional', V: 'Vecinos y Vecinas',
+                      M: 'Movimiento Popular Ribereño', F: 'Frente Cívico',
+                      B: 'Bloque Socialista', U: 'Unión Agraria' };
+    Viz.controles('#panel-dist', [
+      { tipo: 'titulo', texto: 'Lo que dibuja el modelo' },
+      { tipo: 'texto', html:
+        'Las seis primeras son <b>las iniciales de los seis bloques</b> que existen en el '
+        + 'corpus:<br>' +
+        top.slice(0, 6).filter(d => nombres[d.ficha]).map(d =>
+          '<b>' + d.ficha + '</b> ' + nombres[d.ficha] + ' — ' +
+          (d.prob * 100).toFixed(0) + '%').join('<br>') },
+      { tipo: 'texto', html:
+        'Nadie le dio la lista de partidos. Salió de tratar de adivinar la próxima letra.' }
+    ]);
+  })();
+
+  /* ================================================================
+     Slide 11 — la curva de la cross-entropy
+     ================================================================ */
+  (function () {
+    const p = Viz.plano('#caja-ce', {
+      xmin: 0, xmax: 1, ymin: 0, ymax: 5,
+      ejeX: 'probabilidad que le diste a la correcta',
+      ejeY: 'pérdida',
+      titulo: 'la pérdida se dispara cerca de cero',
+      alto: 320
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => v.toFixed(1) });
+      p.curva(x => Math.min(5, -Math.log(Math.max(x, 1e-4))),
+              { color: 'error', grosor: 3.5 });
+      [[0.9, 'le diste 90%'], [0.1, 'le diste 10%'], [0.01, 'le diste 1%']]
+        .forEach(([x, t]) => {
+          const y = -Math.log(x);
+          p.segmento(x, 0, x, y, { color: 'parametro', grosor: 1.4, punteada: [5, 4] });
+          p.punto(x, y, { color: 'parametro', r: 6 });
+          p.texto(x, y, t + ' → ' + Viz.num(y, 2),
+                  { color: 'parametro', tam: 11, dx: x > .5 ? -8 : 10,
+                    dy: -10, alinear: x > .5 ? 'right' : 'left', caja: true });
+        });
+      p.segmento(0, Math.log(71), 1, Math.log(71),
+                 { color: 'verdad', grosor: 2, punteada: [7, 5] });
+      p.texto(0.62, Math.log(71), '«no tengo idea» = log 71 = 4,26',
+              { color: 'verdad', tam: 11, dy: -8, caja: true });
+    });
+    p.redibujar();
+  })();
+
+  /* ================================================================
+     Slide 18 — la curva de loss real del entrenamiento
+     ================================================================ */
+  (function () {
+    const h = D.historial;
+    const p = Viz.plano('#caja-loss', {
+      xmin: 0, xmax: D.meta.pasos, ymin: 0, ymax: 4.6,
+      ejeX: 'pasos de descenso', ejeY: 'loss (cross-entropy)',
+      titulo: 'el entrenamiento real: ' + D.meta.pasos + ' pasos en ' +
+              Math.round(D.meta.segundos_cpu) + ' s de CPU',
+      alto: 320
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => String(Math.round(v)) });
+      p.segmento(0, D.meta.loss_bigrama_val, D.meta.pasos, D.meta.loss_bigrama_val,
+                 { color: 'verdad', grosor: 2, punteada: [7, 5] });
+      p.texto(D.meta.pasos * 0.62, D.meta.loss_bigrama_val,
+              'el bigrama tonto: ' + Viz.num(D.meta.loss_bigrama_val, 2),
+              { color: 'verdad', tam: 11, dy: -8, caja: true });
+      p.linea(h.map(d => ({ x: d.paso, y: d.train })), { color: 'modelo', grosor: 3 });
+      p.linea(h.map(d => ({ x: d.paso, y: d.val })), { color: 'val', grosor: 3 });
+      D.muestras.forEach(m => {
+        const punto = h.reduce((a, b) =>
+          Math.abs(b.paso - m.paso) < Math.abs(a.paso - m.paso) ? b : a, h[0]);
+        p.punto(punto.paso, punto.val, { color: 'parametro', r: 5 });
+      });
+      p.leyenda([
+        { color: 'modelo', texto: 'lo que vio (train)', forma: 'linea' },
+        { color: 'val', texto: 'lo que NO vio (val)', forma: 'linea' },
+        { color: 'parametro', texto: 'las muestras que leímos' }
+      ], { pos: 'ad' });
+    });
+    p.redibujar();
+
+    Viz.controles('#panel-loss', [
+      { tipo: 'titulo', texto: 'Los números' },
+      { tipo: 'texto', html:
+        'loss de validación<br><b>' + coma(D.meta.loss_inicial) + '</b> → <b>' +
+        coma(D.meta.loss_final_val) + '</b><br><br>' +
+        'el bigrama tonto se quedó en <b>' + coma(D.meta.loss_bigrama_val) +
+        '</b><br><br>' +
+        'train final <b>' + coma(D.meta.loss_final_train) + '</b> · ' +
+        'val final <b>' + coma(D.meta.loss_final_val) + '</b>' },
+      { tipo: 'texto', html:
+        '<b>¿Hay tijera?</b> No: las dos curvas bajan juntas. Todavía no está calcando ' +
+        'la muestra. (Clase 4.)' }
+    ]);
+  })();
+
+  /* ================================================================
+     Slide 26 — el costo cuadrático de attention
+     ================================================================ */
+  (function () {
+    const p = Viz.plano('#caja-n2', {
+      xmin: 0, xmax: 4100, ymin: 0, ymax: 17,
+      ejeX: 'largo del prompt (fichas)', ejeY: 'cómputo (relativo)',
+      titulo: 'el doble de texto, cuatro veces el cómputo',
+      alto: 320
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => String(Math.round(v)) });
+      p.curva(x => Math.pow(x / 1000, 2), { color: 'error', grosor: 3.5 });
+      p.curva(x => x / 1000, { color: 'verdad', grosor: 2, punteada: [6, 5] });
+      [1000, 2000, 4000].forEach(n => {
+        const y = Math.pow(n / 1000, 2);
+        p.punto(n, y, { color: 'parametro', r: 6 });
+        p.texto(n, y, n + ' → ' + y + '×',
+                { color: 'parametro', tam: 11, dx: -8, dy: -10,
+                  alinear: 'right', caja: true });
+      });
+      p.leyenda([
+        { color: 'error', texto: 'attention: crece con n²', forma: 'linea' },
+        { color: 'verdad', texto: 'si creciera con n', forma: 'linea', punteada: true }
+      ], { pos: 'ai' });
+    });
+    p.redibujar();
+  })();
+</script>
+</body>
+</html>

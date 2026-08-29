@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buscar por significado, no por palabra — Clase 9</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "la búsqueda semántica me trajo titulares que NO tienen la
+     palabra que escribí. O sea: mi lista de palabras clave venía perdiendo
+     todo lo que no se me había ocurrido escribir en la lista."
+
+     CONTRAPUNTO OBLIGATORIO (el botón "mostrar los falsos positivos"):
+     "...y también me trajo tres que no tienen nada que ver. Esto no es magia:
+     es un ranking por parecido, y el parecido no es lo mismo que el tema."
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .viz-frame, .panel { box-sizing: border-box; }
+
+  #buscador { display: flex; gap: .5rem; align-items: center; margin: 0 0 .7rem; flex-wrap: wrap; }
+  #consulta {
+    flex: 1 1 16rem; min-width: 0;
+    font-family: var(--f-texto); font-size: 1rem; padding: .5em .7em;
+    border: 1px solid var(--borde-fuerte); border-radius: var(--r-medio);
+    background: var(--papel); color: var(--tinta);
+  }
+  #consulta:focus { outline: 2px solid var(--c-acento); outline-offset: 1px; }
+  #sugerencias { display: flex; gap: .35rem; flex-wrap: wrap; margin: 0 0 .8rem; }
+  #sugerencias button { font-size: .8rem; padding: .25em .6em; }
+
+  .columnas { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .8rem; }
+  @media (max-width: 760px) { .columnas { grid-template-columns: minmax(0,1fr); } }
+  .col h3 {
+    font-family: var(--f-texto); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; margin: 0 0 .5rem; display: flex;
+    justify-content: space-between; align-items: baseline; gap: .5em;
+  }
+  .col h3 .cuenta { font-family: var(--f-mono); font-size: .72rem; color: var(--tinta-3);
+                    letter-spacing: 0; text-transform: none; }
+  ol.resultados { list-style: none; padding: 0; margin: 0; }
+  ol.resultados li {
+    display: grid; grid-template-columns: 3.1em minmax(0,1fr); gap: .5em;
+    padding: .4em .5em; border-radius: var(--r-medio); margin-bottom: .3em;
+    background: var(--papel-2); border: 1px solid var(--borde); font-size: .82rem;
+    line-height: 1.35;
+  }
+  ol.resultados li .p { font-family: var(--f-mono); font-size: .78rem; font-weight: 700;
+                        color: var(--c-acento); font-variant-numeric: tabular-nums; }
+  ol.resultados li .tm { display: block; font-size: .7rem; color: var(--tinta-3); margin-top: .15em; }
+  ol.resultados li.sinpalabra { border-color: var(--c-ok); background: var(--c-ok-suave); }
+  ol.resultados li.malo { border-color: var(--c-error); background: var(--c-error-suave); }
+  ol.resultados li.malo .p { color: var(--c-error); }
+  ol.resultados li mark { background: var(--c-acento-suave); color: inherit; border-radius: 3px; }
+  ol.resultados li .marca-fp { display: inline-block; font-size: .66rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--c-error); margin-right: .4em; }
+  p.vacio { font-size: .82rem; color: var(--tinta-3); font-style: italic; margin: .4em 0; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Buscar por significado, no por palabra</h1>
+    <p>300 titulares reales del corpus de prensa del curso. A la izquierda, la
+       búsqueda de toda la vida: <b>¿contiene la palabra?</b> A la derecha, la
+       búsqueda semántica: <b>¿se parece?</b> Escribí algo y compará las dos listas.
+       Lo que la izquierda no puede encontrar es lo que a vos no se te ocurrió poner
+       en la lista de palabras clave.</p>
+  </header>
+
+  <div>
+    <div id="buscador">
+      <input id="consulta" type="text" autocomplete="off" spellcheck="false"
+             placeholder="escribí una palabra: protesta, vacuna, elecciones…">
+    </div>
+    <div id="sugerencias" class="grupo-botones"></div>
+
+    <div class="columnas">
+      <div class="col">
+        <h3><span>Por palabra clave</span><span class="cuenta" id="cuenta-kw"></span></h3>
+        <div id="lista-kw"></div>
+      </div>
+      <div class="col">
+        <h3><span class="c-acento">Por significado</span><span class="cuenta" id="cuenta-sem"></span></h3>
+        <div id="lista-sem"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Empezá por <b>fútbol</b>: la búsqueda por palabra
+      encuentra <em>uno</em> (un cura que puso un televisor en el confesionario), y la
+      semántica te trae FIFA, Chivas, el Cruz Azul y la NFL, ninguno de los cuales dice
+      «fútbol». Después probá <b>protesta</b>: aparece
+      <em>«Desmanes y ataques contra 10 CAI dejan varios heridos en Bogotá»</em>, que
+      tampoco tiene la palabra. Todo lo que está <span class="c-ok">en verde</span> es lo
+      que tu lista de palabras clave venía perdiendo <em>sin que te enteraras</em>.
+      Ahora prendé <b>marcar los que no vienen al caso</b> y mirá el otro lado. Con
+      «protesta» te trae una discoteca que cierra y una reforma de derechos de autor, con
+      la misma cara de confianza. Y con <b>vacuna</b> es peor: de los ocho, cuatro no
+      tienen la palabra y <b>los cuatro son basura</b> — cero hallazgos, cuatro falsas
+      alarmas. Misma técnica, misma pantalla, resultado opuesto según la consulta.
+      Un ranking por parecido no es un clasificador validado: es un buen primer filtro,
+      y hay que leerlo.
+    </div>
+    <p class="viz-pie">
+      Datos <b>reales</b>: 300 titulares del <i>Spanish Fake News Corpus 2.0</i>
+      (nov 2020 – mar 2021), CC BY 4.0 — ver <code>datos/README.md</code> §1.3.
+      Los vectores son los del curso: coocurrencia → PPMI → SVD sobre el mismo corpus,
+      con numpy y sin bajar ningún modelo (<code>medir-clase09.py</code>).
+      Un modelo de embeddings de oración de verdad anda mejor que esto; la mecánica y
+      los problemas son los mismos.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-clase09.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. Los datos: los vectores medidos, no inventados.
+   =========================================================================== */
+const B = DATOS_C9.busqueda;
+const PAL = B.palabras, VEC = B.vectores, DIM = B.dim;
+const INDICE = {}; PAL.forEach((p, i) => { INDICE[p] = i; });
+
+/* Los titulares que el equipo marcó a mano como "no viene al caso" para las
+   consultas sugeridas. Se leyeron uno por uno; no salen de ninguna regla.
+   La clave es la consulta, el valor son los índices del corpus. */
+const FALSOS_POSITIVOS = {
+  protesta: ['derechos de autor', 'discoteca', 'tribunal de cuentas',
+             'tribunal constitucional', 'chivas tv'],
+  vacuna: ['homosexualismo', 'cucuta', 'tarjetas sanitizantes', 'militares franceses'],
+  violencia: ['olga sanchez cordero', 'margarita zavala', 'facebook', 'pri compro'],
+  elecciones: ['miss universo'],
+  'futbol': ['nfl'],
+  coronavirus: []      // revisados uno por uno: los ocho vienen al caso
+};
+
+/** Normaliza para comparar: minúsculas y sin tildes. */
+function pelar(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+/** Parte una consulta en palabras que existan en el vocabulario. */
+function fichasDe(texto) {
+  const crudas = texto.toLowerCase().match(/[a-záéíóúüñ]+/g) || [];
+  return crudas.filter(w => INDICE[w] !== undefined);
+}
+
+/** El vector de un texto: el promedio de los vectores de sus palabras.
+    Es la versión de bolsillo de un "embedding de oración": suficiente para ver
+    la idea, y bastante peor que un modelo entrenado para eso. */
+function vectorDe(texto) {
+  const ws = fichasDe(texto);
+  if (!ws.length) return null;
+  const v = new Array(DIM).fill(0);
+  for (const w of ws) { const f = VEC[INDICE[w]]; for (let k = 0; k < DIM; k++) v[k] += f[k]; }
+  let n = 0; for (let k = 0; k < DIM; k++) n += v[k] * v[k];
+  n = Math.sqrt(n) || 1;
+  for (let k = 0; k < DIM; k++) v[k] /= n;
+  return v;
+}
+
+// el vector de cada titular, una sola vez
+const CORPUS = DATOS_C9.busqueda.corpus.map(c => {
+  const v = new Array(DIM).fill(0);
+  for (const j of c.w) { const f = VEC[j]; for (let k = 0; k < DIM; k++) v[k] += f[k]; }
+  let n = 0; for (let k = 0; k < DIM; k++) n += v[k] * v[k];
+  n = Math.sqrt(n) || 1;
+  for (let k = 0; k < DIM; k++) v[k] /= n;
+  return { t: c.t, tema: c.tema, f: c.f, falso: c.falso, v: v, plano: pelar(c.t) };
+});
+
+/* ===========================================================================
+   2. Las dos búsquedas
+   =========================================================================== */
+function buscarPorPalabra(consulta) {
+  const partes = pelar(consulta).split(/\s+/).filter(Boolean);
+  if (!partes.length) return [];
+  const out = [];
+  CORPUS.forEach((c, i) => {
+    if (partes.every(p => c.plano.indexOf(p) >= 0)) out.push({ i: i, s: 1 });
+  });
+  return out;
+}
+
+function buscarPorSignificado(consulta, k) {
+  const q = vectorDe(consulta);
+  if (!q) return null;
+  const puntajes = CORPUS.map((c, i) => {
+    let s = 0; for (let j = 0; j < DIM; j++) s += c.v[j] * q[j];
+    return { i: i, s: s };
+  });
+  puntajes.sort((a, b) => b.s - a.s);
+  return puntajes.slice(0, k);
+}
+
+/* ===========================================================================
+   3. Pintar
+   =========================================================================== */
+function resaltar(titular, consulta) {
+  const partes = pelar(consulta).split(/\s+/).filter(p => p.length > 2);
+  if (!partes.length) return escapar(titular);
+  let salida = '', plano = pelar(titular), i = 0;
+  const marcas = new Array(titular.length).fill(false);
+  for (const p of partes) {
+    let d = plano.indexOf(p);
+    while (d >= 0) {
+      for (let k = d; k < d + p.length && k < marcas.length; k++) marcas[k] = true;
+      d = plano.indexOf(p, d + p.length);
+    }
+  }
+  let abierto = false;
+  for (i = 0; i < titular.length; i++) {
+    if (marcas[i] && !abierto) { salida += '<mark>'; abierto = true; }
+    if (!marcas[i] && abierto) { salida += '</mark>'; abierto = false; }
+    salida += escapar(titular[i]);
+  }
+  if (abierto) salida += '</mark>';
+  return salida;
+}
+
+function escapar(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function esFalsoPositivo(consulta, titular) {
+  const clave = pelar(consulta.trim());
+  const lista = FALSOS_POSITIVOS[clave];
+  if (!lista) return false;
+  const t = pelar(titular);
+  return lista.some(m => t.indexOf(pelar(m)) >= 0);
+}
+
+function pintarLista(destino, filas, consulta, op) {
+  op = op || {};
+  const cont = document.getElementById(destino);
+  if (!filas.length) {
+    cont.innerHTML = '<p class="vacio">' + (op.vacio || 'Nada.') + '</p>';
+    return 0;
+  }
+  let sinPalabra = 0;
+  let html = '<ol class="resultados">';
+  for (const f of filas) {
+    const c = CORPUS[f.i];
+    const tienePalabra = pelar(consulta).split(/\s+/).filter(Boolean)
+      .every(p => c.plano.indexOf(p) >= 0);
+    const fp = op.marcarFP && esFalsoPositivo(consulta, c.t);
+    let clase = '';
+    if (op.semantica && fp) clase = 'malo';
+    else if (op.semantica && !tienePalabra) { clase = 'sinpalabra'; sinPalabra++; }
+    html += '<li class="' + clase + '">' +
+      '<span class="p">' + (op.semantica ? Viz.num(f.s, 2) : '✓') + '</span>' +
+      '<span>' + (fp ? '<span class="marca-fp">no viene al caso</span>' : '') +
+      resaltar(c.t, consulta) +
+      '<span class="tm">' + c.tema + ' · ' + c.f + '</span></span></li>';
+  }
+  html += '</ol>';
+  cont.innerHTML = html;
+  return sinPalabra;
+}
+
+/* ===========================================================================
+   4. El estado y el panel
+   =========================================================================== */
+let consultaActual = 'protesta';
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Cómo buscar' },
+  { tipo: 'slider', id: 'k', etiqueta: 'cuántos resultados', sub: 'el largo del ranking',
+    min: 3, max: 15, paso: 1, valor: 8, decimales: 0, color: 'acento' },
+  { tipo: 'checkbox', id: 'marcarFP', etiqueta: 'marcar los que no vienen al caso', valor: false },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => actualizar());
+
+const sug = document.getElementById('sugerencias');
+for (const q of B.consultas) {
+  const b = Viz.el('button', { texto: q }, sug);
+  b.addEventListener('click', () => {
+    document.getElementById('consulta').value = q;
+    consultaActual = q;
+    actualizar();
+  });
+}
+
+const campo = document.getElementById('consulta');
+campo.value = consultaActual;
+campo.addEventListener('input', () => { consultaActual = campo.value; actualizar(); });
+
+function actualizar() {
+  const q = consultaActual.trim();
+  const k = ctl.valores.k;
+  const marcarFP = ctl.valores.marcarFP;
+
+  if (!q) {
+    document.getElementById('lista-kw').innerHTML = '<p class="vacio">Escribí algo arriba.</p>';
+    document.getElementById('lista-sem').innerHTML = '<p class="vacio">Escribí algo arriba.</p>';
+    document.getElementById('cuenta-kw').textContent = '';
+    document.getElementById('cuenta-sem').textContent = '';
+    ctl.texto('lectura', 'Probá con <b>protesta</b>, o con cualquier palabra que se te ocurra.');
+    return;
+  }
+
+  const kw = buscarPorPalabra(q).slice(0, k);
+  pintarLista('lista-kw', kw, q,
+    { vacio: 'Ningún titular contiene «' + escapar(q) + '». Cero resultados. ' +
+             'Así se siente una lista de palabras clave incompleta.' });
+  document.getElementById('cuenta-kw').textContent =
+    buscarPorPalabra(q).length + ' en todo el corpus';
+
+  const sem = buscarPorSignificado(q, k);
+  if (!sem) {
+    document.getElementById('lista-sem').innerHTML =
+      '<p class="vacio">Ninguna de esas palabras está en el vocabulario de este corpus ' +
+      'chiquito (1.224 palabras). Probá con otra. <b>Esto también pasa de verdad:</b> ' +
+      'un modelo sólo conoce lo que vio.</p>';
+    document.getElementById('cuenta-sem').textContent = '';
+    ctl.texto('lectura', 'La consulta cayó fuera del vocabulario. Probá con una palabra más común.');
+    return;
+  }
+  pintarLista('lista-sem', sem, q, { semantica: true, marcarFP: marcarFP });
+  document.getElementById('cuenta-sem').textContent = 'los ' + k + ' más parecidos';
+
+  // Los tres números que importan, contados sobre el ranking entero (no sobre lo
+  // que quedó pintado): cuántos no tienen la palabra, cuántos revisamos y marcamos
+  // como fuera de tema, y cuántos son hallazgos de verdad.
+  const partes = pelar(q).split(/\s+/).filter(Boolean);
+  const sinPalabra = sem.filter(f =>
+    !partes.every(p => CORPUS[f.i].plano.indexOf(p) >= 0)).length;
+  const fps = sem.filter(f => esFalsoPositivo(q, CORPUS[f.i].t)).length;
+  const hallazgos = sem.filter(f =>
+    !partes.every(p => CORPUS[f.i].plano.indexOf(p) >= 0) &&
+    !esFalsoPositivo(q, CORPUS[f.i].t)).length;
+
+  let txt = 'De los <b>' + sem.length + '</b> que trajo la búsqueda semántica, <b>' +
+    sinPalabra + '</b> no contienen la palabra que escribiste. ' +
+    'Esos son los que tu lista de palabras clave <b>no podía encontrar</b>.';
+  if (marcarFP) {
+    txt += '<br><br>De ese ranking, <b class="c-error">' + fps + '</b> no vienen al caso ' +
+      '(los leímos uno por uno para marcarlos: no hay ninguna regla automática que los ' +
+      'detecte, porque si la hubiera ya sería el clasificador) y quedan <b class="c-ok">' +
+      hallazgos + '</b> <span class="c-ok">hallazgos genuinos</span>: sin la palabra y ' +
+      'en tema.';
+    if (!FALSOS_POSITIVOS[pelar(q)]) {
+      txt += '<br><br><i>Ojo: esta consulta no está entre las que revisamos a mano, ' +
+        'así que el conteo de arriba dice cero por omisión, no porque esté todo bien. ' +
+        'Probá con <b>protesta</b>, <b>vacuna</b>, <b>violencia</b> o <b>fútbol</b>.</i>';
+    }
+  } else {
+    txt += '<br><br>Ahora prendé <b>marcar los que no vienen al caso</b>: la técnica también trae basura.';
+  }
+  ctl.texto('lectura', txt);
+}
+
+ctl.disparar();
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

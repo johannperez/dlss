@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 6 — Texto, secuencias y embeddings | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* la tabla de conteos del gancho: dos bolsas enfrentadas */
+  .reveal .bolsa { display:flex; flex-wrap:wrap; gap:.3em; margin:.4em 0; }
+  .reveal .bolsa span { font-family:var(--f-mono); font-size:.62em;
+    background:var(--papel-2); border:1px solid var(--borde);
+    border-radius:6px; padding:.15em .5em; }
+  .reveal .frase-grande { font-family:var(--f-titulo); font-size:1.25em;
+    line-height:1.3; margin:.3em 0; }
+  .reveal .fichas-demo { display:flex; flex-wrap:wrap; gap:.3em; margin:.5em 0; }
+  .reveal .fichas-demo b { font-family:var(--f-mono); font-size:.62em; font-weight:600;
+    background:var(--c-acento-suave); border-radius:6px; padding:.2em .5em; color:var(--tinta); }
+  .reveal .fichas-demo i { font-family:var(--f-mono); font-size:.62em; font-style:normal;
+    background:var(--papel-2); border:1px dashed var(--borde); border-radius:6px;
+    padding:.2em .5em; color:var(--tinta-2); }
+  .reveal table.vecinos { font-size:.58em; }
+  .reveal table.vecinos td:first-child { font-family:var(--f-mono); color:var(--c-acento); }
+  .reveal .cifra { font-family:var(--f-mono); font-variant-numeric:tabular-nums;
+    font-weight:700; color:var(--c-error); }
+  .reveal .onehot-tira { display:flex; gap:2px; margin:.4em 0; }
+  .reveal .onehot-tira i { display:block; width:1.1em; height:1.6em; border-radius:3px;
+    background:var(--papel-3); font:700 .5em/1.6em var(--f-mono); text-align:center;
+    color:var(--tinta-3); font-style:normal; }
+  .reveal .onehot-tira i.uno { background:var(--c-acento); color:var(--papel); }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ===== 1 · PORTADA ===================================================== -->
+<section class="portada">
+  <p class="num-clase">Clase 6</p>
+  <h1>La forma de los datos manda:<br>texto, secuencias y embeddings</h1>
+  <div class="franja"></div>
+  <p class="gancho">Hoy dibujamos el mapa donde viven las palabras. Y vamos a
+    descubrir que ese mapa, además de servir, confiesa cosas.</p>
+  <aside class="notes">
+    1 minuto. No leas objetivos: pasá directo al gancho. La clase entera se juega
+    en los primeros tres minutos y en el modo «eje» de la viz del minuto 70.
+  </aside>
+</section>
+
+<!-- ===== 2 · DÓNDE VENIMOS ============================================== -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">La clase pasada: la arquitectura de una red es una teoría sobre
+     cómo está hecho el mundo.</p>
+  <ul>
+    <li>Una CNN supone que <strong>lo que importa es local</strong> y que lo mismo
+        vale en toda la imagen. Cuando eso es cierto, necesita muchísimos menos datos.</li>
+    <li>Barajamos los píxeles y la red densa ni se enteró: <strong>nunca supo que había
+        una grilla</strong>.</li>
+    <li class="fragment"><strong>Hoy: ¿qué forma tiene el texto?</strong> Porque tiene una,
+        y es distinta. Se llama <em>orden</em>.</li>
+  </ul>
+  <aside class="notes">
+    2 minutos, no más. Preguntá: «¿qué supone una CNN sobre el mundo?». Alguien va a
+    decir «que lo importante es local». Enganchá ahí: «bueno, ¿qué supondría una
+    arquitectura hecha para texto?». No lo respondas todavía.
+  </aside>
+</section>
+
+<!-- ===== 3 · EL GANCHO ================================================= -->
+<section>
+  <h2>Dos frases</h2>
+  <p class="frase-grande c-datos">«La comisión rechazó al ministro.»</p>
+  <p class="frase-grande c-datos">«El ministro rechazó a la comisión.»</p>
+  <p class="bajada" style="margin-top:1em">¿Significan lo mismo?</p>
+  <aside class="notes">
+    Leelas en voz alta, con énfasis distinto en cada una. Preguntá al aula:
+    «¿significan lo mismo?». Se ríen. Que alguien diga por qué no. Que use la
+    palabra «quién». Anotala en el pizarrón. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 4 · LA MISMA BOLSA ============================================= -->
+<section>
+  <h2>Las mismas, contadas</h2>
+  <div class="comparacion">
+    <div>
+      <h4>«El gobierno criticó al congreso»</h4>
+      <div class="bolsa"><span>al 1</span><span>congreso 1</span><span>criticó 1</span>
+        <span>el 1</span><span>gobierno 1</span></div>
+    </div>
+    <div>
+      <h4>«El congreso criticó al gobierno»</h4>
+      <div class="bolsa"><span>al 1</span><span>congreso 1</span><span>criticó 1</span>
+        <span>el 1</span><span>gobierno 1</span></div>
+    </div>
+  </div>
+  <div class="ojo compacta">Idénticas. No parecidas: <strong>idénticas</strong>.
+    Este es el método más usado en análisis cuantitativo de texto en ciencias
+    sociales durante treinta años, y no puede distinguir quién criticó a quién.</div>
+  <aside class="notes">
+    Callate cinco segundos después de mostrar las dos tablas. Es el golpe seco de
+    la clase. Después: «esto se llama bag-of-words, bolsa de palabras, y es la base
+    de los diccionarios, del análisis de contenido cuantitativo y de LDA».
+    3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 5 · NO ES PARA DESPRECIARLO =================================== -->
+<section>
+  <h2>Ojo: esto no es para despreciar la bolsa de palabras</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Sigue siendo la elección correcta cuando…</h4>
+      <p>…tu pregunta es <strong>de qué se habla</strong>. Contar palabras es barato,
+         transparente, auditable y lo entiende un revisor. Un diccionario validado
+         le gana a un transformer en la mitad de los casos.</p>
+    </div>
+    <div>
+      <h4>Se queda corta cuando…</h4>
+      <p>…tu pregunta es <strong>quién le hizo qué a quién</strong>: agencia,
+         atribución de responsabilidad, negación, ironía. Todo eso vive en el
+         orden, y el orden se tiró.</p>
+    </div>
+  </div>
+  <div class="ss compacta">Nada de lo que viene hoy invalida las herramientas que
+    ya usás. Volvemos sobre esto en la clase 10, cuando toque decidir en serio.</div>
+  <aside class="notes">
+    Esta slide es política, en el buen sentido: mucha gente del aula publicó con
+    diccionarios y con LDA. Si arrancás despreciando eso, perdiste la clase.
+    Decilo en serio, no como concesión. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 6 · EL PROBLEMA DEL DÍA ======================================= -->
+<section>
+  <h2>El problema del día</h2>
+  <div class="intuicion">
+    Cómo se le da texto a una máquina <strong>sin tirar a la basura</strong>
+    ni el orden ni el parecido entre palabras.
+  </div>
+  <p>Dos preguntas, en este orden:</p>
+  <ol>
+    <li><strong>¿Cómo se convierte una palabra en números</strong> de manera que
+        «diputado» y «senador» queden cerca y «diputado» y «trigo» queden lejos?</li>
+    <li><strong>¿Cómo se junta una secuencia</strong> de esas palabras sin perder
+        quién hizo qué?</li>
+  </ol>
+  <p class="bajada">La primera nos ocupa hasta la pausa. La segunda, después.</p>
+  <aside class="notes">1 minuto. Es el índice de la clase, disfrazado de problema.</aside>
+</section>
+
+<!-- ===== 7 · TOKENIZAR ================================================= -->
+<section>
+  <span class="marca">paso 1</span>
+  <h2>Partir el texto en pedacitos</h2>
+  <p class="frase-grande">«El proyecto fue aprobado por la Cámara»</p>
+  <div class="fichas-demo">
+    <b>el</b><b>proyecto</b><b>fue</b><b>aprobado</b><b>por</b><b>la</b><b>cámara</b>
+  </div>
+  <div class="intuicion compacta">Se llama <span class="glosario"><span class="en">tokenizing</span><span class="es">tokenizar</span></span>
+    y quiere decir «partir en pedacitos». Cada pedacito es un
+    <span class="glosario"><span class="en">token</span><span class="es">ficha</span></span>.</div>
+  <p style="font-size:.8em">Y ya en este paso tomaste tres decisiones de medición:
+     pasar todo a minúscula, tirar los números, cortar por espacios.
+     <em>Ninguna es obviamente correcta.</em></p>
+  <aside class="notes">
+    Preguntá: «¿qué se perdió acá?». Alguien dice las mayúsculas. Otro, la
+    puntuación. Perfecto: son decisiones, no automatismos. Es el libro de códigos
+    de un análisis de contenido, en una línea de código. 3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 8 · EN QUÉ PEDACITOS ========================================= -->
+<section>
+  <h2>¿Y en qué pedacitos, exactamente?</h2>
+  <div class="tarjetas">
+    <div><h4>Por caracteres</h4>
+      <code>i·n·c·o·n·s…</code><br>
+      Vocabulario chiquito (~100). <strong>Nunca</strong> hay palabra desconocida.
+      Precio: secuencias larguísimas.</div>
+    <div><h4>Por palabras</h4>
+      <code>inconstitucionalidad</code><br>
+      Lo más intuitivo. Precio: el castellano tiene un vocabulario enorme y
+      siempre aparece una palabra que no viste. Esa se pierde entera.</div>
+    <div><h4>Por sub-palabras</h4>
+      <code>in·constitu·ci·on·alidad</code><br>
+      El compromiso que ganó (BPE). Nunca hay desconocidas y las secuencias
+      quedan cortas. Precio: los pedazos no coinciden con el significado.</div>
+  </div>
+  <aside class="notes">
+    Tres compromisos, no tres opciones donde una es mejor. Preguntá cuál usarían.
+    La mayoría dice «por palabras» porque es la intuitiva. Anotalo: en la viz que
+    sigue van a ver por qué ganó la tercera. 3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 9 · VIZ TOKENIZADOR ========================================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Tokenizá vos</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/tokenizador.html" title="tokenizador interactivo" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> con <em>sub-palabras</em>,
+    <code>inconstitucionalidad</code> son <b>5 fichas</b> y ninguna es
+    «constitución». Los cortes no siguen la morfología: siguen la estadística
+    del corpus.</p>
+  <aside class="notes">
+    Escribí «inconstitucionalidad» vos, en vivo, letra por letra, y dejá que se
+    vea partirse. Después cambiá a «por palabras» y mostrá el &lt;desc&gt;.
+    <b>Cerrá con la siembra:</b> «¿cuántas erres tiene esta palabra? Guardá la
+    pregunta: en la clase 8 explicamos con esto por qué ChatGPT cuenta mal las
+    letras». No la respondas. 5 minutos.
+  </aside>
+</section>
+
+<!-- ===== 10 · CADA FICHA ES UN NÚMERO ================================= -->
+<section>
+  <span class="marca">paso 2</span>
+  <h2>Cada ficha es un número</h2>
+  <p>Se arma la lista de todas las fichas que el modelo conoce —el
+     <span class="glosario"><span class="en">vocabulary</span><span class="es">vocabulario</span></span>—
+     y cada una se reemplaza por su posición en la lista.</p>
+  <table>
+    <tr><th>ficha</th><td>el</td><td>proyecto</td><td>fue</td><td>aprobado</td><td>por</td><td>la</td><td>cámara</td></tr>
+    <tr><th>número</th><td>5</td><td>147</td><td>63</td><td>—</td><td>11</td><td>2</td><td>281</td></tr>
+  </table>
+  <div class="ojo compacta"><strong>Ese número no significa nada.</strong> Es el lugar
+    donde quedó la palabra en una lista ordenada por frecuencia. Que «cámara» sea
+    281 y «la» sea 2 no dice que una sea el doble de nada.
+    Y <code>aprobado</code> no está: es
+    <span class="glosario"><span class="en">OOV</span><span class="es">fuera de vocabulario</span></span>,
+    y desaparece sin avisar.</div>
+  <aside class="notes">
+    El «no significa nada» es importante: si el número tuviera sentido de escala,
+    el modelo aprendería una relación falsa. Es lo que motiva la slide siguiente.
+    2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 11 · ONE-HOT ================================================= -->
+<section>
+  <span class="marca">paso 3 · primer intento</span>
+  <h2>One-hot: un casillero por palabra</h2>
+  <p>Para que el número no se lea como una escala, se le da a cada palabra
+     <strong>un casillero propio</strong>: todo ceros y un solo 1.</p>
+  <p style="font-size:.8em;margin-bottom:.1em"><code>diputados</code> →</p>
+  <div class="onehot-tira">
+    <i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i class="uno">1</i>
+    <i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i>
+    <i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i>
+    <span style="align-self:center;font-size:.6em;color:var(--tinta-3);margin-left:.6em">
+      …y así <b>50.000</b> veces</span>
+  </div>
+  <p>Un vector del tamaño del vocabulario entero. Por cada palabra.</p>
+  <aside class="notes">
+    Estirá los brazos para dar la idea del largo del vector. Es tonto y funciona.
+    2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 12 · EL PROBLEMA DEL ONE-HOT ================================= -->
+<section>
+  <h2>Y acá se rompe</h2>
+  <div class="comparacion">
+    <div><h4>Distancia entre <code>diputados</code> y <code>senadores</code></h4>
+      <p style="text-align:center"><span class="cifra" style="font-size:2em">√2</span></p></div>
+    <div><h4>Distancia entre <code>diputados</code> y <code>trigo</code></h4>
+      <p style="text-align:center"><span class="cifra" style="font-size:2em">√2</span></p></div>
+  </div>
+  <div class="ojo">Todas las palabras están <strong>exactamente</strong> igual de lejos
+    de todas las demás. No hay grados, no hay parecido, no hay vecindad.
+    Para este esquema, el castellano es una bolsa de 50.000 cosas sin ninguna
+    relación entre sí. <em>Y eso es falso.</em></div>
+  <aside class="notes">
+    Preguntá: «¿alguien ve el problema?». Alguien dice «no hay parecido». Repetilo
+    con sus palabras. Esta es la carencia que el embedding viene a llenar, y hay que
+    sentirla antes de mostrarlo. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 13 · VIZ ONE-HOT VS EMBEDDING =============================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Dos maneras de escribir una palabra con números</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/one-hot-vs-embedding.html" title="one-hot contra embedding" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> alterná <code>diputados</code> ↔
+    <code>senadores</code>: a la izquierda el 1 se corre y nada más; a la derecha
+    el patrón es casi el mismo. Ahora poné <code>trigo</code>: a la izquierda pasa
+    <em>lo mismo de siempre</em>; a la derecha cambia todo.
+    <span class="cifra">0,863</span> contra <span class="cifra">0,031</span>.</p>
+  <aside class="notes">
+    Alterná vos entre las tres palabras, despacio, mirando la pantalla en silencio.
+    Que vean los dos lados a la vez. Después preguntá: «¿de dónde salieron esos
+    cien números de la derecha?». Nadie sabe. Esa es la slide que sigue. 4 minutos.
+  </aside>
+</section>
+
+<!-- ===== 14 · LA IDEA: UN LUGAR EN EL MAPA ============================ -->
+<section>
+  <span class="marca">callback dibujo</span>
+  <h2>La idea: darle a cada palabra un lugar</h2>
+  <div class="intuicion">
+    Un <span class="glosario"><span class="en">embedding</span><span class="es">incrustación</span></span>
+    es un puñado de números —cien, trescientos— que ubican a cada palabra
+    <strong>en un mapa</strong>. Las palabras que se usan parecido quedan cerca.
+  </div>
+  <div class="comparacion">
+    <div><h4>Hasta la clase 5</h4>
+      <p>Dibujábamos <strong>curvas</strong>: una figura sobre unos puntos.</p></div>
+    <div><h4>Hoy</h4>
+      <p>Dibujamos <strong>el mapa</strong> donde viven las palabras. Y las
+         posiciones en ese mapa <em>son</em> lo que el modelo sabe del significado.
+         No hay nada más adentro.</p></div>
+  </div>
+  <aside class="notes">
+    Este es el [CALLBACK DIBUJO] de la clase y hay que decirlo con todas las
+    letras. La metáfora del curso se estira: seguimos dibujando, cambió qué.
+    2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 15 · DE DÓNDE SALEN LAS POSICIONES ========================== -->
+<section>
+  <span class="marca">discusión</span>
+  <h2>¿De dónde salen las posiciones?</h2>
+  <blockquote>«Conocerás una palabra por la compañía que mantiene.»<br>
+    <span style="font-size:.7em">— J. R. Firth, 1957</span></blockquote>
+  <p>Se llama <strong>hipótesis distribucional</strong>. Dice que el significado de
+     una palabra se puede reconstruir a partir de <em>con qué otras palabras
+     aparece</em>. Y es todo lo que usa la máquina: no hay diccionario, no hay
+     definiciones, no hay nadie explicándole nada.</p>
+  <div class="ss compacta">Es una tesis fuerte sobre el significado, y es discutible.
+    Wittgenstein diría que sí, el significado es el uso. Un semiólogo tal vez matice.
+    <strong>Ustedes pueden discutir esto mejor que un ingeniero.</strong></div>
+  <aside class="notes">
+    <b>Acá se pregunta y se escucha.</b> «¿El significado de una palabra es su uso?»
+    Dejá que hablen dos o tres minutos. Es la slide donde la clase deja de ser «de
+    computación». No la apures y no la cierres vos: cerrala con «bueno, la máquina
+    ya decidió que sí; veamos qué le sale». 4 minutos.
+  </aside>
+</section>
+
+<!-- ===== 16 · CÓMO SE APRENDE ======================================== -->
+<section>
+  <h2>Cómo se aprende el mapa</h2>
+  <ol>
+    <li><strong>Contar</strong> con qué palabras aparece cada palabra (a menos de
+        5 de distancia). Eso es una tabla gigante: la <em>coocurrencia</em>.</li>
+    <li><strong>Descontar la frecuencia</strong>: «de» está cerca de todo, y eso no
+        dice nada. Se pregunta si dos palabras aparecen juntas <em>más de lo
+        esperado por azar</em>. Es un residuo de tabla de contingencia.</li>
+    <li><strong>Comprimir</strong> esas 2.000 columnas en 100. Si hiciste un
+        análisis de correspondencias, ya hiciste este paso.</li>
+  </ol>
+  <div class="intuicion compacta">Y esa compresión se puede hacer con el
+    <strong>mismo descenso por gradiente de la clase 3</strong>. Otra vez. Siempre
+    es lo mismo: cambia qué dibuja el modelo, no cómo aprende.</div>
+  <aside class="notes">
+    La analogía del análisis de correspondencias baja la ansiedad muchísimo: «esto
+    que parece de Silicon Valley lo hace la sociología francesa desde los setenta».
+    Si en el aula hay gente de sociología, mirala al decirlo. 3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 17 · PRÁCTICO 1 ============================================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code>, secciones <strong>1 a 4</strong>. Veinte minutos.
+  </div>
+  <ol>
+    <li>Cargar los 35 discursos y <strong>leer un pedazo</strong> antes de tocar nada.</li>
+    <li>Tokenizar a mano con una línea de regex. ¿Cuántas fichas? ¿Cuántas distintas?</li>
+    <li>El vocabulario, la ley de Zipf, y <strong><code>TODO 1</code></strong>:
+        ¿qué porcentaje del vocabulario aparece <em>una sola vez</em>? Apostá antes.</li>
+    <li>La matriz de coocurrencia, y mirar con quién anda una palabra que te importe
+        (<strong><code>TODO 2</code></strong>).</li>
+  </ol>
+  <aside class="notes">
+    20 minutos reales. Pasá por las mesas. El TODO 1 es el que engancha: casi todo
+    el mundo adivina 10 % o 15 % y da <b>45,6 %</b>. Que lo digan en voz alta cuando
+    les sale.
+  </aside>
+</section>
+
+<!-- ===== PAUSA ======================================================== -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+</section>
+
+<!-- ===== 18 · VOLVIMOS =============================================== -->
+<section>
+  <span class="marca">discusión</span>
+  <h2>Volvimos: ¿qué encontraron?</h2>
+  <p class="bajada">Antes de mirar ningún modelo, ustedes ya contaron. ¿Qué salió?</p>
+  <div class="comparacion">
+    <div><h4>Lo que sale del puro conteo</h4>
+      <p><code>seguridad</code> anda con <em>social, consejo, fuerzas, justicia,
+         jurídica</em>.<br>
+         <code>mujeres</code> anda con <em>hombres, niños, embarazadas</em>.</p></div>
+    <div><h4>Y eso ya es un resultado</h4>
+      <p>Sin ningún modelo. Es la hipótesis distribucional funcionando a ojo desnudo.
+         Lo que sigue <strong>no es magia: es esto, comprimido</strong>.</p></div>
+  </div>
+  <aside class="notes">
+    Pedí dos o tres listas que hayan sacado ellos con sus palabras del TODO 2.
+    Escribilas en el pizarrón. Que la clase vea que el hallazgo salió de ellos y no
+    de la pantalla. 3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 19 · VIZ EL MAPA ============================================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>El mapa donde viven las palabras</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/espacio-de-embeddings.html" title="el espacio de embeddings" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> buscá <code>pobreza</code>. Sus vecinas son
+    <em>indigencia, desocupación, inflación, hambre</em>. Nadie escribió esa lista:
+    salió sola de con quién aparece la palabra en 35 discursos.</p>
+  <aside class="notes">
+    Manejala vos. Buscá «reforma» primero (sale ley, tributaria, penal, código) y
+    preguntá: «¿les llama la atención alguno?». Después «pobreza». Después dejá que
+    alguien del aula te tire una palabra y buscala en vivo. Ese momento —una palabra
+    que no preparaste— es el que convence. 6 minutos.
+  </aside>
+</section>
+
+<!-- ===== 20 · LOS VECINOS CUENTAN UNA HISTORIA ====================== -->
+<section>
+  <h2>Los vecinos cuentan una historia</h2>
+  <table class="vecinos">
+    <tr><th>palabra</th><th>sus vecinas más cercanas, en este corpus</th></tr>
+    <tr><td>pobreza</td><td>indigencia 0,72 · desocupación 0,69 · inflación 0,63 · hambre 0,62 · desempleo 0,60 · exclusión 0,57</td></tr>
+    <tr><td>provincias</td><td>formosa 0,69 · chaco 0,67 · salta 0,67 · misiones 0,66 · catamarca 0,66</td></tr>
+    <tr><td>docentes</td><td>investigadores 0,62 · mínimo 0,61 · salario 0,60 · piso 0,59 · trabajadores 0,57</td></tr>
+    <tr><td>mujeres</td><td>hombres 0,79 · jóvenes 0,68 · niños 0,65 · edad 0,61 · embarazadas 0,60</td></tr>
+  </table>
+  <div class="ss compacta">Leelas como cientista social. <code>pobreza</code> vive
+    en un vocabulario <em>económico</em>, no asistencial. <code>docentes</code> vive
+    pegada a <em>salario</em> y <em>piso</em>: en estos discursos, a los docentes se
+    los nombra cuando se habla de paritarias. <strong>Eso es un hallazgo</strong>,
+    y no lo produjo una teoría: lo produjo un conteo.</div>
+  <aside class="notes">
+    Detenete en «docentes». Preguntá: «¿qué les dice que docentes esté al lado de
+    salario y de piso, y no al lado de aula o de pedagogía?». Sale solo.
+    3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 21 · ARITMÉTICA ============================================ -->
+<section>
+  <h2>La cuenta famosa (y su letra chica)</h2>
+  <p class="frase-grande">rey − hombre + mujer ≈ reina</p>
+  <p>Se puede hacer porque son vectores. Y se exageró <strong>muchísimo</strong> en
+     la divulgación. En nuestro corpus, de <strong>diez</strong> analogías con una
+     expectativa escrita <em>de antemano</em>, aciertan <span class="cifra">dos</span>.</p>
+  <table class="vecinos">
+    <tr><td>córdoba − provincia + salta</td><td>= formosa, mendoza, catamarca… <em>otras provincias</em>, no «provincias». El barrio correcto, la casa no.</td></tr>
+    <tr><td>escuelas − escuela + hospitales</td><td>= municipios, viviendas, centros. Plural→singular: no está.</td></tr>
+    <tr><td>mujeres − hombres + niños</td><td>= embarazadas, menores, hijo. «niñas» ni siquiera está en el corpus.</td></tr>
+  </table>
+  <div class="ojo compacta">Con 347.714 palabras de corpus, la aritmética casi no
+    funciona. Es una propiedad que aparece con <em>muchísimo</em> más texto. Decilo
+    antes de que lo descubran solos y se frustren.</div>
+  <aside class="notes">
+    Que «niñas» no exista en 35 discursos presidenciales es, por sí solo, un dato.
+    Dejá que caiga. 3 minutos. Si vas apretado, esta slide se recorta a la mitad.
+  </aside>
+</section>
+
+<!-- ===== 22 · LA APUESTA (antes de la viz de sesgo) ================= -->
+<section class="pregunta">
+  <h2>Si armamos un eje entre «hombres» y «mujeres» y proyectamos
+      <code>niños</code>, <code>poder</code>, <code>familia</code> y
+      <code>derechos</code>… ¿dónde cae cada uno?</h2>
+  <div class="opciones">
+    <div><b>A</b> más o menos en el medio: son palabras neutras</div>
+    <div><b>B</b> se ordenan, y se ordenan como te imaginás</div>
+    <div><b>C</b> se ordenan al azar: el corpus es oficial y cuidado</div>
+  </div>
+  <aside class="notes">
+    <b>Votación a mano alzada, en serio.</b> Contá los votos en voz alta. Sin esta
+    apuesta, la viz que sigue es un dibujito lindo. Casi siempre gana B, pero
+    siempre hay gente en A y en C, y esa gente es la que aprende. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 23 · VIZ SESGO / EJE ======================================= -->
+<section>
+  <span class="marca">viz · modo eje</span>
+  <h3>La misma propiedad, mirada del otro lado</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/espacio-de-embeddings.html#eje" title="el eje de sesgo" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> <code>niños +0,32</code> ·
+    <code>familia +0,17</code> · <code>hogar +0,08</code> …
+    <code>poder −0,05</code> · <code>fuerza −0,08</code> · <code>derechos −0,12</code>.
+    Cambiá a la lista <em>ocupaciones</em>.</p>
+  <aside class="notes">
+    <b>La escena central de la clase.</b> Poné el modo eje, elegí la lista
+    «conceptos», y quedate callado mientras se dibuja. Silencio de cinco segundos.
+    Después, una sola frase: «esto no es un error del modelo. El modelo aprendió
+    cómo se habla en el corpus. El sesgo estaba en el corpus, o sea, en nosotros».
+    Después cambiá a «ocupaciones». No agregues nada más hasta que alguien hable.
+    6 minutos, y si se estira, dejala estirarse.
+  </aside>
+</section>
+
+<!-- ===== 24 · PROBLEMA O INSTRUMENTO =============================== -->
+<section>
+  <h2>¿Problema… o instrumento?</h2>
+  <div class="comparacion">
+    <div><h4>Si lo usás para DECIDIR</h4>
+      <p>Rankear currículums, asignar un beneficio, moderar contenido.
+         El sesgo es <strong>daño</strong>: se lo reproduce y se lo amplifica,
+         y encima con cara de objetividad.</p></div>
+    <div><h4>Si lo usás para MEDIR</h4>
+      <p>Estudiar cómo habló un Estado durante 35 años. El sesgo
+         <strong>es tu variable dependiente</strong>. Un embedding «sin sesgo»
+         sería un instrumento roto: no reflejaría el corpus.</p></div>
+  </div>
+  <div class="ss">Garg, Schiebinger, Jurafsky &amp; Zou (<em>PNAS</em>, 2018) midieron
+    <strong>cien años</strong> de estereotipos de género y etnia entrenando un
+    embedding por década. Kozlowski, Taddy &amp; Evans (<em>American Sociological
+    Review</em>, 2019) midieron la estructura de clase con ejes como el que acaban
+    de mover. <strong>Es arqueología del discurso con herramienta nueva.</strong></div>
+  <aside class="notes">
+    Alguien va a pedir «el modelo sin sesgo». Desarmalo así: un embedding sin sesgo
+    es un embedding que no refleja el corpus, o sea, un mal termómetro. La corrección
+    tiene sentido en aplicaciones de decisión, y aun ahí es difícil y parcial.
+    3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 24bis · LAS TRES LÍNEAS =================================== -->
+<section>
+  <span class="marca">el código</span>
+  <h3>Todo lo de hoy, en tres líneas</h3>
+  <pre><code class="language-python" data-trim>
+corpus = datos.corpus_mini_gpt()            # 35 discursos, 2,2 MB de texto real
+V, palabras = datos.embeddings_ppmi_svd(corpus, dim=100, top=2000,
+                                        ventana=5, minimo=8)   # unos 4 segundos en CPU
+
+datos.vecinos("pobreza", V, palabras, k=6)
+# [('indigencia', 0.72), ('desocupación', 0.69), ('inflación', 0.63),
+#  ('hambre', 0.62), ('desempleo', 0.60), ('lucha', 0.57)]
+</code></pre>
+  <div class="intuicion compacta">Es el mismo código que corriste en el notebook, y
+    corre <strong>en tu máquina, sin GPU y sin internet</strong>. Cambiale
+    <code>corpus</code> por tu corpus y ya está.</div>
+  <aside class="notes">
+    Mostrá que son literalmente tres líneas. Alguien va a preguntar «¿y para mi
+    corpus?»: la respuesta es que `corpus` es un string, nada más. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 25 · EL LUNES ============================================= -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué podés hacer el lunes con esto</h2>
+  <ol>
+    <li><strong>Los vecinos de tus cinco palabras clave.</strong> Corpus propio, tres
+        líneas, diez minutos. Vas a aprender algo de tu corpus que no sabías.</li>
+    <li><strong>Un eje.</strong> Elegí dos palabras que definan una tensión de tu campo
+        y proyectá una lista de términos. Eso ya es una medición reportable.</li>
+    <li><strong>Cambio semántico.</strong> Entrená dos embeddings, uno por período, y
+        compará las vecinas de una palabra. En este corpus, las vecinas de
+        <code>seguridad</code> pasan de <em>social · justicia · salud</em> (1984-1999)
+        a <em>policía · fuerzas · defensa</em> (2004-2019). <strong>De ocho vecinas,
+        siguen dos.</strong></li>
+  </ol>
+  <div class="ojo compacta">Si tu corpus tiene 200 documentos cortos,
+    <strong>no</strong> entrenes embeddings propios: te va a salir ruido. Ahí van
+    modelos pre-entrenados, y eso es la clase 9.</div>
+  <aside class="notes">
+    El punto 3 es el que se llevan puesto. Mostralo en la viz, modo «dos épocas»,
+    palabra «seguridad», si te queda tiempo. Es la tesis de alguien del aula.
+    3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 26 · ADVERTENCIA DE VALIDEZ ============================== -->
+<section>
+  <h2>La advertencia que te salva de un revisor</h2>
+  <div class="ojo">
+    <strong>Cerca en el mapa NO quiere decir que signifiquen lo mismo.</strong>
+    Quiere decir que <em>se usan parecido</em>. Y los antónimos se usan
+    parecidísimo: aparecen en las mismas oraciones.
+  </div>
+  <table class="vecinos">
+    <tr><td>importaciones / exportaciones</td><td class="cifra">0,78</td></tr>
+    <tr><td>público / privado</td><td class="cifra">0,67</td></tr>
+    <tr><td>aumento / reducción</td><td class="cifra">0,54</td></tr>
+    <tr><td>gobierno / oposición</td><td class="cifra">0,48</td></tr>
+  </table>
+  <p style="font-size:.8em">Si usás la similitud coseno entre documentos como medida
+    de <em>acuerdo político</em>, dos discursos que dicen lo contrario sobre el mismo
+    tema te van a dar altísimo. <strong>Es el error de interpretación número uno con
+    embeddings, y está en papers publicados.</strong></p>
+  <aside class="notes">
+    Preguntá por qué quedan cerca antes de explicarlo. La respuesta correcta —
+    «porque aparecen en las mismas oraciones» — la dice alguien del aula casi siempre.
+    3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 27 · PRÁCTICO 2 ========================================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 — de a dos</h2>
+  <div class="manos">
+    Notebook, secciones <strong>5 a 10</strong>. Diecisiete minutos. De a dos, y
+    turnándose el teclado.
+  </div>
+  <ol>
+    <li>Ver que el <strong>loop de cinco líneas de la clase 4</strong>, sin cambiarle
+        nada, encuentra casi el mismo mapa que el atajo exacto (5,2 vecinas de 6).</li>
+    <li><strong><code>TODO 3</code></strong>: los vecinos de tres palabras tuyas.
+        Anotá <em>cuál te sorprendió</em>.</li>
+    <li><strong><code>TODO 4</code></strong>: el parecido entre los 35 discursos.
+        Ojo con el primer número que les va a dar.</li>
+    <li><strong><code>TODO 5</code> y <code>TODO 6</code></strong>: las dos preguntas
+        de criterio. Se responden escribiendo, no corriendo celdas.</li>
+  </ol>
+  <aside class="notes">
+    17 minutos. Si te atrasaste, esta es la única casilla que se puede achicar a 12,
+    y el resto del notebook se termina en casa. Pasá por las mesas: el momento en
+    que el heatmap crudo les sale todo amarillo es cuando levantan la mano.
+  </aside>
+</section>
+
+<!-- ===== 28 · Y AHORA EL ORDEN ==================================== -->
+<section>
+  <h2>Y ahora sí: el orden</h2>
+  <p class="bajada">Tenemos un vector por palabra. Nos falta la mitad del problema.</p>
+  <div class="intuicion">
+    ¿Cómo se arma el vector de <strong>una frase entera</strong> a partir de los
+    vectores de sus palabras?
+  </div>
+  <p>Suena a detalle técnico. Es la pregunta que abre las próximas tres clases.</p>
+  <aside class="notes">1 minuto. Es una bisagra, no una slide de contenido.</aside>
+</section>
+
+<!-- ===== 29 · PROMEDIAR =========================================== -->
+<section>
+  <h2>Opción 1: promediar</h2>
+  <p>Sumás los vectores de todas las palabras y dividís. Es lo primero que se te
+     ocurre, es una línea de código, y <strong>anda mejor que contar palabras</strong>.</p>
+  <div class="ojo">Pero el promedio de un conjunto <strong>no depende del orden</strong>.
+    «El gobierno criticó al congreso» y «el congreso criticó al gobierno» dan el
+    <em>mismo vector</em>. No parecido: <span class="cifra">1,000</span>, exacto.
+    Volvimos al problema del principio de la clase, con más decimales.</div>
+  <aside class="notes">
+    «Con más decimales» es el chiste y funciona. Después ponete serio: mejoramos la
+    representación de la palabra y no tocamos el problema de la secuencia. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 30 · VIZ BOLSA VS ORDEN ================================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Dos frases, un solo vector</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/bolsa-vs-orden.html" title="bolsa de palabras contra orden" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el par <em>«la negación»</em>. Difieren en una
+    palabra de ocho, dicen lo contrario, y el parecido da
+    <span class="cifra">0,984</span>. Lo que se pierde no es estilo: es
+    <strong>agencia, responsabilidad y negación</strong>, que es exactamente lo que
+    codificás a mano.</p>
+  <aside class="notes">
+    Recorré los cinco pares en orden. Frená en la negación. Preguntá: «¿cuántos de
+    ustedes tienen una variable en su investigación que depende de una negación?».
+    Se levantan manos. 4 minutos.
+  </aside>
+</section>
+
+<!-- ===== 31 · LEER EN ORDEN ====================================== -->
+<section>
+  <h2>Opción 2: leer en orden, con una mochila</h2>
+  <div class="intuicion">
+    Una persona lee palabra por palabra y va arrastrando <strong>una mochila</strong>
+    con todo lo que entendió hasta ahí. Cada palabra nueva actualiza la mochila.
+    Al final, la mochila <em>es</em> el resumen de la frase.
+  </div>
+  <p>Eso es una <span class="glosario"><span class="en">RNN</span><span class="es">red recurrente</span></span>:
+     lee en orden y arrastra un estado. Fue el estado del arte en texto
+     hasta 2017, y <strong>por fin distingue quién le hizo qué a quién</strong>,
+     porque el orden le llega.</p>
+  <aside class="notes">
+    Caminá por el aula haciendo el gesto de cargar una mochila que se llena. Es tonto
+    y se acuerdan. Dejá la sensación de solución antes de romperla. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 32 · VIZ MEMORIA ======================================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>…y la mochila se va vaciando</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/memoria-que-se-olvida.html" title="la memoria que se olvida" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> para decidir si va «lo» o «la» hace falta la
+    palabra <b>2</b>, y en la palabra <b>32</b> de esa palabra 2 no queda casi nada.
+    Agrandá la mochila al máximo: el olvido se hace más lento y <em>igual llega abajo</em>.</p>
+  <aside class="notes">
+    Apretá «Leer» con la mochila en el mínimo y no hables mientras corre. Cuando el
+    cursor llega a «lo», mostrá las dos barras 50/50 y decí: «el modelo está tirando
+    una moneda». Después subí la mochila y volvé a leer. La frase que cierra:
+    «agrandar la memoria posterga el problema, no lo resuelve». 4 minutos.
+  </aside>
+</section>
+
+<!-- ===== 33 · LAS RNN EN 30 SEGUNDOS ============================= -->
+<section>
+  <h2>Las RNN en treinta segundos</h2>
+  <p>Hubo veinte años de ingeniería para que la mochila olvidara mejor:
+     <strong>LSTM</strong> y <strong>GRU</strong> le agregan compuertas que deciden
+     qué guardar y qué tirar. Funcionan, y fueron el estado del arte hasta 2017.</p>
+  <div class="ojo compacta">Dos límites que las compuertas no arreglan:
+    el olvido se posterga pero no desaparece, y sobre todo
+    <strong>hay que leer en orden</strong>, una palabra por vez. No se puede
+    paralelizar, así que no se puede entrenar con muchísimo texto.</div>
+  <p style="font-size:.8em">No las vamos a implementar. Están acá sólo para que se
+     entienda <em>qué problema</em> vino a resolver lo de la clase que viene.</p>
+  <aside class="notes">
+    <b>Esta es la slide que se recorta si vas atrasado.</b> Se dice en dos oraciones
+    de pie y se pasa. Lo que NUNCA se recorta es la slide siguiente. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 34 · LA PREGUNTA ======================================== -->
+<section class="pregunta">
+  <h2>¿Y si en vez de <em>recordar</em>,<br>miramos directamente?</h2>
+  <p style="font-size:.75em;color:var(--tinta-2);max-width:26em;margin:1em auto 0">
+    Cuando vos leés «lo» al final de un párrafo largo, no recordás todo el párrafo:
+    <strong>saltás</strong> al sustantivo. Sin releer. Sin esfuerzo.
+  </p>
+  <aside class="notes">
+    <b>Esto no se recorta nunca.</b> Es el puente de toda la segunda mitad del curso.
+    Leé la pregunta en voz alta, despacio, y dejá tres segundos de silencio.
+    Después la frase del salto. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 35 · QUÉ TE LLEVÁS ===================================== -->
+<section>
+  <h2>Qué te llevás de hoy</h2>
+  <ol>
+    <li><strong>Una palabra es un lugar en un mapa, y ese lugar sale de con quién
+        aparece.</strong> Contar, descontar la frecuencia, comprimir. Nada más.</li>
+    <li><strong>La geometría de ese mapa es un instrumento de medición.</strong>
+        Dos palabras definen un eje y el vocabulario se ordena solo. Eso es un paper
+        de la <em>ASR</em>, y lo hiciste hoy.</li>
+    <li><strong>Cerca es «se usan parecido», no «significan lo mismo».</strong> Los
+        antónimos están cerquísima, y promediar tira el orden entero.</li>
+  </ol>
+  <aside class="notes">
+    Tres, no cuatro. Si te sobra tiempo no agregues una cuarta: repetí la segunda.
+    2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 36 · HERRAMIENTAS ====================================== -->
+<section>
+  <h2>Herramientas que ya podés usar</h2>
+  <div class="tarjetas">
+    <div><h4>spaCy</h4>Procesamiento en castellano: tokenizar bien, lematizar,
+      entidades. Lo que hoy hicimos con una regex, hecho en serio.</div>
+    <div><h4>gensim</h4>La biblioteca clásica para entrenar word2vec y usar
+      embeddings. Si tu corpus es grande, es lo que vas a usar.</div>
+    <div><h4>ssdl (este curso)</h4><code>datos.embeddings_ppmi_svd()</code> y
+      <code>datos.vecinos()</code>: sin dependencias, sin red, cuatro segundos.
+      Suficiente para explorar.</div>
+  </div>
+  <div class="ss compacta">No reinventes la rueda el lunes. Lo de hoy es para
+    <strong>entender qué hace la rueda</strong> cuando te dé un número raro.</div>
+  <aside class="notes">
+    1 minuto. No te metas a comparar bibliotecas: no es esta clase.
+  </aside>
+</section>
+
+<!-- ===== 37 · GLOSARIO ========================================== -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista">
+    <li><b>token</b><span>ficha — un pedacito de texto; casi siempre una palabra, a veces un pedazo</span></li>
+    <li><b>tokenization</b><span>tokenización — partir el texto en esos pedacitos</span></li>
+    <li><b>vocabulary</b><span>vocabulario — la lista de todas las fichas que el modelo conoce</span></li>
+    <li><b>OOV</b><span>fuera de vocabulario — una palabra que no está en la lista, y desaparece sin avisar</span></li>
+    <li><b>one-hot</b><span>un casillero por palabra: todo ceros y un 1</span></li>
+    <li><b>embedding</b><span>los pocos números que ubican a una palabra en el mapa</span></li>
+    <li><b>cosine similarity</b><span>similitud coseno — qué tan parecido apuntan dos vectores, de −1 a 1</span></li>
+    <li><b>bag-of-words</b><span>bolsa de palabras — representar un texto por sus conteos, tirando el orden</span></li>
+    <li><b>distributional hypothesis</b><span>hipótesis distribucional — «conocerás una palabra por la compañía que mantiene»</span></li>
+    <li><b>RNN / LSTM</b><span>red recurrente — lee en orden arrastrando una mochila de memoria</span></li>
+  </ul>
+  <aside class="notes">
+    No la leas entera: está para que la fotografíen. Señalá dos: OOV y similitud
+    coseno, que son las que van a usar mañana. 1 minuto.
+  </aside>
+</section>
+
+<!-- ===== 38 · PUENTE =========================================== -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 7: attention</h1>
+  <div class="franja"></div>
+  <p class="gancho">Cada palabra le pregunta a todas las demás qué tan relevantes
+    son para ella, y se arma su propio resumen. En paralelo, sin mochila y sin
+    olvidarse de nada.</p>
+  <aside class="notes">
+    Cerrá prometiendo algo cobrable: «la clase que viene vamos a construir la pieza,
+    y en la 8 la entrenamos y la vemos escribir». 1 minuto.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script>
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+</script>
+</body>
+</html>

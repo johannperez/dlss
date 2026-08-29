@@ -100,6 +100,9 @@ te acordás de la analogía, te acordás del concepto.
 | **invariancia traslacional** | invariancia a la traslación | Un gato sigue siendo un gato aunque esté corrido tres píxeles. |
 | **sesgo inductivo** (*inductive bias*) | sesgo inductivo | Los supuestos que la arquitectura trae de fábrica sobre cómo es el mundo. **Es una teoría, y puede ser falsa.** |
 | **jerarquía de representaciones** | jerarquía | Bordes → texturas → partes → objetos. Cada capa arma sobre la anterior. |
+| **aplanar** (*flatten*) | aplanar | Estirar la grilla de 28×28 en una fila de 784 números. Es lo que hacía la red de la clase 4, y es donde se pierde la vecindad. |
+| **compartir parámetros** (*parameter sharing*) | compartir parámetros | Los **mismos** nueve números recorren toda la imagen. Es de dónde sale que una capa convolucional tenga 170 veces menos perillas que una densa. |
+| **campo receptivo** (*receptive field*) | campo receptivo | Qué pedazo de la foto original influye sobre una unidad. Crece al apilar capas, no al agrandar el filtro. |
 
 ## Clase 6 — La forma de los datos manda: texto, secuencias y embeddings
 
@@ -118,6 +121,12 @@ te acordás de la analogía, te acordás del concepto.
 | **RNN** (*recurrent neural network*) | red recurrente | Leer palabra por palabra arrastrando una mochila de memoria. |
 | **LSTM** | LSTM | Una RNN con una mochila más grande y con candados. Mejora la memoria; no la arregla. |
 | **secuencia** | secuencia | Datos donde el orden es información, no un detalle de presentación. |
+| **BPE** (*byte pair encoding*) | fusión de pares frecuentes | El algoritmo que arma las sub-palabras: arranca por letras y va pegando el par que más aparece. El de GPT es éste, en grande. |
+| **coocurrencia** | coocurrencia | Cuántas veces dos palabras aparecen cerca. Es la materia prima de todo embedding. |
+| **PPMI** (*positive pointwise mutual information*) | información mutua positiva | ¿Estas dos palabras aparecen juntas más de lo esperable por azar? Descuenta que «de» esté cerca de todo. Es el residuo de una tabla de contingencia. |
+| **ley de Zipf** | ley de Zipf | Un puñado de palabras se lleva casi todo el texto y la mayoría del vocabulario aparece poquísimo. Pasa en todos los idiomas y nadie lo diseñó. |
+| **hapax legomenon** | dicho una sola vez | Una palabra que aparece exactamente una vez en el corpus. En los discursos de apertura son el **45,6 %** del vocabulario. |
+| **cambio semántico** | cambio semántico | Que las vecinas de una palabra sean otras en dos períodos distintos. Se mide entrenando un embedding por época. |
 
 ## Clase 7 — Attention: cada palabra arma su propio resumen del contexto
 
@@ -144,6 +153,8 @@ te acordás de la analogía, te acordás del concepto.
 |---|---|---|
 | **LLM** (*large language model*) | modelo de lenguaje grande | Una máquina de dibujar la distribución de la próxima ficha. Todo lo demás sale de ahí. |
 | **modelo autorregresivo** | autorregresivo | Predice la ficha siguiente, la agrega, y vuelve a empezar con eso adentro. |
+| **bigrama** | bigrama | El modelo de lenguaje más tonto: mirar sólo la ficha anterior y contar qué vino después. La línea de base de la clase. |
+| **muestreo** (*sampling*) | sorteo | Elegir la próxima ficha sorteando sobre la distribución, en vez de tomar siempre la más probable. Es de acá que sale la irreproducibilidad. |
 | **cross-entropy** | entropía cruzada | La loss de los modelos que predicen una categoría: castiga estar seguro y equivocado. |
 | **logits** | logits | Los puntajes crudos, antes de convertirlos en probabilidades con softmax. |
 | **temperatura** | temperatura | La perilla del riesgo. Baja: elige siempre lo más probable y repite. Alta: arriesga y desbarranca. **No lo hace más inteligente.** |
@@ -189,6 +200,14 @@ te acordás de la analogía, te acordás del concepto.
 | **semilla** (*seed*) | semilla | El número que hace repetible el azar. En este curso siempre es **1983**. |
 | **ficha de modelo** (*model card*) | ficha de modelo | El documento que dice con qué datos se entrenó, para qué sirve y para qué no. |
 | **MNAR** (*missing not at random*) | faltante no aleatorio | Los agujeros de tus datos tienen una causa, y esa causa suele ser sustantiva. En el corpus de discursos, los años que faltan son los golpes de Estado. |
+| **shortcut learning** | atajo | El modelo aprendió algo que separa las clases pero **no es el concepto**: un nombre propio, el medio, el día de la semana. Sube el F1 igual, y no sobrevive fuera del corpus. |
+| **ablación** (*ablation*) | ablación | Sacarle algo al modelo o al corpus, reentrenar, y mirar cuánto cae el número. Ojo: en la clase 10 se mide que **casi no cae**, porque los atajos son redundantes. |
+| **test de placebo** | test de placebo | Aplicar el modelo a un corpus donde el fenómeno **no debería** aparecer. Si aparece igual, tenés un problema. |
+| **control positivo** | control positivo | Su hermano: aplicarlo donde el fenómeno **tiene que** aparecer. Si ahí no lo encuentra, tampoco lo encontraba antes. |
+| **par mínimo** (*minimal pair*) | par mínimo | Dos textos idénticos salvo por **una** cosa, escritos a mano. Es un experimento, no una observación. |
+| **banda de ruido** | banda de ruido | Cuánto se mueve tu métrica sólo por cambiar la semilla de la partición. Un test que se mueve menos que eso no es un test. |
+| **out-of-distribution** (OOD) | fuera de dominio | Datos que no se parecen a los del entrenamiento. Es donde todo modelo se rompe y donde casi nadie lo mide. |
+| **ficha de dataset** (*datasheet*) | ficha de datos | Lo mismo que la ficha de modelo, pero para el corpus: cómo se recolectó, quién etiquetó, con qué instrucciones, qué se excluyó. |
 
 ---
 

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qué supone cada arquitectura (con las cuatro filas abiertas) — Clase 7</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "elegí «una tabla de encuesta» y se puso todo rojo o amarillo,
+     incluida la arquitectura más nueva. Elegir arquitectura no es elegir la más
+     moderna: es afirmar algo sobre la forma de MIS datos, y esa afirmación
+     puede ser falsa."
+
+     ESTA ES LA COPIA DE LA CLASE 7. Es el MISMO archivo de la clase 5 con
+     DESBLOQUEADAS = true: las filas de RNN y Transformer, que allá estaban
+     grises con el cartel "lo vemos en las clases 6 y 7", acá están abiertas.
+     Se deja como copia (y no como enlace a la de la clase 5) para que cada
+     clase abra con lo que su audiencia ya vio y nada más.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* curso.css no declara `box-sizing: border-box` global, así que el padding de
+     .viz-frame y .panel se suma POR FUERA del ancho de su columna y el dibujo
+     termina tapándole el borde izquierdo al panel (se ve sobre todo embebido en
+     una slide, que es más angosto). Arreglo local, sin tocar el CSS compartido. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
+  .tabla-sup { width:100%; border-collapse:separate; border-spacing:0 8px; }
+  .tabla-sup th {
+    text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--tinta-3); font-weight:700; padding:0 10px .2rem;
+  }
+  .fila { background:var(--papel-2); }
+  .fila td {
+    padding:10px 12px; vertical-align:top; font-size:.86rem; line-height:1.42;
+    border-top:1px solid var(--borde); border-bottom:1px solid var(--borde);
+    background:var(--papel-2); cursor:pointer;
+  }
+  .fila td:first-child { border-left:1px solid var(--borde);
+    border-radius:var(--r-medio) 0 0 var(--r-medio); width:190px; }
+  .fila td:last-child  { border-right:1px solid var(--borde);
+    border-radius:0 var(--r-medio) var(--r-medio) 0; }
+  .fila.gris td { opacity:.5; cursor:default; }
+  .fila td.abierta { background:var(--papel-3); }
+  .nombre-arq { font-weight:700; color:var(--tinta); display:block; margin-bottom:.3rem; }
+  .icono { display:block; margin:.2rem 0 .4rem; }
+  .badge {
+    display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.03em;
+    padding:.15em .55em; border-radius:999px; color:#fff; margin-bottom:.35rem;
+  }
+  .justif { font-size:.78rem; color:var(--tinta-2); }
+  .detalle {
+    grid-column:1/-1; margin:.5rem 0 0; padding:.7rem .85rem; font-size:.83rem;
+    border-radius:var(--r-medio); background:var(--papel);
+    border:1px dashed var(--borde-fuerte); color:var(--tinta-2);
+  }
+  .detalle b { color:var(--tinta); }
+  .candado { font-size:.72rem; color:var(--tinta-3); font-style:italic; }
+  #cartel:not(:empty) { margin-bottom:12px; }
+  /* Embebida en la slide hay 610 px y nada más: se achica todo y se saca lo
+     que la slide ya dice. En la página suelta se ve entero. */
+  body.embebido .viz-pagina { padding:.45rem; gap:.7rem; }
+  body.embebido .icono { display:none; }
+  body.embebido .fila td { padding:6px 9px; font-size:.735rem; line-height:1.3; }
+  body.embebido .fila td:first-child { width:158px; }
+  body.embebido .justif { font-size:.68rem; }
+  body.embebido .tabla-sup th { font-size:.63rem; }
+  body.embebido .tabla-sup { border-spacing:0 5px; }
+  body.embebido #ayuda-caja { display:none; }
+  body.embebido .ojo, body.embebido .ss { font-size:.76rem; padding:.5rem .7rem; }
+  @media (max-width:900px){
+    .tabla-sup, .tabla-sup tbody, .tabla-sup tr, .tabla-sup td { display:block; width:auto; }
+    .tabla-sup thead { display:none; }
+    .fila td:first-child { width:auto; }
+  }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La arquitectura es una teoría sobre el mundo</h1>
+    <p>Cada arquitectura mete adentro un supuesto sobre cómo están estructurados tus
+       datos. Elegí arriba qué datos tenés y mirá cuáles de esos supuestos son
+       razonables y cuáles son directamente falsos. Hacé clic en cualquier celda
+       para ver el ejemplo concreto.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:14px">
+      <div id="cartel"></div>
+      <table class="tabla-sup">
+        <thead>
+          <tr>
+            <th>arquitectura</th>
+            <th>qué supone sobre el mundo</th>
+            <th>cuándo ese supuesto es cierto</th>
+            <th>cuándo te miente</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Elegí <b>una tabla de encuesta</b>, que es el dato con el
+      que trabajás todos los días. No se pone verde <em>ninguna</em> fila: ni siquiera la
+      arquitectura más nueva. Aparece el cartel incómodo: para datos tabulares, un modelo
+      de árboles suele ganarle a una red neuronal. Elegir arquitectura no es elegir la más
+      moderna — es afirmar algo sobre la forma de tus datos, y esa afirmación puede ser falsa.
+    </div>
+    <p class="viz-pie">
+      El cartel de datos tabulares se apoya en Grinsztajn, Oyallon &amp; Varoquaux (2022),
+      <i>Why do tree-based models still outperform deep learning on tabular data?</i>
+      <span class="chip">[VERIFICAR URL]</span> — la cita está en <code>referencias.md</code>.
+      Es la misma tabla de la clase 5, con las dos filas que allá estaban grises
+      ya abiertas: <b>RNN</b> (clase 6) y <b>Transformer</b> (hoy). Prometido en la
+      clase 5, cumplido.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* --------------------------------------------------------------------------
+   CLASE 7: las dos filas que en la clase 5 estaban grises, abiertas.
+   -------------------------------------------------------------------------- */
+const DESBLOQUEADAS = true;
+
+/* --------------------------------------------------------------------------
+   1. Las cuatro arquitecturas
+   -------------------------------------------------------------------------- */
+const ARQ = [
+  {
+    id: 'densa', nombre: 'Red densa (MLP)', pie: 'la de la clase 4', gris: false,
+    supone: 'Nada sobre la forma del dato. Las variables de entrada son intercambiables: si las barajás todas siempre igual, para ella no cambió nada.',
+    cierto: 'Cuando tus variables no tienen ni orden ni vecindad. Las columnas de una tabla no tienen "columnas vecinas".',
+    miente: 'Cuando la estructura importaba y vos la tiraste al aplanar. Una foto convertida en 784 números sueltos perdió la grilla y nadie avisó.',
+    ejemplo: 'Es el modelo de la clase 4. Su honestidad es su límite: <b>no supone nada, así que tampoco te regala nada</b>. Todo lo que sabe sobre la forma del dato lo tiene que descubrir con ejemplos, y descubrirlo cuesta datos.'
+  },
+  {
+    id: 'cnn', nombre: 'CNN (convolucional)', pie: 'la de hoy', gris: false,
+    supone: 'Tres cosas: (1) lo que importa es <b>local</b> —los vecinos se relacionan—; (2) un patrón <b>vale igual en cualquier posición</b>; (3) lo grande está hecho de lo chico.',
+    cierto: 'En imágenes, espectrogramas, mapas: hay una grilla real y la vecindad significa algo. Un píxel se parece a su vecino porque son el mismo objeto.',
+    miente: 'Cuando no hay grilla (una tabla), cuando la posición <b>sí</b> cambia el significado (el norte y el sur de un país se ven distinto), o cuando el objeto aparece rotado y no sólo corrido.',
+    ejemplo: 'La invariancia traslacional es el mismo tipo de supuesto que la <b>equivalencia de medición</b> en una encuesta: decir "este patrón significa lo mismo en cualquier parte de la imagen" es decir "esta pregunta significa lo mismo en todas las provincias". A veces es cierto y a veces es una fuente conocida de sesgo.'
+  },
+  {
+    id: 'rnn', nombre: 'RNN (secuencial)', pie: 'clase 6', gris: false,
+    supone: 'Que los datos vienen en <b>orden</b> y que lo que importa se puede acumular leyendo de a uno y arrastrando una memoria.',
+    cierto: 'Series temporales y texto leído de corrido: lo de recién pesa más que lo de hace rato.',
+    miente: 'Cuando lo que importa está lejos: el sujeto de la línea 1 y el verbo de la línea 30. La memoria se diluye por el camino.',
+    ejemplo: 'Se vio entera en la <b>clase 6</b>, con la frase larga donde el modelo se olvida de quién era el sujeto. Es exactamente la falla que hoy vinimos a arreglar.'
+  },
+  {
+    id: 'transformer', nombre: 'Transformer (atención)', pie: 'la de hoy', gris: false,
+    supone: 'Que cualquier parte puede depender de cualquier otra, y que el modelo puede aprender <b>a quién mirar</b> en vez de que se lo digamos nosotros.',
+    cierto: 'Cuando las dependencias son largas e impredecibles: lenguaje, código, secuencias largas.',
+    miente: 'Casi no supone nada, y eso se paga en datos: necesita muchísimos ejemplos, o alguien que ya lo haya entrenado por vos.',
+    ejemplo: 'Es el de hoy: cada palabra mira directamente a cualquier otra, sin mochila y sin distancia. Lo caro es que <b>casi no supone nada</b>, y todo lo que no supone lo tiene que aprender con datos. Por eso en la clase 9 vamos a usar uno que ya entrenó otro.'
+  }
+];
+
+/* --------------------------------------------------------------------------
+   2. Los datos que puede tener alguien de esta sala, y el veredicto de cada
+      arquitectura sobre ellos. V = verde (razonable), A = amarillo (depende),
+      R = rojo (el supuesto es falso).
+   -------------------------------------------------------------------------- */
+const DATOS_POSIBLES = [
+  {
+    id: 'encuesta', nombre: 'una tabla de encuesta (60 columnas)',
+    v: {
+      densa: ['A', 'No supone nada falso, pero tampoco aporta nada: va a necesitar muchos casos para encontrar sola lo que un modelo más simple encuentra rápido.'],
+      cnn: ['R', 'Supone que la columna 12 es vecina de la 13. ¿Lo es? Si reordenás las columnas del CSV, el "vecindario" cambia entero: no había ninguno.'],
+      rnn: ['R', 'Supone que hay un orden. Los encuestados no vienen en secuencia; la fila 5 no es "antes" que la fila 6.'],
+      transformer: ['A', 'Puede aprender qué columna mira a cuál, pero para eso necesita una cantidad de casos que tu encuesta no tiene.']
+    },
+    cartel: ['error', 'La respuesta honesta para datos tabulares',
+      'Para tablas, un modelo de <b>árboles</b> (random forest, gradient boosting) suele ganarle a una red neuronal, con menos datos, en menos tiempo y siendo más fácil de explicar. Hay literatura reciente que lo mide. Deep learning no es "la versión moderna de la regresión": es una herramienta para datos con <b>forma</b>. Esta conversación se retoma entera en la clase 10.']
+  },
+  {
+    id: 'satelital', nombre: 'fotos satelitales de un territorio',
+    v: {
+      densa: ['R', 'Aplanar una imagen satelital es tirar la grilla justo cuando la grilla es todo lo que hay.'],
+      cnn: ['V', 'Hay grilla de verdad, la vecindad significa algo y los patrones (techos, calles, cultivos) se repiten. Es el caso para el que la CNN fue inventada.'],
+      rnn: ['R', 'No hay una secuencia: una foto no se lee de izquierda a derecha.'],
+      transformer: ['A', 'Existen versiones para imágenes y andan muy bien, pero piden muchísimos más datos que una CNN.']
+    },
+    cartel: ['val', 'Ojo con el supuesto que sí se rompe',
+      'La invariancia <b>traslacional</b> vale: un techo de chapa es un techo de chapa esté donde esté en la foto. La invariancia de <b>región</b> no vale: si entrenaste en el norte y aplicás en el sur, estás suponiendo que la pobreza <i>se ve</i> igual en los dos lados. Eso es una hipótesis sustantiva, y hay que probarla, no asumirla.']
+  },
+  {
+    id: 'serie', nombre: 'una serie mensual (desempleo, precios)',
+    v: {
+      densa: ['A', 'Anda si le armás vos las variables ("el mes pasado", "hace 12 meses"). El supuesto lo ponés vos a mano, no la arquitectura.'],
+      cnn: ['A', 'Una convolución 1D sobre el tiempo es razonable: "lo que pasa en meses cercanos se relaciona". Pero supone que el patrón vale igual en 1998 y en 2020, y eso en economía es discutible.'],
+      rnn: ['V', 'Hay orden real y la memoria de lo reciente es exactamente lo que importa. Es el caso de manual.'],
+      transformer: ['A', 'Puede mirar lejos, que está bueno, pero con 400 meses de datos no tiene con qué aprender.']
+    },
+    cartel: ['ok', 'Y antes de todo esto',
+      'Para una serie mensual sola, <b>ARIMA o un modelo de espacio de estados</b> siguen siendo excelentes y mucho más fáciles de defender ante un revisor. Deep learning empieza a convenir cuando tenés muchas series a la vez o cuando hay que combinar la serie con texto o imágenes.']
+  },
+  {
+    id: 'discursos', nombre: 'un corpus de discursos',
+    v: {
+      densa: ['A', 'Sobre una bolsa de palabras funciona, pero la bolsa ya tiró el orden: "la comisión rechazó al ministro" y "el ministro rechazó a la comisión" son el mismo vector.'],
+      cnn: ['A', 'Una CNN 1D detecta bien las frases hechas ("estado de derecho"), que son patrones locales. Lo lejano se le escapa.'],
+      rnn: ['A', 'Lee en orden, que es lo correcto, pero se olvida del principio de los párrafos largos.'],
+      transformer: ['V', 'Cada palabra puede mirar directamente a cualquier otra, sin importar la distancia. Es la arquitectura hecha para esto.']
+    },
+    cartel: ['ok', 'El camino del curso',
+      'Este es exactamente el recorrido de las clases 6, 7 y 8: primero convertimos el texto en números sin perder el orden, después le damos <b>atención</b>, y recién ahí aparece lo que hay abajo de un LLM.']
+  },
+  {
+    id: 'red', nombre: 'una red de contactos o de citas',
+    v: {
+      densa: ['R', 'La matriz de adyacencia aplanada pierde que los nodos se pueden renumerar sin que la red cambie.'],
+      cnn: ['R', 'No hay grilla: el "vecino" de un nodo en la matriz depende de en qué orden numeraste los nodos, que es arbitrario.'],
+      rnn: ['R', 'Una red no tiene un orden de lectura.'],
+      transformer: ['A', 'Se le parece bastante: la atención es "cada uno mira a los demás". De hecho, las redes neuronales <b>de grafos</b> (GNN) son primas de esto.']
+    },
+    cartel: ['val', 'Lo que falta en esta tabla',
+      'Para grafos hay una familia entera, las <b>GNN</b>, que suponen lo correcto: lo que importa son los vecinos <i>en el grafo</i>, no en una grilla. No las vemos en este curso, pero si trabajás con redes, ese es el nombre que tenés que googlear.']
+  },
+  {
+    id: 'archivo', nombre: 'un archivo fotográfico o de prensa gráfica',
+    v: {
+      densa: ['R', 'Mismo problema que siempre: aplanar tira la única estructura que había.'],
+      cnn: ['V', 'Es el caso ideal, y con transferencia (clase 9) alcanza con unos cientos de fotos etiquetadas.'],
+      rnn: ['R', 'Una foto no es una secuencia.'],
+      transformer: ['A', 'Los modelos de imagen que ya vienen entrenados suelen ser transformers, y en la clase 9 vamos a usar uno sin entrenarlo nosotros.']
+    },
+    cartel: ['ok', 'El caso más concreto para esta sala',
+      'Clasificar 40.000 fotos de archivo en tres categorías es imposible a mano y perfectamente factible con esto. Lo que necesitás antes de empezar: <b>etiquetas</b>, una <b>partición honesta</b> (que no mezcle las fotos del mismo álbum entre train y test) y un <b>baseline</b> contra el cual comparar.']
+  }
+];
+
+const COLOR_VEREDICTO = { V: 'ok', A: 'val', R: 'error' };
+const TEXTO_VEREDICTO = { V: 'supuesto razonable', A: 'depende', R: 'supuesto falso' };
+
+/* --------------------------------------------------------------------------
+   3. Los iconitos: un dibujo por arquitectura
+   -------------------------------------------------------------------------- */
+function icono(id, celda) {
+  const cv = document.createElement('canvas');
+  const W = 150, H = 46, dpr = window.devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.className = 'icono';
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const tinta = Viz.color('tinta3'), acento = Viz.color('acento');
+  c.lineWidth = 1;
+  if (id === 'densa') {                       // todos con todos
+    const iz = [8, 18, 28, 38], de = [16, 26, 36];
+    c.strokeStyle = Viz.alfa('acento', .45);
+    for (const a of iz) for (const b of de) { c.beginPath(); c.moveTo(22, a); c.lineTo(96, b); c.stroke(); }
+    c.fillStyle = tinta;
+    for (const a of iz) { c.beginPath(); c.arc(22, a, 3.2, 0, 7); c.fill(); }
+    c.fillStyle = acento;
+    for (const b of de) { c.beginPath(); c.arc(96, b, 3.2, 0, 7); c.fill(); }
+  } else if (id === 'cnn') {                  // una grilla y una ventanita
+    c.strokeStyle = Viz.alfa('tinta3', .55);
+    for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) c.strokeRect(10 + i * 7, 6 + j * 6, 7, 6);
+    c.strokeStyle = Viz.color('parametro'); c.lineWidth = 2;
+    c.strokeRect(24, 12, 21, 18);
+    c.strokeStyle = Viz.alfa('acento', .8); c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(45, 21); c.lineTo(96, 21); c.stroke();
+    c.fillStyle = acento; c.fillRect(96, 15, 12, 12);
+  } else if (id === 'rnn') {                  // la cadena con la mochila
+    c.strokeStyle = tinta; c.fillStyle = Viz.alfa('acento', .18);
+    for (let k = 0; k < 4; k++) {
+      c.fillRect(10 + k * 26, 14, 18, 16); c.strokeRect(10 + k * 26, 14, 18, 16);
+      if (k < 3) {
+        c.strokeStyle = acento; c.beginPath();
+        c.moveTo(28 + k * 26, 22); c.lineTo(36 + k * 26, 22); c.stroke();
+        c.strokeStyle = tinta;
+      }
+    }
+  } else {                                    // el transformer: arcos de todos a todos
+    const xs = [16, 46, 76, 106];
+    c.strokeStyle = Viz.alfa('acento', .55);
+    for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++) {
+      c.beginPath(); c.moveTo(xs[a], 32);
+      c.quadraticCurveTo((xs[a] + xs[b]) / 2, 32 - (xs[b] - xs[a]) * .55, xs[b], 32); c.stroke();
+    }
+    c.fillStyle = tinta;
+    for (const x of xs) c.fillRect(x - 5, 32, 10, 8);
+  }
+  celda.appendChild(cv);
+}
+
+/* --------------------------------------------------------------------------
+   4. Dibujar la tabla
+   -------------------------------------------------------------------------- */
+const cuerpo = document.getElementById('cuerpo');
+let abierta = null;     // {arq, campo}
+
+function datosElegidos() {
+  return DATOS_POSIBLES.find(d => d.id === ctl.valores.datos) || null;
+}
+
+function pintar() {
+  cuerpo.innerHTML = '';
+  const D = datosElegidos();
+  for (const a of ARQ) {
+    const gris = a.gris && !DESBLOQUEADAS;
+    const tr = document.createElement('tr');
+    tr.className = 'fila' + (gris ? ' gris' : '');
+
+    const td0 = document.createElement('td');
+    const nm = document.createElement('span');
+    nm.className = 'nombre-arq'; nm.textContent = a.nombre;
+    td0.appendChild(nm);
+    icono(a.id, td0);
+    if (gris) {
+      const p = document.createElement('p');
+      p.className = 'candado'; p.textContent = 'lo vemos en la ' + a.pie;
+      p.style.margin = '0';
+      td0.appendChild(p);
+    }
+    if (D) {
+      const [v, just] = D.v[a.id];
+      const b = document.createElement('span');
+      b.className = 'badge'; b.textContent = TEXTO_VEREDICTO[v];
+      b.style.background = Viz.color(COLOR_VEREDICTO[v]);
+      td0.appendChild(b);
+      const j = document.createElement('div');
+      j.className = 'justif'; j.innerHTML = just;
+      td0.appendChild(j);
+    }
+    tr.appendChild(td0);
+
+    for (const campo of ['supone', 'cierto', 'miente']) {
+      const td = document.createElement('td');
+      td.innerHTML = a[campo];
+      if (abierta && abierta.arq === a.id && abierta.campo === campo) {
+        td.classList.add('abierta');
+        const d = document.createElement('div');
+        d.className = 'detalle';
+        d.innerHTML = gris ? a.ejemplo : '<b>En ciencias sociales.</b> ' + a.ejemplo;
+        td.appendChild(d);
+      }
+      td.addEventListener('click', () => {
+        abierta = (abierta && abierta.arq === a.id && abierta.campo === campo)
+          ? null : { arq: a.id, campo: campo };
+        pintar();
+      });
+      tr.appendChild(td);
+    }
+    cuerpo.appendChild(tr);
+  }
+
+  // el cartel honesto de abajo
+  const cartel = document.getElementById('cartel');
+  cartel.innerHTML = '';
+  if (D && D.cartel) {
+    const [tono, titulo, texto] = D.cartel;
+    const caja = document.createElement('div');
+    caja.className = tono === 'error' ? 'ojo' : (tono === 'val' ? 'ojo' : 'ss');
+    caja.style.borderLeftColor = Viz.color(tono);
+    caja.innerHTML = '<b>' + titulo + '.</b> ' + texto;
+    cartel.appendChild(caja);
+  }
+  const D2 = datosElegidos();
+  if (D2) {
+    const cuantos = ARQ.filter(a => D2.v[a.id][0] === 'V').length;
+    ctl.texto('lectura', cuantos === 0
+      ? 'Con estos datos <b>ninguna</b> de las cuatro arquitecturas tiene sus supuestos claramente a favor. Eso es un resultado, no un problema del cuadro.'
+      : 'Con estos datos hay <b>' + cuantos + '</b> arquitectura' + (cuantos > 1 ? 's' : '') +
+        ' cuyos supuestos son razonables. Las otras están afirmando algo falso sobre tus datos.');
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. El panel
+   -------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Tengo estos datos…' },
+  { tipo: 'select', id: 'datos', etiqueta: 'elegí lo que tenés en tu investigación',
+    opciones: DATOS_POSIBLES.map(d => ({ valor: d.id, texto: d.nombre })), valor: 'satelital' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Cómo se lee' },
+  { tipo: 'texto', id: 'ayuda', html:
+      '<span id="ayuda-caja">Cada fila es una <b>teoría sobre la forma del mundo</b>. Verde: el supuesto es ' +
+      'razonable para estos datos. Amarillo: depende. Rojo: la arquitectura está ' +
+      'afirmando algo falso.<br><br>Hacé clic en cualquier celda para abrir el ejemplo.</span>' },
+  { tipo: 'boton', texto: 'Cerrar los ejemplos', alClic: () => { abierta = null; pintar(); } }
+], () => pintar());
+
+ctl.disparar();
+Viz.botonTema();
+</script>
+</body>
+</html>

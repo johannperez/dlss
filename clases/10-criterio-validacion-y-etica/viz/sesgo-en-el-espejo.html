@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sesgo en el espejo — Clase 10</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "la misma oración, cambiando una sola palabra, saca un puntaje
+     un 34 % más alto. Y tres sujetos distintos sacan EXACTAMENTE el mismo
+     número, hasta el último decimal: no es equidad, es que el modelo no los
+     conoce y lo único que está leyendo es el artículo."
+
+     Los scores salen del modelo real entrenado en medir-clase10.py sobre el
+     corpus de prensa del curso. Reconstruimos acá el mismo cálculo que hace
+     una regresión logística: sumar los pesos de las palabras presentes.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .plantilla-caja {
+    display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .7rem; margin-bottom: .6rem;
+  }
+  .plantilla-caja label { font-size: .72rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--tinta-3); }
+  .plantilla-caja input[type="text"] {
+    flex: 1 1 320px; font: inherit; font-size: .92rem; padding: .35em .55em;
+    border: 1px solid var(--borde-fuerte); border-radius: var(--r-chico);
+    background: var(--papel); color: var(--tinta);
+  }
+  .plantilla-caja .hueco { font-family: var(--f-mono); color: var(--c-acento); font-weight: 700; }
+  .tabla-md {
+    width: 100%; font-family: var(--f-mono); font-size: .74rem; line-height: 1.5;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .7rem; white-space: pre;
+    overflow-x: auto; color: var(--tinta-2); margin-top: .6rem;
+  }
+  .advertencia {
+    border: 2px solid var(--c-error); background: var(--c-error-suave);
+    border-radius: var(--r-medio); padding: .6rem .8rem; margin-top: .7rem;
+    font-size: .9rem; line-height: 1.45;
+  }
+  .advertencia b { color: var(--c-error); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La misma oración, distinto sujeto</h1>
+    <p>Un clasificador real de «esta nota es sobre política», entrenado con prensa en castellano.
+       Le damos <em>la misma oración</em> cambiando sólo quién es el sujeto, y miramos el puntaje.
+       Esto no es una opinión sobre el modelo: es un <b>procedimiento</b>, se llama
+       <em>pares mínimos</em>, y su resultado es una tabla que va en el apéndice del paper.</p>
+  </header>
+
+  <div>
+    <div class="plantilla-caja">
+      <label for="plantilla">la oración</label>
+      <input type="text" id="plantilla" value="reclamó frente a la sede del ministerio">
+      <span class="hueco">el sujeto va adelante</span>
+    </div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="advertencia">
+      <b>Ojo, esto es importante.</b> Una diferencia de score <em>no prueba daño</em>: prueba una
+      asociación adentro del modelo. Para afirmar que hay daño hay que mostrar el uso concreto,
+      quién decide con eso y a quién le cae el error. Esta es una viz sobre rigor, no sobre
+      indignación — y la distinción es parte del contenido.
+    </div>
+    <div class="tabla-md" id="tabla">…</div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Dos cosas, y la segunda es la que casi nadie ve.
+      <b>Una:</b> la diferencia entre el sujeto de arriba y el de abajo de la tabla — misma
+      oración, misma estructura, misma valoración, y el puntaje se mueve.
+      <b>Dos:</b> prendé <em>marcar los que el modelo no conoce</em>. Varios sujetos sacan
+      <em>exactamente</em> el mismo número, hasta el último decimal. No es que el modelo los trate
+      igual de bien: es que <b>no los vio nunca</b> y lo único que está leyendo es el artículo
+      («los» o «las»). Un score idéntico no es evidencia de equidad; muchas veces es evidencia
+      de ceguera, y se reporta distinto.
+    </div>
+    <p class="viz-pie">
+      Modelo real: regresión logística sobre bolsa de palabras, entrenada con
+      <b id="pie-n">…</b> notas de prensa reales en castellano (Spanish Fake News Corpus 2.0,
+      CC BY 4.0), noviembre 2020 – marzo 2021. Pesos medidos por
+      <code>medir-clase10.py</code>.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-clase10.js"></script>
+<script src="../pesos-clase10.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS10;
+const P = window.PESOS10;          // { intercepto, pesos: {palabra: peso} }
+document.getElementById('pie-n').textContent = D.modelo.n_train;
+
+/* --------------------------------------------------------------------------
+   El modelo, reconstruido. Una regresión logística sobre bolsa de palabras
+   binaria es literalmente esto: sumar el peso de cada palabra que aparece
+   (una sola vez, aunque se repita) y pasarlo por la sigmoide.
+   -------------------------------------------------------------------------- */
+function fichas(texto) {
+  // OJO: en JavaScript \w es sólo ASCII, así que "médicos" se partiría en dos.
+  // \p{L} y \p{N} con la bandera `u` sí entienden las tildes y la ñ.
+  const t = texto.toLowerCase().match(/[\p{L}\p{N}]{2,}/gu) || [];
+  return Array.from(new Set(t));
+}
+function score(texto) {
+  let z = P.intercepto;
+  for (const w of fichas(texto)) if (P.pesos[w] !== undefined) z += P.pesos[w];
+  return 1 / (1 + Math.exp(-z));
+}
+function desconocidas(sujeto) {
+  return fichas(sujeto).filter(w => P.pesos[w] === undefined);
+}
+
+const CONJUNTOS = {
+  ocupacion: ['los docentes', 'los médicos', 'los policías', 'los taxistas',
+              'los estudiantes', 'los empresarios', 'los enfermeros', 'los jubilados'],
+  genero: ['los trabajadores', 'las trabajadoras', 'los médicos', 'las médicas',
+           'los empresarios', 'las empresarias', 'los docentes', 'las docentes'],
+  origen: ['los vecinos', 'los migrantes', 'los venezolanos', 'los mexicanos',
+           'los campesinos', 'los indígenas', 'los porteños', 'los provincianos'],
+  edad: ['los jóvenes', 'los jubilados', 'los adolescentes', 'los adultos mayores',
+         'los estudiantes', 'los pensionados']
+};
+
+let plantilla = document.getElementById('plantilla').value;
+let filas = [];
+
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 340,
+  margen: { i: 18, d: 18, a: 32, b: 34 }
+});
+
+function recalcular() {
+  const dim = ctl.valores.dimension;
+  const sujetos = CONJUNTOS[dim];
+  filas = sujetos.map(s => {
+    const frase = s + ' ' + plantilla;
+    return { sujeto: s, frase: frase, score: score(frase), fuera: desconocidas(s) };
+  }).sort((a, b) => b.score - a.score);
+}
+
+p.alDibujar(() => {
+  const marcar = ctl.valores.marcar;
+  const alto = filas[0], bajo = filas[filas.length - 1];
+  const dif = alto.score - bajo.score;
+  // El rótulo va en el título del plano: adentro del dibujo le pisaría la
+  // primera barra, que es justamente la que hay que leer.
+  p.titulo = 'puntaje de «esto es sobre política»  ·  diferencia máxima ' +
+    dif.toFixed(3) + ' (×' + (alto.score / bajo.score).toFixed(2) + ')' +
+    (marcar ? '  ·  en gris, palabras que el modelo nunca vio' : '');
+  p.fondo();
+  p.barras(filas.map(f => ({
+    etiqueta: f.sujeto,
+    valor: f.score,
+    color: (marcar && f.fuera.length) ? 'verdad' : 'modelo'
+  })), { horizontal: true, max: Math.max(0.5, filas[0].score * 1.2),
+         formato: v => v.toFixed(3) });
+});
+
+function actualizar() {
+  plantilla = document.getElementById('plantilla').value.trim();
+  recalcular();
+  const alto = filas[0], bajo = filas[filas.length - 1];
+  const dif = alto.score - bajo.score;
+  const ciegos = filas.filter(f => f.fuera.length).length;
+
+  ctl.texto('lectura',
+    '<span class="grande">' + dif.toFixed(3) + '</span>' +
+    'de diferencia entre <b>«' + alto.sujeto + '»</b> (' + alto.score.toFixed(3) + ') y <b>«' +
+    bajo.sujeto + '»</b> (' + bajo.score.toFixed(3) + ').<br><br>' +
+    (ciegos
+      ? '<b>' + ciegos + ' de ' + filas.length + '</b> sujetos tienen alguna palabra que el modelo ' +
+        'nunca vio. Para esos, el puntaje sale sólo del artículo.'
+      : 'Todas las palabras de estos sujetos están en el vocabulario del modelo.'));
+
+  // la tabla, en markdown, lista para pegar en el apéndice
+  let md = '| sujeto | puntaje | en el vocabulario |\n|---|---|---|\n';
+  for (const f of filas) {
+    md += '| ' + f.sujeto + ' | ' + f.score.toFixed(3) + ' | ' +
+      (f.fuera.length ? 'no: ' + f.fuera.join(', ') : 'sí') + ' |\n';
+  }
+  md += '\nPlantilla: «[SUJETO] ' + plantilla + '».  ';
+  md += 'Diferencia máxima ' + dif.toFixed(3) + '. ';
+  md += 'Modelo: regresión logística sobre bolsa de palabras, ' + D.modelo.n_train +
+        ' notas de entrenamiento, semilla 1983.';
+  document.getElementById('tabla').textContent = md;
+
+  p.redibujar();
+}
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué variamos' },
+  { tipo: 'select', id: 'dimension', etiqueta: 'la dimensión del sujeto', valor: 'genero',
+    opciones: [
+      { valor: 'genero', texto: 'género' },
+      { valor: 'ocupacion', texto: 'ocupación' },
+      { valor: 'origen', texto: 'origen y región' },
+      { valor: 'edad', texto: 'edad' }
+    ] },
+  { tipo: 'checkbox', id: 'marcar', etiqueta: 'marcar los que el modelo no conoce', valor: false },
+  { tipo: 'titulo', texto: 'El resultado' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Para el apéndice' },
+  { tipo: 'boton', texto: 'Copiar la tabla', principal: true, alClic: () => {
+      const t = document.getElementById('tabla').textContent;
+      try {
+        navigator.clipboard.writeText(t);
+        ctl.texto('copiado', 'Copiada. Pegala en el apéndice y contá qué hiciste.');
+      } catch (e) {
+        ctl.texto('copiado', 'El navegador no dejó copiar (pasa con <code>file://</code>). ' +
+          'Seleccionala a mano de la caja de abajo.');
+      }
+    } },
+  { tipo: 'texto', id: 'copiado', html: 'La tabla de abajo ya está en markdown.' }
+], () => actualizar());
+
+document.getElementById('plantilla').addEventListener('input', actualizar);
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

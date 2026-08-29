@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 7 — Attention: cada palabra arma su propio resumen del contexto | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* la oración del gancho, grande y aireada */
+  .oracion-gancho {
+    font-size: 1.05em; line-height: 1.75; max-width: 30ch;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-grande); padding: 1rem 1.3rem;
+  }
+  .oracion-gancho.ancha { max-width: none; }
+  .oracion-gancho .marcada {
+    background: var(--c-acento-suave); border-bottom: 2px solid var(--c-acento);
+    border-radius: 3px; padding: 0 .18em; font-weight: 700;
+  }
+  .oracion-gancho .candidata {
+    border-bottom: 2px dashed var(--c-val); padding: 0 .12em;
+  }
+  .fila-palabras { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+  .fila-palabras > span {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: 7px; padding: .25em .55em; font-size: .82em;
+  }
+  .fila-palabras > span.foco {
+    background: var(--c-acento); color: var(--papel); border-color: var(--c-acento);
+    font-weight: 700;
+  }
+  .peso-mini { font-family: var(--f-mono); color: var(--c-acento); font-weight: 700; }
+  svg.diagrama { width: 100%; height: auto; display: block; }
+  svg.diagrama text { font-family: var(--f-texto); }
+  .cuenta {
+    font-family: var(--f-mono); font-size: .70em; line-height: 1.65;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .8rem;
+  }
+  .cuenta b { color: var(--c-acento); }
+  .tres-mapas { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .tres-mapas > div { text-align: center; }
+  .tres-mapas h4 { margin: 0 0 .3rem; font-size: .72em; }
+  /* trece términos no entran en una columna: los partimos en dos */
+  .glosario-dos { columns: 2; column-gap: 1.8rem; font-size: .78em; }
+  .glosario-dos li { break-inside: avoid; padding: .28em 0; }
+
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ===================== 1. PORTADA ===================== -->
+<section class="portada">
+  <p class="num-clase">Clase 7</p>
+  <h1>Attention: cada palabra arma su propio resumen del contexto</h1>
+  <div class="franja"></div>
+  <p class="gancho">Cuando leés «lo» al final de una oración larga, saltás para atrás y
+    encontrás a qué se refiere. Eso que hacés sin pensarlo es <em>lo único nuevo</em>
+    que trajo el transformer. Hoy lo construimos.</p>
+  <aside class="notes">
+    No empieces con el temario. Empezá con la oración de la slide 3 y con silencio.
+    Los primeros tres minutos deciden la clase. (1 min)
+  </aside>
+</section>
+
+<!-- ===================== 2. DÓNDE VENIMOS ===================== -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">La clase 6 terminó con una bronca. Hoy la resolvemos.</p>
+  <ul>
+    <li>Aprendimos que una palabra <strong>tiene un lugar en un mapa</strong>, y que ese
+      lugar lo decide la compañía que frecuenta (<em>embeddings</em>).</li>
+    <li>Vimos que la bolsa de palabras <strong>no distingue quién le hizo qué a quién</strong>.</li>
+    <li>Probamos leer en orden con una <strong>mochila de memoria</strong> (RNN) y la
+      mochila <strong>se desborda</strong>: el sujeto de la línea 1 no llega al verbo de la línea 30.</li>
+    <li class="fragment"><strong>La pregunta que dejamos abierta:</strong> ¿y si en vez de
+      <em>acordarse</em> de todo el camino, la palabra pudiera <em>mirar</em> directamente
+      a la que le importa?</li>
+  </ul>
+  <aside class="notes">
+    Preguntá: «¿quién se acuerda de qué se olvidaba la mochila?». Necesitás que alguien
+    diga «del principio». Si no sale, decilo vos y seguí: es el gancho de hoy. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 3. LEÉ ESTO ===================== -->
+<section>
+  <h2>Leé esto. Sin apuro.</h2>
+  <div class="oracion-gancho ancha">
+    El proyecto de reforma del sistema jubilatorio que la comisión de presupuesto venía
+    discutiendo desde marzo, y que el ministro había prometido enviar antes del receso,
+    entró finalmente al recinto en diciembre, y el oficialismo
+    <span class="marcada">lo</span> aprobó.
+  </div>
+  <aside class="notes">
+    Proyectala y CALLATE. Diez segundos de silencio real, contados. La gente tiene que
+    leerla de verdad para que la pregunta de la próxima slide funcione. (1,5 min)
+  </aside>
+</section>
+
+<!-- ===================== 4. LA APUESTA ===================== -->
+<section class="pregunta">
+  <h2>Cuando leíste <code>lo</code>, ¿a qué palabra fuiste a buscar?</h2>
+  <div class="opciones">
+    <div><b>A</b> «proyecto»</div>
+    <div><b>B</b> «ministro»</div>
+    <div><b>C</b> «receso»</div>
+    <div><b>D</b> «oficialismo»</div>
+  </div>
+  <aside class="notes">
+    A mano alzada, en serio, las cuatro opciones. Va a ganar A por goleada, con alguna
+    risa por D. Preguntá a alguien que votó A: «¿releíste la oración entera para
+    encontrarla?». Va a decir que no. Ese «no» es la clase de hoy. (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 5. NO RELEÍSTE TODO ===================== -->
+<section>
+  <h2>No releíste. <span class="c-acento">Saltaste.</span></h2>
+  <div class="oracion-gancho ancha">
+    El <span class="candidata">proyecto</span> de reforma del sistema jubilatorio que la
+    <span class="candidata">comisión</span> de presupuesto venía discutiendo desde marzo, y que
+    el <span class="candidata">ministro</span> había prometido enviar antes del receso, entró
+    finalmente al recinto en diciembre, y el oficialismo
+    <span class="marcada">lo</span> aprobó.
+  </div>
+  <div class="intuicion">
+    Tu cerebro tenía tres candidatos a mano y eligió uno, en una fracción de segundo, sin
+    volver al principio. <strong>Eso tiene nombre y es lo único nuevo del transformer.</strong>
+  </div>
+  <aside class="notes">
+    Frase textual: «esa es la clase. Todo lo demás es cómo se implementa eso.»
+    Es importante decirla ahora: baja la ansiedad de la audiencia para las próximas
+    dos horas. (2,5 min)
+  </aside>
+</section>
+
+<!-- ===================== 6. EL MECANISMO SIN FÓRMULAS ===================== -->
+<section>
+  <h2>El mecanismo, sin una sola fórmula</h2>
+  <p class="bajada">Desde «lo», una flecha hacia cada palabra. El grosor es cuánto le importa.</p>
+  <div class="viz-frame" style="padding:10px">
+    <svg class="diagrama" viewBox="0 0 1000 250" role="img"
+         aria-label="la palabra lo repartiendo su atención entre las demás">
+      <!-- arcos -->
+      <path d="M 830 168 Q 505 20 180 168" style="fill:none;stroke:var(--c-acento);stroke-width:17;stroke-opacity:.85;stroke-linecap:round"/>
+      <path d="M 830 168 Q 605 60 380 168" style="fill:none;stroke:var(--c-acento);stroke-width:7;stroke-opacity:.7;stroke-linecap:round"/>
+      <path d="M 830 168 Q 705 95 580 168" style="fill:none;stroke:var(--c-acento);stroke-width:4;stroke-opacity:.55;stroke-linecap:round"/>
+      <path d="M 830 168 Q 780 130 730 168" style="fill:none;stroke:var(--c-acento);stroke-width:2;stroke-opacity:.45;stroke-linecap:round"/>
+      <!-- pesos -->
+      <text x="505" y="42"  style="fill:var(--c-acento);font-size:20px;font-weight:700" text-anchor="middle">0,60</text>
+      <text x="605" y="80"  style="fill:var(--c-acento);font-size:17px;font-weight:700" text-anchor="middle">0,20</text>
+      <text x="712" y="100" style="fill:var(--c-acento);font-size:15px;font-weight:700" text-anchor="middle">0,10</text>
+      <text x="806" y="118" style="fill:var(--c-acento);font-size:14px;font-weight:700" text-anchor="middle">0,05</text>
+      <!-- cajitas -->
+      <g style="font-size:19px">
+        <rect x="110" y="172" width="140" height="42" rx="8" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="180" y="199" text-anchor="middle" style="fill:var(--tinta)">proyecto</text>
+        <rect x="312" y="172" width="136" height="42" rx="8" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="380" y="199" text-anchor="middle" style="fill:var(--tinta)">comisión</text>
+        <rect x="514" y="172" width="132" height="42" rx="8" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="580" y="199" text-anchor="middle" style="fill:var(--tinta)">ministro</text>
+        <rect x="672" y="172" width="116" height="42" rx="8" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="730" y="199" text-anchor="middle" style="fill:var(--tinta)">recinto</text>
+        <rect x="800" y="172" width="60" height="42" rx="8" style="fill:var(--c-acento);stroke:var(--c-acento)"/>
+        <text x="830" y="199" text-anchor="middle" style="fill:var(--papel);font-weight:700">lo</text>
+      </g>
+      <text x="500" y="238" text-anchor="middle" style="fill:var(--tinta-3);font-size:15px">
+        0,60 + 0,20 + 0,10 + 0,05 + 0,05 (lo que se queda para sí) = 1,00
+      </text>
+    </svg>
+  </div>
+  <div class="intuicion compacta">
+    <strong>Reparte, no inventa.</strong> Los cinco números suman 1. Si le da más a una,
+    le da menos a otra. Y todavía no escribimos ninguna fórmula.
+  </div>
+  <aside class="notes">
+    Decilo así: «cada palabra reparte 100 puntos de atención entre todas las demás.
+    <b>Reparte</b>, no inventa: si le da más a una, le da menos a otra.» Preguntá:
+    «¿de dónde salen esos números?» y contestá: «en un rato. Todavía no.» (2 min)
+    Los números de esta slide son redondos a propósito, para el pizarrón. Los reales
+    los van a ver en la viz de la slide 9.
+  </aside>
+</section>
+
+<!-- ===================== 7. Y CON ESO ARMA UN RESUMEN ===================== -->
+<section>
+  <h2>Y con esos pesos se arma un resumen</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Antes</h4>
+      <p>El vector de <code>lo</code> es el vector de la palabra «lo» y nada más.
+         Dice «pronombre, singular, masculino». No dice de qué está hablando.</p>
+    </div>
+    <div>
+      <h4>Después</h4>
+      <p>El vector de <code>lo</code> pasa a ser
+         <span class="peso-mini">0,60</span> del vector de «proyecto» +
+         <span class="peso-mini">0,20</span> del de «comisión» +
+         <span class="peso-mini">0,10</span> del de «ministro» + …</p>
+    </div>
+  </div>
+  <div class="intuicion">
+    Eso es un <strong>promedio ponderado</strong>: la misma cuenta que hacés para sacar el
+    promedio de una materia cuando el parcial vale más que el práctico. No hay nada más
+    difícil que eso adentro de attention.
+  </div>
+  <aside class="notes">
+    Insistí con «promedio ponderado» tres veces. Es aritmética de secundaria y la
+    audiencia la sabe hacer; nombrarla les baja el miedo a lo que viene. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 8. EN NÚMEROS ===================== -->
+<section>
+  <span class="marca">a mano</span>
+  <h3>La cuenta entera, con tres palabras y dos números por palabra</h3>
+  <div style="display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:1rem;align-items:start">
+    <div class="viz-frame" style="padding:8px" id="caja-promedio"></div>
+    <div>
+      <div class="cuenta">
+        proyecto = (4 , 1)&nbsp;&nbsp;× 0,60 → (2,4 ; 0,6)<br>
+        comisión = (1 , 4)&nbsp;&nbsp;× 0,30 → (0,3 ; 1,2)<br>
+        ministro = (−2, 2)&nbsp; × 0,10 → (−0,2 ; 0,2)<br>
+        ───────────────────<br>
+        <b>el resumen de «lo» = (2,5 ; 2,0)</b>
+      </div>
+      <p style="font-size:.8em">Los pesos suman 1, así que el resultado <b>cae adentro</b>
+        de la nube de las tres. Nunca se va para cualquier lado.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    ESTA SLIDE NO SE SALTEA. Hacé la cuenta en voz alta, número por número, con el dedo
+    en la pantalla. Es la única aritmética explícita de la clase y es la que sostiene
+    todo lo demás. Preguntá: «si le subo el peso a proyecto, ¿para dónde se va la flecha
+    violeta?». (4 min)
+  </aside>
+</section>
+
+<!-- ===================== 9. VIZ: attention como mesa ===================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Hacé clic en una palabra</h3>
+  <div class="viz-frame" data-alto="medio">
+    <iframe src="viz/attention-como-mesa.html" title="cada palabra arma su propio resumen" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> hacé clic en «lo» y después en «si». Son mapas
+    completamente distintos. <b>Cada palabra tiene el suyo.</b> Y los pesos no son
+    inventados: salen de un transformer entrenado sobre discursos de apertura reales.</p>
+  <aside class="notes">
+    Movelo vos primero, despacio, dos o tres palabras. Después dejá que lo toquen 2
+    minutos. Pregunta al aula: «¿alguien encontró una palabra que mire a algo raro?».
+    Siempre aparece una, y es oro: sirve para la slide 32. (6 min con la exploración)
+  </aside>
+</section>
+
+<!-- ===================== 10. LA PREGUNTA QUE FALTA ===================== -->
+<section>
+  <h2>Nos falta una sola cosa</h2>
+  <p class="bajada">Hasta acá dije «hay pesos» y ustedes me lo creyeron. Gracias.</p>
+  <div class="ojo">
+    <strong>¿Quién decide los pesos?</strong> No están en el diccionario, no los escribió
+    nadie, y cambian según la oración. Tienen que <em>salir de algún lado</em>.
+  </div>
+  <p class="fragment">Salen de tres cajas de perillas que se aprenden con el mismo descenso
+    por gradiente de la clase 3. Y tienen tres nombres feos que en cinco minutos van a
+    dejar de dar miedo: <b class="c-val">query</b>, <b class="c-modelo">key</b> y
+    <b class="c-ok">value</b>.</p>
+  <aside class="notes">
+    Nombralos y seguí de largo, sin definirlos. La definición viene con la analogía.
+    Si los definís acá, los perdés. (1 min)
+  </aside>
+</section>
+
+<!-- ===================== 11. EL AVISO CLASIFICADO ===================== -->
+<section>
+  <h2>El aviso clasificado</h2>
+  <div class="comparacion">
+    <div>
+      <h4 class="c-modelo">key — el aviso que publico</h4>
+      <p style="font-size:.92em">«<b>OFREZCO:</b> soy un sustantivo, masculino, singular,
+        del área económica, y soy el sujeto de esta oración.»</p>
+      <p style="font-size:.85em">Es lo que cada palabra <em>cuelga en el tablón</em> para
+        que la encuentren.</p>
+    </div>
+    <div>
+      <h4 class="c-val">query — lo que ando buscando</h4>
+      <p style="font-size:.92em">«<b>BUSCO:</b> mi sustantivo. Masculino, singular.
+        Preferentemente algo que se pueda aprobar.»</p>
+      <p style="font-size:.85em">Es el papelito con el que cada palabra
+        <em>camina por el tablón</em>.</p>
+    </div>
+  </div>
+  <div class="intuicion">
+    El <strong>peso</strong> de atención es <strong>qué tan bien matchea lo que uno busca
+    con lo que el otro ofrece</strong>. Igual que buscar departamento: leés cien avisos y
+    dos te sirven.
+  </div>
+  <aside class="notes">
+    Esta es LA analogía de la clase. Contala con tiempo y con un ejemplo del aula
+    («busco monoambiente, luminoso, cerca del subte»). Si esta analogía prende, la
+    fórmula de la slide 17 pasa sin dolor. (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 12. Y EL VALUE ===================== -->
+<section>
+  <h2>Y el <span class="c-ok">value</span>: la mercadería</h2>
+  <div class="comparacion">
+    <div>
+      <h4>El aviso dice qué es</h4>
+      <p>«Luminoso, a estrenar, excelente ubicación.»</p>
+    </div>
+    <div>
+      <h4>El value es lo que te llevás</h4>
+      <p>Lo que efectivamente hay adentro cuando vas a verlo.</p>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>Pueden no coincidir, y está bien que puedan no coincidir.</strong> El aviso
+    (key) existe para que te <em>encuentren</em>. El value es el <em>contenido</em> que
+    viaja cuando ya te encontraron. Son dos transformaciones distintas de la misma palabra.
+  </div>
+  <div class="ss compacta">
+    En una ronda de presentación: <b>key</b> es lo que decís que sos, <b>query</b> es lo
+    que venís a buscar, <b>value</b> es lo que efectivamente aportás cuando alguien te
+    consulta. Que las tres cosas no coincidan no es un defecto del modelo: es el modelo
+    copiando bien la vida.
+  </div>
+  <aside class="notes">
+    El chiste de «lo que decís que ofrecés y lo que efectivamente das» funciona siempre
+    y además es conceptualmente correcto. Usalo. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 13. LAS TRES EN EL MISMO DIBUJO ===================== -->
+<section>
+  <h2>Las tres salen de la <span class="c-acento">misma</span> palabra</h2>
+  <div class="viz-frame" style="padding:10px">
+    <svg class="diagrama" viewBox="0 0 1000 240" role="img"
+         aria-label="el embedding de una palabra pasando por tres matrices">
+      <rect x="40" y="90" width="180" height="58" rx="9" style="fill:var(--papel-2);stroke:var(--borde);stroke-width:1.5"/>
+      <text x="130" y="115" text-anchor="middle" style="fill:var(--tinta);font-size:18px;font-weight:700">«proyecto»</text>
+      <text x="130" y="136" text-anchor="middle" style="fill:var(--tinta-3);font-size:13px">su embedding (clase 6)</text>
+
+      <g style="stroke:var(--tinta-3);stroke-width:1.6;fill:none">
+        <path d="M 224 105 L 330 55" marker-end="url(#flechita)"/>
+        <path d="M 224 119 L 330 119" marker-end="url(#flechita)"/>
+        <path d="M 224 133 L 330 183" marker-end="url(#flechita)"/>
+      </g>
+      <defs>
+        <marker id="flechita" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--tinta-3)"/>
+        </marker>
+      </defs>
+
+      <rect x="336" y="30" width="130" height="50" rx="9" style="fill:var(--c-val-suave);stroke:var(--c-val);stroke-width:2"/>
+      <text x="401" y="61" text-anchor="middle" style="fill:var(--c-val);font-size:17px;font-weight:700">W<tspan font-size="13">q</tspan></text>
+      <rect x="336" y="94" width="130" height="50" rx="9" style="fill:var(--c-modelo-suave);stroke:var(--c-modelo);stroke-width:2"/>
+      <text x="401" y="125" text-anchor="middle" style="fill:var(--c-modelo);font-size:17px;font-weight:700">W<tspan font-size="13">k</tspan></text>
+      <rect x="336" y="158" width="130" height="50" rx="9" style="fill:var(--c-ok-suave);stroke:var(--c-ok);stroke-width:2"/>
+      <text x="401" y="189" text-anchor="middle" style="fill:var(--c-ok);font-size:17px;font-weight:700">W<tspan font-size="13">v</tspan></text>
+
+      <g style="stroke-width:1.6;fill:none">
+        <path d="M 470 55  L 570 55"  style="stroke:var(--c-val)"   marker-end="url(#flechita)"/>
+        <path d="M 470 119 L 570 119" style="stroke:var(--c-modelo)" marker-end="url(#flechita)"/>
+        <path d="M 470 183 L 570 183" style="stroke:var(--c-ok)"     marker-end="url(#flechita)"/>
+      </g>
+
+      <text x="580" y="61"  style="fill:var(--c-val);font-size:17px;font-weight:700">query</text>
+      <text x="660" y="61"  style="fill:var(--tinta-2);font-size:15px">lo que «proyecto» busca</text>
+      <text x="580" y="125" style="fill:var(--c-modelo);font-size:17px;font-weight:700">key</text>
+      <text x="660" y="125" style="fill:var(--tinta-2);font-size:15px">el aviso que «proyecto» publica</text>
+      <text x="580" y="189" style="fill:var(--c-ok);font-size:17px;font-weight:700">value</text>
+      <text x="660" y="189" style="fill:var(--tinta-2);font-size:15px">lo que «proyecto» aporta</text>
+
+      <text x="500" y="228" text-anchor="middle" style="fill:var(--c-parametro);font-size:15px;font-weight:600">
+        las tres cajas son perillas: se aprenden con el mismo descenso de la clase 3
+      </text>
+    </svg>
+  </div>
+  <aside class="notes">
+    Acá se desarma la confusión más común: creen que Q, K y V son tres entradas
+    distintas. Son <b>tres copias transformadas de la misma palabra</b>. Decilo mirando
+    el dibujo y señalando la caja de la izquierda. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 14. VIZ qkv ===================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movelo: las perillas cambian a quién mira cada palabra</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/qkv.html" title="query, key y value con flechas" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> con «lo» preguntando, girá <b>el aviso</b> hasta +60°.
+    La oración no cambió y sin embargo «lo» dejó de mirar a «algo» y se puso a mirar a la
+    coma. <b>La atención no está en el texto: se aprende.</b></p>
+  <aside class="notes">
+    Movelo vos. Es la slide donde se entiende que Q y K son parámetros. Frase:
+    «entrenar un transformer es, en buena medida, ajustar estas dos perillas hasta que
+    cada palabra encuentre a la que le sirve». (4 min)
+  </aside>
+</section>
+
+<!-- ===================== 15. EL PUNTAJE ===================== -->
+<section>
+  <h3>El puntaje es «cuánto apuntan para el mismo lado»</h3>
+  <div style="display:grid;grid-template-columns:400px 320px minmax(0,1fr);gap:1.1rem;align-items:start">
+    <div class="viz-frame" style="padding:8px" id="caja-punto"></div>
+    <div class="panel" id="panel-punto"></div>
+    <div class="intuicion compacta">
+      <b>Producto punto</b> suena horrible y es exactamente esto: dos flechas alineadas
+      dan un número grande, perpendiculares dan cero, opuestas dan negativo.
+      <br><br>Movés el ángulo de punta a punta y mirás el número de abajo a la izquierda.
+      Eso, y nada más, es lo que decide el peso de atención.
+    </div>
+  </div>
+  <aside class="notes">
+    Movés el ángulo de un extremo al otro mientras hablás. No escribas la fórmula del
+    producto punto: no hace falta y no aporta. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 16. DE PUNTAJES A PORCENTAJES ===================== -->
+<section>
+  <h3>De puntajes a porcentajes: <span class="c-acento">softmax</span></h3>
+  <div class="viz-con-panel">
+    <div class="viz-frame" style="padding:8px" id="caja-softmax"></div>
+    <div class="panel" id="panel-softmax"></div>
+  </div>
+  <div class="intuicion compacta">
+    <strong>softmax = convertir puntajes en porcentajes que suman 100, exagerando un poco
+    al ganador.</strong> Eso es todo. Va a volver en la clase 8, con otro nombre:
+    <em>temperatura</em>.
+  </div>
+  <aside class="notes">
+    Nunca escribas la fórmula del softmax en esta clase. Con los cuatro números y las
+    barras alcanza. Si alguien pregunta «¿por qué exponencial?», la respuesta honesta es:
+    «porque hace que todo quede positivo y sume 1, y porque exagera al ganador de una
+    manera que se puede regular. Lo regulamos la clase que viene.» (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 17. LA FÓRMULA ===================== -->
+<section>
+  <h2>Recién ahora, la fórmula</h2>
+  <p style="text-align:center;font-size:1.35em;margin:.4em 0">
+    $$\text{Attention}(\textcolor{#e08519}{Q},\textcolor{#1f6fb5}{K},\textcolor{#2f8a56}{V})
+    =\underbrace{\text{softmax}\!\left(\frac{\textcolor{#e08519}{Q}\textcolor{#1f6fb5}{K}^{\top}}{\sqrt{d}}\right)}_{\text{los pesos}}\;\textcolor{#2f8a56}{V}$$
+  </p>
+  <ul style="font-size:.9em">
+    <li><b class="c-val">Q · </b><b class="c-modelo">Kᵀ</b> — cada búsqueda contra cada
+      aviso. Salen todos los puntajes de una.</li>
+    <li><b>÷ √d</b> — lo único que no expliqué. Es un detalle de escala: con vectores
+      largos los puntajes se disparan, el softmax se satura y no aprende nada.
+      Se dividen y listo.</li>
+    <li><b>softmax(...)</b> — puntajes → porcentajes que suman 100.</li>
+    <li><b class="c-ok">· V</b> — el promedio ponderado de la slide 8, con esos porcentajes.</li>
+  </ul>
+  <div class="aha compacta">
+    No hay nada en esa línea que no hayamos hecho ya con flechas y con una cuenta de
+    promedio. <strong>Eso es un transformer.</strong> Lo demás es apilarlo y darle datos.
+  </div>
+  <aside class="notes">
+    Frase: «esta es la ecuación más famosa de la década y la acaban de entender entera».
+    Después de decirlo, esperá. Alguien se va a reír de alivio. (3 min)
+    Si preguntan «¿y esto es todo?», la respuesta es SÍ, y está en las notas del docente.
+  </aside>
+</section>
+
+<!-- ===================== 18. BLOQUE PRÁCTICO 1 ===================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1 — attention a mano</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code> y corré hasta la sección 4.
+    <ul style="margin-top:.4em">
+      <li>El <b>promedio ponderado</b> con tres vectores y tres pesos (<code>TODO 1</code>).</li>
+      <li><b>Attention entera</b>, en doce líneas, sobre una oración real del corpus.</li>
+      <li>Mirar la matriz <b>antes</b> y <b>después</b> del softmax.</li>
+      <li><code>TODO 2</code>: comprobar que las filas suman 1 y que las columnas no.</li>
+    </ul>
+  </div>
+  <p><b>15 minutos.</b> El hábito que se lleva de acá: <code>print(X.shape)</code> después
+    de cada paso. No es manía, es el 80% de los errores de esta materia.</p>
+  <aside class="notes">
+    Caminá por el aula. El error que más vas a ver es transponer mal (`K.T`) y que salga
+    una matriz que no es cuadrada. La pregunta que destraba: «¿de qué tamaño TIENE que
+    ser la matriz de pesos? Tantas filas como palabras, tantas columnas como palabras.»
+    (15 min)
+  </aside>
+</section>
+
+<!-- ===================== PAUSA ===================== -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    NO SE RECORTA. Si venís atrasado, recortá contenido de la segunda mitad (está
+    priorizado en notas-docente.md), nunca la pausa. (10 min)
+  </aside>
+</section>
+
+<!-- ===================== 19. VOLVIMOS ===================== -->
+<section>
+  <h2>Volvimos: ¿les sumaron 1 las filas?</h2>
+  <div class="comparacion contra">
+    <div>
+      <h4>Las filas suman 1</h4>
+      <p>Siempre. Cada palabra reparte <b>su</b> 100%. Si no suman 1, algo se rompió, y
+        el <code>assert</code> del notebook te lo dice.</p>
+    </div>
+    <div>
+      <h4>Las columnas suman cualquier cosa</h4>
+      <p>Nada obliga a que una palabra sea mirada en total 100%. Hay palabras que mira
+        todo el mundo y palabras que no mira nadie.</p>
+    </div>
+  </div>
+  <div class="ss compacta">
+    Si alguna vez viste una <b>matriz de adyacencia</b> de una red de citas, es el mismo
+    objeto: que A cite a B no implica que B cite a A. La fila es «a quién cito yo»; la
+    columna, «quién me cita». Esa asimetría es la misma de acá.
+  </div>
+  <aside class="notes">
+    Es la mejor verificación que existe y la confusión número uno al leer heatmaps de
+    atención. Preguntá: «¿a alguien le dio 0,99?». Suele haber uno: es error de
+    redondeo al imprimir, no un bug. (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 20. DECISIÓN 1: MÁSCARA ===================== -->
+<section>
+  <h2>Decisión 1: no se espía el futuro</h2>
+  <div class="comparacion">
+    <div>
+      <h4>El problema</h4>
+      <p>Si el modelo tiene que adivinar la palabra 5 y puede mirar la palabra 6, no
+        aprende a predecir: <strong>aprende a copiar</strong>. Y su loss de entrenamiento
+        va a dar hermosa mientras el modelo no sirve para nada.</p>
+    </div>
+    <div>
+      <h4>La solución</h4>
+      <p>Se tapan las celdas del futuro <em>antes</em> del softmax, con un puntaje tan
+        bajo que después del softmax quedan en <b>cero</b>. Se llama
+        <b>máscara causal</b>.</p>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>La máscara no es para ahorrar cómputo.</strong> Es para no hacer trampa. Es el
+    examen donde ves la hoja del compañero: sacás diez y no aprendiste nada.
+  </div>
+  <aside class="notes">
+    La confusión «es por eficiencia» aparece todos los años. Desarmala acá, con la
+    analogía del examen. Y anticipá: en la clase 9 vamos a ver modelos SIN máscara
+    (BERT), que sirven para clasificar, no para generar. (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 21. VIZ matriz ===================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>La matriz, y las dos sumas que hay que mirar</h3>
+  <div class="viz-frame" data-alto="medio">
+    <iframe src="viz/matriz-de-atencion.html" title="la matriz de atención" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> la columna verde dice 1,00 en todas las filas; la
+    fila roja de abajo dice cualquier cosa. Después movés «hasta qué palabra escribió» y
+    <b>se ve crecer el triángulo</b>: cuando el modelo va por la palabra 5, sólo existen
+    5 columnas.</p>
+  <aside class="notes">
+    Mostrá primero la matriz completa, después apagá la máscara y dejá que vean el
+    cuadrado lleno, y volvé a prenderla. Después el slider de posición, despacio.
+    Frase: «el triángulo no es un adorno, es el paso del tiempo». (5 min)
+  </aside>
+</section>
+
+<!-- ===================== 22. DECISIÓN 2: CABEZAS ===================== -->
+<section>
+  <h2>Decisión 2: varias cabezas a la vez</h2>
+  <p class="bajada">Una sola cabeza tiene que decidir una sola cosa: a quién mirar.
+    Pero hay muchas maneras de «importar».</p>
+  <div class="tarjetas">
+    <div><h4>relación sintáctica</h4>quién es el sujeto de qué verbo</div>
+    <div><h4>relación temática</h4>qué palabras hablan del mismo tema</div>
+    <div><h4>relación posicional</h4>simplemente la palabra anterior</div>
+  </div>
+  <div class="ss compacta">
+    Es un <b>equipo de codificadores con libros de códigos distintos</b>: uno marca
+    actores, otro marca temporalidad, otro marca valoración. Leen el mismo texto y
+    después se juntan los resultados. Análisis de contenido multidimensional, tal cual.
+  </div>
+  <aside class="notes">
+    Ojo con la tentación de decir «cada cabeza aprende una función lingüística». Es una
+    simplificación que circula mucho y que la literatura no sostiene. La viz siguiente
+    existe justamente para vacunar contra eso. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 23. VIZ cabezas ===================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Cuatro cabezas leyendo la misma oración</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/cabezas.html" title="cuatro cabezas de atención" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> leé los rótulos. <b>A ninguna de las cuatro se la
+    puede resumir en una regla simple</b>, y eso no lo decidimos nosotros: se calcula
+    midiendo. Después apretá «bloque 1» y mirá cómo las cuatro se vuelven la misma
+    diagonal. En un modelo real, la mayoría de las cabezas no se entienden — y funciona
+    igual.</p>
+  <aside class="notes">
+    Frase clave, decila textual: «una de estas cuatro no se entiende. En un modelo de
+    verdad, la mayoría no se entiende. Y sin embargo funciona.» Es la vacuna contra los
+    papers que le ponen nombre lingüístico a cada cabeza. (4 min)
+  </aside>
+</section>
+
+<!-- ===================== 24. DECISIÓN 3: LA POSICIÓN ===================== -->
+<section>
+  <h2>Decisión 3: attention sola <span class="c-error">no sabe qué viene antes</span></h2>
+  <div class="comparacion">
+    <div>
+      <h4>La comisión rechazó al ministro</h4>
+      <p style="font-size:.9em">Alguien perdió su cargo.</p>
+    </div>
+    <div>
+      <h4>El ministro rechazó a la comisión</h4>
+      <p style="font-size:.9em">Alguien desairó a un cuerpo legislativo.</p>
+    </div>
+  </div>
+  <div class="ojo">
+    <strong>Para attention pura, esas dos oraciones son la misma entrada.</strong> No hay
+    ningún lugar en la cuenta donde entre el orden: cada palabra mira a todas, y a todas
+    les hace la misma cuenta. Acabamos de volver a la <b>bolsa de palabras de la clase 6</b>,
+    pero carísima.
+  </div>
+  <aside class="notes">
+    Es el callback más importante de la clase. Es la misma oración con la que abrió la
+    clase 6. Preguntá: «¿se acuerdan de esta oración?». Alguien se va a acordar y se le
+    va a caer la ficha solo. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 25. POSITIONAL ENCODING ===================== -->
+<section>
+  <h2>El sellito de posición</h2>
+  <div class="fila-palabras" style="font-size:1.15em">
+    <span>la <span class="peso-mini">+ pos 1</span></span>
+    <span>comisión <span class="peso-mini">+ pos 2</span></span>
+    <span>rechazó <span class="peso-mini">+ pos 3</span></span>
+    <span>al <span class="peso-mini">+ pos 4</span></span>
+    <span>ministro <span class="peso-mini">+ pos 5</span></span>
+  </div>
+  <div class="intuicion">
+    A cada palabra se le <strong>suma</strong> un vector que codifica en qué posición está.
+    Como un sellito con el número de orden. Con eso, «no» en la posición 3 ya no es el
+    mismo vector que «no» en la posición 20, y el modelo puede aprender que el orden
+    significa algo.
+  </div>
+  <div class="ojo compacta">
+    <strong>Se suma, no se pega al lado.</strong> Suena raro y funciona. Y es una de las
+    pocas piezas del transformer que sigue en discusión: hay media docena de maneras de
+    hacerlo y se sigue publicando sobre eso.
+  </div>
+  <aside class="notes">
+    No entres en senos y cosenos. En el notebook usamos posiciones aprendidas, que son
+    una tabla más: una fila por posición, y las filas se ajustan solas. Si alguien
+    pregunta por los senos: «es la versión del paper original de 2017; hoy casi todos
+    usan posiciones aprendidas o rotativas». (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 26. EL BLOQUE COMPLETO ===================== -->
+<section>
+  <h2>El bloque completo: cuatro piezas</h2>
+  <div class="viz-frame" style="padding:10px">
+    <svg class="diagrama" viewBox="0 0 1000 300" role="img"
+         aria-label="diagrama del bloque transformer">
+      <defs>
+        <marker id="f2" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--tinta-2)"/>
+        </marker>
+      </defs>
+      <g style="font-size:15px">
+        <rect x="20" y="120" width="98" height="52" rx="9" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="69" y="151" text-anchor="middle" style="fill:var(--tinta)">entrada</text>
+
+        <rect x="160" y="120" width="110" height="52" rx="9" style="fill:var(--papel-3);stroke:var(--borde)"/>
+        <text x="215" y="145" text-anchor="middle" style="fill:var(--tinta-2);font-size:13px">normalizar</text>
+        <text x="215" y="162" text-anchor="middle" style="fill:var(--tinta-3);font-size:11px">plomería</text>
+
+        <rect x="300" y="112" width="150" height="68" rx="9" style="fill:var(--c-acento-suave);stroke:var(--c-acento);stroke-width:2"/>
+        <text x="375" y="140" text-anchor="middle" style="fill:var(--c-acento);font-weight:700">attention</text>
+        <text x="375" y="160" text-anchor="middle" style="fill:var(--tinta-2);font-size:12px">cada palabra mira</text>
+        <text x="375" y="174" text-anchor="middle" style="fill:var(--tinta-2);font-size:12px">a las anteriores</text>
+
+        <circle cx="500" cy="146" r="17" style="fill:var(--papel);stroke:var(--c-parametro);stroke-width:2"/>
+        <text x="500" y="153" text-anchor="middle" style="fill:var(--c-parametro);font-size:19px;font-weight:700">+</text>
+
+        <rect x="548" y="120" width="110" height="52" rx="9" style="fill:var(--papel-3);stroke:var(--borde)"/>
+        <text x="603" y="145" text-anchor="middle" style="fill:var(--tinta-2);font-size:13px">normalizar</text>
+        <text x="603" y="162" text-anchor="middle" style="fill:var(--tinta-3);font-size:11px">plomería</text>
+
+        <rect x="688" y="112" width="150" height="68" rx="9" style="fill:var(--c-modelo-suave);stroke:var(--c-modelo);stroke-width:2"/>
+        <text x="763" y="140" text-anchor="middle" style="fill:var(--c-modelo);font-weight:700">MLP</text>
+        <text x="763" y="160" text-anchor="middle" style="fill:var(--tinta-2);font-size:12px">la suma de rampas</text>
+        <text x="763" y="174" text-anchor="middle" style="fill:var(--tinta-2);font-size:12px">de la clase 2</text>
+
+        <circle cx="888" cy="146" r="17" style="fill:var(--papel);stroke:var(--c-parametro);stroke-width:2"/>
+        <text x="888" y="153" text-anchor="middle" style="fill:var(--c-parametro);font-size:19px;font-weight:700">+</text>
+
+        <rect x="925" y="120" width="60" height="52" rx="9" style="fill:var(--papel-2);stroke:var(--borde)"/>
+        <text x="955" y="151" text-anchor="middle" style="fill:var(--tinta);font-size:13px">salida</text>
+      </g>
+
+      <g style="stroke:var(--tinta-2);stroke-width:1.6;fill:none">
+        <path d="M 118 146 L 158 146" marker-end="url(#f2)"/>
+        <path d="M 270 146 L 298 146" marker-end="url(#f2)"/>
+        <path d="M 450 146 L 481 146" marker-end="url(#f2)"/>
+        <path d="M 519 146 L 546 146" marker-end="url(#f2)"/>
+        <path d="M 658 146 L 686 146" marker-end="url(#f2)"/>
+        <path d="M 838 146 L 869 146" marker-end="url(#f2)"/>
+        <path d="M 907 146 L 923 146" marker-end="url(#f2)"/>
+      </g>
+
+      <!-- los dos desvíos residuales -->
+      <g style="stroke:var(--c-parametro);stroke-width:2.2;fill:none;stroke-dasharray:7 5">
+        <path d="M 140 132 L 140 62 L 500 62 L 500 128" marker-end="url(#f2)"/>
+        <path d="M 528 132 L 528 62 L 888 62 L 888 128" marker-end="url(#f2)"/>
+      </g>
+      <text x="320" y="52" text-anchor="middle" style="fill:var(--c-parametro);font-size:14px;font-weight:600">
+        conexión residual: una fotocopia de lo que entró
+      </text>
+      <text x="708" y="52" text-anchor="middle" style="fill:var(--c-parametro);font-size:14px;font-weight:600">
+        otra vez lo mismo
+      </text>
+      <text x="500" y="240" text-anchor="middle" style="fill:var(--tinta-3);font-size:14px">
+        entra una oración de n palabras · sale una oración de n palabras, con cada palabra ya contextualizada
+      </text>
+      <text x="500" y="264" text-anchor="middle" style="fill:var(--tinta-3);font-size:14px">
+        la forma del tensor no cambia — por eso se puede apilar
+      </text>
+    </svg>
+  </div>
+  <aside class="notes">
+    Recorrelo con el dedo, izquierda a derecha, una pieza por vez, sin apurarte.
+    Después decí la frase que importa: «entra n palabras y sale n palabras, con la misma
+    forma. Por eso se puede apilar.» (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 27. LA CONEXIÓN RESIDUAL ===================== -->
+<section>
+  <h2>La conexión residual: el original del expediente</h2>
+  <div class="ss">
+    Un expediente pasa por cinco oficinas. Cada una agrega su dictamen, y el
+    <strong>documento original sigue adjunto</strong>. Si cada oficina reemplazara el
+    expediente por su propio resumen, a la quinta no quedaría nada del caso.
+  </div>
+  <div class="intuicion">
+    <code>salida = entrada + lo_que_hizo_el_bloque</code>. El bloque no reemplaza: agrega.
+    Sirve para dos cosas: que la información no se pierda al apilar 12 bloques, y que
+    <strong>el gradiente de la clase 3 llegue hasta abajo</strong> sin diluirse.
+  </div>
+  <div class="manos compacta">
+    En el <code>TODO 4</code> del notebook la borrás y mirás la desviación estándar de la
+    salida después de apilar 6 bloques. Se ve la señal desvanecerse con números, no con fe.
+  </div>
+  <aside class="notes">
+    Es una de esas ideas de una línea que cambiaron el campo entero (viene de las ResNet
+    de imágenes, 2015). Si alguien pregunta «¿y con eso alcanza?», la respuesta es sí, y
+    es genuinamente sorprendente. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 28. EL MLP DE ADENTRO ===================== -->
+<section>
+  <h2>El MLP de adentro: <span class="c-acento">viejos conocidos</span></h2>
+  <pre><code class="language-python" data-trim>
+self.mlp = nn.Sequential(
+    nn.Linear(dim, 4 * dim),   # se agranda: más rampas para dibujar
+    nn.ReLU(),                 # LA rampa de la clase 2
+    nn.Linear(4 * dim, dim),   # se vuelve al tamaño de siempre
+)
+</code></pre>
+  <div class="intuicion">
+    Attention decide <strong>de dónde traer información</strong>. El MLP decide
+    <strong>qué hacer con lo que trajo</strong>, palabra por palabra. Y es, literalmente,
+    la suma de rampas de la clase 2. Nunca se fue.
+  </div>
+  <aside class="notes">
+    Callback fuerte: mostrales que reconocen las tres líneas. «Esto ya lo escribieron
+    ustedes en la clase 2 y en la 4.» Es el momento en que la clase deja de sentirse
+    como magia nueva. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 29. LA NORMALIZACIÓN ===================== -->
+<section>
+  <h2>La normalización: plomería honesta</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Qué hace</h4>
+      <p>Reescala los números de cada palabra para que no se vayan a las nubes ni se
+        aplasten contra el cero, capa tras capa.</p>
+    </div>
+    <div>
+      <h4>Qué NO hace</h4>
+      <p>No aporta ninguna idea. No hay nada conceptual escondido acá. Si sacás la
+        normalización, el modelo entrena mal; si la ponés, entrena bien.</p>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>Es la única pieza de la clase que te podés llevar sin entender el detalle.</strong>
+    Importa que esté. Y decirlo en voz alta es más honesto que inventarle una metáfora.
+  </div>
+  <aside class="notes">
+    Esta slide es corta a propósito. Si vas atrasado, es la primera candidata a
+    resumirse en una frase dicha al pasar. (1 min)
+  </aside>
+</section>
+
+<!-- ===================== 30. APILAR ===================== -->
+<section>
+  <h2>Y después… se apila el mismo bloque</h2>
+  <div class="viz-frame" style="padding:10px">
+    <svg class="diagrama" viewBox="0 0 1000 190" role="img" aria-label="seis bloques apilados">
+      <g id="pila"></g>
+      <text x="500" y="180" text-anchor="middle" style="fill:var(--tinta-3);font-size:15px;font-family:var(--f-texto)">
+        no hay una idea nueva por piso: es el mismo piso, repetido
+      </text>
+    </svg>
+  </div>
+  <div class="tarjetas">
+    <div><h4>el de hoy</h4>2 bloques, 4 cabezas, ~0,5 M de perillas</div>
+    <div><h4>GPT-2 chico</h4>12 bloques, 12 cabezas, 124 M</div>
+    <div><h4>los grandes</h4>más de 100 bloques. Misma idea, más plata.</div>
+  </div>
+  <aside class="notes">
+    Frase: «no hay una idea nueva por piso. Es el mismo piso repetido, con más plata».
+    Esto desmitifica más que cualquier otra cosa que digas hoy. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 30b. LA SIEMBRA DE LA CLASE 5, CUMPLIDA ===================== -->
+<section>
+  <span class="marca">prometido en la clase 5, cumplido</span>
+  <h3>Se llenaron las dos filas grises</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/supuestos-de-arquitectura.html" title="qué supone cada arquitectura" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> es la misma tabla de la clase 5, con las filas de
+    RNN y de Transformer <b>abiertas</b>. Elegí «una tabla de encuesta»: el transformer
+    tampoco se pone verde. <b>Casi no supone nada, y eso se paga en datos.</b></p>
+  <aside class="notes">
+    Gesto de continuidad: «esta la abrimos en la clase 5 y quedaron dos filas grises.
+    Hoy se llenaron». Si vas justo de tiempo, esta slide se muestra 30 segundos y se
+    sigue; se puede recortar sin daño. (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 31. BLOQUE PRÁCTICO 2 ===================== -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 — armar el bloque entero</h2>
+  <div class="manos">
+    De a dos, secciones 5 a 8 del notebook.
+    <ul style="margin-top:.4em">
+      <li>La <b>máscara causal</b> con <code>torch.tril</code>, y el <code>TODO 3</code>:
+        qué pasa si la aplicás <em>después</em> del softmax.</li>
+      <li><b>Multi-head</b>: llamar cuatro veces a la misma función y pegar los resultados.</li>
+      <li>La demostración de la <b>bolsa de palabras</b>: permutar la oración y ver que
+        sin posición sale lo mismo.</li>
+      <li>La clase <code>BloqueTransformer</code> entera, y verificar formas.</li>
+      <li><code>TODO 4</code>: sacar la residual y mirar la señal desvanecerse.</li>
+    </ul>
+  </div>
+  <p><b>20 minutos.</b> Al final tienen un transformer entero. Apagado, pero entero.</p>
+  <aside class="notes">
+    De a dos, en serio: el que explica aprende más que el que escucha. Al final, poné
+    en pantalla la tabla de formas del notebook y que la comparen con la suya.
+    (20 min)
+  </aside>
+</section>
+
+<!-- ===================== 32. LA ADVERTENCIA ===================== -->
+<section>
+  <span class="marca">criterio</span>
+  <h2>Un mapa hermoso, y una pregunta incómoda</h2>
+  <div class="comparacion contra">
+    <div>
+      <h4>Lo que el mapa SÍ dice</h4>
+      <p>Por dónde <strong>fluyó la información</strong>. Que al calcular el vector de esta
+        palabra, el modelo tomó un 34% del vector de aquella.</p>
+    </div>
+    <div>
+      <h4>Lo que el mapa NO dice</h4>
+      <p>Por qué el modelo <strong>decidió</strong> lo que decidió. Se pueden construir
+        mapas de atención muy distintos que producen <b>la misma salida</b>. Si el mapa no
+        determina la salida, no puede explicarla.</p>
+    </div>
+  </div>
+  <div class="ss">
+    Ustedes ya tienen el vocabulario para esto: <strong>que el modelo haya mirado una
+    palabra no prueba que esa palabra haya causado la salida</strong>. Es correlación y
+    causalidad, otra vez, en un envase nuevo. Hay literatura entera: Jain &amp; Wallace
+    (2019), <em>Attention is not Explanation</em> — y su réplica, Wiegreffe &amp; Pinter
+    (2019), <em>Attention is not not Explanation</em>. El debate está abierto, y que esté
+    abierto también es un dato sobre cómo funciona el campo.
+  </div>
+  <aside class="notes">
+    Es la slide más importante de la clase para esta audiencia. No la apures.
+    Pregunta al aula: «¿qué evidencia pedirían ustedes para afirmar que el modelo
+    <b>usó</b> esa palabra?». La respuesta que buscás es una intervención: cambiar la
+    palabra y ver si cambia la predicción. Si alguien la dice, celebralo. (5 min)
+  </aside>
+</section>
+
+<!-- ===================== 33. EL LUNES ===================== -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás para el lunes</h2>
+  <ol>
+    <li>Si leés un paper que muestra un mapa de atención y concluye <em>«el modelo se basa
+      en la palabra X»</em>, ahí tenés <strong>un comentario de revisor</strong>: eso es
+      flujo de información, no explicación. Pedí una intervención.</li>
+    <li>Si <em>vos</em> mostrás mapas de atención, reportalos como
+      <strong>exploratorios</strong>. «Nos llamó la atención que…», no «el modelo decide
+      en base a…».</li>
+    <li>Cuando alguien te diga que un LLM «entiende» un texto, ya sabés qué hay adentro:
+      promedios ponderados con perillas aprendidas. <strong>Eso no es poco, y no es
+      comprensión.</strong></li>
+  </ol>
+  <div class="aha compacta">
+    Lo más útil que se llevan hoy es <strong>lo que van a poder no creerse</strong>.
+  </div>
+  <aside class="notes">
+    Decilo tal cual: «lo más útil de esta clase es una figura linda que ahora saben
+    mirar con desconfianza». (2 min)
+  </aside>
+</section>
+
+<!-- ===================== 34. QUÉ TE LLEVÁS ===================== -->
+<section>
+  <h2>Las tres cosas de hoy</h2>
+  <div class="tarjetas">
+    <div>
+      <h4>uno</h4>
+      Attention es un <b>promedio ponderado</b>: cada palabra reparte su 100% entre las
+      demás y se arma su propio resumen del contexto. Nada más difícil que eso.
+    </div>
+    <div>
+      <h4>dos</h4>
+      Los pesos <b>se aprenden</b>: query, key y value son tres transformaciones de la
+      misma palabra, y sus matrices son perillas que ajusta el mismo descenso de la clase 3.
+    </div>
+    <div>
+      <h4>tres</h4>
+      El mapa de atención muestra <b>por dónde pasó la información</b>, no por qué el
+      modelo decidió. Es la advertencia que te sirve para leer y para escribir papers.
+    </div>
+  </div>
+  <aside class="notes">
+    Tres, no cuatro. Si te preguntan por la máscara o las cabezas: son consecuencias de
+    la uno. (1 min)
+  </aside>
+</section>
+
+<!-- ===================== 35. GLOSARIO ===================== -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista glosario-dos">
+    <li><b>attention</b><span>atención — cada elemento arma un resumen ponderado de los demás</span></li>
+    <li><b>self-attention</b><span>autoatención — la oración se mira a sí misma; no hay dos textos</span></li>
+    <li><b>query</b><span>consulta — lo que una palabra busca</span></li>
+    <li><b>key</b><span>clave — el aviso que una palabra publica</span></li>
+    <li><b>value</b><span>valor — lo que una palabra aporta cuando la miran</span></li>
+    <li><b>dot product</b><span>producto punto — cuánto apuntan dos flechas para el mismo lado</span></li>
+    <li><b>softmax</b><span>puntajes convertidos en porcentajes que suman 100</span></li>
+    <li><b>causal mask</b><span>máscara causal — tapar el futuro para no hacer trampa</span></li>
+    <li><b>head / multi-head</b><span>cabeza — un juego de perillas Q, K, V; varias en paralelo</span></li>
+    <li><b>positional encoding</b><span>codificación posicional — el sellito con el número de orden</span></li>
+    <li><b>residual connection</b><span>conexión residual — el original del expediente, siempre adjunto</span></li>
+    <li><b>layer norm</b><span>normalización — plomería para que los números no se disparen</span></li>
+    <li><b>transformer block</b><span>bloque transformer — attention + MLP + dos residuales + dos normalizaciones</span></li>
+  </ul>
+  <aside class="notes">
+    Están todos en <code>recursos/glosario.md</code> con la clase donde aparecieron.
+    Pasala rápido: es material de consulta, no de exposición. (1 min)
+  </aside>
+</section>
+
+<!-- ===================== 36. PUENTE ===================== -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 8: un mini-GPT propio, y la traducción a ChatGPT</h1>
+  <div class="franja"></div>
+  <p class="gancho">Tenemos la máquina construida y apagada. La clase que viene le damos de
+    comer cuarenta años de discursos, la vemos aprender a escribir en vivo, y después
+    traducimos cada pieza de hoy a algo que ChatGPT hace y que te vuelve loco: por qué
+    alucina, por qué le importa tanto el prompt, y por qué no sabe contar las erres.</p>
+  <aside class="notes">
+    Cerrá con una promesa cobrable, y decila mirando a la sala: «lo que construyeron hoy
+    es lo que vamos a encender la clase que viene». (1 min)
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  /* KaTeX no acepta `var(--c-val)` adentro de \textcolor: hay que escribirle el
+     color literal. Para que la fórmula no quede con los colores del tema claro
+     sobre fondo oscuro, después de renderizar los cambiamos por los tokens del
+     curso, que sí cambian con el tema. Son los mismos tres de siempre:
+     query = val, key = modelo, value = ok. */
+  const COLORES_FORMULA = {
+    '#e08519': '--c-val', '#1f6fb5': '--c-modelo', '#2f8a56': '--c-ok'
+  };
+  function comoRgb(hex) {
+    return 'rgb(' + parseInt(hex.slice(1, 3), 16) + ', ' +
+      parseInt(hex.slice(3, 5), 16) + ', ' + parseInt(hex.slice(5, 7), 16) + ')';
+  }
+  function repintarFormula() {
+    const cs = getComputedStyle(document.documentElement);
+    document.querySelectorAll('.katex [style]').forEach(el => {
+      const c = (el.style.color || '').toLowerCase();
+      for (const hex in COLORES_FORMULA) {
+        if (c === hex || c === comoRgb(hex)) {
+          el.dataset.tokenColor = COLORES_FORMULA[hex];
+        }
+      }
+      if (el.dataset.tokenColor) {
+        el.style.color = cs.getPropertyValue(el.dataset.tokenColor).trim();
+      }
+    });
+  }
+  // si el sistema cambia de claro a oscuro con la presentación abierta
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', repintarFormula);
+  }
+
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          repintarFormula();
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+  const planos = [];
+  function nuevoPlano(sel, op) { const p = Viz.plano(sel, op); planos.push(p); return p; }
+
+  /* ---------- slide 8: el promedio ponderado, con la cuenta a la vista ------ */
+  (function () {
+    const V = [
+      { nombre: 'proyecto', x: 4,  y: 1, peso: 0.60 },
+      { nombre: 'comisión', x: 1,  y: 4, peso: 0.30 },
+      { nombre: 'ministro', x: -2, y: 2, peso: 0.10 }
+    ];
+    const p = nuevoPlano('#caja-promedio', {
+      xmin: -3, xmax: 6.6, ymin: -0.8, ymax: 4.8, alto: 330, cuadrado: false,
+      titulo: 'tres palabras, dos números cada una'
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla(); p.ejes();
+      let rx = 0, ry = 0;
+      for (const v of V) { rx += v.peso * v.x; ry += v.peso * v.y; }
+      for (const v of V) {
+        p.flecha(0, 0, v.x, v.y, { color: Viz.alfa('datos', .45 + v.peso), grosor: 1.4 + v.peso * 5 });
+        p.texto(v.x, v.y, v.nombre + '  ×' + Viz.num(v.peso, 2),
+          { color: 'datos', tam: 12, peso: '600', dx: 6, dy: -12 });
+      }
+      p.flecha(0, 0, rx, ry, { color: 'parametro', grosor: 5 });
+      p.texto(rx, ry, 'el resumen de «lo»', { color: 'parametro', tam: 13, peso: '700',
+        dx: 8, dy: 16, caja: true });
+      p.leyenda([
+        { color: 'datos', texto: 'las tres palabras del contexto', forma: 'linea' },
+        { color: 'parametro', texto: 'el promedio ponderado', forma: 'linea' }
+      ], { pos: 'ai' });
+    });
+  })();
+
+  /* ---------- slide 15: el producto punto como alineación ------------------ */
+  (function () {
+    let ang = 25;   // grados entre la búsqueda y el aviso
+    // OJO: `cuadrado` sólo funciona si NO le pasás `alto` (si se lo pasás, manda
+    // el alto y el plano queda achatado — y un ángulo dibujado en un plano
+    // achatado miente, que es justo lo que esta slide no puede hacer).
+    const p = nuevoPlano('#caja-punto', {
+      xmin: -1.6, xmax: 1.6, ymin: -1.6, ymax: 1.6, cuadrado: true,
+      titulo: 'dos flechas y su puntaje'
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: () => '', formatoY: () => '' });
+      const a = ang * Math.PI / 180;
+      const der = Math.cos(a) >= 0;    // ¿el aviso apunta para la derecha?
+      p.flecha(0, 0, 1.25, 0, { color: 'val', grosor: 4.5 });
+      p.texto(1.25, 0, 'lo que busca «lo»',
+        { color: 'val', tam: 12, peso: '700', alinear: 'right', dx: -8, dy: 18 });
+      p.flecha(0, 0, 1.25 * Math.cos(a), 1.25 * Math.sin(a), { color: 'modelo', grosor: 4.5 });
+      p.texto(1.25 * Math.cos(a), 1.25 * Math.sin(a), 'el aviso de «proyecto»',
+        { color: 'modelo', tam: 12, peso: '700',
+          alinear: der ? 'right' : 'left', dx: der ? -8 : 8, dy: -16 });
+      const pts = [];
+      for (let t = 0; t <= 30; t++) {
+        const b = a * t / 30;
+        pts.push({ x: .5 * Math.cos(b), y: .5 * Math.sin(b) });
+      }
+      p.linea(pts, { color: 'acento', grosor: 2, punteada: [4, 4] });
+      p.textoPx(p.L + 12, p.B - 14, 'puntaje = ' + Viz.num(Math.cos(a) * 1.25 * 1.25, 2),
+        { color: 'acento', tam: 18, peso: '700', base: 'bottom', caja: true });
+    });
+    const ctl = Viz.controles('#panel-punto', [
+      { tipo: 'titulo', texto: 'La perilla' },
+      { tipo: 'slider', id: 'ang', etiqueta: 'qué tan distinto apuntan',
+        sub: 'el ángulo entre las dos flechas',
+        min: 0, max: 180, paso: 1, valor: 25, decimales: 0, color: 'acento',
+        formato: v => v + '°' },
+      { tipo: 'texto', id: 'lectura', html: '' }
+    ], (v) => {
+      ang = v.ang;
+      const punt = Math.cos(ang * Math.PI / 180) * 1.25 * 1.25;
+      ctl.texto('lectura',
+        ang < 25 ? 'Casi el mismo lado: <b>puntaje alto</b>. Esta palabra le va a dar mucha atención a la otra.'
+        : ang < 80 ? 'Se parecen a medias. Puntaje mediano.'
+        : ang < 100 ? 'Perpendiculares: <b>puntaje ≈ 0</b>. No tienen nada que ver.'
+        : 'Apuntan al revés: <b>puntaje negativo</b>. Después del softmax esta palabra queda casi en cero.');
+      p.redibujar();
+    });
+    ctl.disparar();
+  })();
+
+  /* ---------- slide 16: softmax con cuatro puntajes ------------------------ */
+  (function () {
+    // Puntajes elegidos para que el reparto quede parejo con la explicación oral.
+    // Los porcentajes NO están escritos a mano: los calcula el softmax de acá abajo.
+    const NOMBRES = ['proyecto', 'comisión', 'ministro', 'recinto'];
+    const BASE = [2.0, 0.6, -0.5, 0.8];
+    let escala = 1;
+    const p = nuevoPlano('#caja-softmax', {
+      xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 330,
+      titulo: 'los cuatro puntajes, antes y después'
+    });
+    function repartir() {
+      const s = BASE.map(v => v * escala);
+      const m = Math.max.apply(null, s);
+      const e = s.map(v => Math.exp(v - m));
+      const t = e.reduce((a, b) => a + b, 0);
+      return { s: s, w: e.map(v => v / t) };
+    }
+    p.alDibujar(() => {
+      p.fondo();
+      const r = repartir();
+      const W = p.R - p.L, H = p.B - p.T;
+      p.textoPx(p.L + 4, p.T + 2, 'puntajes crudos', { color: 'tinta3', tam: 12, peso: '700' });
+      p.textoPx(p.L + W / 2 + 20, p.T + 2, 'después del softmax', { color: 'acento', tam: 12, peso: '700' });
+      for (let i = 0; i < 4; i++) {
+        const y = p.T + 42 + i * (H - 60) / 4;
+        p.textoPx(p.L + 4, y - 12, NOMBRES[i], { color: 'tinta2', tam: 12, peso: '600' });
+        // barra del puntaje crudo (puede ser negativo: arranca en un cero visual)
+        const cero = p.L + 118, esc = 24;
+        p.ctx.fillStyle = Viz.alfa('datos', .5);
+        const w1 = r.s[i] * esc;
+        p.ctx.fillRect(w1 >= 0 ? cero : cero + w1, y - 8, Math.abs(w1), 16);
+        p.ctx.strokeStyle = Viz.color('borde');
+        p.ctx.beginPath(); p.ctx.moveTo(cero, y - 16); p.ctx.lineTo(cero, y + 12); p.ctx.stroke();
+        p.textoPx(cero + (w1 >= 0 ? w1 + 6 : -6), y - 6,
+          Viz.num(r.s[i], 1), { color: 'tinta2', tam: 12, alinear: w1 >= 0 ? 'left' : 'right' });
+        // barra del porcentaje
+        const x2 = p.L + W / 2 + 20;
+        p.ctx.fillStyle = Viz.color('acento');
+        p.ctx.fillRect(x2, y - 8, r.w[i] * (W / 2 - 70), 16);
+        p.textoPx(x2 + r.w[i] * (W / 2 - 70) + 6, y - 6,
+          Math.round(r.w[i] * 100) + '%', { color: 'acento', tam: 13, peso: '700' });
+      }
+      p.textoPx(p.L + W / 2 + 20, p.B - 16,
+        'suman ' + Viz.num(r.w.reduce((a, b) => a + b, 0), 2),
+        { color: 'ok', tam: 13, peso: '700', base: 'bottom' });
+    });
+    const ctl = Viz.controles('#panel-softmax', [
+      { tipo: 'titulo', texto: 'Una perilla que vuelve en la clase 8' },
+      { tipo: 'slider', id: 'escala', etiqueta: 'qué tan marcada la diferencia',
+        sub: 'multiplicar todos los puntajes',
+        min: 0, max: 3, paso: 0.05, valor: 1, decimales: 2, color: 'acento' },
+      { tipo: 'texto', id: 'lectura', html: '' }
+    ], (v) => {
+      escala = v.escala;
+      const r = repartir();
+      ctl.texto('lectura',
+        escala < 0.25 ? 'Con los puntajes casi apagados, el reparto queda <b>parejo</b>: mira a todas por igual.'
+        : escala > 1.9 ? 'Con los puntajes exagerados, <b>el ganador se lleva casi todo</b>. Eso es una distribución afilada.'
+        : 'El ganador se lleva <b>' + Math.round(Math.max.apply(null, r.w) * 100) + '%</b>. ' +
+          'Movés la perilla y mirás cómo se afila o se aplana el reparto.');
+      p.redibujar();
+    });
+    ctl.disparar();
+  })();
+
+  /* ---------- slide 30: la pila de seis bloques ---------------------------- */
+  (function () {
+    const svg = document.getElementById('pila');
+    if (!svg) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    for (let i = 0; i < 6; i++) {
+      const x = 130 + i * 125;
+      const r = document.createElementNS(NS, 'rect');
+      r.setAttribute('x', x); r.setAttribute('y', 45);
+      r.setAttribute('width', 108); r.setAttribute('height', 86);
+      r.setAttribute('rx', 9);
+      r.setAttribute('style', 'fill:var(--c-acento-suave);stroke:var(--c-acento);stroke-width:2');
+      svg.appendChild(r);
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', x + 54); t.setAttribute('y', 82);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('style', 'fill:var(--c-acento);font-size:14px;font-weight:700;font-family:var(--f-texto)');
+      t.textContent = 'bloque ' + (i + 1);
+      svg.appendChild(t);
+      const t2 = document.createElementNS(NS, 'text');
+      t2.setAttribute('x', x + 54); t2.setAttribute('y', 103);
+      t2.setAttribute('text-anchor', 'middle');
+      t2.setAttribute('style', 'fill:var(--tinta-2);font-size:11px;font-family:var(--f-texto)');
+      t2.textContent = 'idéntico';
+      svg.appendChild(t2);
+    }
+  })();
+
+  // Reveal esconde las slides: cuando aparece una, el canvas recién ahí tiene el
+  // ancho bueno y hay que redibujar. Si no, en el proyector sale cortado.
+  Reveal.on('slidechanged', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+  Reveal.on('ready', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+</script>
+</body>
+</html>

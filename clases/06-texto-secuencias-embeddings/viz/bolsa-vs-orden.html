@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolsa de palabras contra orden — Clase 6</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "«el proyecto fue aprobado» y «el proyecto NO fue aprobado»
+     difieren en una palabra de ocho y dicen lo contrario. Para la bolsa de
+     palabras son casi el mismo documento: el coseno de los promedios da 0,984.
+     Y en el par de la agencia da 1,000 exacto: no casi, exacto."
+
+     Todos los cosenos salen de `medir-embeddings.py`, calculados con los
+     embeddings reales del corpus de discursos. Ninguno está inventado.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .par { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .8rem; }
+  @media (max-width: 720px) { .par { grid-template-columns: minmax(0,1fr); } }
+  .frase-caja { background: var(--papel-2); border: 1px solid var(--borde);
+                border-radius: var(--r-medio); padding: .7rem .85rem; }
+  .frase-caja .frase { font-family: var(--f-titulo); font-size: 1.12rem;
+                       line-height: 1.35; margin: 0 0 .55em; }
+  .frase-caja .frase .dif { background: var(--c-error-suave); border-radius: 4px;
+                            padding: 0 .18em; color: var(--c-error); font-weight: 700; }
+  .frase-caja h4 { margin: .7em 0 .25em; font-size: .7rem; letter-spacing: .08em;
+                   text-transform: uppercase; color: var(--tinta-3); font-family: var(--f-texto); }
+  .conteos { display: flex; flex-wrap: wrap; gap: .25rem; }
+  .conteos span { font-family: var(--f-mono); font-size: .8rem;
+                  background: var(--papel-3); border-radius: 4px; padding: .1em .4em; }
+  .conteos span.dif { background: var(--c-error-suave); color: var(--c-error); font-weight: 700; }
+  .promedio { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; margin-top: .2rem; }
+  .promedio > i { display: block; padding-top: 100%; border-radius: 2px; }
+  .roles { font-size: .86rem; }
+  .roles b { font-family: var(--f-mono); color: var(--c-acento); }
+
+  .veredicto { margin-top: .8rem; border-radius: var(--r-medio); padding: .75rem .9rem;
+               border: 1px solid var(--borde); background: var(--papel-2); }
+  .veredicto .numeron { font-family: var(--f-mono); font-variant-numeric: tabular-nums;
+                        font-size: 2rem; font-weight: 700; color: var(--c-error);
+                        line-height: 1; }
+  .veredicto .fila { display: flex; gap: 1.2rem; align-items: baseline; flex-wrap: wrap; }
+  .veredicto p { margin: .5em 0 0; font-size: .92rem; }
+  .humano { border-left: 4px solid var(--c-ok); background: var(--c-ok-suave);
+            border-radius: 0 var(--r-medio) var(--r-medio) 0; padding: .6rem .8rem;
+            margin-top: .7rem; font-size: .92rem; }
+  .humano h4 { margin: 0 0 .25em; font-size: .7rem; letter-spacing: .08em;
+               text-transform: uppercase; color: var(--c-ok); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Dos frases, un solo vector</h1>
+    <p>Elegí un par de frases. Abajo de cada una está lo que ve un método que
+       <em>cuenta palabras</em>: la tabla de conteos y el promedio de los vectores.
+       A la derecha, lo que entendés vos sin esfuerzo. La pregunta es qué se
+       pierde en el camino.</p>
+  </header>
+
+  <div>
+    <div class="par" id="par"></div>
+    <div class="veredicto" id="veredicto"></div>
+    <div class="humano" id="humano"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Empezá por <em>«quién le hizo qué a quién»</em>:
+      las mismas cinco palabras, cambia quién critica, y el coseno de los dos
+      promedios da <b>1,000</b>. No «casi»: <b>exacto</b>, porque el promedio de
+      un conjunto no depende del orden. Ahora andá a <em>«la negación»</em>:
+      difieren en una palabra de ocho, dicen lo contrario, y el número da
+      <b>0,984</b> — un método que use ese número va a decir que son el mismo
+      documento. Lo que se pierde no es un detalle de estilo: es <em>agencia,
+      responsabilidad y negación</em>, que es exactamente lo que un cientista
+      social codifica a mano.
+    </div>
+    <p class="viz-pie">
+      Los cosenos están <b>medidos</b>, no estimados: se calculan con los
+      embeddings reales del corpus de discursos de apertura (1984-2019) en
+      <code>medir-embeddings.py</code>. Las frases son ejemplos escritos para la
+      clase con vocabulario del corpus; no son citas de nadie.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-texto.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const PARES = window.DATOS_TEXTO.frases;
+const cajaPar = document.getElementById('par');
+const cajaVer = document.getElementById('veredicto');
+const cajaHum = document.getElementById('humano');
+
+function tiras(vec) {
+  if (!vec) return '';
+  // misma convención que la clase 5: azul negativo, rojo positivo
+  const M = Math.max.apply(null, vec.map(Math.abs)) || 1;
+  return '<div class="promedio">' + vec.map(v => {
+    const t = v / M;
+    const c = t >= 0 ? Viz.alfa('error', .1 + Math.abs(t) * .9)
+                     : Viz.alfa('modelo', .1 + Math.abs(t) * .9);
+    return '<i style="background:' + c + '" title="' + v + '"></i>';
+  }).join('') + '</div>';
+}
+
+function ladoHTML(par, cual) {
+  const frase = par[cual];
+  const otras = new Set(par[cual === 'a' ? 'b' : 'a'].split(' '));
+  const propias = par[cual].split(' ');
+  // marcamos las palabras que la OTRA frase no tiene
+  const cuenta = {}; for (const w of propias) cuenta[w] = (cuenta[w] || 0) + 1;
+  const cuentaOtra = {};
+  for (const w of par[cual === 'a' ? 'b' : 'a'].split(' '))
+    cuentaOtra[w] = (cuentaOtra[w] || 0) + 1;
+
+  const fraseHTML = propias.map(w =>
+    (cuenta[w] !== (cuentaOtra[w] || 0)) ? '<span class="dif">' + w + '</span>' : w
+  ).join(' ');
+
+  const conteos = par.conteos.map((w, k) => {
+    const n = cual === 'a' ? par.conteo_a[k] : par.conteo_b[k];
+    const m = cual === 'a' ? par.conteo_b[k] : par.conteo_a[k];
+    return '<span class="' + (n !== m ? 'dif' : '') + '">' + w + ' ' + n + '</span>';
+  }).join('');
+
+  const roles = par['roles_' + cual];
+  const rolesHTML = Object.keys(roles)
+    .map(k => k + ': <b>' + roles[k] + '</b>').join('<br>');
+
+  return '<div class="frase-caja">' +
+    '<p class="frase">«' + fraseHTML + '»</p>' +
+    '<h4>lo que ve la bolsa de palabras</h4>' +
+    '<div class="conteos">' + conteos + '</div>' +
+    '<h4>el promedio de los embeddings (primeras 40 dimensiones)</h4>' +
+    tiras(cual === 'a' ? par.vec_a : par.vec_b) +
+    (JSON.stringify(par.vec_a) === JSON.stringify(par.vec_b)
+      ? '<p style="font-size:.78rem;color:var(--c-error);margin:.3em 0 0">' +
+        'idéntica a la de al lado, celda por celda</p>' : '') +
+    '<h4>lo que entendés vos</h4>' +
+    '<p class="roles">' + rolesHTML + '</p>' +
+    '</div>';
+}
+
+function pintar() {
+  const par = PARES.find(x => x.id === ctl.valores.par) || PARES[0];
+  cajaPar.innerHTML = ladoHTML(par, 'a') + ladoHTML(par, 'b');
+
+  const cos = par.coseno_promedio;
+  const iguales = par.bolsa_identica;
+  cajaVer.innerHTML =
+    '<div class="fila">' +
+      '<div><span class="numeron">' + Viz.num(cos, 3).replace('.', ',') + '</span>' +
+      '<div class="etiqueta-chica">parecido entre los dos promedios</div></div>' +
+      '<div style="flex:1;min-width:16rem">' +
+      '<p style="margin:0">' +
+      (iguales
+        ? '<b>Las dos tablas de conteos son idénticas, palabra por palabra.</b> ' +
+          'No parecidas: <em>idénticas</em>. Y el promedio de los vectores también, ' +
+          'porque promediar no mira el orden. Cualquier método que represente un ' +
+          'texto contando palabras <b>no puede distinguir estas dos frases</b>. ' +
+          'Ni con conteos, ni con embeddings promediados.'
+        : '<b>Las tablas difieren en ' +
+          par.conteos.filter((w, k) => par.conteo_a[k] !== par.conteo_b[k]).length +
+          ' palabra(s)</b>, marcadas en rojo. El parecido entre los promedios ' +
+          'igual da <b>' + Viz.num(cos, 3).replace('.', ',') + '</b>: para casi ' +
+          'cualquier umbral que uses, esto es "el mismo documento".') +
+      '</p></div>' +
+    '</div>' +
+    (par.fuera_de_vocabulario.length
+      ? '<p style="color:var(--tinta-3);font-size:.82rem">Fuera del vocabulario de ' +
+        '2.000 palabras (no entran al promedio): <code>' +
+        par.fuera_de_vocabulario.join('</code>, <code>') + '</code>.</p>'
+      : '');
+
+  cajaHum.innerHTML = '<h4>Lo que se pierde</h4>' + par.humano;
+
+  ctl.texto('lectura',
+    iguales
+      ? 'Este par tiene <b>la misma bolsa exacta</b>. El número no puede dar otra ' +
+        'cosa que 1,000: es una consecuencia matemática, no una casualidad del corpus.'
+      : 'Este par <b>no</b> tiene la misma bolsa: difiere en palabras vacías o en la ' +
+        'negación. Fijate igual lo alto que queda el número.');
+}
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué par de frases' },
+  { tipo: 'botones', id: 'par', etiqueta: 'el par', valor: PARES[0].id,
+    opciones: PARES.map(x => ({ valor: x.id, texto: x.titulo })) },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Para tener a mano' },
+  { tipo: 'texto', html:
+    'La <b>bolsa de palabras</b> (<i>bag-of-words</i>) representa un texto por ' +
+    'cuántas veces aparece cada palabra, sin orden. Es la base de los ' +
+    'diccionarios, del análisis de contenido cuantitativo y de LDA.<br><br>' +
+    '<b>No es basura</b>: si tu pregunta es <em>de qué se habla</em>, funciona ' +
+    'bárbaro, es barata y es interpretable. El problema aparece cuando la ' +
+    'pregunta es <em>quién le hizo qué a quién</em>.' }
+], () => pintar());
+
+pintar();
+Viz.botonTema();
+</script>
+</body>
+</html>

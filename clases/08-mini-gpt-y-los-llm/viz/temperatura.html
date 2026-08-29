@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La temperatura — Clase 8</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "El orden de las barras no cambia NUNCA. Entonces la
+     temperatura no lo hace ni más inteligente ni más tonto: lo hace más o
+     menos arriesgado al sortear."
+
+     Todo lo que se muestra acá sale de una corrida real del mini-GPT de la
+     clase (1.541.056 perillas, corpus SINTÉTICO Aguasclaras), exportada por
+     `entrenar-mini-gpt.py` a `datos-mini-gpt.js`. Las logits son las de verdad;
+     el softmax con temperatura se calcula acá, en el navegador.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .salida {
+    font-family: var(--f-mono); font-size: .88rem; line-height: 1.55;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .75rem;
+    white-space: pre-wrap; word-break: break-word; min-height: 4.2em;
+    margin-top: .6rem;
+  }
+  .salida .prompt { color: var(--c-acento); font-weight: 700; }
+  .salida .cont { color: var(--tinta); }
+  .tiradas { display: grid; gap: .4rem; margin-top: .6rem; }
+  .tiradas .fila {
+    font-family: var(--f-mono); font-size: .78rem; line-height: 1.45;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-left: 3px solid var(--c-parametro);
+    border-radius: var(--r-chico); padding: .35rem .55rem;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .tiradas .fila b { color: var(--c-parametro); }
+  .rotulo { font-size: .78rem; color: var(--tinta-3); margin: .7rem 0 0;
+            text-transform: uppercase; letter-spacing: .09em; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La temperatura: cuánto se arriesga al elegir</h1>
+    <p>Abajo están las fichas que el modelo considera para la <b>próxima letra</b>,
+       con la probabilidad que le da a cada una. Movés la temperatura y mirás qué
+       les pasa a las barras. Después generás texto con esa misma temperatura y
+       mirás qué sale. Vení con una hipótesis: <em>¿qué creés que le va a pasar al
+       orden de las barras?</em></p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <p class="rotulo" id="rot-salida">Texto generado</p>
+    <div class="salida" id="salida"></div>
+    <div class="tiradas" id="tiradas"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Movés la temperatura de 0,2 a 1,8 y las barras se
+      aplastan… pero <b>el orden no se mueve nunca</b>. La primera sigue siendo la
+      primera. La temperatura no cambia lo que el modelo sabe: cambia cuánta chance
+      le da a las opciones de más abajo cuando sortea. Después apretá
+      <em>«5 veces con el mismo prompt»</em>: en 0,0 las cinco tiradas son idénticas
+      y en 1,2 son cinco textos distintos. Eso, y no otra cosa, es por qué ChatGPT te
+      contesta distinto dos veces seguidas.
+    </div>
+    <p class="viz-pie">
+      Datos: corrida real del mini-GPT de la clase (1.541.056 parámetros, nivel
+      carácter) sobre el corpus <b>Aguasclaras</b> — país ficticio, corpus generado
+      programáticamente con semilla fija. <span class="chip sintetico">sintético</span>
+      No son discursos reales de nadie.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-mini-gpt.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* --- 1. los datos de la corrida real --------------------------------------- */
+const D = window.DATOS_MINIGPT;
+const PROMPTS = D.temperatura.prompts;
+const TEMPS = D.temperatura.temperaturas;
+const N_BARRAS = 12;
+
+/** Nombre legible de una ficha: el espacio y el salto de línea se ven. */
+function rotulo(f) {
+  if (f === ' ') return '␣ (espacio)';
+  if (f === '\n') return '⏎ (renglón)';
+  return '«' + f + '»';
+}
+
+/** Softmax con temperatura sobre TODAS las logits (por eso suma 1 de verdad). */
+function softmaxT(logits, T) {
+  if (T <= 0) {                       // T = 0: no hay sorteo, gana la más alta
+    let iMax = 0;
+    for (let i = 1; i < logits.length; i++) if (logits[i] > logits[iMax]) iMax = i;
+    return logits.map((_, i) => (i === iMax ? 1 : 0));
+  }
+  let m = -Infinity;
+  for (const v of logits) if (v > m) m = v;
+  const ex = logits.map(v => Math.exp((v - m) / T));
+  const s = ex.reduce((a, b) => a + b, 0);
+  return ex.map(v => v / s);
+}
+
+/* --- 2. estado -------------------------------------------------------------- */
+let iPrompt = 2, tirada = 0, modo = 'una';   // arrancamos con «El bloque del »
+
+function promptActual() { return PROMPTS[iPrompt]; }
+function tempActual() { return ctl ? ctl.valores.T : 0.8; }
+function claveT(T) { return T.toFixed(1); }
+
+/* --- 3. el gráfico de barras ------------------------------------------------ */
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 340,
+  titulo: 'las 12 fichas más probables para la próxima letra',
+  margen: { i: 18, d: 18, a: 34, b: 14 }
+});
+
+p.alDibujar(() => {
+  p.fondo();
+  const pr = promptActual();
+  const logits = pr.distribucion.map(d => d.logit);
+  const probs = softmaxT(logits, tempActual());
+  // el ORDEN se calcula UNA sola vez, con las logits crudas, y no se recalcula:
+  // que las barras no se reordenen es exactamente lo que hay que ver.
+  const items = [];
+  for (let i = 0; i < N_BARRAS; i++) {
+    items.push({
+      etiqueta: rotulo(pr.distribucion[i].ficha),
+      valor: probs[i],
+      color: i === 0 ? 'modelo' : 'acento'
+    });
+  }
+  p.barras(items, {
+    horizontal: true, max: 1,
+    formato: v => (v * 100).toFixed(1) + '%'
+  });
+});
+
+/* --- 4. el texto generado --------------------------------------------------- */
+const cajaSalida = document.getElementById('salida');
+const cajaTiradas = document.getElementById('tiradas');
+const rotSalida = document.getElementById('rot-salida');
+
+function escapar(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function mostrarUna() {
+  const pr = promptActual();
+  const lista = pr.generaciones[claveT(tempActual())];
+  const txt = lista[tirada % lista.length];
+  rotSalida.textContent = 'Texto generado con temperatura ' + claveT(tempActual());
+  cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
+                         '<span class="cont">' + escapar(txt) + '</span>';
+  cajaTiradas.innerHTML = '';
+}
+
+function mostrarCinco() {
+  const pr = promptActual();
+  const lista = pr.generaciones[claveT(tempActual())];
+  rotSalida.textContent = 'Cinco tiradas con el MISMO prompt y temperatura ' +
+                          claveT(tempActual());
+  cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
+    '<span class="cont">…</span>';
+  cajaTiradas.innerHTML = lista.map((t, i) =>
+    '<div class="fila"><b>tirada ' + (i + 1) + ':</b> ' +
+    escapar(t.slice(0, 150)) + '</div>').join('');
+  const distintas = new Set(lista.map(t => t.slice(0, 80))).size;
+  ctl.texto('lectura2', distintas === 1
+    ? '<b>Las cinco tiradas son idénticas.</b> A temperatura 0 no hay sorteo: ' +
+      'siempre gana la ficha más probable. Reproducible, y aburrido.'
+    : '<b>' + distintas + ' de 5 tiradas son distintas.</b> Mismo modelo, mismos ' +
+      'parámetros, mismo prompt. Lo único que cambió fue el sorteo. ' +
+      '<em>Por eso hay que reportar la temperatura y la semilla.</em>');
+}
+
+/* --- 5. el panel ------------------------------------------------------------ */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La perilla' },
+  { tipo: 'slider', id: 'T', etiqueta: 'cuánto se arriesga al elegir',
+    sub: 'temperatura: 0 = siempre la más probable', min: 0, max: 2, paso: 0.1,
+    valor: 0.8, decimales: 1, color: 'parametro' },
+  { tipo: 'medidor', id: 'punta', etiqueta: 'probabilidad de la primera' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Con qué la arrancamos' },
+  { tipo: 'botones', id: 'prompt', etiqueta: 'el prompt', valor: '2',
+    opciones: PROMPTS.map((pr, i) => ({ valor: String(i), texto: pr.texto.trim() })) },
+  { tipo: 'texto', id: 'porque', html: '' },
+  { tipo: 'titulo', texto: 'Generar' },
+  { tipo: 'boton', texto: 'Generar 200 fichas', principal: true,
+    alClic: () => { modo = 'una'; tirada++; pintarTexto(); } },
+  { tipo: 'boton', texto: '5 veces con el mismo prompt',
+    alClic: () => { modo = 'cinco'; pintarTexto(); } },
+  { tipo: 'texto', id: 'lectura2', html: '' }
+], (v, id) => {
+  iPrompt = +v.prompt;
+  if (id === 'prompt') { tirada = 0; modo = 'una'; }
+  actualizar();
+  pintarTexto();
+});
+
+/** Un solo lugar que decide qué se muestra abajo. Sin esto, el callback del
+ *  panel (que también corre al apretar un botón) le pisaba la salida a los
+ *  botones de generar. */
+function pintarTexto() { (modo === 'cinco' ? mostrarCinco : mostrarUna)(); }
+
+function actualizar() {
+  const pr = promptActual();
+  const T = tempActual();
+  const probs = softmaxT(pr.distribucion.map(d => d.logit), T);
+  const punta = probs[0];
+  // "cuántas fichas se reparten el 90%": la medida honesta de cuánto se abre
+  let acum = 0, cuantas = 0;
+  const orden = probs.slice().sort((a, b) => b - a);
+  while (acum < 0.9 && cuantas < orden.length) { acum += orden[cuantas]; cuantas++; }
+
+  ctl.medidor('punta', punta, (punta * 100).toFixed(1) + '%');
+  ctl.texto('porque', '<b>Por qué este prompt:</b> ' + pr.por_que + '.');
+  ctl.texto('lectura',
+    T <= 0
+      ? 'Temperatura <b>0</b>: no hay sorteo. Siempre sale la primera barra. ' +
+        'El texto se vuelve repetitivo, pero es <b>reproducible</b>.'
+      : (cuantas === 1
+          ? '<b>Una sola ficha</b> se lleva más del 90% de la probabilidad. '
+          : 'Entre <b>' + cuantas + '</b> fichas se reparten el 90% de la ' +
+            'probabilidad. ') +
+        (T < 0.5 ? 'Está jugando a lo seguro.'
+                 : (T > 1.3 ? 'Está dispuesto a elegir cosas raras: mirá el texto.'
+                            : 'Un punto intermedio: variado y todavía legible.')) +
+        '<br><b>El orden de las barras es siempre el mismo.</b>');
+  p.redibujar();
+}
+
+actualizar();
+pintarTexto();
+Viz.botonTema();
+</script>
+</body>
+</html>

@@ -1,30 +1,32 @@
 """Corre DE VERDAD los experimentos de la clase 5 y escribe `datos-experimentos.js`.
 
-Ninguno de los números que muestran las slides ni las visualizaciones de esta
-clase está inventado ni "estimado": todos salen de correr acá el mismo código
-que corre el notebook, con la misma semilla (1983).
+Ninguno de los numeros que muestran las slides ni las visualizaciones de esta
+clase esta inventado ni "estimado": todos salen de correr aca el mismo codigo
+que corre el notebook, con la misma semilla (1983) y la misma configuracion.
 
     PYTHONPATH=_shared python3 clases/05-imagenes-y-convoluciones/medir-experimentos.py
 
-Si tocás el notebook, volvé a correr esto. Si no, las slides y el notebook
-empiezan a contar cosas distintas — que es exactamente lo que este curso le
-pide a los demás que no hagan.
+Si tocas el notebook, volve a correr esto. Si no, las slides y el notebook
+empiezan a contar cosas distintas -- que es exactamente lo que este curso le
+pide a los demas que no hagan.
 
-Qué mide:
-  A) EL BARAJADO (se vuelve a entrenar con los píxeles permutados)
-     1. red densa sobre las imágenes normales   -> exactitud
-     2. red densa sobre los píxeles BARAJADOS   -> exactitud (sale igual)
-     3. CNN sobre las imágenes normales         -> exactitud
-     4. CNN sobre los píxeles BARAJADOS         -> exactitud (baja)
-  B) EL CORRIMIENTO (se entrena con imágenes centradas y se prueba con la foto
-     corrida unos píxeles: NO se vuelve a entrenar)
-     la densa se desploma; la CNN aguanta mucho mejor.
+Que mide:
+  A) EL BARAJADO (se vuelve a entrenar con los pixeles permutados)
+     1. red densa sobre las imagenes normales   -> exactitud
+     2. red densa sobre los pixeles BARAJADOS   -> exactitud (sale igual)
+     3. CNN sobre las imagenes normales         -> exactitud
+     4. CNN sobre los pixeles BARAJADOS         -> exactitud (baja)
+  B) EL CORRIMIENTO (se entrena con imagenes centradas y se prueba con la foto
+     corrida unos pixeles: NO se vuelve a entrenar). Es el gancho de la clase.
+     la densa se desploma; la CNN aguanta.
+  C) EL ARCHIVO VISUAL sintetico (multitud / no multitud) y el analisis de
+     errores: la exactitud global y la exactitud por subgrupo.
 
-Qué exporta además, para que las viz dibujen datos reales y no dibujitos:
-  - un puñado de imágenes de muestra (28x28, 0-255)
-  - la permutación exacta que usa el barajado
-  - los filtros de 3x3 que la CNN aprendió sola
-  - unas imágenes esquemáticas sintéticas (afiche, diario, multitud, reja)
+Que exporta ademas, para que las viz dibujen datos reales y no dibujitos:
+  - un punado de imagenes de muestra (28x28, 0-255)
+  - la permutacion exacta que usa el barajado
+  - los filtros de 3x3 que la CNN aprendio sola
+  - unas imagenes esquematicas sinteticas (afiche, diario, multitud, reja)
     generadas con numpy, para la viz del filtro deslizante
 """
 import json
@@ -46,7 +48,11 @@ os.environ.setdefault("DLSS_RAIZ", str(RAIZ))
 from ssdl import utils  # noqa: E402
 
 SEMILLA = 1983
-N_TRAIN, N_TEST, EPOCAS = 20000, 5000, 12
+N_TRAIN, N_TEST, EPOCAS, LR, LOTE = 12000, 4000, 12, 2e-3, 64
+
+# el archivo visual sintetico de la segunda mitad del notebook
+LADO_ARCHIVO = 32
+ARCH_TRAIN, ARCH_TEST, ARCH_EPOCAS = 400, 400, 10
 
 
 # ---------------------------------------------------------------------------
@@ -77,7 +83,7 @@ def imagenes_sinteticas(n, semilla=0):
 
 
 def traer_datos():
-    """FashionMNIST si se puede; si no, las figuras sintéticas."""
+    """FashionMNIST si se puede; si no, las figuras sinteticas."""
     try:
         import descargar
         tr = descargar.fashion_mnist("train")
@@ -86,10 +92,10 @@ def traer_datos():
             nombres = descargar.ETIQUETAS_FASHION
             return tr, te, nombres, "FashionMNIST"
     except Exception as e:                              # noqa: BLE001
-        print(f"  [!] FashionMNIST no disponible ({type(e).__name__}). Voy a lo sintético.")
+        print(f"  [!] FashionMNIST no disponible ({type(e).__name__}). Voy a lo sintetico.")
     nombres = ["barras verticales", "barras horizontales", "bloque", "marco"]
     return (imagenes_sinteticas(N_TRAIN, 1), imagenes_sinteticas(N_TEST, 2),
-            nombres, "figuras sintéticas")
+            nombres, "figuras sinteticas")
 
 
 # ---------------------------------------------------------------------------
@@ -106,18 +112,21 @@ def red_densa(n_clases):
 
 
 def red_convolucional(n_clases):
-    """Mira de a 3x3, dos veces, y recién al final decide."""
+    """Mira de a 3x3 tres veces; al final se queda con el maximo de cada mapa
+    (";aparecio esta pieza en algun lado?") y recien ahi decide."""
     return nn.Sequential(
         nn.Conv2d(1, 16, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
         nn.Conv2d(16, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
-        nn.Flatten(),
-        nn.Linear(32 * 7 * 7, n_clases),
+        nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(),
+        nn.AdaptiveMaxPool2d(1), nn.Flatten(),
+        nn.Linear(64, n_clases),
     )
 
 
 def correr(X, d):
-    """La misma imagen, corrida `d` píxeles a la derecha. Lo que entra por la
-    izquierda es fondo (negro), no el otro borde: una foto corrida no da la vuelta."""
+    """La misma imagen, corrida `d` pixeles a la derecha. Lo que entra por la
+    izquierda es fondo (negro), no el otro borde: una foto corrida no da la
+    vuelta."""
     if d == 0:
         return X
     Y = torch.zeros_like(X)
@@ -125,7 +134,7 @@ def correr(X, d):
     return Y
 
 
-def entrenar(modelo, Xtr, ytr, Xte, yte, epocas=EPOCAS, lr=1e-3, lote=64,
+def entrenar(modelo, Xtr, ytr, Xte, yte, epocas=EPOCAS, lr=LR, lote=LOTE,
              semilla=SEMILLA):
     torch.manual_seed(semilla)
     crit = nn.CrossEntropyLoss()
@@ -140,21 +149,22 @@ def entrenar(modelo, Xtr, ytr, Xte, yte, epocas=EPOCAS, lr=1e-3, lote=64,
             opt.zero_grad()
             crit(modelo(Xtr[idx]), ytr[idx]).backward()
             opt.step()
+    modelo.eval()
     with torch.no_grad():
         acc = (modelo(Xte).argmax(1) == yte).float().mean().item()
     return acc, time.time() - t0
 
 
 # ---------------------------------------------------------------------------
-# 2. Las imágenes esquemáticas para la viz del filtro
+# 2. Las imagenes esquematicas para la viz del filtro
 # ---------------------------------------------------------------------------
 
 def esquemas_sinteticos():
-    """Cuatro escenas de 28x28 dibujadas con numpy. Sintéticas y rotuladas."""
+    """Cuatro escenas de 28x28 dibujadas con numpy. Sinteticas y rotuladas."""
     rng = np.random.default_rng(7)
     out = {}
 
-    # --- afiche de campaña: fondo claro, letras (palotes verticales), franja ---
+    # --- afiche de campana: fondo claro, letras (palotes verticales), franja ---
     a = np.full((28, 28), 40.0)
     a[3:25, 3:25] = 215.0                       # el papel
     for c in (6, 9, 12, 16, 19, 22):            # los palotes de las letras
@@ -162,15 +172,15 @@ def esquemas_sinteticos():
     a[17:21, 5:23] = 90.0                       # la franja de abajo
     out["afiche"] = a
 
-    # --- fragmento de página de diario: título + dos columnas de renglones ---
+    # --- fragmento de pagina de diario: titulo + dos columnas de renglones ---
     d = np.full((28, 28), 230.0)
-    d[2:5, 3:25] = 40.0                         # el título
+    d[2:5, 3:25] = 40.0                         # el titulo
     for f in range(8, 26, 3):
         d[f:f + 1, 3:12] = 55.0                 # columna izquierda
         d[f:f + 1, 15:25] = 55.0                # columna derecha
     out["diario"] = d
 
-    # --- multitud: cabecitas sobre un fondo con degradé ---
+    # --- multitud: cabecitas sobre un fondo con degrade ---
     m = np.tile(np.linspace(200, 120, 28), (28, 1))
     yy, xx = np.mgrid[0:28, 0:28]
     for _ in range(38):
@@ -184,17 +194,97 @@ def esquemas_sinteticos():
     r[4:6, :] = r[13:15, :] = r[22:24, :] = 35.0
     out["reja"] = r
 
-    return {k: np.clip(v, 0, 255).astype(np.uint8).tolist() for k, v in out.items()}
+    # OJO CON LA CONVENCION. Arriba dibujamos "en papel": numero alto = claro.
+    # FashionMNIST viene al reves (fondo 0 = negro, prenda 255 = clara) y todo el
+    # material de la clase pinta con `Viz.paleta('grises')`, que va de papel a
+    # tinta: numero ALTO = TINTA. Asi que invertimos aca, una sola vez, y todos
+    # los consumidores (viz y slides) usan la misma regla sin excepciones.
+    return {k: (255 - np.clip(v, 0, 255)).astype(np.uint8).tolist()
+            for k, v in out.items()}
 
 
 # ---------------------------------------------------------------------------
-# 3. Correrlo todo
+# 3. El archivo visual sintetico: multitud / no multitud
+#    IDENTICO al del notebook (misma funcion, mismas semillas).
+# ---------------------------------------------------------------------------
+
+def _suavizar(img):
+    """Un desenfoque 3x3. Las fotos de archivo no tienen bordes de bisturi."""
+    L = img.shape[0]
+    k = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]], float)
+    k /= k.sum()
+    p = np.pad(img, 1, mode="edge")
+    out = np.zeros_like(img)
+    for j in range(3):
+        for i in range(3):
+            out += k[j, i] * p[j:j + L, i:i + L]
+    return out
+
+
+def archivo_visual(n, semilla, lado=LADO_ARCHIVO, prop_follaje=0.34):
+    """Un archivo fotografico SINTETICO de 32x32 en escala de grises.
+
+    Tres tipos de escena, dos etiquetas:
+      - 'multitud'  (etiqueta 1): muchas cabecitas repartidas bajo el horizonte
+      - 'edificio'  (etiqueta 0): un bloque grande con ventanas
+      - 'follaje'   (etiqueta 0): racimos de manchitas -- copas de arboles
+
+    'follaje' esta puesto A PROPOSITO: tiene la misma *textura* que una
+    multitud y ninguna persona. Es el confundidor que hace que el analisis de
+    errores del notebook diga algo. Pais ficticio, proceso generador conocido.
+    """
+    rng = np.random.default_rng(semilla)
+    X = np.zeros((n, lado, lado))
+    y = np.zeros(n, dtype=np.int64)
+    tipo = []
+    yy, xx = np.mgrid[0:lado, 0:lado]
+    for k in range(n):
+        base = rng.uniform(140, 205)
+        img = np.tile(np.linspace(base, base - 40, lado), (lado, 1)).T
+        r = rng.random()
+        if k % 2 == 0:                                     # ---- multitud
+            y[k] = 1
+            tipo.append("multitud")
+            hor = rng.integers(3, 18)
+            img[hor:, :] = rng.uniform(110, 175)
+            for _ in range(rng.integers(45, 120)):
+                cy, cx = rng.integers(hor, lado - 1), rng.integers(0, lado)
+                img[(yy - cy) ** 2 + (xx - cx) ** 2
+                    <= rng.uniform(0.8, 2.0) ** 2] = rng.uniform(20, 90)
+        elif r < prop_follaje:                             # ---- follaje
+            y[k] = 0
+            tipo.append("follaje")
+            hor = rng.integers(3, 18)
+            img[hor:, :] = rng.uniform(110, 175)
+            for _ in range(rng.integers(2, 6)):
+                by, bx = rng.integers(2, lado - 4), rng.integers(2, lado - 4)
+                for _ in range(rng.integers(15, 40)):
+                    cy = int(np.clip(by + rng.normal(0, 3.5), 0, lado - 1))
+                    cx = int(np.clip(bx + rng.normal(0, 3.5), 0, lado - 1))
+                    img[(yy - cy) ** 2 + (xx - cx) ** 2
+                        <= rng.uniform(0.8, 2.0) ** 2] = rng.uniform(20, 90)
+        else:                                              # ---- edificio
+            y[k] = 0
+            tipo.append("edificio")
+            a, an = rng.integers(10, 20), rng.integers(12, 24)
+            f0 = lado - a - rng.integers(0, 5)
+            c0 = rng.integers(0, lado - an)
+            img[f0:f0 + a, c0:c0 + an] = rng.uniform(60, 110)
+            for fv in range(f0 + 2, f0 + a - 2, 4):
+                for cv in range(c0 + 2, c0 + an - 2, 5):
+                    img[fv:fv + 2, cv:cv + 3] = rng.uniform(170, 215)
+        X[k] = np.clip(_suavizar(img) + rng.normal(0, 7, (lado, lado)), 0, 255)
+    return X.astype(np.uint8), y, np.array(tipo)
+
+
+# ---------------------------------------------------------------------------
+# 4. Correrlo todo
 # ---------------------------------------------------------------------------
 
 def main():
     utils.fijar_semilla(SEMILLA)
     (Xtr_raw, ytr_raw), (Xte_raw, yte_raw), nombres, fuente = traer_datos()
-    print(f"Datos: {fuente}  ·  train {Xtr_raw.shape}  test {Xte_raw.shape}")
+    print(f"Datos: {fuente}  .  train {Xtr_raw.shape}  test {Xte_raw.shape}")
 
     rng = np.random.default_rng(SEMILLA)
     itr = rng.choice(len(Xtr_raw), size=min(N_TRAIN, len(Xtr_raw)), replace=False)
@@ -206,7 +296,7 @@ def main():
     yte = torch.tensor(np.asarray(yte_raw)[ite], dtype=torch.long)
     n_clases = int(max(ytr.max().item(), yte.max().item())) + 1
 
-    # LA permutación: una sola, la misma para todas las imágenes.
+    # LA permutacion: una sola, la misma para todas las imagenes.
     perm = np.random.default_rng(SEMILLA).permutation(28 * 28)
     tperm = torch.tensor(perm, dtype=torch.long)
 
@@ -216,7 +306,7 @@ def main():
     Xtr_b, Xte_b = barajar(Xtr), barajar(Xte)
 
     res, filtros, entrenados = {}, None, {}
-    print("\nA) EL BARAJADO — se vuelve a entrenar con los píxeles permutados")
+    print("\nA) EL BARAJADO -- se vuelve a entrenar con los pixeles permutados")
     for nombre, constructor, datos_tr, datos_te in [
         ("densa_normal", red_densa, Xtr, Xte),
         ("densa_barajada", red_densa, Xtr_b, Xte_b),
@@ -235,7 +325,7 @@ def main():
             filtros = modelo[0].weight.detach().numpy()[:, 0]   # (16,3,3)
 
     # --- B) el corrimiento: mismos modelos, la foto movida ------------------
-    print("\nB) EL CORRIMIENTO — mismos modelos, la foto corrida (sin reentrenar)")
+    print("\nB) EL CORRIMIENTO -- mismos modelos, la foto corrida (sin reentrenar)")
     desplazamientos = [0, 1, 2, 3, 4, 6]
     corrimiento = {"pixeles": desplazamientos, "densa": [], "cnn": []}
     for clave, mod in [("densa", entrenados["densa_normal"]),
@@ -248,7 +338,39 @@ def main():
         print(f"  {clave:6s}  " + "  ".join(
             f"{d}px:{v:5.1f}%" for d, v in zip(desplazamientos, corrimiento[clave])))
 
-    # --- imágenes de muestra para las viz -----------------------------------
+    # --- C) el archivo visual sintetico y el analisis de errores -------------
+    print("\nC) EL ARCHIVO VISUAL sintetico (multitud / no multitud)")
+    Xa, ya, ta = archivo_visual(ARCH_TRAIN, 11)
+    Xv, yv, tv = archivo_visual(ARCH_TEST, 22)
+    Xa_t = torch.tensor(Xa / 255.0, dtype=torch.float32).unsqueeze(1)
+    ya_t = torch.tensor(ya, dtype=torch.long)
+    Xv_t = torch.tensor(Xv / 255.0, dtype=torch.float32).unsqueeze(1)
+    yv_t = torch.tensor(yv, dtype=torch.long)
+    torch.manual_seed(SEMILLA)
+    mod_arch = red_convolucional(2)
+    acc_a, seg_a = entrenar(mod_arch, Xa_t, ya_t, Xv_t, yv_t,
+                            epocas=ARCH_EPOCAS, lote=32)
+    with torch.no_grad():
+        pred = mod_arch(Xv_t).argmax(1).numpy()
+    por_tipo = {t: {"n": int((tv == t).sum()),
+                    "exactitud": round(float((pred[tv == t] == yv[tv == t]).mean()) * 100, 1),
+                    "errores": int(((pred != yv) & (tv == t)).sum())}
+                for t in ["multitud", "follaje", "edificio"]}
+    archivo = {
+        "n_train": ARCH_TRAIN, "n_test": ARCH_TEST, "epocas": ARCH_EPOCAS,
+        "lado": LADO_ARCHIVO,
+        "exactitud": round(acc_a * 100, 1), "segundos": round(seg_a, 1),
+        "parametros": utils.contar_parametros(mod_arch),
+        "por_tipo": por_tipo,
+        "errores_totales": int((pred != yv).sum()),
+    }
+    print(f"  exactitud global {acc_a*100:.1f} %  ({seg_a:.0f} s, "
+          f"{archivo['errores_totales']} errores de {ARCH_TEST})")
+    for t, d in por_tipo.items():
+        print(f"    {t:9s} n={d['n']:3d}  exactitud {d['exactitud']:5.1f} %  "
+              f"({d['errores']} errores)")
+
+    # --- imagenes de muestra para las viz -----------------------------------
     muestras = []
     vistos = set()
     for k in range(len(Xte_raw)):
@@ -267,6 +389,7 @@ def main():
         "epocas": EPOCAS, "semilla": SEMILLA, "clases": nombres[:n_clases],
         "resultados": res,
         "corrimiento": corrimiento,
+        "archivo": archivo,
         "permutacion": perm.tolist(),
         "filtros_aprendidos": [[[round(float(v), 3) for v in fila] for fila in f]
                                for f in filtros],
@@ -276,9 +399,9 @@ def main():
 
     destino = AQUI / "datos-experimentos.js"
     with open(destino, "w", encoding="utf-8") as fh:
-        fh.write("/* GENERADO por medir-experimentos.py — no lo edites a mano.\n"
-                 "   Son los números REALES de la corrida del notebook (semilla 1983).\n"
-                 f"   Datos: {fuente}. {len(Xtr)} imágenes de entrenamiento, "
+        fh.write("/* GENERADO por medir-experimentos.py -- no lo edites a mano.\n"
+                 "   Son los numeros REALES de la corrida del notebook (semilla 1983).\n"
+                 f"   Datos: {fuente}. {len(Xtr)} imagenes de entrenamiento, "
                  f"{EPOCAS} pasadas. */\n")
         fh.write("const DATOS_EXP = " + json.dumps(salida, ensure_ascii=False) + ";\n")
     print(f"\nEscrito: {destino}  ({destino.stat().st_size/1024:.0f} KB)")

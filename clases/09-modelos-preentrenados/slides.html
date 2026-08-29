@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 9 — Usar modelos que ya existen, sin creerles | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  .reveal .tabla-decision { width: 100%; border-collapse: collapse; font-size: .62em; }
+  .reveal .tabla-decision th, .reveal .tabla-decision td {
+    border: 1px solid var(--borde); padding: .45em .6em; text-align: left; vertical-align: top;
+  }
+  .reveal .tabla-decision th { background: var(--papel-2); font-size: .95em;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-3); }
+  .reveal .tabla-decision td.destaca { background: var(--c-acento-suave); }
+  .reveal table.numeros { font-size: .68em; border-collapse: collapse; margin: .4em auto; }
+  .reveal table.numeros td, .reveal table.numeros th {
+    border-bottom: 1px solid var(--borde); padding: .3em .8em; text-align: right; }
+  .reveal table.numeros td:first-child, .reveal table.numeros th:first-child { text-align: left; }
+  .reveal .mono { font-family: var(--f-mono); }
+  /* el rótulo .marca flota arriba a la derecha: que el título no se le meta abajo */
+  .reveal .marca + h2, .reveal .marca + h3 { padding-right: 10.5rem; }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+  <!-- =========================== 1 · PORTADA =========================== -->
+  <section class="portada">
+    <p class="num-clase">Clase 9</p>
+    <h1>Usar modelos que ya existen,<br>sin creerles</h1>
+    <div class="franja"></div>
+    <p class="gancho">Bajar un modelo que entrenó otro y clasificar tu corpus son
+      tres líneas y cuarenta segundos. Saber si sirve es todo lo demás.</p>
+    <aside class="notes">
+      2 min. No leas el temario. Decí: "hoy cambia el registro del curso. Hasta acá
+      construimos para entender. A partir de hoy usamos para investigar."
+      Y avisá el reparto: "la parte de hacerlo andar es corta y fácil; la de saber si
+      anda es larga y difícil, y le vamos a dedicar el doble de tiempo. Es a propósito."
+    </aside>
+  </section>
+
+  <!-- =========================== 2 · DE DÓNDE VENIMOS =========================== -->
+  <section>
+    <span class="marca">callback</span>
+    <h2>Dónde quedamos</h2>
+    <p class="bajada">Ocho clases construyendo la máquina desde adentro.</p>
+    <ul>
+      <li>Clase 1-3: una función es una máquina con perillas, y el error tiene pendiente.</li>
+      <li>Clase 4: entrenar de verdad, y la diferencia entre <strong>dibujar</strong> y <strong>calcar</strong>.</li>
+      <li>Clase 5-7: la arquitectura son supuestos. Convoluciones, embeddings, attention.</li>
+      <li>Clase 8: entrenamos un mini-GPT de <strong>~1,5 millones</strong> de perillas.
+          Tardó diez minutos y escribe castellano reconocible.</li>
+      <li class="fragment"><strong>Y ahí terminó lo que podemos entrenar nosotros.</strong></li>
+    </ul>
+    <aside class="notes">
+      2 min. Preguntá quién se acuerda de la primera muestra que escupió el mini-GPT
+      (la sopa de letras). Sirve para medir la distancia recorrida.
+      Cerrá con la última viñeta y dejala colgada.
+    </aside>
+  </section>
+
+  <!-- =========================== 3 · EL PRESUPUESTO =========================== -->
+  <section>
+    <h2>Lo que costó el de la clase 8, y lo que cuesta uno grande</h2>
+    <div class="comparacion">
+      <div>
+        <h4>Tu mini-GPT</h4>
+        <p><span class="numero-vivo">~1,5 M</span> de parámetros<br>
+           <strong>10 minutos</strong> en una CPU<br>
+           <strong>1 MB</strong> de texto<br>
+           costo: el café que te tomaste mientras entrenaba</p>
+      </div>
+      <div>
+        <h4>Un modelo grande</h4>
+        <p>cientos de miles de millones de parámetros<br>
+           <strong>meses</strong> de miles de placas<br>
+           una porción enorme de la web<br>
+           costo: no lo publican, y las estimaciones andan en millones de dólares</p>
+      </div>
+    </div>
+    <div class="ojo compacta">Las cifras de los modelos grandes son <strong>estimaciones
+      públicas, no datos oficiales</strong>. El orden de magnitud es lo único que
+      necesitamos: no lo vas a entrenar vos.</div>
+    <aside class="notes">
+      3 min. No inventes un número exacto de dólares: no existe uno confiable y el aula
+      se va a acordar del número, no del argumento. Decí: "nadie de esta sala va a
+      entrenar uno desde cero. Ni falta que hace. Lo interesante es que **no hace falta**."
+      Transición: "entonces, ¿qué hacemos? Agarramos uno que ya entrenó otro."
+    </aside>
+  </section>
+
+  <!-- =========================== 4 · LAS TRES LÍNEAS =========================== -->
+  <section>
+    <h3>Tres líneas</h3>
+    <pre><code class="language-python" data-trim data-line-numbers>
+from transformers import pipeline
+clasificador = pipeline("sentiment-analysis",
+                        model="pysentimiento/robertuito-sentiment-analysis")
+clasificador(titulares[:20])
+</code></pre>
+    <p>Eso baja un modelo entrenado en castellano rioplatense y te clasifica
+       <strong>1471 titulares</strong> mientras se enfría el café.</p>
+    <div class="ojo compacta">El notebook de hoy <strong>detecta solo</strong> si tenés
+      Hugging Face. Si no hay red, cae a un camino que corre con numpy y no baja nada.
+      Todo lo que importa de esta clase —la evaluación— es idéntico en los dos caminos.</div>
+    <aside class="notes">
+      3 min. Corrélo en vivo si tenés red. Si no, mostrá la salida guardada.
+      Mientras corre, contá que `pipeline` es una cañería: texto crudo entra, etiqueta sale,
+      y adentro hay un tokenizador, un modelo y una capa de clasificación.
+      Cuando termine, quedate callado/a dos segundos y mirá la cara de asombro.
+      Está bien que se asombren: es asombroso. Y ahora lo rompemos.
+    </aside>
+  </section>
+
+  <!-- =========================== 5 · LOS RESULTADOS =========================== -->
+  <section>
+    <h3>Los resultados. Ahora mirá <em>qué</em> estás midiendo.</h3>
+    <table class="numeros" style="font-size:.66em">
+      <tr><th>titular (real, del corpus del curso)</th><th>el corpus dice</th><th>y en realidad es…</th></tr>
+      <tr><td>Es falso que la vacuna del coronavirus esterilice a las mujeres</td>
+          <td class="c-ok">VERDADERA</td><td>un <b>chequeo</b>: desmiente una mentira</td></tr>
+      <tr><td>55 personas mueren en EEUU tras recibir la vacuna anti-COVID-19</td>
+          <td class="c-error">FALSA</td><td>la afirmación que <b>AFP Factual desmintió</b></td></tr>
+      <tr><td>La palabra "haiga", aceptada por la RAE</td>
+          <td class="c-error">FALSA</td><td><b>sátira</b>: el medio se llama "Hay noticia"</td></tr>
+      <tr><td>Bill Gates reconoce que miles de personas morirán con la vacuna</td>
+          <td class="c-error">FALSA</td><td>desinformación, esta vez sí</td></tr>
+    </table>
+    <p style="font-size:.82em">Las dos primeras hablan de lo mismo y tienen etiquetas
+      opuestas. Cualquier clasificador de sentimiento les va a poner <b>NEG</b> a las dos.
+      Y bajo la misma etiqueta "falsa" conviven <strong>tres cosas distintas</strong>:
+      sátira, una afirmación desmentida y desinformación de verdad.</p>
+    <aside class="notes">
+      4 min. Esta es la slide del giro, y todos los datos son reales (corpus de prensa
+      del curso, verificables en el CSV).
+      Preguntá: "si entreno un modelo con estas etiquetas, ¿qué le estoy enseñando a
+      detectar?" Dejá que se peleen un rato. Van a llegar solos a que la etiqueta mezcla
+      constructos.
+      Frase para decir tal cual: "el modelo no está roto. Va a aprender perfectamente
+      **algo**. La pregunta es qué, y esa pregunta no la contesta ninguna métrica."
+      No inventes una salida de modelo acá: si tenés red, corré el pipeline en vivo sobre
+      estos cuatro y mostrá lo que devuelva de verdad.
+    </aside>
+  </section>
+
+  <!-- =========================== 6 · LA PREGUNTA =========================== -->
+  <section class="pregunta">
+    <h2>¿Cómo sabés que está bien?</h2>
+    <div class="opciones">
+      <div><b>A</b> leí unos cuantos y tenían sentido</div>
+      <div><b>B</b> el paper del modelo reporta 0,92 de F1</div>
+      <div><b>C</b> ninguna de las anteriores</div>
+    </div>
+    <aside class="notes">
+      3 min. Votación a mano alzada, en serio. Casi todos votan A o B.
+      A es "validé con cinco casos que elegí yo": no es una muestra.
+      B es "confío en una métrica medida en OTRO corpus, en OTRO idioma, para OTRA tarea".
+      La respuesta es C, y el resto de la clase es por qué.
+      Frase para decir tal cual: "esta pregunta separa un paper de un posteo de blog.
+      Y le vamos a dedicar más tiempo que a la biblioteca."
+    </aside>
+  </section>
+
+  <!-- =========================== 7 · POR QUÉ FUNCIONA =========================== -->
+  <section>
+    <h2>¿Por qué funciona, si nadie le enseñó tu tarea?</h2>
+    <div class="intuicion">
+      Alguien ya le enseñó <strong>castellano</strong>: gramática, qué palabras van juntas,
+      que "renunció" y "dimitió" son casi lo mismo. Eso costó meses y millones.
+      Vos sólo le tenés que enseñar <strong>tu distinción</strong>, que es una capita fina
+      arriba de todo eso.
+    </div>
+    <p>Se llama <span class="glosario"><span class="en">transfer learning</span><span class="es">aprendizaje por transferencia</span></span>.
+       Y es la razón por la que doscientos ejemplos etiquetados a veces alcanzan.</p>
+    <aside class="notes">
+      2 min. Analogía que funciona: contratar a alguien que ya habla el idioma y conoce el
+      país. No le enseñás a hablar: le enseñás tu tema. Un mes de puesta al día, no cinco
+      años de carrera. Guardala, porque en tres slides la vamos a dar vuelta.
+    </aside>
+  </section>
+
+  <!-- =========================== 8 · CALLBACK CLASE 5 =========================== -->
+  <section>
+    <span class="marca">callback clase 5</span>
+    <h3>Ya vimos esto, con imágenes</h3>
+    <div class="comparacion">
+      <div>
+        <h4>Una CNN</h4>
+        <p><strong>Abajo:</strong> bordes, manchas, texturas. Genérico: sirve para
+           cualquier foto del mundo.<br>
+           <strong>Arriba:</strong> "esto es un gato". Específico de tu tarea.</p>
+      </div>
+      <div>
+        <h4>Un modelo de texto</h4>
+        <p><strong>Abajo:</strong> morfología, sintaxis, qué palabra va con cuál.
+           Genérico: sirve para cualquier texto en castellano.<br>
+           <strong>Arriba:</strong> "esto es una nota sobre protesta". Tuyo.</p>
+      </div>
+    </div>
+    <p class="fragment"><strong>Es la misma jerarquía.</strong> Por eso se puede
+       reutilizar la parte de abajo y reentrenar sólo la de arriba.</p>
+    <aside class="notes">
+      2 min. Si te acordás del gráfico de filtros de la clase 5, volvé un segundo a él
+      mentalmente con el aula: "los filtros de la primera capa parecían todos iguales,
+      detectaban bordes. Los de la última eran raros y específicos."
+    </aside>
+  </section>
+
+  <!-- =========================== 9 · QUÉ SE CONGELA =========================== -->
+  <section>
+    <h3>Qué se congela y qué se toca</h3>
+    <div class="tarjetas">
+      <div><h4>🔒 Capas de abajo</h4>Congeladas. Ya saben castellano.
+        <strong>Cero</strong> perillas que mover.</div>
+      <div><h4>🔧 Capa de arriba</h4>La única que entrenás. Unas pocas miles de perillas.</div>
+      <div><h4>📉 Consecuencia</h4>Menos perillas = <strong>menos datos necesarios</strong>.
+        Eso es la clase 4, otra vez.</div>
+    </div>
+    <div class="aha compacta">
+      Congelar no es una optimización técnica: es <strong>bajar la capacidad del modelo
+      a propósito</strong>, para que 200 ejemplos alcancen. La misma decisión que tomaste
+      cuando elegiste 8 rampas en vez de 32.
+    </div>
+    <aside class="notes">
+      3 min. Esta es la slide donde se cobra la clase 4. Preguntá:
+      "si dejo TODAS las capas libres y tengo 200 ejemplos, ¿qué pasa?"
+      Respuesta que van a dar: sobreajuste. Exacto. Fine-tuning completo con pocos datos
+      calca. Congelar es el freno.
+    </aside>
+  </section>
+
+  <!-- =========================== 10 · LA METÁFORA =========================== -->
+  <section>
+    <h2>El informante clave</h2>
+    <div class="ss">
+      Un modelo pre-entrenado es como un <strong>informante clave</strong>: conoce el
+      terreno, habla el idioma, te ahorra meses de trabajo de campo.
+      <br><br>
+      Y como todo informante: tiene <strong>su posición</strong>, sus puntos ciegos y su
+      manera de nombrar las cosas. Se lo usa, se lo <strong>cita con precisión</strong>
+      (versión incluida) y se lo <strong>triangula</strong>.
+    </div>
+    <p class="fragment">Nadie publicaría una etnografía diciendo "me lo contó un tipo".
+       <strong>Tampoco publiques "usamos BERT".</strong></p>
+    <aside class="notes">
+      2 min. Esta metáfora es la que se llevan. Usala cada vez que aparezca un modelo
+      nuevo en el resto del curso.
+      La segunda frase entra fuerte: dejá el fragment para el final y hacé silencio.
+    </aside>
+  </section>
+
+  <!-- =========================== 11 · LAS TRES ESTRATEGIAS =========================== -->
+  <section>
+    <span class="marca">para llevarse</span>
+    <h3>Las tres estrategias, y cuándo cada una</h3>
+    <table class="tabla-decision">
+      <tr><th>si tenés…</th><th>usás…</th><th>cómo funciona</th><th>lo que cuesta</th></tr>
+      <tr>
+        <td><strong>0 etiquetas</strong></td>
+        <td><strong>zero-shot</strong> / diccionario</td>
+        <td>Le describís la categoría con palabras. Clasifica sin ejemplos.</td>
+        <td>Nada. Y <em>no tenés con qué saber si anda</em>.</td>
+      </tr>
+      <tr class="destaca">
+        <td><strong>50 a 500</strong></td>
+        <td class="destaca"><strong>embeddings + clasificador simple</strong></td>
+        <td>Texto → vector (modelo prestado) → regresión logística.</td>
+        <td>Barato, corre en CPU, <strong>interpretable</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>300 y más</strong></td>
+        <td><strong>fine-tuning</strong></td>
+        <td>Seguís entrenando el modelo entero con tus ejemplos.</td>
+        <td>GPU, horas, y muchas más etiquetas.</td>
+      </tr>
+    </table>
+    <p style="font-size:.8em">La pregunta no es <em>"cuál es la mejor"</em>. Es
+      <strong>"cuántas etiquetas puedo producir"</strong> — y eso lo decidís vos, no la técnica.</p>
+    <aside class="notes">
+      4 min. Esta tabla se la llevan impresa. Decilo: "es la decisión práctica que van a
+      tomar de verdad".
+      Marcá la fila del medio: "mi recomendación por defecto, siempre, es la del medio.
+      Es barata, es interpretable y con 200 etiquetas anda sorprendentemente bien."
+      Anticipá la trampa: "y en un rato les voy a mostrar un caso donde la de arriba,
+      la gratis, le gana a las dos."
+    </aside>
+  </section>
+
+  <!-- =========================== 12 · ESTRATEGIA A =========================== -->
+  <section>
+    <h3>A · Embeddings + clasificador simple</h3>
+    <pre><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
+X = vectorizar(titulares)          # texto -> un punto en 100 dimensiones
+                                   # (clase 6: el mapa donde viven las palabras)
+modelo = LogisticRegression(max_iter=2000, class_weight="balanced")
+modelo.fit(X[i_train], y[i_train])
+pred  = modelo.predict(X[i_test])
+proba = modelo.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
+</code></pre>
+    <div class="intuicion compacta">
+      El clasificador es <strong>una regresión logística</strong>. La misma que ya sabés
+      interpretar. El deep learning hizo el trabajo pesado de convertir texto en números;
+      la decisión la toma estadística de toda la vida.
+    </div>
+    <aside class="notes">
+      3 min. Mostrá que `vectorizar` es la única pieza nueva, y que ya la vieron en la
+      clase 6 (embeddings). Todo el resto es scikit-learn.
+      Si alguien pregunta por `class_weight="balanced"`: le da más peso a la clase rara,
+      para que el modelo no aprenda a decir siempre "no". Se retoma con el baseline tonto.
+    </aside>
+  </section>
+
+  <!-- =========================== 13 · ESTRATEGIA B =========================== -->
+  <section>
+    <h3>B · Zero-shot: cero etiquetas</h3>
+    <div class="comparacion">
+      <div>
+        <h4>Qué hacés</h4>
+        <p>Le describís la categoría con palabras —"esta nota es sobre una protesta
+           social"— y clasifica sin haber visto ni un ejemplo tuyo.</p>
+      </div>
+      <div>
+        <h4>Su primo de toda la vida</h4>
+        <p>El <strong>diccionario de palabras clave</strong>. LIWC. Los diccionarios de
+           sentimiento. Misma posición en la tabla: cero etiquetas, y una lista que
+           escribiste vos.</p>
+      </div>
+    </div>
+    <div class="ojo">
+      "Como no entrené nada, no puede haber sobreajuste." <strong>Falso.</strong>
+      Si probás cinco prompts y te quedás con el que mejor da <em>en el test</em>,
+      ajustaste contra el test igual que todo el mundo. Y encima no tenés idea de qué
+      entendió el modelo por tu categoría. Hay que validar <strong>más</strong>, no menos.
+    </div>
+    <aside class="notes">
+      3 min. Momento de reconocimiento: preguntá quién usó alguna vez un diccionario
+      (LIWC, listas de términos). Van a levantar varias manos.
+      Decí: "entonces ya hicieron zero-shot, con otra tecnología. Y ya conocen la
+      discusión sobre su validez. Esa misma discusión es la de hoy, con más parámetros."
+      Eso les da autoridad sobre el tema en vez de quitársela.
+    </aside>
+  </section>
+
+  <!-- =========================== 14 · ESTRATEGIA C =========================== -->
+  <section>
+    <h3>C · Fine-tuning: y adentro no hay magia</h3>
+    <pre><code class="language-python" data-trim data-line-numbers>
+for epoca in range(3):
+    for lote in cargador:
+        prediccion = modelo(**lote)      # 1. PREDECIR
+        perdida    = prediccion.loss     # 2. COMPARAR
+        optimizador.zero_grad()          # 3. BORRAR
+        perdida.backward()               # 4. ANOTAR
+        optimizador.step()               # 5. MOVER
+</code></pre>
+    <p>Eso es lo que hay adentro del <span class="mono">Trainer</span> de Hugging Face.
+       <strong>Las cinco estaciones de la clase 4</strong>, sin una idea nueva.
+       Lo que agrega es contabilidad, lotes y checkpoints.</p>
+    <div class="aha compacta">Si alguna vez te dicen que el fine-tuning es magia,
+      acordate de que le viste el motor. Y de que lo escribiste vos.</div>
+    <aside class="notes">
+      3 min. Slide de empoderamiento. Regla de la casa: ninguna abstracción se muestra
+      sin la versión a mano al lado.
+      Preguntá: "¿qué pasa si le dejo todas las capas libres y tengo 80 ejemplos?"
+      Que lo digan ellos: calca.
+    </aside>
+  </section>
+
+  <!-- =========================== 15 · APUESTA ANTES DE LA VIZ =========================== -->
+  <section class="pregunta">
+    <h2>Con <span class="c-acento">25</span> ejemplos etiquetados,<br>¿cuál gana?</h2>
+    <div class="opciones">
+      <div><b>A</b> la más sofisticada (aprender todo desde cero)</div>
+      <div><b>B</b> la del medio (embeddings + logística)</div>
+      <div><b>C</b> el diccionario de palabras, que es gratis</div>
+    </div>
+    <aside class="notes">
+      1 min. VOTACIÓN OBLIGATORIA, a mano alzada, antes de mostrar la viz.
+      Sin la predicción fallida, mover el slider es un dibujito lindo.
+      Muchos votan A porque "es la mejor técnica". Ese error es el contenido de la
+      próxima slide.
+    </aside>
+  </section>
+
+  <!-- =========================== 16 · VIZ CURVA =========================== -->
+  <section>
+    <span class="marca">viz</span>
+    <h3>¿Cuántas etiquetas hacen falta?</h3>
+    <div class="viz-frame" data-alto="grande">
+      <iframe src="viz/zero-shot-vs-finetune.html" title="cuántas etiquetas hacen falta" loading="lazy"></iframe>
+    </div>
+    <p class="viz-pie"><b>Qué mirar:</b> con 25 etiquetas, la estrategia más sofisticada
+      saca <b>0,14</b> y la simple <b>0,45</b>. Recién cerca de las <b>680</b> se cruzan.
+      Y si cambiás la tarea a Covid-19, el diccionario gratis le gana a las dos.</p>
+    <aside class="notes">
+      5 min. Movelo vos primero, despacio. Empezá en 25 y subí de a poco.
+      Cuando llegues al cruce, pará y decí: "los primeros 100 ejemplos valen muchísimo.
+      Del 500 al 1000, mucho menos. **Etiquetar bien 200 casos vale más que cualquier
+      prompt ingenioso.**"
+      Después cambiá la tarea a Covid-19 y dejá que vean que la línea negra queda arriba
+      de todo. Frase: "acá el diccionario, que cuesta cero, le gana a las dos. Y sólo lo
+      saben porque midieron el piso."
+      Las curvas están MEDIDAS sobre el corpus del curso (medir-clase09.py). Decilo.
+    </aside>
+  </section>
+
+  <!-- =========================== 17 · MODELOS EN CASTELLANO =========================== -->
+  <section>
+    <h3>Y que sea en castellano, por favor</h3>
+    <div class="tarjetas">
+      <div><h4>BETO</h4>BERT entrenado en castellano por la Universidad de Chile.
+        El caballito de batalla.</div>
+      <div><h4>RoBERTuito / pysentimiento</h4>Entrenado en tuits en castellano, con
+        variantes rioplatenses. Muy pertinente para nosotros.</div>
+      <div><h4>Multilingües</h4>XLM-R, mBERT, MiniLM multilingüe. Andan en muchos idiomas
+        y en ninguno tan bien como uno dedicado.</div>
+    </div>
+    <table class="numeros" style="font-size:.62em">
+      <tr><th>macro-F1 en castellano (reportado por pysentimiento)</th><th>sentimiento</th><th>emoción</th><th>ironía</th></tr>
+      <tr><td>BETO</td><td>67,2</td><td>52,2</td><td>71,5</td></tr>
+      <tr><td>RoBERTuito</td><td class="c-ok">70,2</td><td class="c-ok">55,3</td><td class="c-ok">74,1</td></tr>
+    </table>
+    <div class="ojo compacta">
+      <strong>Mirá los números de verdad: 70, no 95.</strong> El mejor modelo en
+      castellano acierta dos de cada tres en sentimiento. Si usás uno entrenado en inglés
+      sobre texto en castellano <em>va a andar</em> —te devuelve etiquetas con su
+      probabilidad y todo— y va a andar <strong>peor que eso</strong>. Y no te vas a
+      enterar si no evaluás.
+    </div>
+    <aside class="notes">
+      3 min. Si tenés red, hacé la demo: la misma oración por un modelo en inglés y uno
+      en castellano. Es de las cosas más convincentes de la clase.
+      Los números de la tabla salen del repositorio de pysentimiento (docs/TASKS.md,
+      bajado y verificado). Son macro-F1, promedio de varias corridas. Decilos en voz alta:
+      "el mejor modelo en castellano acierta 70 de cada 100 en una tarea de tres clases.
+      Cuando alguien te muestre 0,95, preguntá contra qué."
+      IMPORTANTE: los nombres de modelo cambian y los modelos se despublican. Antes de dar
+      la clase verificá que existan y **anotá la revisión exacta**. El identificador
+      `pysentimiento/robertuito-sentiment-analysis` está verificado contra el código
+      fuente de la biblioteca; los pesos en huggingface.co no se pudieron probar desde el
+      contenedor donde se armó el material. Ver notas-docente.md.
+    </aside>
+  </section>
+
+  <!-- =========================== 18 · PRÁCTICO 1 =========================== -->
+  <section>
+    <h2>A las manos · bloque 1</h2>
+    <div class="manos">
+      Abrí <code>notebook.ipynb</code>. Secciones 1 a 4.
+      <ol>
+        <li>Corré la celda que <strong>detecta si hay Hugging Face</strong> y mirá por qué
+            camino te mandó.</li>
+        <li>Vectorizá los 1471 titulares y hacé <strong>búsqueda semántica</strong>.
+            Probá <code>fútbol</code>, <code>vacuna</code> y <code>protesta</code>.</li>
+        <li><strong>TODO 2:</strong> buscá una categoría <em>tuya</em> y anotá dos listas:
+            lo que la búsqueda semántica encontró de más (ganancia) y lo que trajo
+            de basura (costo). <b>Las dos listas.</b></li>
+      </ol>
+      <strong>20 minutos.</strong> Si algo no corre, levantá la mano.
+    </div>
+    <aside class="notes">
+      20 min de práctico. Circulá. Lo que vas a ver:
+      · Alguien busca una palabra que no está en el vocabulario y se frustra → es un
+        hallazgo, no un error: "un modelo sólo conoce lo que vio".
+      · Alguien va a mostrarte un resultado buenísimo. Pedile los falsos positivos.
+      A los 15 min avisá "cinco minutos" y pedí que dos o tres compartan su TODO 2.
+    </aside>
+  </section>
+
+  <!-- =========================== 19 · VIZ BÚSQUEDA =========================== -->
+  <section>
+    <span class="marca">viz</span>
+    <h3>Buscar por significado, no por palabra</h3>
+    <div class="viz-frame" data-alto="grande">
+      <iframe src="viz/similitud-semantica.html" title="búsqueda semántica" loading="lazy"></iframe>
+    </div>
+    <p class="viz-pie"><b>Qué mirar:</b> buscá <b>fútbol</b>. Por palabra clave hay
+      <b>uno</b>; por significado aparecen la FIFA, Chivas y el Cruz Azul, y ninguno dice
+      "fútbol". Después prendé <b>marcar los que no vienen al caso</b>: también trae basura.</p>
+    <aside class="notes">
+      5 min. Esto solo ya les cambia el trabajo con corpus grandes, y decílo:
+      "la lista de palabras clave siempre deja afuera lo que no se te ocurrió.
+      Esto lo encuentra."
+      Y de inmediato el contrapunto, sin excepción: prendé el toggle de falsos positivos.
+      "Un ranking por parecido no es un clasificador validado. Es un buen primer filtro
+      **que hay que leer**."
+    </aside>
+  </section>
+
+  <!-- =========================== 20 · PAUSA =========================== -->
+  <section class="pausa">
+    <h2>Pausa</h2>
+    <p class="minutos">10 minutos</p>
+    <p class="letra-chica">
+      Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+      preguntarlo sin levantar la mano delante de treinta personas.
+    </p>
+    <aside class="notes">
+      10 min. EN SERIO, PAUSA. No la recortes: la segunda mitad es la importante y
+      necesitan cabeza. Si vas atrasado/a, recortá contenido, no la pausa.
+    </aside>
+  </section>
+
+  <!-- =========================== 21 · SEGUNDA PARTE =========================== -->
+  <section class="portada">
+    <p class="num-clase">Segunda parte</p>
+    <h1>Ahora sí: evaluar</h1>
+    <div class="franja"></div>
+    <p class="gancho">Hacerlo andar tomó veinte minutos. Saber si anda nos va a tomar
+      el resto de la clase. Y toda tu carrera.</p>
+    <aside class="notes">
+      1 min. Cambiá el tono. Esto es lo que separa el trabajo de ellos del de cualquiera
+      que copie un tutorial.
+    </aside>
+  </section>
+
+  <!-- =========================== 22 · ETIQUETAR A MANO =========================== -->
+  <section>
+    <h2>Primero: etiquetá a mano</h2>
+    <ol>
+      <li>Sacá una muestra <strong>al azar</strong> de 200 a 300 casos.</li>
+      <li>Etiquetalos vos. Mejor: <strong>dos personas</strong>, por separado.</li>
+      <li><strong>Sin mirar lo que dijo el modelo.</strong> A ciegas. Es el mismo
+          principio del doble ciego, y por el mismo motivo.</li>
+    </ol>
+    <div class="ojo">
+      Etiquetar mirando la predicción del modelo <strong>contamina el patrón de
+      referencia</strong>. Vas a estar de acuerdo con él más de lo que corresponde, y
+      tu evaluación va a decir que es mejor de lo que es. Pasa siempre, y nadie se da
+      cuenta solo.
+    </div>
+    <p class="fragment">Sí, a mano. No hay atajo. Es la parte más aburrida y es
+      <strong>la que convierte esto en investigación</strong>.</p>
+    <aside class="notes">
+      3 min. Va a haber resistencia ("¿no era que la máquina lo hacía?").
+      Contestá: "la máquina codifica los 20.000. Vos codificás 300 para saber si la
+      máquina sirve. Sin esos 300 no tenés un resultado: tenés una salida."
+      Si alguien pregunta cuántos: 200-300 alcanza para intervalos razonables; menos de
+      100 y tus métricas tienen un intervalo tan ancho que no distinguís 0,7 de 0,85.
+    </aside>
+  </section>
+
+  <!-- =========================== 23 · LA MATRIZ =========================== -->
+  <section>
+    <h3>La matriz de confusión, en tu problema y no en abstracto</h3>
+    <div class="comparacion">
+      <div>
+        <h4>Como te la enseñaron</h4>
+        <p>Verdaderos positivos · Falsos positivos<br>
+           Falsos negativos · Verdaderos negativos<br><br>
+           <em>Cuatro palabras que nadie recuerda cuál es cuál.</em></p>
+      </div>
+      <div>
+        <h4>Como se escribe</h4>
+        <p><strong>74</strong> notas de protesta que el modelo encontró<br>
+           <strong>51</strong> notas que no eran protesta y marcó igual<br>
+           <strong>29</strong> notas de protesta que se le pasaron<br>
+           <strong>214</strong> notas comunes que dejó pasar bien</p>
+      </div>
+    </div>
+    <p class="fragment"><strong>Cuatro números, y cada uno significa algo distinto para tu
+      pregunta.</strong> Si estás armando un corpus para leerlo, el segundo te hace perder
+      tardes. Si estás estimando cuántas notas del tema hubo, el tercero te subestima el
+      fenómeno. <span style="font-size:.8em">(Los cuatro números son los del notebook de
+      hoy, tarea «¿es una nota sobre política?», test de 368 casos.)</span></p>
+    <aside class="notes">
+      3 min. Escribí los cuatro casilleros en el pizarrón CON LAS PALABRAS DE ELLOS.
+      Pedí un ejemplo del aula: "alguien que tenga un corpus, ¿qué sería un falso
+      positivo en su caso?" Que lo digan en su dominio.
+    </aside>
+  </section>
+
+  <!-- =========================== 24 · APUESTA UMBRAL =========================== -->
+  <section class="pregunta">
+    <h2>Si bajo el umbral, ¿qué pasa?</h2>
+    <div class="opciones">
+      <div><b>A</b> mejoran precisión y recall</div>
+      <div><b>B</b> sube el recall y baja la precisión</div>
+      <div><b>C</b> baja el recall y sube la precisión</div>
+      <div><b>D</b> depende del modelo</div>
+    </div>
+    <aside class="notes">
+      1 min. Votación. Después, la segunda pregunta, que es la buena:
+      "y si el fenómeno pasa de ser la mitad del corpus a ser el 5 %, ¿qué le pasa a la
+      accuracy?" Que apuesten. Casi todos dicen "baja". Sube. Ese es el aha.
+    </aside>
+  </section>
+
+  <!-- =========================== 25 · VIZ MATRIZ =========================== -->
+  <section>
+    <span class="marca">viz</span>
+    <h3>Movés el umbral, elegís qué error preferís</h3>
+    <div class="viz-frame" data-alto="grande">
+      <iframe src="viz/matriz-de-confusion.html" title="matriz de confusión y umbral" loading="lazy"></iframe>
+    </div>
+    <p class="viz-pie"><b>Qué mirar:</b> no hay umbral donde suban las dos.
+      Y después, sin tocar nada más, bajá <b>cuán raro es el fenómeno</b> al 5 %:
+      la precisión cae de 0,88 a 0,23, la accuracy no se mueve, y el modelo bobo te gana.</p>
+    <aside class="notes">
+      8 min. LA VIZ CENTRAL DE LA CLASE. No la apures.
+      1) Movés el umbral despacio. Que vean precisión y recall pelearse.
+         "Elegir el umbral es elegir qué error preferís, y eso es una decisión de
+         investigación, no una métrica que se optimiza sola." (Y es la clase 3 otra vez:
+         elegir la loss también era elegir qué error te importa.)
+      2) Volvés el umbral a 0,5. Bajás la prevalencia al 5 %. PARÁ Y ESPERÁ.
+         "El modelo es exactamente el mismo. Cambió sólo cuán raro es el fenómeno."
+      3) Prendés "mostrar el modelo bobo". El bobo saca 0,96 y les gana por 8 puntos.
+      4) Cerrá con la epidemiología: detectar algo raro con un test imperfecto produce
+         mayoritariamente falsos positivos. Tiene un siglo de literatura y ellos ya la
+         conocen de otra materia.
+      Los 600 casos son SIMULADOS y está dicho al pie. Decilo vos también.
+    </aside>
+  </section>
+
+  <!-- =========================== 26 · PRECISIÓN Y RECALL =========================== -->
+  <section>
+    <h3>Precisión y recall, en castellano</h3>
+    <div class="comparacion">
+      <div>
+        <h4 class="c-modelo">Precisión</h4>
+        <p><strong>De cada 100 notas que el modelo llamó «sobre política», 59 lo eran.</strong></p>
+        <p style="font-size:.85em">Te dice cuánta basura vas a tener que leer.</p>
+      </div>
+      <div>
+        <h4 class="c-val">Recall</h4>
+        <p><strong>De cada 100 notas que eran sobre política, el modelo encontró 72.</strong></p>
+        <p style="font-size:.85em">Te dice cuánto del fenómeno te estás perdiendo.</p>
+      </div>
+    </div>
+    <div class="ojo">
+      <strong>Regla de la casa, sin excepciones:</strong> nunca digas "precisión de 0,59".
+      Decí la frase. Si no la podés decir en voz alta, no entendiste tu propio resultado
+      y no lo vas a poder defender.
+    </div>
+    <aside class="notes">
+      3 min. Hacé que la digan. En serio: pedile a alguien que lea la frase de precisión
+      en voz alta con SU fenómeno. Los números son los del notebook de hoy (F1 0,65).
+      El paquete del curso tiene `g.frase_de_metricas()`, que las escribe solo. Mostralo.
+    </aside>
+  </section>
+
+  <!-- =========================== 27 · CUÁL TE IMPORTA =========================== -->
+  <section>
+    <h3>¿Cuál te importa más? Depende de tu pregunta.</h3>
+    <div class="tarjetas">
+      <div><h4>Estimar una prevalencia</h4>"¿Cuántas notas del tema hubo?"<br>
+        Te importan <strong>las dos</strong>, y sobre todo que estén balanceadas:
+        los errores en un sentido tienen que compensar los del otro.</div>
+      <div><h4>Armar un corpus para leer</h4>"Quiero todas las notas de protesta."<br>
+        Te importa el <strong>recall</strong>. Vas a filtrar la basura a mano.</div>
+      <div><h4>Afirmar algo de casos concretos</h4>"Estos 40 medios cubrieron la protesta."<br>
+        Te importa la <strong>precisión</strong>. Un falso positivo es un error en tu paper.</div>
+    </div>
+    <p class="fragment">Otra vez: <strong>es una decisión de investigación</strong>, no una
+      métrica que se optimiza sola.</p>
+    <aside class="notes">
+      3 min. Pedí que cada uno escriba en una línea cuál de las tres es su caso.
+      Es de las cosas más útiles de la clase y toma treinta segundos.
+    </aside>
+  </section>
+
+  <!-- =========================== 28 · EL BASELINE TONTO =========================== -->
+  <section>
+    <h3>El modelo bobo, y por qué siempre se reporta</h3>
+    <table class="numeros">
+      <tr><th>estrategia</th><th>accuracy</th><th>F1</th><th>etiquetas</th></tr>
+      <tr><td>el bobo: decir siempre «no»</td><td>0,72</td><td class="c-error">0,00</td><td>0</td></tr>
+      <tr><td>diccionario de palabras clave</td><td>0,75</td><td>0,40</td><td>0</td></tr>
+      <tr><td>A · embeddings + logística</td><td>0,78</td><td>0,65</td><td>1103</td></tr>
+      <tr><td>C · vocabulario desde cero</td><td>0,83</td><td>0,67</td><td>1103</td></tr>
+    </table>
+    <div class="aha">
+      Si tu clase mayoritaria es el 92 %, un <strong>93 % de accuracy es un desastre</strong>
+      — y suena espectacular. Reportar accuracy sin el piso al lado no es un descuido:
+      es lo que hace que un resultado nulo parezca un hallazgo.
+    </div>
+    <aside class="notes">
+      3 min. Números REALES del notebook de hoy: corpus de prensa del curso, tarea
+      "¿es una nota sobre política?", 28 % de positivos.
+      Fijate en la columna F1 del bobo: cero. Encontró CERO notas de política y acertó
+      el 72 % de las veces. Ese contraste es la slide entera.
+    </aside>
+  </section>
+
+  <!-- =========================== 29 · EL TECHO HUMANO =========================== -->
+  <section>
+    <h2>El techo humano</h2>
+    <div class="intuicion">
+      Si dos codificadores entrenados coinciden en el <strong>73 %</strong> de los casos
+      (kappa 0,46), ese es tu <strong>techo realista</strong>. No hay modelo que pueda
+      hacer mejor una distinción que dos personas no saben hacer igual.
+    </div>
+    <div class="ojo">
+      Y si tu modelo saca <strong>0,95</strong> donde dos humanos coinciden en 0,73:
+      <strong>no festejes. Buscá el error.</strong> Casi siempre hay una fuga, o el modelo
+      aprendió el estilo de <em>un</em> codificador en particular.
+    </div>
+    <p class="fragment"><strong>Este es probablemente el aporte más valioso que un
+      cientista social hace en un equipo de ML</strong>, y hay que decirlo así. El kappa
+      no es un detalle de calidad: es un <em>límite epistemológico</em>.</p>
+    <aside class="notes">
+      4 min. Terreno conocido: acá ellos saben más que el ingeniero.
+      El número 0,73/0,46 sale del archivo del curso, y los dos codificadores son
+      SIMULADOS: está en el nombre del archivo y hay que decirlo. Sirve para practicar
+      la cuenta, no para afirmar nada sobre el corpus.
+      Cerrá con la frase que se llevan: "si dos codificadores no se ponen de acuerdo,
+      no tenés un problema de modelo. Tenés un problema de concepto."
+    </aside>
+  </section>
+
+  <!-- =========================== 30 · PRÁCTICO 2 =========================== -->
+  <section>
+    <h2>A las manos · bloque 2 — el proyecto chico</h2>
+    <div class="manos">
+      <strong>De a dos.</strong> Notebook, secciones 5 a 11.
+      <ol>
+        <li>Entrená las <strong>tres estrategias</strong> y armá la tabla comparativa
+            con el piso incluido.</li>
+        <li>Corré la <strong>curva de etiquetas</strong> y traducila a horas de
+            codificación (30 s por caso).</li>
+        <li><strong>TODO 6, el importante:</strong> leé los 30 errores. ¿Tienen algo en
+            común? ¿Alguno está <em>bien</em> clasificado y la etiqueta estaba mal?</li>
+        <li>Corré la sección 11: <strong>la trampa de este corpus</strong>.</li>
+      </ol>
+      <strong>25 minutos.</strong>
+    </div>
+    <aside class="notes">
+      25 min. Circulá y buscá activamente a quién le ganó la regresión logística al
+      modelo grande: eso se pone en común después.
+      A los 20 min avisá. Si van muy atrasados, saltá el punto 2 (la curva ya la vieron
+      en la viz) y no toques el 3 ni el 4.
+    </aside>
+  </section>
+
+  <!-- =========================== 31 · RESULTADOS DEL AULA =========================== -->
+  <section>
+    <h2>Poné en común</h2>
+    <ul>
+      <li>¿A quién le ganó la <strong>regresión logística</strong> a la estrategia
+          sofisticada? Levanten la mano.</li>
+      <li>¿A quién le ganó el <strong>diccionario</strong>, que es gratis?</li>
+      <li>¿Quién encontró en los errores <strong>una etiqueta humana equivocada</strong>?</li>
+      <li>¿A quién le bajó el número al partir por medio?</li>
+    </ul>
+    <div class="ss compacta">Todo eso pasa seguido, y todo eso <strong>se reporta</strong>.
+      Un paper que sólo cuenta la corrida que salió linda no es un paper: es una anécdota
+      con tabla.</div>
+    <aside class="notes">
+      4 min. Que hablen ellos. Tu trabajo acá es validar los resultados "malos":
+      que quede clarísimo que reportar que lo barato ganó es un resultado, no un fracaso.
+    </aside>
+  </section>
+
+  <!-- =========================== 32 · LA TRAMPA =========================== -->
+  <section>
+    <span class="marca">el corpus de hoy</span>
+    <h3>El detector de desinformación que era un detector de chistes</h3>
+    <table class="numeros">
+      <tr><th>cómo partí los datos</th><th>accuracy</th><th>F1</th></tr>
+      <tr><td>al azar, como en los tutoriales</td><td>0,73</td><td class="c-ok">0,68</td></tr>
+      <tr><td>por medio (ningún diario en los dos lados)</td><td>0,44</td><td class="c-error">0,22</td></tr>
+    </table>
+    <p><strong>332 de los 346 medios (96 %) aparecen con una sola clase.</strong>
+       Y las notas "falsas" vienen sobre todo de <em>El Dizque</em> y
+       <em>El Ruinaversal</em>, que son <strong>sitios de sátira</strong>: publican
+       noticias falsas a propósito, para hacer humor.</p>
+    <div class="aha">
+      Lo que aprendió el clasificador no es "¿esto es desinformación?".
+      Es <strong>"¿esto está escrito con el estilo de un sitio de sátira mexicano?"</strong>.
+      Da un F1 lindo, es reproducible, y mide otra cosa.
+    </div>
+    <aside class="notes">
+      5 min. Este es el momento más importante de la segunda mitad, y es con datos reales
+      del curso (medidos en el notebook, no inventados).
+      Regla que se llevan, dictala: "entrená dos veces, con y sin el atajo sospechoso
+      disponible, y mostrá la diferencia. **Si no cae, algo está mal en tu evaluación.**"
+      Y sembrá la clase 10: "esto tiene nombre —validez de constructo— y es la clase que
+      viene entera."
+    </aside>
+  </section>
+
+  <!-- =========================== 33 · MIRÁ LOS ERRORES =========================== -->
+  <section>
+    <h2>Mirá los errores. Leelos.</h2>
+    <div class="intuicion">
+      Leer <strong>30 errores</strong> del modelo te enseña más sobre tu propia definición
+      operativa que leer 300 aciertos.
+    </div>
+    <ul>
+      <li>Los <strong>falsos positivos</strong> te dicen qué entendió el modelo por tu
+          categoría. (Si "política" le trae fútbol con políticos adentro, aprendiste algo
+          sobre tu categoría.)</li>
+      <li>Los <strong>falsos negativos</strong> te dicen qué parte del fenómeno queda
+          sistemáticamente afuera. Suele haber un patrón, y suele ser sustantivo.</li>
+      <li class="fragment"><strong>Y varios de los "errores" van a estar bien
+          clasificados</strong>, con la etiqueta humana equivocada. Cuando eso pasa, tu F1
+          está midiendo tu desacuerdo con quien etiquetó, no la calidad del modelo.</li>
+    </ul>
+    <aside class="notes">
+      3 min. La última viñeta es la que cambia hábitos. Preguntá quién encontró un caso
+      así en el práctico: siempre hay alguien.
+      Si nadie lo hizo, mostrá uno del notebook (los falsos positivos de "Deporte" que son
+      notas sobre Cuauhtémoc Blanco, futbolista y alcalde: ¿deporte o política?).
+    </aside>
+  </section>
+
+  <!-- =========================== 34 · QUÉ REPORTAR =========================== -->
+  <section>
+    <span class="marca">la sección de métodos</span>
+    <h3>Lo que hay que reportar, sí o sí</h3>
+    <ol style="font-size:.85em">
+      <li><strong>Modelo y versión exactos.</strong> Los modelos se actualizan y se
+          despublican. "Usamos BERT" no es una cita.</li>
+      <li><strong>Cuántos casos etiquetaste, quién los etiquetó</strong> y con qué manual.</li>
+      <li><strong>El acuerdo entre codificadores</strong> sobre una submuestra.</li>
+      <li><strong>Cómo partiste</strong> los datos, y por qué así.</li>
+      <li><strong>El piso</strong> (clase mayoritaria) al lado de tu número.</li>
+      <li><strong>Precisión, recall y F1 con su frase</strong>, más la matriz de confusión.</li>
+      <li><strong>Ejemplos de errores</strong>, de los dos tipos.</li>
+    </ol>
+    <div class="ss compacta">Si podés escribir esos siete puntos, tu sección de métodos
+      está hecha. La clase 10 te la da armada, con el checklist del revisor.</div>
+    <aside class="notes">
+      3 min. Slide para fotografiar. Decilo: "saquen una foto".
+      Si preguntan por intervalos de confianza: sí, van, y la manera fácil es bootstrap
+      sobre el test. Se ve en la clase 10.
+    </aside>
+  </section>
+
+  <!-- =========================== 35 · EL LUNES =========================== -->
+  <section>
+    <span class="marca">el lunes</span>
+    <h2>Qué te llevás para el lunes</h2>
+    <ol style="font-size:.86em">
+      <li><strong>Definí la categoría</strong> por escrito, con los casos límite resueltos.</li>
+      <li><strong>Etiquetá 300 al azar</strong>, a ciegas. Son unas 2,5 horas.</li>
+      <li><strong>Que otra persona codifique 60</strong> y calculá el kappa. Si da bajo,
+          parás: el problema es el concepto.</li>
+      <li><strong>Elegí estrategia</strong> según cuántas etiquetas conseguiste.</li>
+      <li><strong>Medí el piso</strong> antes de festejar nada.</li>
+      <li><strong>Evaluá en test</strong>, una sola vez, y <strong>leé 30 errores</strong>.</li>
+      <li><strong>Reportá</strong> los siete puntos de la slide anterior.</li>
+    </ol>
+    <div class="manos compacta">Con esto, el lunes clasificás tu corpus. En serio.
+      La función <code>clasificar_corpus(textos)</code> está en la sección 13 del notebook,
+      lista para que le pases tus datos.</div>
+    <aside class="notes">
+      3 min. Insistí en el paso 3: es el más barato y el que más disgustos evita.
+      "Sesenta casos codificados por dos personas cuestan media hora y te pueden ahorrar
+      seis meses de medir algo que no existe."
+    </aside>
+  </section>
+
+  <!-- =========================== 36 · CUÁNDO NO =========================== -->
+  <section>
+    <h2>Cuando el modelo no es la respuesta</h2>
+    <div class="comparacion contra">
+      <div>
+        <h4>Tenés 200 documentos</h4>
+        <p><strong>Leelos.</strong> Vas a entender más y te va a tomar menos que armar
+          todo esto. Un clasificador para 200 casos es un lujo mal puesto.</p>
+      </div>
+      <div>
+        <h4>Tu categoría es ambigua para dos humanos</h4>
+        <p>Ningún modelo la va a resolver. El problema es la <strong>definición</strong>,
+          no la herramienta. Volvé al libro de códigos.</p>
+      </div>
+    </div>
+    <div class="aha">
+      El mejor consejo de la clase: <strong>si dos codificadores no se ponen de acuerdo,
+      no tenés un problema de modelo. Tenés un problema de concepto.</strong>
+      Y eso lo arreglás pensando, no comprando GPU.
+    </div>
+    <aside class="notes">
+      2 min. Decilo sin ironía y con convicción. Es de las cosas que más agradecen,
+      porque les devuelve autoridad sobre su propio trabajo.
+      Y es una siembra directa de la clase 10 ("cuándo NO usar deep learning").
+    </aside>
+  </section>
+
+  <!-- =========================== 37 · QUÉ TE LLEVÁS =========================== -->
+  <section>
+    <h2>Qué te llevás de hoy</h2>
+    <div class="tarjetas">
+      <div><h4>1</h4>Hacerlo andar es fácil. <strong>Saber si anda es tu trabajo</strong>,
+        y es lo que separa un paper de un posteo.</div>
+      <div><h4>2</h4>La estrategia se elige por <strong>cuántas etiquetas podés
+        producir</strong>, no por cuál técnica está de moda. Con pocas, lo simple gana.</div>
+      <div><h4>3</h4>Toda métrica va con su <strong>frase en castellano</strong> y su
+        <strong>piso al lado</strong>. Sin las dos cosas, el número no significa nada.</div>
+    </div>
+    <aside class="notes">
+      2 min. Tres, no más. Si te quedan cinco minutos, hacé que las digan ellos antes de
+      mostrarlas.
+    </aside>
+  </section>
+
+  <!-- =========================== 38 · GLOSARIO =========================== -->
+  <section>
+    <h2>Glosario de hoy</h2>
+    <ul class="glosario-lista" style="font-size:.82em">
+      <li><b>transfer learning</b><span>aprendizaje por transferencia — aprovechar lo que otro modelo ya aprendió</span></li>
+      <li><b>fine-tuning</b><span>ajuste fino — seguir entrenando ese modelo con tus ejemplos</span></li>
+      <li><b>freezing</b><span>congelar capas — dejar quietas las de abajo y mover sólo las de arriba</span></li>
+      <li><b>zero-shot / few-shot</b><span>sin ejemplos / con poquitos — describir la categoría en vez de entrenarla</span></li>
+      <li><b>pipeline</b><span>la cañería — texto crudo entra, etiqueta sale</span></li>
+      <li><b>sentence embedding</b><span>la oración entera convertida en un punto del espacio</span></li>
+      <li><b>precision / recall</b><span>de lo que marqué cuánto era / de lo que había cuánto encontré</span></li>
+      <li><b>F1</b><span>el promedio armónico de las dos. Un número que esconde dos</span></li>
+      <li><b>baseline</b><span>el piso — cuánto saca no hacer nada. Sin él, un 0,85 no significa nada</span></li>
+      <li><b>kappa</b><span>cuánto coinciden dos codificadores, descontando el azar</span></li>
+      <li><b>threshold</b><span>umbral — dónde cortás el puntaje para decir «sí»</span></li>
+    </ul>
+    <aside class="notes">
+      1 min. Todos están en recursos/glosario.md con la clase donde aparecieron.
+    </aside>
+  </section>
+
+  <!-- =========================== 39 · LO QUE FALTA =========================== -->
+  <section>
+    <h2>Tenemos un número bueno.<br>¿Eso prueba algo?</h2>
+    <p class="bajada">El detector de sátira de hace un rato tenía un número bueno.
+      Era reproducible. Y no medía lo que decía medir.</p>
+    <div class="ojo">
+      Desempeño (<em>¿acierta?</em>) y validez (<em>¿mide lo que digo que mide?</em>)
+      son <strong>dos preguntas distintas</strong>. Hoy contestamos la primera.
+    </div>
+    <aside class="notes">
+      2 min. Dejá que quede incómodo. No lo resuelvas: es el gancho de la última clase.
+    </aside>
+  </section>
+
+  <!-- =========================== 40 · PUENTE =========================== -->
+  <section class="portada">
+    <p class="num-clase">La que viene</p>
+    <h1>Clase 10: criterio</h1>
+    <div class="franja"></div>
+    <p class="gancho">Validez, sesgo, reproducibilidad y el revisor 2.
+      Sabés hacerlo andar y sabés medirlo. Falta lo más difícil: convencer a otro
+      —y a vos— de que lo que medís es lo que decís que medís.</p>
+    <aside class="notes">
+      1 min. Cerrá con esta frase y no agregues nada.
+    </aside>
+  </section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+</script>
+</body>
+</html>

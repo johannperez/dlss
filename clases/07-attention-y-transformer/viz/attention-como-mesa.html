@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cada palabra arma su propio resumen — Clase 7</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "hice clic en «lo» y el arco más grueso no fue a la palabra
+     de al lado: se fue cinco palabras para atrás, justo al sustantivo al que
+     «lo» se refiere. Nadie le enseñó gramática a esta cosa."
+
+     Y el aha secundario, que es el que sostiene toda la clase 7:
+     cada palabra tiene SU PROPIO mapa. El mapa de «lo» no se parece en nada
+     al de «si». Attention es direccional y es por palabra.
+
+     Los pesos NO son inventados: salen de un transformer entrenado de verdad
+     sobre los discursos de apertura 1984-2019 (ver medir-atencion.py).
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* curso.css no declara `box-sizing: border-box` global, así que el padding de
+     .viz-frame y .panel se suma POR FUERA del ancho de su columna y el dibujo
+     termina tapándole el borde izquierdo al panel (se ve sobre todo embebido en
+     una slide, que es más angosto). Arreglo local, sin tocar el CSS compartido. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
+  #escena { width: 100%; }
+  .barra-reparto {
+    display: flex; width: 100%; height: 26px; border-radius: 6px;
+    overflow: hidden; border: 1px solid var(--borde); margin-top: .5rem;
+  }
+  .barra-reparto > span {
+    display: flex; align-items: center; justify-content: center;
+    font: 600 10px/1 var(--f-mono); color: var(--papel);
+    overflow: hidden; white-space: nowrap;
+    transition: width .18s ease;
+  }
+  .rotulo-reparto {
+    font-size: .72rem; color: var(--tinta-3); margin: .45rem 0 0;
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  .nota-cabeza {
+    font-size: .78rem; color: var(--tinta-2); line-height: 1.4;
+    border-left: 3px solid var(--c-parametro); padding-left: .6rem; margin: .3rem 0 0;
+  }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Cada palabra arma su propio resumen del contexto</h1>
+    <p>Hacé clic en cualquier palabra de la oración. Los arcos que salen de ella son
+       la atención que le presta a cada una de las otras: cuanto más grueso el arco,
+       más peso. Los pesos de una palabra <b>siempre suman 100%</b>: si le da más a
+       una, le da menos a otra. Probá con <b>«lo»</b> y después con <b>«si»</b>.</p>
+  </header>
+
+  <div class="viz-frame" style="padding:10px">
+    <div id="escena"></div>
+    <p class="rotulo-reparto" id="rotulo-barra">cómo reparte su 100%</p>
+    <div class="barra-reparto" id="barra"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar, en tres pasos.</strong>
+      <b>(1)</b> Así como abre: la palabra elegida es <b>«lo»</b> y el arco se va derecho a
+      <b>«algo»</b>, dos palabras atrás — que es exactamente a lo que «lo» se refiere.
+      Y no le da un poco: le da <b>todo</b>. Nadie le enseñó gramática a esta cosa.
+      <b>(2)</b> Cambiá la oración a la <b>enumeración</b> y elegí la cabeza
+      <b>«bloque 2 · cabeza 1»</b>. Hacé clic en la <b>«y»</b>: ahí sí reparte, y reparte
+      justo entre los tres sustantivos enumerados. <em>Eso</em> es el promedio ponderado.
+      <b>(3)</b> Ahora pasá a cualquier cabeza del <b>bloque 1</b>: se miran casi sólo a
+      sí mismas y los arcos desaparecen. No está roto: es lo que aprendió este modelo, y
+      en modelos chicos pasa seguido. La mitad de lo que hace un transformer no es
+      interpretable, y funciona igual.
+    </div>
+    <p class="viz-pie">
+      Los pesos salen de un transformer de <span id="pie-param">—</span> parámetros
+      entrenado en CPU sobre los <b>discursos de apertura de sesiones de la Argentina,
+      1984-2019</b> (corpus real). Sin retoques: si un patrón se ve feo, es porque el
+      modelo hace eso. Reproducible con
+      <code>clases/07-attention-y-transformer/medir-atencion.py</code>.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-atencion.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. Datos
+   =========================================================================== */
+const D = (typeof DATOS_ATENCION !== 'undefined') ? DATOS_ATENCION : null;
+
+const estado = { oracion: 0, capa: 1, cabeza: 1, mascara: true, todas: false, sel: null };
+
+const nombresOracion = D.oraciones.map((o, i) => ({ valor: String(i), texto: o.fenomeno }));
+const nombresCabeza = [];
+D.cabezas.forEach((fila, c) => fila.forEach((h, i) => {
+  nombresCabeza.push({ valor: c + ':' + i, texto: 'bloque ' + (c + 1) + ' · cabeza ' + (i + 1) });
+}));
+
+function oracion() { return D.oraciones[estado.oracion]; }
+function fichas() { return oracion().fichas; }
+function matriz() {
+  const fuente = estado.mascara ? oracion().atencion : oracion().atencion_sin_mascara;
+  return fuente[estado.capa][estado.cabeza];
+}
+function infoCabeza() { return D.cabezas[estado.capa][estado.cabeza]; }
+
+/* ===========================================================================
+   2. Dibujo
+   =========================================================================== */
+const ANCHO = 1000, ALTO = 252;
+const Y_CAJA = 190, ALTO_CAJA = 34;
+
+const lienzo = document.createElement('canvas').getContext('2d');
+
+function medirTexto(t, tam) {
+  lienzo.font = '600 ' + tam + 'px ' + Viz.colores().fuente;
+  return lienzo.measureText(t).width;
+}
+
+let cajas = [];   // {x, ancho, centro, ficha}
+
+function calcularCajas() {
+  const fs = fichas();
+  let tam = 16, sep = 10, relleno = 9;
+  let total = 0;
+  // achicamos la letra hasta que la oración entre entera en una sola fila
+  for (let intento = 0; intento < 8; intento++) {
+    total = 0;
+    for (const f of fs) total += medirTexto(f, tam) + 2 * relleno + sep;
+    if (total <= ANCHO - 40) break;
+    tam -= 1; sep -= 0.6; relleno -= 0.4;
+  }
+  let x = (ANCHO - (total - sep)) / 2;
+  cajas = fs.map(f => {
+    const w = medirTexto(f, tam) + 2 * relleno;
+    const caja = { x: x, ancho: w, centro: x + w / 2, ficha: f, tam: tam };
+    x += w + sep;
+    return caja;
+  });
+}
+
+function dibujar() {
+  calcularCajas();
+  const A = matriz();
+  const fs = fichas();
+  const cont = document.getElementById('escena');
+  cont.innerHTML = '';
+  const s = Viz.svg.crear('#escena', { ancho: ANCHO, alto: ALTO, altoCss: 'auto' });
+  s.style.height = 'auto';
+  s.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+  // --- los arcos ---
+  // Cuánto se arquea un arco. Se acota para que los arcos largos no se salgan
+  // por arriba del lienzo: la altura que sube es |dx| * curva / 2.
+  function curvaDe(dx) {
+    const d = Math.max(1, Math.abs(dx));
+    // mínimo: que suba al menos 26 px, para que entre el rótulo del porcentaje
+    return Math.min(Math.max(0.62, 52 / d), 2 * (Y_CAJA - 34) / d);
+  }
+
+  function arcosDe(i, opacidadBase) {
+    const fila = A[i];
+    for (let j = 0; j < fs.length; j++) {
+      const w = fila[j];
+      if (!w || w < 0.012 || j === i) continue;
+      Viz.svg.arco(s, cajas[i].centro, Y_CAJA - 2, cajas[j].centro, Y_CAJA - 2, {
+        curva: curvaDe(cajas[j].centro - cajas[i].centro),
+        grosor: 0.8 + w * 26,
+        color: 'acento',
+        opacidad: opacidadBase * (0.28 + 0.62 * Math.min(1, w * 2.2))
+      });
+    }
+  }
+
+  if (estado.todas) {
+    for (let i = 0; i < fs.length; i++) arcosDe(i, 0.42);
+  } else if (estado.sel !== null) {
+    arcosDe(estado.sel, 1);
+  }
+
+  // --- los porcentajes sobre los arcos (sólo del seleccionado) ---
+  if (!estado.todas && estado.sel !== null) {
+    const fila = A[estado.sel];
+    for (let j = 0; j < fs.length; j++) {
+      const w = fila[j];
+      if (!w || w < 0.06 || j === estado.sel) continue;
+      const dx = cajas[j].centro - cajas[estado.sel].centro;
+      const mx = (cajas[estado.sel].centro + cajas[j].centro) / 2;
+      const sube = Math.abs(dx) * curvaDe(dx) / 2;        // cuánto sube el arco
+      const grosor = 0.8 + w * 26;
+      Viz.svg.el('text', {
+        x: mx, y: Y_CAJA - 2 - sube - grosor / 2 - 7, 'text-anchor': 'middle',
+        'font-family': Viz.colores().mono, 'font-size': 12, 'font-weight': 700,
+        fill: Viz.color('acento'), texto: Math.round(w * 100) + '%'
+      }, s);
+    }
+  }
+
+  // --- las cajitas con las palabras ---
+  const filaSel = estado.sel !== null ? A[estado.sel] : null;
+  cajas.forEach((c, j) => {
+    const esSel = j === estado.sel;
+    const w = filaSel ? filaSel[j] : 0;
+    const relleno = esSel ? Viz.color('acento')
+      : Viz.mezclarColor('papel2', 'acento', Math.min(0.55, w * 1.1));
+    const g = Viz.svg.el('g', { style: 'cursor:pointer' }, s);
+    Viz.svg.el('rect', {
+      x: c.x, y: Y_CAJA, width: c.ancho, height: ALTO_CAJA, rx: 7,
+      fill: relleno,
+      stroke: esSel ? Viz.color('acento') : Viz.color('borde'),
+      'stroke-width': esSel ? 2 : 1
+    }, g);
+    Viz.svg.el('text', {
+      x: c.centro, y: Y_CAJA + ALTO_CAJA / 2 + 5, 'text-anchor': 'middle',
+      'font-family': Viz.colores().fuente, 'font-size': c.tam, 'font-weight': 600,
+      fill: esSel ? Viz.color('papel') : Viz.color('tinta'), texto: c.ficha
+    }, g);
+    // rectángulo invisible más grande, para que sea fácil hacerle clic
+    const zona = Viz.svg.el('rect', {
+      x: c.x - 3, y: Y_CAJA - 6, width: c.ancho + 6, height: ALTO_CAJA + 12,
+      fill: 'transparent', style: 'cursor:pointer'
+    }, g);
+    zona.addEventListener('click', () => { estado.sel = j; estado.todas = false;
+      ctl.set('todas', false, true); actualizar(); });
+  });
+
+  // --- rótulo de ayuda cuando todavía no eligieron nada ---
+  if (estado.sel === null && !estado.todas) {
+    Viz.svg.el('text', {
+      x: ANCHO / 2, y: 120, 'text-anchor': 'middle',
+      'font-family': Viz.colores().fuente, 'font-size': 17, 'font-weight': 600,
+      fill: Viz.color('tinta3'), texto: 'Hacé clic en una palabra ↓'
+    }, s);
+  }
+  if (estado.todas) {
+    Viz.svg.el('text', {
+      x: ANCHO / 2, y: 26, 'text-anchor': 'middle',
+      'font-family': Viz.colores().fuente, 'font-size': 15, 'font-weight': 600,
+      fill: Viz.color('error'),
+      texto: 'Todos los mapas a la vez. Es ilegible: por eso existe el heatmap.'
+    }, s);
+  }
+}
+
+/* --- la barra que muestra cómo reparte su 100% --- */
+function dibujarBarra() {
+  const caja = document.getElementById('barra');
+  const rotulo = document.getElementById('rotulo-barra');
+  caja.innerHTML = '';
+  if (estado.sel === null || estado.todas) {
+    rotulo.textContent = 'cómo reparte su 100% (elegí una palabra)';
+    const s = document.createElement('span');
+    s.style.width = '100%';
+    s.style.background = Viz.color('papel3');
+    caja.appendChild(s);
+    return;
+  }
+  const fs = fichas(), fila = matriz()[estado.sel];
+  rotulo.textContent = 'cómo «' + fs[estado.sel] + '» reparte su 100%';
+  fila.forEach((w, j) => {
+    if (w < 0.004) return;
+    const s = document.createElement('span');
+    s.style.width = (w * 100) + '%';
+    s.style.background = Viz.mezclarColor('papel3', 'acento', Math.min(1, 0.25 + w * 1.6));
+    s.title = fs[j] + ': ' + Math.round(w * 100) + '%';
+    if (w > 0.09) s.textContent = fs[j];
+    caja.appendChild(s);
+  });
+}
+
+/* ===========================================================================
+   3. Panel
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué mirar' },
+  { tipo: 'select', id: 'oracion', etiqueta: 'oración (todas del corpus real)',
+    opciones: nombresOracion, valor: '0' },
+  { tipo: 'select', id: 'cabeza', etiqueta: 'qué cabeza mira',
+    opciones: nombresCabeza, valor: '1:1' },
+  { tipo: 'checkbox', id: 'mascara',
+    etiqueta: 'máscara causal (no espiar el futuro)', valor: true },
+  { tipo: 'checkbox', id: 'todas', etiqueta: 'mostrar todas las palabras a la vez',
+    valor: false },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'texto', id: 'quehace', html: '' }
+], (v, id) => {
+  if (id === 'oracion') { estado.oracion = +v.oracion; estado.sel = null; }
+  if (id === 'cabeza') {
+    const p = v.cabeza.split(':');
+    estado.capa = +p[0]; estado.cabeza = +p[1];
+  }
+  estado.mascara = v.mascara;
+  estado.todas = v.todas;
+  actualizar();
+});
+
+function actualizar() {
+  dibujar();
+  dibujarBarra();
+
+  const info = infoCabeza();
+  ctl.texto('quehace',
+    '<b>Esta cabeza:</b> ' + info.titulo + '.<br>' +
+    '<span style="font-size:.92em">' + info.detalle + '.</span>');
+
+  if (estado.todas) {
+    ctl.texto('lectura',
+      'Ahí están los <b>' + fichas().length + '</b> mapas superpuestos. ' +
+      'No se entiende nada, y con razón: son ' + fichas().length + ' repartos de 100% ' +
+      'dibujados uno encima del otro. Para eso se usa una <b>matriz</b> en vez de arcos ' +
+      '(la viz siguiente).');
+    return;
+  }
+  if (estado.sel === null) {
+    ctl.texto('lectura', 'Hacé clic en una palabra de la oración para ver su mapa. ' +
+      'Empezá por la última.');
+    return;
+  }
+  const fs = fichas(), fila = matriz()[estado.sel];
+  // a quién le presta más atención, sin contarse a sí misma
+  let mejor = -1, mejorV = -1, suma = 0;
+  fila.forEach((w, j) => {
+    suma += w;
+    if (j !== estado.sel && w > mejorV) { mejorV = w; mejor = j; }
+  });
+  const distancia = mejor >= 0 ? Math.abs(mejor - estado.sel) : 0;
+  ctl.texto('lectura',
+    '«<b>' + fs[estado.sel] + '</b>» le presta <b>' + Math.round(mejorV * 100) + '%</b> ' +
+    'de su atención a «<b>' + (mejor >= 0 ? fs[mejor] : '—') + '</b>», ' +
+    (distancia === 1 ? 'que está justo al lado.' :
+      'que está <b>' + distancia + ' palabras</b> ' + (mejor < estado.sel ? 'atrás' : 'adelante') + '.') +
+    '<br><span style="font-size:.92em">Y se queda con ' +
+    Math.round(fila[estado.sel] * 100) + '% para sí misma. ' +
+    'Toda la fila suma <b>' + Viz.num(suma, 2) + '</b>.</span>');
+}
+
+/* ===========================================================================
+   4. Arranque
+   =========================================================================== */
+document.getElementById('pie-param').textContent =
+  D.meta.parametros.toLocaleString('es-AR');
+
+// arrancamos con «lo» ya elegido: es la palabra del gancho de la clase y es donde
+// mejor se ve el mecanismo (tiene todo el contexto atrás y algo a lo que referirse).
+estado.sel = Math.max(0, fichas().indexOf('lo'));
+actualizar();
+Viz.botonTema();
+
+// el tema oscuro cambia los colores: hay que volver a dibujar
+new MutationObserver(() => { Viz.recargarColores(); actualizar(); })
+  .observe(document.documentElement, { attributes: true, attributeFilter: ['data-tema'] });
+window.addEventListener('resize', () => { dibujar(); });
+</script>
+</body>
+</html>

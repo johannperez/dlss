@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barajar los píxeles — Clase 5</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "las dos tiras tienen exactamente los mismos 784 números, sólo
+     cambiados de orden. Y la red densa saca EL MISMO 85,6 %. Entonces la red
+     densa nunca supo que había una grilla: para ella eran 784 variables sueltas."
+
+     SEGUNDO MOMENTO (pestaña «correrla»): con la foto corrida 3 píxeles la densa
+     se desploma de 85,8 % a 32,3 % y la CNN se queda en 74,1 %. Eso es lo que
+     compramos con el supuesto de que un patrón vale igual en cualquier posición.
+
+     Todos los números salen de medir-experimentos.py (semilla 1983), que corre
+     el mismo código que el notebook. Ninguno está estimado.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* `.viz-frame` de curso.css es width:100% y el navegador no tiene box-sizing
+     global, asi que cualquier padding propio la hace 30px mas ancha que su
+     columna y se le monta encima al panel. Se arregla local, sin tocar el CSS
+     compartido que usan las otras nueve clases. */
+  .viz-frame { box-sizing: border-box; }
+
+  .tres { display:grid; grid-template-columns: 1fr 1fr 1.15fr; gap:14px; align-items:start; }
+  .tres figure { margin:0; }
+  .tres figcaption {
+    font-size:.74rem; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--tinta-3); margin:0 0 .35rem; font-weight:600; min-height:2.4em;
+  }
+  .tira-caja { margin-top:12px; padding:10px 12px; border-radius:var(--r-medio);
+    background:var(--papel-2); border:1px dashed var(--borde-fuerte); }
+  .tira-titulo { font-size:.74rem; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--tinta-3); margin:0 0 .5rem; font-weight:600; }
+  .tira-fila { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .tira-etq { font-size:.72rem; color:var(--tinta-2); width:132px; flex:none; text-align:right; }
+  .tira-lienzo { flex:1; min-width:0; }
+  .barras { display:flex; flex-direction:column; gap:9px; }
+  .b-fila { font-size:.78rem; }
+  .b-cabeza { display:flex; justify-content:space-between; align-items:baseline;
+    color:var(--tinta-2); margin-bottom:2px; }
+  .b-cabeza b { font:700 .95rem var(--f-mono); color:var(--tinta); }
+  .b-riel { height:13px; border-radius:7px; background:var(--papel-2);
+    border:1px solid var(--borde); overflow:hidden; }
+  .b-relleno { height:100%; border-radius:7px; transition:width .35s ease; }
+  .b-nota { font-size:.72rem; color:var(--tinta-3); margin:2px 0 0; }
+  .veredicto { margin-top:12px; }
+  @media (max-width: 900px) { .tres { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Barajemos los píxeles</h1>
+    <p>A la izquierda, la foto como la ves vos. En el medio, la foto después de que
+       le hacemos algo. A la derecha, cuánto acierta cada modelo <em>después de
+       entrenarlo con las imágenes de esa columna</em>. Apostá antes de tocar nada:
+       ¿a cuál de los dos modelos le va a molestar?</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:12px">
+      <div class="tres">
+        <figure>
+          <figcaption>1 · la foto original</figcaption>
+          <div id="orig"></div>
+        </figure>
+        <figure>
+          <figcaption id="cap-mod">2 · la foto con los píxeles barajados</figcaption>
+          <div id="mod"></div>
+        </figure>
+        <figure>
+          <figcaption>3 · cuánto acierta cada modelo</figcaption>
+          <div class="barras" id="barras"></div>
+          <div class="veredicto" id="veredicto"></div>
+        </figure>
+      </div>
+
+      <div class="tira-caja" id="caja-tira">
+        <p class="tira-titulo">Cómo se la damos a la red densa: los 784 números, en fila</p>
+        <div class="tira-fila">
+          <span class="tira-etq">la foto original</span>
+          <div class="tira-lienzo"><div id="tira-a"></div></div>
+        </div>
+        <div class="tira-fila">
+          <span class="tira-etq" id="tira-etq-b">la foto barajada</span>
+          <div class="tira-lienzo"><div id="tira-b"></div></div>
+        </div>
+        <p class="b-nota" id="nota-tira"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Primero las dos tiras de abajo: tienen
+      <em>exactamente los mismos 784 números</em>, sólo que en otro orden — no se
+      perdió ni un dato. Ahora la columna 3: la red densa saca lo mismo con la foto
+      y con el revoltijo. <b>Nunca supo que había una grilla.</b> La CNN, en cambio,
+      pierde puntos: los estaba sacando de saber quién estaba al lado de quién.
+      Después pasá a <b>«correrla unos píxeles»</b>, que es la pregunta con la que
+      abrimos la clase, y mirá quién aguanta.
+    </div>
+    <p class="viz-pie">
+      Las imágenes salen de <b>FashionMNIST</b> (Zalando Research, licencia MIT):
+      un sandbox técnico, no un dato de ciencias sociales. Los porcentajes son de
+      una corrida real de <code>medir-experimentos.py</code> con semilla 1983,
+      el mismo código que corre el notebook: 12.000 imágenes de entrenamiento,
+      12 pasadas, 4.000 imágenes de prueba.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-experimentos.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   1. Los datos medidos
+   --------------------------------------------------------------------------- */
+const R    = DATOS_EXP.resultados;
+const CORR = DATOS_EXP.corrimiento;
+const PERM = DATOS_EXP.permutacion;          // la permutación exacta que se usó
+const IMGS = DATOS_EXP.muestras;
+const N = 28;
+
+const estado = {
+  modo: 'barajar',      // 'barajar' | 'correr'
+  imagen: 0,
+  t: 0,                 // 0 = ordenada, 1 = barajada (la animación va en el medio)
+  corrimiento: 3,
+  tira: true
+};
+
+// arranque por hash: viz/vecindad-de-pixeles.html#correr
+if ((location.hash || '').indexOf('correr') >= 0) { estado.modo = 'correr'; }
+
+let px = IMGS[estado.imagen].px;             // 28x28, 0-255
+
+/* destino de cada píxel bajo la permutación (en coordenadas fila/columna) */
+const destino = new Array(N * N);
+for (let k = 0; k < N * N; k++) destino[PERM[k]] = k;
+// PERM[k] = de dónde viene el píxel k de la imagen barajada.
+// Para animar necesitamos: el píxel que estaba en la posición PERM[k] va a k.
+
+function posDe(k) { return { f: Math.floor(k / N), c: k % N }; }
+
+/* la imagen transformada, según el modo */
+function imagenTransformada() {
+  const out = [];
+  for (let f = 0; f < N; f++) out.push(new Array(N).fill(0));
+  if (estado.modo === 'barajar') {
+    for (let k = 0; k < N * N; k++) {
+      const o = posDe(PERM[k]), d = posDe(k);
+      out[d.f][d.c] = px[o.f][o.c];
+    }
+  } else {
+    const d = estado.corrimiento;
+    for (let f = 0; f < N; f++)
+      for (let c = 0; c < N; c++) out[f][c] = (c - d >= 0) ? px[f][c - d] : 0;
+  }
+  return out;
+}
+
+/* ---------------------------------------------------------------------------
+   2. Los dos planos con las imágenes
+   --------------------------------------------------------------------------- */
+const marg = { i: 3, d: 3, a: 3, b: 3 };
+const pOrig = Viz.plano('#orig', { xmin:0, xmax:N, ymin:0, ymax:N, cuadrado:true, margen:marg });
+const pMod  = Viz.plano('#mod',  { xmin:0, xmax:N, ymin:0, ymax:N, cuadrado:true, margen:marg });
+
+pOrig.alDibujar(() => {
+  pOrig.fondo({ marco: false });
+  pOrig.celdas(px.map(f => f.map(v => v / 255)), { paleta:'grises', min:0, max:1, borde:false });
+});
+
+pMod.alDibujar(() => {
+  pMod.fondo({ marco: false });
+  const c = pMod.ctx;
+  const w = pMod.escalaX(1), h = pMod.escalaY(1);
+  const gris = Viz.paleta('grises');
+  if (estado.modo === 'correr') {
+    pMod.celdas(imagenTransformada().map(f => f.map(v => v / 255)),
+                { paleta:'grises', min:0, max:1, borde:false });
+    return;
+  }
+  // modo barajar: cada píxel viaja de su lugar al lugar que le toca
+  const t = estado.t;
+  const suave = t * t * (3 - 2 * t);        // arranque y frenada suaves
+  for (let k = 0; k < N * N; k++) {
+    const o = posDe(PERM[k]), d = posDe(k);
+    const f = o.f + (d.f - o.f) * suave;
+    const col = o.c + (d.c - o.c) * suave;
+    c.fillStyle = gris(Viz.acotar(px[o.f][o.c] / 255, 0, 1));
+    c.fillRect(pMod.px(col), pMod.py(N - f), w + .6, h + .6);
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   3. Las dos tiras de 784 números
+   --------------------------------------------------------------------------- */
+function dibujarTira(sel, matriz) {
+  const p = Viz.plano(sel, { xmin:0, xmax:N*N, ymin:0, ymax:1, alto:26,
+                             margen:{ i:0, d:0, a:0, b:0 } });
+  p.alDibujar(() => {
+    p.fondo({ marco:false });
+    const fila = [];
+    for (let f = 0; f < N; f++) for (let c = 0; c < N; c++) fila.push(matriz[f][c] / 255);
+    p.celdas([fila], { paleta:'grises', min:0, max:1, borde:false });
+  });
+  p.redibujar();
+  return p;
+}
+let tiraA = null, tiraB = null;
+function refrescarTiras() {
+  document.getElementById('tira-a').innerHTML = '';
+  document.getElementById('tira-b').innerHTML = '';
+  const yaPaso = estado.modo === 'correr' || estado.t > .5;
+  tiraA = dibujarTira('#tira-a', px);
+  tiraB = dibujarTira('#tira-b', yaPaso ? imagenTransformada() : px);
+  document.getElementById('tira-etq-b').textContent =
+    estado.modo === 'correr' ? 'la foto corrida'
+      : (yaPaso ? 'la foto barajada' : 'la misma foto, sin barajar');
+  document.getElementById('nota-tira').innerHTML = estado.modo === 'correr'
+    ? 'Al correr la foto, cada número se muda de casilla y por la izquierda entran ceros: <b>la tira cambia de verdad</b>.'
+    : (yaPaso
+       ? 'Las dos tiras tienen <b>los mismos 784 números</b>: no se perdió ni se agregó nada, sólo cambió el orden.'
+       : 'Apretá <b>Barajar</b> y mirá qué le pasa a esta segunda tira.');
+}
+
+/* ---------------------------------------------------------------------------
+   4. Las barras de desempeño (medidas, no estimadas)
+   --------------------------------------------------------------------------- */
+function barra(etq, valor, colorTok, nota) {
+  return '<div class="b-fila">' +
+    '<div class="b-cabeza"><span>' + etq + '</span><b>' + Viz.num(valor,1) + ' %</b></div>' +
+    '<div class="b-riel"><i class="b-relleno" style="display:block;width:' +
+      (valor) + '%;background:' + Viz.color(colorTok) + '"></i></div>' +
+    (nota ? '<p class="b-nota">' + nota + '</p>' : '') + '</div>';
+}
+
+function refrescarBarras() {
+  const caja = document.getElementById('barras');
+  const ver = document.getElementById('veredicto');
+  if (estado.modo === 'barajar') {
+    const mezclado = estado.t > .5;
+    caja.innerHTML =
+      barra('red densa · foto normal', R.densa_normal.exactitud, 'datos') +
+      (mezclado ? barra('red densa · píxeles barajados', R.densa_barajada.exactitud, 'datos',
+            'pierde ' + Viz.num(R.densa_normal.exactitud - R.densa_barajada.exactitud, 1) + ' puntos') : '') +
+      barra('CNN · foto normal', R.cnn_normal.exactitud, 'modelo') +
+      (mezclado ? barra('CNN · píxeles barajados', R.cnn_barajada.exactitud, 'modelo',
+            'pierde ' + Viz.num(R.cnn_normal.exactitud - R.cnn_barajada.exactitud, 1) + ' puntos') : '');
+    ver.innerHTML = mezclado
+      ? '<div class="aha compacta" style="margin:0">La densa quedó igual (<b>' +
+        Viz.num(R.densa_normal.exactitud - R.densa_barajada.exactitud, 1) +
+        '</b> puntos de diferencia). La CNN perdió <b>' +
+        Viz.num(R.cnn_normal.exactitud - R.cnn_barajada.exactitud, 1) +
+        '</b>. Esa diferencia es <em>todo</em> lo que la CNN estaba sacando de la grilla.</div>'
+      : '<div class="ojo compacta" style="margin:0">Apostá primero: si barajo los píxeles de <b>todas</b> las imágenes con la misma permutación y vuelvo a entrenar, ¿a quién le va a ir peor?</div>';
+  } else {
+    const d = estado.corrimiento;
+    const k = CORR.pixeles.indexOf(d);
+    const vd = CORR.densa[k], vc = CORR.cnn[k];
+    caja.innerHTML =
+      barra('red densa · sin correr', CORR.densa[0], 'datos') +
+      barra('red densa · corrida ' + d + ' px', vd, 'datos',
+            d ? 'pierde ' + Viz.num(CORR.densa[0] - vd, 1) + ' puntos' : 'es la foto original') +
+      barra('CNN · sin correr', CORR.cnn[0], 'modelo') +
+      barra('CNN · corrida ' + d + ' px', vc, 'modelo',
+            d ? 'pierde ' + Viz.num(CORR.cnn[0] - vc, 1) + ' puntos' : 'es la foto original');
+    ver.innerHTML = d === 0
+      ? '<div class="ojo compacta" style="margin:0">Movés el slider y corrés la foto. Los dos modelos ya están entrenados: <b>no se vuelve a entrenar nada</b>, es la misma foto un poco más a la derecha.</div>'
+      : '<div class="aha compacta" style="margin:0">Con <b>' + d + ' píxeles</b> de corrimiento la densa cae a <b>' +
+        Viz.num(vd,1) + ' %</b> y la CNN se queda en <b>' + Viz.num(vc,1) +
+        ' %</b>. Para vos es la misma foto; para la densa cambiaron todas las variables.</div>';
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   5. La animación del barajado
+   --------------------------------------------------------------------------- */
+let animando = 0;
+function animarHasta(destinoT) {
+  cancelAnimationFrame(animando);
+  const desde = estado.t, t0 = performance.now(), dur = 1400;
+  (function marco(ahora) {
+    const u = Viz.acotar((ahora - t0) / dur, 0, 1);
+    estado.t = desde + (destinoT - desde) * u;
+    pMod.redibujar();
+    if (u < 1) { animando = requestAnimationFrame(marco); }
+    else { estado.t = destinoT; sincronizar(); }
+  })(t0);
+}
+
+/* ---------------------------------------------------------------------------
+   6. El panel
+   --------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo:'titulo', texto:'Qué le hacemos a la foto' },
+  { tipo:'botones', id:'modo', etiqueta:'el experimento', valor:estado.modo,
+    opciones:[ { valor:'barajar', texto:'barajar los píxeles' },
+               { valor:'correr',  texto:'correrla unos píxeles' } ] },
+  { tipo:'boton', id:'bt-barajar', texto:'Barajar', principal:true,
+    alClic: () => { ctl.set('modo','barajar',true); estado.modo='barajar'; sincronizar(); animarHasta(1); } },
+  { tipo:'boton', texto:'Volver a ordenar',
+    alClic: () => { ctl.set('modo','barajar',true); estado.modo='barajar'; sincronizar(); animarHasta(0); } },
+  { tipo:'slider', id:'corrimiento', etiqueta:'cuántos píxeles la corro',
+    sub:'a la derecha, sin volver a entrenar', min:0, max:6, paso:1, valor:3, decimales:0,
+    color:'parametro' },
+  { tipo:'titulo', texto:'Sobre qué foto' },
+  { tipo:'select', id:'imagen', etiqueta:'la imagen de entrada',
+    opciones: IMGS.map((m,k) => ({ valor:String(k), texto:m.nombre })), valor:'0' },
+  { tipo:'checkbox', id:'tira', etiqueta:'mostrar las tiras de 784 números', valor:true },
+  { tipo:'texto', id:'lectura', html:'' }
+], (v, id) => {
+  if (id === 'modo') {
+    estado.modo = v.modo;
+    if (estado.modo === 'barajar' && estado.t === 0) { sincronizar(); animarHasta(1); return; }
+  }
+  estado.corrimiento = +v.corrimiento;
+  estado.tira = v.tira;
+  if (id === 'imagen') { estado.imagen = +v.imagen; px = IMGS[estado.imagen].px; pOrig.redibujar(); }
+  sincronizar();
+});
+
+function sincronizar() {
+  document.getElementById('cap-mod').textContent = estado.modo === 'correr'
+    ? '2 · la misma foto, corrida ' + estado.corrimiento + ' píxeles'
+    : (estado.t > .5 ? '2 · la foto con los píxeles barajados'
+                     : '2 · la misma foto (todavía sin barajar)');
+  document.getElementById('caja-tira').style.display = estado.tira ? '' : 'none';
+  pMod.redibujar();
+  if (estado.tira) refrescarTiras();
+  refrescarBarras();
+  leer();
+}
+
+function leer() {
+  if (estado.modo === 'barajar') {
+    ctl.texto('lectura',
+      'Modelos entrenados con <b>' + Viz.num(DATOS_EXP.n_train/1000,0) + '.000</b> imágenes, ' +
+      DATOS_EXP.epocas + ' pasadas, semilla ' + DATOS_EXP.semilla + '. La densa tiene <b>' +
+      R.densa_normal.parametros.toLocaleString('es-AR') + '</b> perillas; la CNN, <b>' +
+      R.cnn_normal.parametros.toLocaleString('es-AR') + '</b>: menos de la mitad.');
+  } else {
+    ctl.texto('lectura',
+      'Nadie reentrenó nada: son los <b>mismos dos modelos</b> de la pestaña anterior, ' +
+      'mirando la foto corrida. Lo que entra por la izquierda es fondo, no el otro borde.');
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   7. Arranque
+   --------------------------------------------------------------------------- */
+pOrig.redibujar();
+sincronizar();
+if (estado.modo === 'barajar') estado.t = 0;
+window.addEventListener('resize', () => { if (estado.tira) refrescarTiras(); });
+Viz.botonTema();
+</script>
+</body>
+</html>

@@ -14,6 +14,12 @@
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
 <style>
+  /* `.viz-frame` de curso.css es width:100% y el navegador no tiene box-sizing
+     global, asi que cualquier padding propio la hace 30px mas ancha que su
+     columna y se le monta encima al panel. Se arregla local, sin tocar el CSS
+     compartido que usan las otras nueve clases. */
+  .viz-frame { box-sizing: border-box; }
+
   #escenario { position:relative; }
   .capas { display:grid; grid-template-columns:repeat(4,1fr); gap:22px; position:relative; z-index:2; }
   .capa h3 {
@@ -35,7 +41,7 @@
   .unidad.apagada  { opacity:.28; }
   .unidad .nom {
     position:absolute; left:0; right:0; bottom:0; font:600 9px var(--f-texto);
-    background:color-mix(in srgb, var(--papel) 82%, transparent);
+    background:color-mix(in srgb, var(--papel) 94%, transparent);
     color:var(--tinta-2); text-align:center; padding:1px 0;
   }
   #lineas { position:absolute; inset:0; z-index:1; pointer-events:none; }

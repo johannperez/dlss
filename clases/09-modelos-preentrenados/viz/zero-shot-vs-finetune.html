@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuántas etiquetas hacen falta? — Clase 9</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA (tarea "política"): "con menos de 400 etiquetas, la estrategia
+     MÁS SOFISTICADA es la PEOR. Aprender el vocabulario desde cero necesita
+     muchos ejemplos; usar vectores que ya venían hechos, no. Es la clase 4 otra
+     vez: capacidad contra datos."
+
+     MOMENTO AHA (tarea "Covid-19"): "el diccionario de palabras clave, que
+     cuesta CERO etiquetas y lo escribís en cinco minutos, le gana a las dos.
+     Cuando tu categoría ES una lista de palabras, no necesitás nada de esto."
+
+     Y el aha transversal: la decisión no depende de qué técnica está de moda.
+     Depende de cuántas horas de codificación podés pagar, que es un recurso
+     que vos controlás.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .viz-frame, .panel { box-sizing: border-box; }
+
+  #recomendacion {
+    margin-top: .75rem; background: var(--papel-2); border: 1px solid var(--borde);
+    border-left: 4px solid var(--c-acento); border-radius: var(--r-grande);
+    padding: .8rem .95rem .95rem;
+  }
+  #recomendacion .tit {
+    font-family: var(--f-texto); font-size: .68rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--tinta-3); margin: 0 0 .35rem;
+  }
+  #recomendacion .gana { font-size: 1.05rem; font-weight: 700; margin: 0 0 .3rem; }
+  #recomendacion p { margin: .3em 0; font-size: .87rem; line-height: 1.45; }
+  .fichas { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .5rem;
+            margin: .6rem 0 0; }
+  @media (max-width: 640px) { .fichas { grid-template-columns: minmax(0,1fr); } }
+  .fichas .f {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .45em .6em; font-size: .78rem; line-height: 1.3;
+  }
+  .fichas .f.elegida { border-color: var(--c-acento); background: var(--c-acento-suave); }
+  .fichas .f > b { display: block; font-size: .72rem; text-transform: uppercase;
+                 letter-spacing: .06em; color: var(--tinta-3); margin-bottom: .15em; }
+  .fichas .f .eq { margin-top: .25em; color: var(--tinta-2); }
+  .fichas .f .n { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 700;
+                  font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>¿Cuántas etiquetas hacen falta?</h1>
+    <p>Cada curva es una estrategia. El eje horizontal es <b>cuántos casos etiquetaste
+       a mano</b> (escala logarítmica); el vertical, el F1 que consigue. Movés
+       <em>cuántas etiquetas puedo producir</em> y la viz te dice cuál conviene ahí
+       — y cuántas horas de codificación cuesta.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <ul class="leyenda" style="margin-top:.45rem">
+      <li><i style="background:var(--c-datos)"></i> cero etiquetas: diccionario de palabras clave</li>
+      <li><i style="background:var(--c-modelo)"></i> embeddings + regresión logística</li>
+      <li><i style="background:var(--c-parametro)"></i> aprender el vocabulario desde cero (TF-IDF)</li>
+    </ul>
+
+    <div id="recomendacion">
+      <p class="tit">Con ese presupuesto de etiquetas</p>
+      <p class="gana" id="gana">—</p>
+      <p id="porque">—</p>
+      <div class="fichas" id="fichas"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> En <b>«¿es una nota sobre política?»</b>, la estrategia
+      más sofisticada —aprender el vocabulario desde cero— es la <em>peor</em> hasta
+      cerca de las <b>680</b> etiquetas, y recién ahí alcanza a la simple. Con 25
+      etiquetas saca 0,14 contra 0,45. Más capacidad no es mejor cuando tenés pocos datos: es la
+      clase 4 otra vez, capacidad contra datos.
+      Ahora cambiá a <b>«¿es una nota sobre Covid-19?»</b>: el diccionario de palabras
+      clave, que cuesta <b>cero</b> etiquetas y se escribe en cinco minutos, saca 0,87 y
+      le gana a las dos estrategias con 800 etiquetas encima. Cuando tu categoría
+      <em>es</em> una lista de palabras, la herramienta cara no aporta nada — y sólo lo
+      sabés si medís el piso.
+    </div>
+    <p class="viz-pie">
+      Estas curvas <b>se midieron</b>, no se dibujaron a ojo: seis tamaños de muestra,
+      ocho repeticiones con semillas distintas, sobre el corpus real de prensa del curso
+      (1471 notas, CC BY 4.0), test fijo de 368 casos.
+      El script está en <code>clases/09-modelos-preentrenados/medir-clase09.py</code> y
+      el notebook de la clase reproduce la curva.
+      <b>Ojo con la traducción a Hugging Face:</b> acá el lugar del <i>zero-shot</i> lo
+      ocupa un diccionario, y el lugar del <i>fine-tuning</i> lo ocupa TF-IDF, porque
+      son las versiones que corren sin bajar ningún modelo. La <b>forma</b> de las curvas
+      es la que la literatura reporta para las tres estrategias reales; los <b>valores</b>
+      con modelos pre-entrenados son más altos. Está medido con lo que tenemos y dicho
+      como es.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-clase09.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. Los datos medidos
+   =========================================================================== */
+const TAREAS = DATOS_C9.tareas;
+const TAM = TAREAS.politica.tamanios;
+const EMBEBIDO = document.body.classList.contains('embebido');
+
+const ESTRATEGIAS = {
+  diccionario: {
+    nombre: 'el diccionario de palabras clave',
+    color: 'datos',
+    equivale: 'el lugar del <b>zero-shot</b> / prompt a un LLM: cero etiquetas',
+    costo: 'cero horas de codificación (más el rato de escribir la lista)',
+    cuidado: 'Cuidado: la lista la escribiste vos un martes. Es un instrumento de medición y hay que validarlo igual que todo lo demás.'
+  },
+  embeddings: {
+    nombre: 'embeddings + regresión logística',
+    color: 'modelo',
+    equivale: 'la <b>estrategia A</b>: vectores que ya venían hechos + un clasificador de estadística clásica',
+    costo: 'corre en tu notebook, en CPU, en segundos',
+    cuidado: 'Es interpretable, es barata y casi siempre es la primera que hay que probar.'
+  },
+  tfidf: {
+    nombre: 'aprender el vocabulario desde cero',
+    color: 'parametro',
+    equivale: 'el lugar del <b>fine-tuning</b>: muchas más perillas, aprendidas de tus datos',
+    costo: 'más tiempo de cómputo y muchas más etiquetas',
+    cuidado: 'Con pocos ejemplos pierde feo. Sólo conviene cuando ya tenés muchos casos etiquetados.'
+  }
+};
+
+const estado = { tarea: 'politica', n: 200, banda: true };
+
+function L(n) { return Math.log10(Math.max(n, 1)); }
+const XMIN = L(18), XMAX = L(1150);
+
+/** Interpola linealmente (en log n) el F1 de una serie medida. */
+function f1En(serie, n) {
+  if (n <= serie[0].n) return serie[0].f1;
+  for (let i = 1; i < serie.length; i++) {
+    if (n <= serie[i].n) {
+      const a = serie[i - 1], b = serie[i];
+      const t = (L(n) - L(a.n)) / (L(b.n) - L(a.n));
+      return a.f1 + t * (b.f1 - a.f1);
+    }
+  }
+  return serie[serie.length - 1].f1;
+}
+
+/* ===========================================================================
+   2. El dibujo
+   =========================================================================== */
+const p = Viz.plano('#lienzo', {
+  xmin: XMIN, xmax: XMAX, ymin: 0, ymax: 1,
+  ejeX: 'casos etiquetados a mano', ejeY: 'F1',
+  alto: EMBEBIDO ? 250 : 300, margen: { i: 58, d: 18, a: 26, b: 48 }
+});
+
+const TICKS = [25, 50, 100, 200, 400, 800].map(L);
+
+function serieComoPuntos(serie) { return serie.map(d => ({ x: L(d.n), y: d.f1 })); }
+
+p.alDibujar(() => {
+  const T = TAREAS[estado.tarea];
+  p.fondo();
+  p.grilla({ ticksX: TICKS });
+  p.ejes({ ticksX: TICKS, formatoX: v => String(Math.round(Math.pow(10, v))),
+           formatoY: v => v.toFixed(1) });
+
+  // bandas de incertidumbre (± 1 desvío entre las 8 repeticiones)
+  if (estado.banda) {
+    for (const clave of ['embeddings', 'tfidf']) {
+      const s = T[clave];
+      const arriba = s.map(d => ({ x: L(d.n), y: Math.min(1, d.f1 + d.sd) }));
+      const abajo = s.map(d => ({ x: L(d.n), y: Math.max(0, d.f1 - d.sd) })).reverse();
+      p.poligono(arriba.concat(abajo),
+                 { color: ESTRATEGIAS[clave].color, opacidad: .15, borde: false });
+    }
+  }
+
+  // el diccionario: no mejora con más etiquetas, así que es una recta
+  const fd = T.diccionario.f1;
+  p.linea([{ x: XMIN, y: fd }, { x: XMAX, y: fd }],
+          { color: 'datos', grosor: 2.5, punteada: [7, 5] });
+  p.texto(XMAX, fd, 'cero etiquetas: ' + Viz.num(fd, 2),
+          { color: 'datos', tam: 11, peso: '700', alinear: 'right', dy: -12, caja: true });
+
+  // las dos curvas medidas
+  for (const clave of ['embeddings', 'tfidf']) {
+    const pts = serieComoPuntos(T[clave]);
+    p.linea(pts, { color: ESTRATEGIAS[clave].color, grosor: 3 });
+    p.puntos(pts, { color: ESTRATEGIAS[clave].color, r: 4 });
+  }
+
+  // dónde estoy parado
+  const X = estado.n >= 25 ? L(estado.n) : XMIN + 0.012;
+  p.segmento(X, 0, X, 1, { color: 'acento', grosor: 2.5, punteada: [4, 4] });
+  p.texto(X, 0.965, estado.n === 0 ? 'sin etiquetas' : estado.n + ' etiquetas',
+          { color: 'acento', tam: 11.5, peso: '700', dx: 7, caja: true,
+            alinear: X > (XMIN + XMAX) / 2 ? 'right' : 'left',
+            dx: X > (XMIN + XMAX) / 2 ? -7 : 7 });
+
+  // marcar el ganador en ese punto
+  const g = ganador();
+  if (g.clave !== 'diccionario' && estado.n >= 25) {
+    p.punto(X, g.f1, { color: 'acento', r: 7, halo: true });
+  } else if (g.clave === 'diccionario') {
+    p.punto(X, fd, { color: 'acento', r: 7, halo: true });
+  }
+});
+
+/* ===========================================================================
+   3. Quién gana con este presupuesto
+   =========================================================================== */
+function valores() {
+  const T = TAREAS[estado.tarea];
+  return {
+    diccionario: T.diccionario.f1,
+    embeddings: estado.n >= 25 ? f1En(T.embeddings, estado.n) : 0,
+    tfidf: estado.n >= 25 ? f1En(T.tfidf, estado.n) : 0
+  };
+}
+
+function ganador() {
+  const v = valores();
+  let mejor = 'diccionario';
+  for (const k of ['embeddings', 'tfidf']) if (v[k] > v[mejor]) mejor = k;
+  return { clave: mejor, f1: v[mejor], v: v };
+}
+
+function horas(n) { return n * 30 / 3600; }
+
+function pintarRecomendacion() {
+  const T = TAREAS[estado.tarea];
+  const g = ganador(), v = g.v;
+  const E = ESTRATEGIAS[g.clave];
+
+  document.getElementById('gana').innerHTML =
+    'Conviene <span class="c-' + (E.color === 'datos' ? 'datos' : E.color) + '">' +
+    E.nombre + '</span> — F1 ' + Viz.num(g.f1, 2);
+
+  const h = horas(estado.n);
+  const segundo = ['diccionario', 'embeddings', 'tfidf']
+    .filter(k => k !== g.clave)
+    .sort((a, b) => v[b] - v[a])[0];
+  const ventaja = g.f1 - v[segundo];
+
+  document.getElementById('porque').innerHTML =
+    (estado.n === 0
+      ? 'Con cero etiquetas no hay clasificador que entrenar: te queda el diccionario, y no tenés con qué saber si anda. <b>Etiquetá aunque sea 100 casos para poder medirlo.</b>'
+      : 'Etiquetar <b>' + estado.n + '</b> casos a 30 segundos cada uno son <b>' +
+        (h < 1 ? Math.round(h * 60) + ' minutos' : Viz.num(h, 1) + ' horas') +
+        '</b> de codificación (más un <b>20 %</b> doblemente codificado para poder ' +
+        'reportar el acuerdo: ' + Math.round(horas(estado.n * 0.2) * 60) + ' minutos más). ') +
+    (estado.n > 0
+      ? 'Le saca <b>' + Viz.num(Math.abs(ventaja), 2) + '</b> de F1 a ' +
+        ESTRATEGIAS[segundo].nombre + '. ' + E.cuidado
+      : '');
+
+  let html = '';
+  for (const k of ['diccionario', 'embeddings', 'tfidf']) {
+    const activo = k === g.clave;
+    html += '<div class="f' + (activo ? ' elegida' : '') + '">' +
+      '<b>' + ESTRATEGIAS[k].nombre + '</b>' +
+      '<span class="n c-' + ESTRATEGIAS[k].color + '">' +
+      (k !== 'diccionario' && estado.n < 25 ? '—' : Viz.num(v[k], 2)) + '</span> ' +
+      '<span style="color:var(--tinta-3)">F1</span>' +
+      '<div class="eq">' + ESTRATEGIAS[k].equivale + '</div></div>';
+  }
+  document.getElementById('fichas').innerHTML = html;
+
+  ctl.texto('lectura',
+    '<b>Tarea:</b> ' + T.etiqueta + ' &nbsp;·&nbsp; ' +
+    Math.round(T.prevalencia * 100) + ' % del corpus lo son.<br><br>' +
+    'El <b>modelo bobo</b> —decir siempre «no»— saca <b>' +
+    Viz.num(T.baseline_accuracy, 2) + '</b> de accuracy y <b>0,00</b> de F1. ' +
+    'Por eso acá miramos F1 y no accuracy: con esta prevalencia la accuracy ' +
+    'felicita al que no encuentra nada.');
+}
+
+/* ===========================================================================
+   4. El panel
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Tu presupuesto' },
+  { tipo: 'select', id: 'tarea', etiqueta: 'qué querés clasificar',
+    opciones: [{ valor: 'politica', texto: '¿es una nota sobre política?' },
+               { valor: 'covid', texto: '¿es una nota sobre Covid-19?' }],
+    valor: 'politica' },
+  { tipo: 'slider', id: 'n', etiqueta: 'cuántas etiquetas puedo producir',
+    sub: 'casos que vas a codificar a mano',
+    min: 0, max: 800, paso: 25, valor: 200, decimales: 0, color: 'acento' },
+  { tipo: 'checkbox', id: 'banda', etiqueta: 'mostrar la incertidumbre', valor: true },
+  { tipo: 'botones', id: 'atajos', etiqueta: 'tres presupuestos típicos',
+    opciones: [
+      { texto: 'una tarde (50)', alClic: () => { ctl.set('n', 50, true); actualizar(); } },
+      { texto: 'una semana (200)', alClic: () => { ctl.set('n', 200, true); actualizar(); } },
+      { texto: 'un becario (800)', alClic: () => { ctl.set('n', 800, true); actualizar(); } }
+    ] },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => {
+  estado.tarea = ctl.valores.tarea;
+  estado.n = ctl.valores.n;
+  estado.banda = ctl.valores.banda;
+  actualizar();
+});
+
+function actualizar() {
+  pintarRecomendacion();
+  p.redibujar();
+}
+
+ctl.disparar();
+Viz.botonTema();
+</script>
+</body>
+</html>

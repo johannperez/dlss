@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tres casos de validez de constructo — Clase 10</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "el modelo saca F1 0,68 en su propio test y encuentra el 21 %
+     de un corpus que es 100 % política. Entonces el 0,68 no era lo que yo
+     pensaba que era."
+
+     Los tres casos salen de correr codigo sobre los datos reales del curso.
+     Los numeros estan en ../datos-clase10.json, producidos por medir-clase10.py.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .tres-niveles { display: grid; gap: .5rem; margin-top: .7rem; }
+  .nivel {
+    border: 1px solid var(--borde); border-radius: var(--r-medio);
+    padding: .5rem .7rem; background: var(--papel-2);
+    display: grid; grid-template-columns: 190px minmax(0,1fr); gap: .8rem;
+    align-items: baseline; font-size: .88rem; line-height: 1.4;
+  }
+  .nivel > b {
+    font-size: .66rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--tinta-3); font-family: var(--f-texto);
+  }
+  .nivel.conclusion { border-left: 4px solid var(--c-modelo); }
+  .nivel.usa        { border-left: 4px solid var(--c-parametro); }
+  .nivel.evidencia  { border-left: 4px solid var(--c-error); }
+  .nivel.conclusion > b { color: var(--c-modelo); }
+  .nivel.usa > b        { color: var(--c-parametro); }
+  .nivel.evidencia > b  { color: var(--c-error); }
+  .pastilla {
+    display: inline-block; font-family: var(--f-mono); font-weight: 700;
+    background: var(--papel-3); border: 1px solid var(--borde);
+    border-radius: var(--r-chico); padding: 0 .35em;
+  }
+  @media (max-width: 700px) { .nivel { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Tres casos donde la métrica es buena y la conclusión es falsa</h1>
+    <p>Los tres modelos <em>andan</em>. Ninguno de los tres mide lo que el investigador dice
+       que mide, y por razones distintas. Elegí un caso, leé la conclusión que se querría
+       publicar, y después apretá <b>aplicar el arreglo</b> para ver qué queda en pie.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+    <div class="tres-niveles">
+      <div class="nivel conclusion"><b>La conclusión que se quiere sacar</b><span id="n-conclusion"></span></div>
+      <div class="nivel usa"><b>Lo que el modelo usa</b><span id="n-usa"></span></div>
+      <div class="nivel evidencia"><b>La evidencia del desfasaje</b><span id="n-evidencia"></span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> En el caso 1, apretá <em>aplicar el arreglo</em>: el mismo
+      modelo que encuentra 6 de cada 10 notas de política en su propio test encuentra
+      <b>2 de cada 10</b> en un corpus donde <em>todas</em> son política. No cambió el modelo:
+      cambió dónde lo medimos. Y fijate en la banda gris de abajo: la ablación —el test que
+      todo el mundo recomienda— movió el F1 <b>menos de lo que lo mueve cambiar la semilla de
+      la partición</b>. Un test de validez que se mueve menos que el ruido no es un test.
+    </div>
+    <p class="viz-pie">
+      Casos 1 y 2: datos <b>reales</b> — prensa en castellano (Spanish Fake News Corpus 2.0,
+      CC BY 4.0) y discursos presidenciales argentinos 2015-2024. Todos los números salen de
+      <code>medir-clase10.py</code>. Caso 3: dos mini-corpus <b>construidos a mano</b> para
+      mostrar el mecanismo <span class="chip sintetico">construido</span> — no son datos.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-clase10.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS10;
+
+/* --------------------------------------------------------------------------
+   Qué es un "nombre propio" en el top de términos: lo marcamos a mano porque
+   el punto pedagógico es justamente que hay que MIRAR la lista, no automatizarla.
+   -------------------------------------------------------------------------- */
+const NOMBRES = new Set(['amlo','meade','morena','anaya','epn','salinas','pri','peña',
+  'bronco','sánchez','putin','irán','cienfuegos','pp','lópez','obrador','trump','biden',
+  'josé','maría','juan','luis','carlos']);
+
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 330,
+  margen: { i: 18, d: 18, a: 32, b: 30 }
+});
+
+// `p.fondo()` usa `p.titulo`, no un argumento: lo cambiamos antes de dibujar.
+function titulo(t) { p.titulo = t; }
+
+let caso = '1', vista = 'antes';
+p.ejeX = '';
+
+/* ---------- caso 1: el atajo léxico ---------------------------------- */
+function dibujarCaso1() {
+  p.ejeX = '';
+  if (vista === 'antes') {
+    p.limites(0, 1, 0, 1);
+    const items = D.modelo.top_positivos.slice(0, 12).map(t => ({
+      etiqueta: t.termino,
+      valor: t.peso,
+      color: NOMBRES.has(t.termino) ? 'error' : 'modelo'
+    }));
+    titulo('los 12 términos que más pesan en «esto es política»  ·  en rojo, nombres propios de la coyuntura mexicana');
+    p.fondo();
+    p.barras(items, { horizontal: true, formato: v => v.toFixed(2) });
+  } else {
+    // Dos cosas en la misma escala 0..1: los dos recalls arriba, y abajo la
+    // banda de ruido del F1 con las ablaciones adentro.
+    p.limites(0, 1, 0.18, 4.3);
+    titulo('arriba: el mismo modelo medido en dos lugares  ·  abajo: F1 según la semilla de la partición');
+    p.fondo();
+
+    const L = 0.30;   // donde arrancan las barras, en coordenadas del mundo
+    function barra(y, valor, col, etiqueta, lectura) {
+      p.poligono([[L, y - .26], [L + valor * (1 - L - .02), y - .26],
+                  [L + valor * (1 - L - .02), y + .26], [L, y + .26]],
+        { color: col, relleno: col, borde: col });
+      p.texto(L - .015, y, etiqueta, { alinear: 'right', tam: 12, color: 'tinta' });
+      p.texto(L + valor * (1 - L - .02) + .012, y, lectura,
+        { alinear: 'left', tam: 12, peso: '700', color: col, mono: true });
+    }
+    barra(3.5, D.modelo.metricas.recall, 'modelo', 'en su propio test',
+      (D.modelo.metricas.recall * 100).toFixed(0) + ' de cada 100');
+    barra(2.75, D.placebo.casarosada.proporcion_marcada, 'error', 'en discursos presidenciales',
+      (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) + ' de cada 100');
+    p.texto(L, 2.2, 'los discursos presidenciales son 100 % política: ahí tendría que dar 100 de cada 100',
+      { tam: 11, color: 'tinta2' });
+
+    // la banda de ruido: el mismo modelo, 25 particiones distintas
+    const rp = D.ruido_de_particion;
+    p.poligono([[rp.minimo, 0.75], [rp.maximo, 0.75], [rp.maximo, 1.55], [rp.minimo, 1.55]],
+      { color: 'verdad', relleno: true, borde: 'verdad', opacidad: .30 });
+    p.texto((rp.minimo + rp.maximo) / 2, 1.75,
+      'el F1 del MISMO modelo con 25 semillas de partición: de ' + rp.minimo.toFixed(3) +
+      ' a ' + rp.maximo.toFixed(3),
+      { alinear: 'center', tam: 11, color: 'tinta2' });
+    const marcas = [
+      { f1: D.ablacion[0].f1, txt: 'sin ablación' },
+      { f1: D.ablacion[1].f1, txt: 'sin el término n.º 1' },
+      { f1: D.ablacion[4].f1, txt: 'sin los 14 nombres propios' }
+    ];
+    for (const m of marcas) {
+      p.segmento(m.f1, 0.75, m.f1, 1.55, { color: 'parametro', grosor: 2.5 });
+      p.punto(m.f1, 1.15, { color: 'parametro', r: 4.5 });
+    }
+    p.texto((rp.minimo + rp.maximo) / 2, 0.48,
+      marcas.map(m => m.txt + ' ' + m.f1.toFixed(3)).join('   ·   '),
+      { alinear: 'center', tam: 11, color: 'parametro', peso: '700' });
+    p.flecha(rp.minimo - 0.13, 1.15, rp.minimo - 0.012, 1.15,
+      { color: 'error', grosor: 2, cabeza: 9 });
+    p.texto(rp.minimo - 0.15, 1.15, 'las tres ablaciones caen acá adentro',
+      { alinear: 'right', tam: 11.5, color: 'error', peso: '700' });
+    p.ejes({ ticksY: [], ticksX: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+             formatoX: v => v.toFixed(1) });
+  }
+  actualizarTextos();
+}
+
+/* ---------- caso 2: el confusor temporal ------------------------------ */
+function dibujarCaso2() {
+  const ct = D.confusor_temporal;
+  p.ejeX = '';
+  p.limites(2014.4, 2024.6, 0, 3.2);
+  titulo('¿el modelo detecta quién habla, o detecta el año?  ·  eje horizontal: año del discurso');
+  p.fondo();
+  p.grilla({ ticksY: [] });
+  p.ejes({ ticksY: [], formatoX: v => String(Math.round(v)) });
+
+  function franja(anios, y, color, texto) {
+    const a = Math.min.apply(null, anios) - 0.45, b = Math.max.apply(null, anios) + 0.45;
+    p.poligono([[a, y - .32], [b, y - .32], [b, y + .32], [a, y + .32]],
+      { color: color, relleno: true, borde: color });
+    p.texto((a + b) / 2, y, texto, { color: color, alinear: 'center', tam: 13, peso: '700' });
+  }
+  franja(ct.anios_macri, 2.35, 'modelo', 'Macri');
+  franja(ct.anios_fernandez, 2.35, 'val', 'Fernández');
+  franja(ct.anios_macri, 1.35, 'parametro', 'antes de 2020');
+  franja(ct.anios_fernandez, 1.35, 'error', '2020 o después');
+
+  p.texto(2014.7, 2.9, 'la etiqueta que querés: ¿quién habla?', { tam: 12, color: 'tinta2' });
+  p.texto(2014.7, 1.9, 'la etiqueta que no querés: ¿qué período es?', { tam: 12, color: 'tinta2' });
+
+  if (vista === 'despues') {
+    p.segmento(2019.5, 0.35, 2019.5, 2.85, { color: 'error', grosor: 2.5, punteada: [7, 5] });
+    p.texto(2019.5, 0.6, 'acá no hay ni un discurso de los dos lados',
+      { color: 'error', alinear: 'center', tam: 12, peso: '700', caja: true });
+    p.texto(2019.5, 0.25, ct.n_solapados + ' casos en años compartidos',
+      { color: 'error', alinear: 'center', tam: 12, caja: true });
+  }
+  actualizarTextos();
+}
+
+/* ---------- caso 3: la cobertura parcial ------------------------------ */
+function dibujarCaso3() {
+  const cp = D.cobertura_parcial;
+  p.ejeX = '';
+  p.limites(0, 1, 0, 1);
+  const items = [
+    { etiqueta: 'foro A · tono', valor: cp.tono_foro_a / 25, color: 'modelo' },
+    { etiqueta: 'foro B · tono', valor: cp.tono_foro_b / 25, color: 'modelo' }
+  ];
+  if (vista === 'despues') {
+    items.push({ etiqueta: 'foro A · con quién', valor: cp.interlocutores_distintos_a / 2, color: 'acento' });
+    items.push({ etiqueta: 'foro B · con quién', valor: cp.interlocutores_distintos_b / 2, color: 'acento' });
+  }
+  titulo(vista === 'antes' ? 'polarización medida sólo por tono'
+                           : 'la misma medida, más la dimensión que faltaba');
+  p.fondo();
+  p.barras(items, {
+    horizontal: true, max: 1,
+    formato: v => v > 0.9 ? '2 bandos' : (v < 0.6 && v > 0.4 ? '1 solo blanco' : (v * 25).toFixed(1) + ' %')
+  });
+  if (vista === 'antes') {
+    p.textoPx((p.L + p.R) / 2, p.T + 6, 'idénticas: ' + cp.tono_foro_a.toFixed(2) + ' % las dos',
+      { alinear: 'center', tam: 12, color: 'error', peso: '700', caja: true });
+  }
+  actualizarTextos();
+}
+
+/* ---------- los tres niveles de texto --------------------------------- */
+const T = {
+  '1': {
+    antes: {
+      conclusion: 'Armamos el subcorpus de política de un corpus de prensa. El clasificador saca ' +
+        '<span class="pastilla">accuracy ' + D.modelo.metricas.accuracy.toFixed(2) + '</span> y ' +
+        '<span class="pastilla">F1 ' + D.modelo.metricas.f1.toFixed(2) + '</span> sobre ' +
+        D.modelo.n_test + ' casos que nunca vio.',
+      usa: 'Miralos: de los 12 términos que más pesan, la mitad son <b>nombres propios de la ' +
+        'política mexicana de 2018-2021</b>. No son señales del concepto «política»: son la ' +
+        'guía telefónica de una coyuntura.',
+      evidencia: 'Todavía ninguna. Con este panel a la vista, esto se publica.'
+    },
+    despues: {
+      conclusion: 'La misma frase de siempre: «nuestro clasificador identifica notas de contenido político».',
+      usa: 'El modelo no cambió. Cambió <b>dónde lo medimos</b>: ' + D.placebo.casarosada.n +
+        ' fragmentos de discursos presidenciales argentinos 2015-2024, que son 100 % política.',
+      evidencia: 'Encuentra el <b>' + (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) +
+        ' %</b> donde debería encontrar el 100 %. Y la ablación —quitar los ' +
+        '14 nombres propios y reentrenar— movió el F1 de ' + D.modelo.metricas.f1.toFixed(3) +
+        ' a ' + D.ablacion[4].f1.toFixed(3) + ': menos que el ruido de la partición, que va de ' +
+        D.ruido_de_particion.minimo.toFixed(3) + ' a ' + D.ruido_de_particion.maximo.toFixed(3) + '.'
+    }
+  },
+  '2': {
+    antes: {
+      conclusion: '«Clasificamos automáticamente quién pronunció cada discurso con ' +
+        '<span class="pastilla">F1 ' + D.confusor_temporal.metricas_orador.f1.toFixed(3) +
+        '</span>, así que hay un estilo presidencial distinguible.»',
+      usa: 'Palabras. Pero no podemos saber cuáles son <em>de la persona</em> y cuáles son ' +
+        '<em>del año</em>, porque en este corpus las dos cosas son la misma columna.',
+      evidencia: 'Todavía ninguna. La partición al azar no la puede mostrar.'
+    },
+    despues: {
+      conclusion: 'La misma, y sigue teniendo el mismo F1.',
+      usa: 'Entrenamos un segundo modelo con <b>exactamente las mismas palabras</b>, cambiando ' +
+        'sólo la etiqueta: «¿es de 2020 o después?» en vez de «¿es Fernández?».',
+      evidencia: 'Da <b>F1 ' + D.confusor_temporal.metricas_periodo.f1.toFixed(3) + '</b>: el mismo ' +
+        'número, porque las dos etiquetas coinciden en el <b>' +
+        (D.confusor_temporal.coincidencia_etiquetas * 100).toFixed(0) + ' %</b> de los casos. ' +
+        'Macri habla ' + D.confusor_temporal.anios_macri[0] + '-' +
+        D.confusor_temporal.anios_macri.slice(-1)[0] + ' y Fernández ' +
+        D.confusor_temporal.anios_fernandez[0] + '-' + D.confusor_temporal.anios_fernandez.slice(-1)[0] +
+        '. <b>El arreglo no existe con estos datos</b>: entrenar en un período y testear en el otro ' +
+        'deja ' + D.confusor_temporal.n_solapados + ' casos. Lo único honesto es escribirlo en el paper.'
+    }
+  },
+  '3': {
+    antes: {
+      conclusion: '«El foro A está más polarizado que el foro B.» Medimos polarización con un ' +
+        'diccionario de tono, que es lo que hace la mitad de la literatura.',
+      usa: 'Sólo el <b>tono</b>: cuántas palabras del léxico agresivo aparecen. Pero «polarización» ' +
+        'incluye además <em>con quién</em> se discute: dos bandos enfrentados no es lo mismo que ' +
+        'todos contra un tercero ausente.',
+      evidencia: 'Los dos foros dan <b>' + D.cobertura_parcial.tono_foro_a.toFixed(2) + ' %</b>. ' +
+        'Idéntico. La medida no los distingue.'
+    },
+    despues: {
+      conclusion: 'La misma conclusión ya no se sostiene: había que medir dos cosas, no una.',
+      usa: 'Agregamos la dimensión que faltaba: <b>cuántos destinatarios distintos</b> tiene la ' +
+        'agresión en cada foro.',
+      evidencia: 'Foro A: <b>2</b> bandos que se pegan entre sí. Foro B: <b>1</b> solo blanco, ' +
+        'externo y ausente. Mismo tono, estructuras opuestas. Si tu concepto tiene tres ' +
+        'dimensiones y tu medida ve una, medís un tercio y lo llamás por el nombre completo.'
+    }
+  }
+};
+
+function actualizarTextos() {
+  const t = T[caso][vista];
+  document.getElementById('n-conclusion').innerHTML = t.conclusion;
+  document.getElementById('n-usa').innerHTML = t.usa;
+  document.getElementById('n-evidencia').innerHTML = t.evidencia;
+}
+
+p.alDibujar(() => {
+  if (caso === '1') dibujarCaso1();
+  else if (caso === '2') dibujarCaso2();
+  else dibujarCaso3();
+});
+
+const ARREGLO = {
+  '1': 'medirlo donde lo vas a usar',
+  '2': 'separar persona de período',
+  '3': 'agregar la dimensión que falta'
+};
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El caso' },
+  { tipo: 'botones', id: 'caso', valor: '1', opciones: [
+    { valor: '1', texto: '1 · el atajo léxico' },
+    { valor: '2', texto: '2 · el confusor temporal' },
+    { valor: '3', texto: '3 · la cobertura parcial' }
+  ] },
+  { tipo: 'texto', id: 'resumen', html: '' },
+  { tipo: 'titulo', texto: 'La intervención' },
+  { tipo: 'botones', id: 'vista', valor: 'antes', opciones: [
+    { valor: 'antes', texto: 'lo que se publicaría' },
+    { valor: 'despues', texto: 'aplicar el arreglo' }
+  ] },
+  { tipo: 'texto', id: 'arreglo', html: '' },
+  { tipo: 'titulo', texto: 'El número' },
+  { tipo: 'texto', id: 'numero', html: '' }
+], (v, id) => {
+  if (id === 'caso' && v.caso !== caso) { caso = v.caso; vista = 'antes'; ctl.set('vista', 'antes', true); }
+  vista = ctl.valores.vista;
+  refrescar();
+});
+
+const RESUMEN = {
+  '1': 'Un clasificador de «notas sobre política» entrenado con ' + D.modelo.n_train +
+       ' notas de prensa <b>reales</b> en castellano.',
+  '2': 'Un clasificador de «quién pronunció este discurso», con ' + D.confusor_temporal.n +
+       ' discursos presidenciales argentinos <b>reales</b>.',
+  '3': 'Una medida de polarización por diccionario de tono, sobre dos mini-corpus ' +
+       '<b>construidos a mano</b> para esta clase.'
+};
+
+function refrescar() {
+  ctl.texto('resumen', RESUMEN[caso]);
+  ctl.texto('arreglo', vista === 'antes'
+    ? 'Apretá <b>aplicar el arreglo</b> para ver la intervención: <i>' + ARREGLO[caso] + '</i>.'
+    : '<b>' + ARREGLO[caso] + '</b>');
+  const N = {
+    '1': vista === 'antes'
+      ? '<span class="grande">' + D.modelo.metricas.f1.toFixed(2) + '</span>F1 en su propio test'
+      : '<span class="grande">' + (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) +
+        ' %</span>de un corpus 100 % político',
+    '2': vista === 'antes'
+      ? '<span class="grande">' + D.confusor_temporal.metricas_orador.f1.toFixed(2) + '</span>F1 de «¿quién habla?»'
+      : '<span class="grande">' + D.confusor_temporal.metricas_periodo.f1.toFixed(2) + '</span>F1 de «¿qué período es?» — el mismo',
+    '3': vista === 'antes'
+      ? '<span class="grande">0</span>de diferencia entre los dos foros'
+      : '<span class="grande">2 vs 1</span>destinatarios de la agresión'
+  };
+  ctl.texto('numero', N[caso]);
+  p.redibujar();
+}
+
+refrescar();
+Viz.botonTema();
+</script>
+</body>
+</html>

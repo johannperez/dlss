@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El checklist y el revisor 2 — Clase 10</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "quise completarlo para un análisis que ya hice y no puedo.
+     Me faltan la semilla, la versión y cuántos casos validé a mano. Este
+     formulario es un detector de proyectos mal llevados, y es mucho mejor
+     descubrirlo hoy que en la revisión."
+
+     Es el entregable practico del curso: se completa, se copia el parrafo de
+     metodos, y se usa el lunes.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .secciones { display: grid; gap: .7rem; }
+  .seccion {
+    border: 1px solid var(--borde); border-radius: var(--r-medio);
+    background: var(--papel-2); padding: .6rem .8rem .75rem;
+  }
+  .seccion > h3 {
+    font-family: var(--f-texto); font-size: .7rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--c-acento); margin: 0 0 .55rem;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .seccion > h3 .cuenta { font-family: var(--f-mono); color: var(--tinta-3); letter-spacing: 0; }
+  .campo { display: grid; grid-template-columns: minmax(0,1fr); gap: .2rem; margin-bottom: .55rem; }
+  .campo:last-child { margin-bottom: 0; }
+  .campo > label { font-size: .84rem; color: var(--tinta); line-height: 1.35; }
+  .campo > label .pista { display: block; font-size: .74rem; color: var(--tinta-3); }
+  .campo input[type="text"], .campo select, .campo textarea {
+    font: inherit; font-size: .85rem; padding: .32em .5em; width: 100%;
+    border: 1px solid var(--borde-fuerte); border-radius: var(--r-chico);
+    background: var(--papel); color: var(--tinta);
+  }
+  .campo.vacio input[type="text"], .campo.vacio select { border-color: var(--c-error); }
+  .campo.fatal > label::after {
+    content: " · sin esto no hay paper"; color: var(--c-error); font-size: .72rem;
+  }
+  .salida {
+    border: 1px solid var(--borde); border-radius: var(--r-medio);
+    background: var(--papel-2); padding: .8rem 1rem; margin-top: .8rem;
+    font-size: .93rem; line-height: 1.6;
+  }
+  .salida h3 { margin: 0 0 .5rem; font-size: .95rem; }
+  .salida .parrafo { background: var(--papel); border: 1px dashed var(--borde-fuerte);
+    border-radius: var(--r-chico); padding: .7rem .85rem; white-space: pre-wrap; }
+  .salida ol { margin: .4em 0 0 1.2em; padding: 0; }
+  .salida li { margin: .45em 0; line-height: 1.45; }
+  .salida li.grave   { color: var(--c-error); }
+  .salida li.grave b   { color: var(--c-error); }
+  .salida li.menor b { color: var(--c-val); }
+  .falta { color: var(--c-error); font-weight: 700; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El checklist, y lo que le contestás al revisor 2</h1>
+    <p>Veintidós preguntas. Si hiciste las cosas bien, lo completás en veinte minutos y te llevás
+       el párrafo de métodos escrito. Si no las hiciste bien, <b>no lo vas a poder completar</b> —
+       y eso también es información, sobre todo si la conseguís hoy y no en la revisión.</p>
+  </header>
+
+  <div>
+    <div class="secciones" id="form"></div>
+    <div class="salida" id="salida"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Probá primero apretando <em>modo revisor</em> con el formulario
+      vacío: te salen las objeciones que un revisor te va a escribir, ordenadas por gravedad, y
+      las <b>fatales</b> aparecen en rojo. Después apretá <em>completar con el ejemplo de hoy</em>
+      y mirá el párrafo de métodos que se arma solo. La diferencia entre las dos pantallas es
+      exactamente el trabajo del que habla toda esta clase: no es más modelo, es más
+      <b>explicitación</b>. Y fijate cuáles de las 22 preguntas hay que contestar <em>antes</em>
+      de entrenar: la muestra a leer a mano, la partición y los casos límite se diseñan al
+      principio, no al final.
+    </div>
+    <p class="viz-pie">
+      El ejemplo precargado es la auditoría real de esta clase, con los números que salen de
+      <code>medir-clase10.py</code>. Lo que escribas se guarda en tu navegador (y sólo ahí):
+      podés cerrar la pestaña y volver.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-clase10.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS10;
+const M = D.modelo.metricas;
+const n2 = v => v.toFixed(2);
+
+/* ==========================================================================
+   Las 21 preguntas. `fatal: true` marca las que, si faltan, hunden el paper.
+   `revisor` es el comentario que se genera si está vacía, redactado como lo
+   escribiría un revisor cortés (que existen).
+   ========================================================================== */
+const SECCIONES = [
+{ id: 'datos', titulo: 'Datos', campos: [
+  { id: 'fuente', et: '¿De dónde salen los textos?', pista: 'quién los recolectó, cuándo, con qué método',
+    ej: 'Spanish Fake News Corpus 2.0 (Gómez-Adorno et al., 2021), prensa en castellano recolectada entre noviembre de 2020 y marzo de 2021, CC BY 4.0', fatal: true,
+    revisor: 'No queda claro de dónde provienen los textos ni quién los recolectó. Sin la procedencia no se puede evaluar a qué población se generaliza.' },
+  { id: 'n', et: '¿Cuántos casos, y cuántos en cada partición?', pista: 'los números exactos',
+    ej: '1471 notas en total; 1103 de entrenamiento y 368 de test',
+    revisor: 'Faltan los tamaños exactos de las particiones. Con los n a la vista se puede juzgar la precisión de las métricas reportadas.' },
+  { id: 'poblacion', et: '¿Qué población y qué período cubre?', pista: 'y cuál NO',
+    ej: 'prensa digital de México, España, Argentina, Colombia y Chile; cinco meses de pandemia. No cubre otros países ni otros años.', fatal: true,
+    revisor: 'El artículo generaliza más allá del período y la región efectivamente cubiertos. Convendría acotar las afirmaciones o mostrar validación fuera de la ventana.' },
+  { id: 'exclusiones', et: '¿Qué casos se excluyeron y por qué?', pista: 'los faltantes casi nunca faltan al azar',
+    ej: 'se excluyeron 72 notas sin titular. La exclusión no está relacionada con la etiqueta.',
+    revisor: 'No se informan las exclusiones. Si el criterio de exclusión se correlaciona con la variable de interés, las estimaciones quedan sesgadas.' },
+  { id: 'disponible', et: '¿El corpus está disponible?', tipo: 'select',
+    opciones: ['', 'sí, con enlace y licencia', 'sí, previa solicitud', 'no, y explico por qué'],
+    ej: 'sí, con enlace y licencia',
+    revisor: 'No se indica si los datos están disponibles. Aunque no puedan publicarse, hay que decirlo y explicar por qué.' }
+]},
+{ id: 'medicion', titulo: 'Medición', campos: [
+  { id: 'concepto', et: '¿Qué concepto querés medir?', pista: 'en castellano, no el nombre de la variable',
+    ej: 'si una nota de prensa trata sobre política', fatal: true,
+    revisor: 'El constructo que se pretende medir no está definido con precisión. Sin definición no se puede evaluar la validez del instrumento.' },
+  { id: 'operacional', et: '¿Cuál es la definición operativa?', pista: 'la regla concreta con la que se decide caso por caso',
+    ej: 'la nota está codificada con el tema «Política» en el corpus fuente; esa codificación la hizo el equipo original, no nosotros', fatal: true,
+    revisor: 'Falta la definición operativa: la regla concreta que separa un caso positivo de uno negativo. Distintas reglas producen conclusiones distintas.' },
+  { id: 'validadas', et: '¿Cuántos casos leíste y etiquetaste a mano?', pista: 'un número; si es cero, decilo',
+    ej: '150 casos leídos a ciegas, estratificados por la predicción del modelo', fatal: true,
+    revisor: 'No se reporta validación manual. Una métrica contra etiquetas heredadas mide acuerdo con esas etiquetas, no validez de la medida.' },
+  { id: 'acuerdo', et: '¿Cuánto coinciden dos codificadores?', pista: 'kappa, alfa, o el acuerdo crudo',
+    ej: 'kappa de Cohen = 0,46 sobre 100 casos doblemente codificados (moderado; lo discutimos en la sección 5)',
+    revisor: 'No se informa acuerdo entre codificadores. Ese número es el techo realista del modelo: sin él no se puede interpretar un F1 alto.' }
+]},
+{ id: 'modelo', titulo: 'Modelo', campos: [
+  { id: 'arquitectura', et: '¿Qué modelo, en qué versión exacta?', pista: 'nombre, versión y revisión — un modelo sin versión es un libro sin edición',
+    ej: 'regresión logística sobre bolsa de palabras binaria (scikit-learn 1.x, class_weight="balanced")', fatal: true,
+    revisor: 'No se identifica el modelo con su versión o revisión exacta. Con modelos que cambian sin aviso, el resultado no es reproducible.' },
+  { id: 'piso', et: '¿Cuál es el piso de comparación?', pista: 'la clase mayoritaria, un diccionario, una regresión simple',
+    ej: 'decir siempre «no es política» da accuracy ' + n2(D.modelo.piso) + '; el modelo da ' + n2(M.accuracy), fatal: true,
+    revisor: 'No hay línea de base. Sin un piso, un F1 de 0,80 puede ser un logro o un desastre y no hay manera de saberlo.' },
+  { id: 'particion', et: '¿Cómo partiste los datos?', pista: 'al azar, por tiempo, por grupo — y por qué',
+    ej: 'partición estratificada al azar 75/25, semilla 1983. Para la tarea de veracidad además partimos por medio, porque la fuente predice la etiqueta.', fatal: true,
+    revisor: 'La partición al azar sobre datos agrupados (mismo medio, mismo autor, mismo período) infla las métricas. Convendría reportar también una partición por grupo.' },
+  { id: 'umbral', et: '¿Dónde cortaste, y por qué ahí?', pista: 'el 0,5 por defecto también es una decisión',
+    ej: '0,5 por defecto, porque nos interesa estimar prevalencia y no priorizar ninguno de los dos errores',
+    revisor: 'El umbral de decisión no está justificado. Elegirlo es una decisión de investigación: define qué error se prefiere pagar.' }
+]},
+{ id: 'evaluacion', titulo: 'Evaluación', campos: [
+  { id: 'metricas', et: '¿Qué métricas, sobre qué conjunto?', pista: 'y su frase en castellano llano',
+    ej: 'sobre ' + D.modelo.n_test + ' casos de test, precisión ' + n2(M.precision) + ', recall ' + n2(M.recall) + ', F1 ' + n2(M.f1) + '. De cada 100 notas que el modelo llamó política, ' + Math.round(M.precision * 100) + ' lo eran.', fatal: true,
+    revisor: 'Faltan métricas desagregadas sobre el conjunto de test. La accuracy sola oculta el comportamiento en la clase minoritaria.' },
+  { id: 'errores', et: '¿Leíste los falsos positivos? ¿Qué encontraste?', pista: 'ahí está el conocimiento, no en los aciertos',
+    ej: 'leímos 30 falsos positivos: la mayoría son notas de Covid con contenido de política sanitaria, es decir, desacuerdo con la etiqueta original, no error del modelo',
+    revisor: 'No hay análisis cualitativo de errores. Leer treinta falsos positivos suele revelar si el problema es del modelo o de la definición de la categoría.' },
+  { id: 'placebo', et: '¿Hiciste un test de placebo o casos límite?', pista: 'aplicarlo donde el fenómeno no debería estar; o pares mínimos',
+    ej: 'aplicamos el clasificador a ' + D.placebo.casarosada.n + ' fragmentos de discursos presidenciales argentinos, que son 100 % política: marcó el ' + Math.round(D.placebo.casarosada.proporcion_marcada * 100) + ' %. Además, 8 pares mínimos escritos a mano.', fatal: true,
+    revisor: 'No hay evidencia de validez más allá de la métrica en el test. Un test de placebo o un conjunto de pares mínimos mostraría qué está usando el modelo.' },
+  { id: 'externa', et: '¿Contrastaste con una medida independiente?', pista: 'encuesta, otra codificación, un evento conocido',
+    ej: 'no: no hay una medida externa disponible para este corpus, y lo declaramos como limitación',
+    revisor: 'No hay validación externa ni una explicación de por qué no es posible. Contrastar con una medida independiente es lo que convierte un puntaje en una medición.' }
+]},
+{ id: 'repro', titulo: 'Reproducibilidad y ética', campos: [
+  { id: 'semilla', et: '¿Qué semilla usaste?', pista: 'un número. Si no la fijaste, tus números no se repiten.',
+    ej: '1983, fijada en random, numpy y torch', fatal: true,
+    revisor: 'No se informa la semilla. Sin ella, ni los propios autores pueden reproducir exactamente los números que publican.' },
+  { id: 'versiones', et: '¿Versiones exactas de las bibliotecas?', pista: 'la salida de pip freeze va al apéndice',
+    ej: 'Python 3.11, numpy, scikit-learn y torch con las versiones listadas en el apéndice B', fatal: true,
+    revisor: 'Faltan las versiones de las bibliotecas. El comportamiento de varias funciones cambia entre versiones menores.' },
+  { id: 'codigo', et: '¿Dónde está el código?', pista: 'y ojo: código en un repositorio no es lo mismo que reproducible',
+    ej: 'repositorio público con los notebooks, los datos derivados y el script de medición',
+    revisor: 'No se indica dónde está el código. Y conviene recordar que publicar el código sin la semilla, las versiones y los datos no alcanza para reproducir nada.' },
+  { id: 'sesgo', et: '¿Auditaste el modelo por subgrupo?', pista: 'pares mínimos, o métricas desagregadas',
+    ej: 'sí: 18 sujetos en tres dimensiones sobre una plantilla fija. Diferencia máxima de puntaje ' + D.sesgo.diferencia_maxima.toFixed(3) + '; parte de ella se explica por el artículo («los» vs «las») y no por el sustantivo.',
+    revisor: 'No hay auditoría por subgrupo. Si el modelo se va a usar para decidir sobre personas, esa auditoría es condición, no adorno.' },
+  { id: 'uso', et: '¿Para qué se va a usar el resultado y quién paga el error?', pista: 'medir no es lo mismo que decidir',
+    ej: 'sólo para describir la composición temática de un corpus. No se usa para decidir sobre casos individuales.', fatal: true,
+    revisor: 'No se explicita el uso previsto. Un instrumento aceptable para describir un corpus puede ser inaceptable para decidir sobre personas.' }
+]}
+];
+
+// Ojo: NO copiamos los objetos. Más abajo les colgamos el nodo del input, y si
+// acá hiciéramos copias, el nodo quedaría colgado del original y no de la copia.
+for (const s of SECCIONES) for (const c of s.campos) c.seccion = s.titulo;
+const TODOS = SECCIONES.flatMap(s => s.campos);
+const CLAVE = 'dlss-clase10-checklist';
+const estado = {};
+
+/* ---------- persistencia, con try/catch porque file:// a veces tira ---------- */
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { /* sin drama */ }
+}
+function cargar() {
+  try {
+    const g = JSON.parse(localStorage.getItem(CLAVE) || '{}');
+    for (const k in g) estado[k] = g[k];
+  } catch (e) { /* sin drama */ }
+}
+cargar();
+
+/* ---------- el formulario ---------- */
+const cont = document.getElementById('form');
+for (const s of SECCIONES) {
+  const caja = Viz.el('div', { class: 'seccion' }, cont);
+  const h = Viz.el('h3', {}, caja);
+  Viz.el('span', { texto: s.titulo }, h);
+  const cuenta = Viz.el('span', { class: 'cuenta' }, h);
+  s._cuenta = cuenta;
+  for (const c of s.campos) {
+    const w = Viz.el('div', { class: 'campo' + (c.fatal ? ' fatal' : '') }, caja);
+    const lab = Viz.el('label', {}, w);
+    lab.appendChild(document.createTextNode(c.et));
+    Viz.el('span', { class: 'pista', texto: c.pista }, lab);
+    let inp;
+    if (c.tipo === 'select') {
+      inp = Viz.el('select', {}, w);
+      for (const o of c.opciones) Viz.el('option', { value: o, texto: o || '— elegí —' }, inp);
+    } else {
+      inp = Viz.el('input', { type: 'text', placeholder: 'escribí acá' }, w);
+    }
+    inp.value = estado[c.id] || '';
+    c._inp = inp; c._caja = w;
+    inp.addEventListener('input', () => { estado[c.id] = inp.value; guardar(); refrescar(); });
+    inp.addEventListener('change', () => { estado[c.id] = inp.value; guardar(); refrescar(); });
+  }
+}
+
+/* ---------- el párrafo de métodos ---------- */
+function falta(id) { return '<span class="falta">[FALTA: ' + id + ']</span>'; }
+// Sacamos el punto final si el usuario lo escribió: la plantilla ya pone el suyo,
+// y "…de 2021.." con dos puntos queda feo en el borrador que se va a copiar.
+function v(id) { return (estado[id] || '').trim().replace(/\.+$/, ''); }
+function o(id) { return v(id) || falta(id); }
+
+function parrafo() {
+  return (
+'Datos. ' + o('fuente') + '. El corpus tiene ' + o('n') + '. Cubre ' + o('poblacion') +
+'. Exclusiones: ' + o('exclusiones') + '. Disponibilidad de los datos: ' + o('disponible') + '.\n\n' +
+'Medición. El constructo de interés es ' + o('concepto') + '. La definición operativa es: ' +
+o('operacional') + '. Validación manual: ' + o('validadas') + '. Acuerdo entre codificadores: ' +
+o('acuerdo') + '.\n\n' +
+'Modelo. Se utilizó ' + o('arquitectura') + '. Como línea de base se reporta que ' + o('piso') +
+'. Partición: ' + o('particion') + '. Umbral de decisión: ' + o('umbral') + '.\n\n' +
+'Evaluación. Métricas: ' + o('metricas') + '. Análisis de errores: ' + o('errores') +
+'. Evidencia adicional de validez: ' + o('placebo') + '. Validación externa: ' + o('externa') + '.\n\n' +
+'Reproducibilidad y usos. Semilla: ' + o('semilla') + '. Entorno: ' + o('versiones') +
+'. Código: ' + o('codigo') + '. Auditoría por subgrupo: ' + o('sesgo') + '. Uso previsto: ' +
+o('uso') + '.'
+  );
+}
+
+function comentarios() {
+  const vacios = TODOS.filter(c => !v(c.id));
+  const graves = vacios.filter(c => c.fatal);
+  const menores = vacios.filter(c => !c.fatal);
+  if (!vacios.length) {
+    return '<p><b>Ningún hueco.</b> Un revisor con este apéndice adelante va a discutir tus ' +
+      'conclusiones, que es lo que querés que discuta, y no tu prolijidad.</p>';
+  }
+  let h = '<p>El revisor 2 escribiría <b>' + vacios.length + '</b> comentarios. ' +
+    (graves.length ? '<b class="falta">' + graves.length + ' de ellos son fatales</b>: ' +
+      'no se arreglan con una revisión menor, hay que volver a hacer análisis.'
+                   : 'Ninguno es fatal: todos se arreglan agregando texto.') + '</p><ol>';
+  for (const c of graves) {
+    h += '<li class="grave"><b>[' + c.seccion + ' · fatal]</b> ' + c.revisor + '</li>';
+  }
+  for (const c of menores) {
+    h += '<li class="menor"><b>[' + c.seccion + ' · menor]</b> ' + c.revisor + '</li>';
+  }
+  return h + '</ol>';
+}
+
+function refrescar() {
+  let llenos = 0, fatalesVacios = 0;
+  for (const c of TODOS) {
+    const lleno = !!v(c.id);
+    if (lleno) llenos++;
+    else if (c.fatal) fatalesVacios++;
+    c._caja.classList.toggle('vacio', !lleno);
+  }
+  for (const s of SECCIONES) {
+    const n = s.campos.filter(c => v(c.id)).length;
+    s._cuenta.textContent = n + '/' + s.campos.length;
+  }
+  const t = llenos / TODOS.length;
+  ctl.medidor('completo', t, llenos + ' de ' + TODOS.length);
+  ctl.texto('estado', fatalesVacios
+    ? 'Te faltan <b class="falta">' + fatalesVacios + '</b> respuestas de las que hunden un paper. ' +
+      'Están marcadas en rojo.'
+    : (llenos === TODOS.length
+        ? 'Completo. Copiá el párrafo y pegalo en tu sección de métodos.'
+        : 'Ninguna de las fatales está vacía. Lo que falta se arregla escribiendo.'));
+
+  const salida = document.getElementById('salida');
+  if (ctl.valores.modo === 'metodos') {
+    salida.innerHTML = '<h3>Tu párrafo de métodos, en borrador</h3>' +
+      '<div class="parrafo" id="parrafo">' + parrafo() + '</div>';
+  } else {
+    salida.innerHTML = '<h3>Lo que te va a escribir el revisor 2</h3>' + comentarios();
+  }
+}
+
+const EJEMPLO = () => {
+  for (const c of TODOS) { estado[c.id] = c.ej || ''; c._inp.value = estado[c.id]; }
+  guardar(); refrescar();
+};
+const VACIAR = () => {
+  for (const c of TODOS) { estado[c.id] = ''; c._inp.value = ''; }
+  guardar(); refrescar();
+};
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué mostrar abajo' },
+  { tipo: 'botones', id: 'modo', valor: 'metodos', opciones: [
+    { valor: 'metodos', texto: 'párrafo de métodos' },
+    { valor: 'revisor', texto: 'modo revisor' }
+  ] },
+  { tipo: 'titulo', texto: 'Cuánto falta' },
+  { tipo: 'medidor', id: 'completo', etiqueta: 'respuestas completas' },
+  { tipo: 'texto', id: 'estado', html: '' },
+  { tipo: 'titulo', texto: 'Acciones' },
+  { tipo: 'boton', texto: 'Copiar el párrafo', principal: true, alClic: () => {
+      const n = document.getElementById('parrafo');
+      const t = n ? n.innerText : parrafo();
+      try {
+        navigator.clipboard.writeText(t);
+        ctl.texto('aviso', 'Copiado. Los <b>[FALTA: …]</b> quedan a propósito: son tu lista de tareas.');
+      } catch (e) {
+        ctl.texto('aviso', 'El navegador no dejó copiar (pasa con <code>file://</code>). ' +
+          'Seleccioná el texto de abajo a mano.');
+      }
+    } },
+  { tipo: 'boton', texto: 'Completar con el ejemplo de hoy', alClic: EJEMPLO },
+  { tipo: 'boton', texto: 'Vaciar', alClic: VACIAR },
+  { tipo: 'texto', id: 'aviso', html: 'Lo que escribas se guarda en tu navegador.' }
+], () => refrescar());
+
+refrescar();
+Viz.botonTema();
+</script>
+</body>
+</html>
