@@ -29,6 +29,11 @@
      lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
      Abierta suelta, la página se ve completa y esta regla no hace nada. */
   body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+  /* y además lo compactamos y le damos un poco más de ancho, para que entre
+     entero sin scrollear adentro del marco de la slide. */
+  body.embebido .viz-pagina { grid-template-columns: minmax(0, 1fr) 330px; }
+  body.embebido .panel { font-size: .86em; padding: .5rem .55rem .55rem; }
+  body.embebido .ctrl { margin-bottom: .40rem; }
 </style>
 </head>
 <body class="curso">
@@ -213,8 +218,12 @@ for (let k = 0; k < 3; k++) {
    --------------------------------------------------------------------------- */
 const anim = Viz.animacion({
   cadaMs: 55,
-  paso: function (i) {
-    estado.hasta = i + 1;
+  // OJO: el contador interno de Viz.animacion NO se reinicia solo entre corridas.
+  // Si nos colgáramos de él, la segunda vez que apretás «Soltar las tres» la
+  // animación terminaría en un cuadro y nadie vería nada rodar. Llevamos el
+  // nuestro, que `soltar()` y `reset` ponen en cero.
+  paso: function () {
+    estado.hasta += 1;
     redibujarTodo();
     return estado.hasta < estado.pasos;
   },

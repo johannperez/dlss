@@ -34,6 +34,11 @@
      lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
      Abierta suelta, la página se ve completa y esta regla no hace nada. */
   body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+  /* y además lo compactamos y le damos un poco más de ancho, para que entre
+     entero sin scrollear adentro del marco de la slide. */
+  body.embebido .viz-pagina { grid-template-columns: minmax(0, 1fr) 330px; }
+  body.embebido .panel { font-size: .86em; padding: .5rem .55rem .55rem; }
+  body.embebido .ctrl { margin-bottom: .40rem; }
 </style>
 </head>
 <body class="curso">

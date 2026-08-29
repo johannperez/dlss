@@ -67,7 +67,7 @@ que dice la slide. Si querés los 20, lo que se recorta está en la sección 6.
 
 > **Diferencia con `PROGRAMA.md`.** El plan del curso pone «Manos 2» en 85-105 y
 > el cierre en 105-120. Medido slide por slide, el tramo del nombre y el
-> vocabulario (25-28) no entra en 20 minutos: son cinco slides y una viz. Así que
+> vocabulario (25-28) no entra en el reloj del programa: son cuatro slides y una viz. Así que
 > acá el práctico 2 va **90-107** y el cierre **107-120**. Suma lo mismo, la pausa
 > no se movió, y ningún bloque quedó por debajo de lo que necesita. Si preferís
 > respetar el reloj del programa al pie de la letra, recortá la slide 28 (ancho vs
