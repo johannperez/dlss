@@ -63,6 +63,12 @@
   body.embebido .leyenda { margin-top: .3rem !important; font-size: .76em; }
   body.embebido .caja-metricas { padding: .55rem .65rem; }
   body.embebido .caja-metricas h3 { margin-bottom: .4rem; }
+  /* embebida, el botón de copiar se va al costado del título: así entra entero
+     en los 610 px del iframe sin tener que scrollear adentro de la slide. */
+  body.embebido #paper { position: relative; padding-bottom: .35em; }
+  body.embebido #btn-copiar { position: absolute; top: .4em; right: .7em; margin: 0;
+                              font-size: .78rem; padding: .3em .7em; }
+  body.embebido #copiado { position: absolute; top: 2.5em; right: .8em; }
 </style>
 </head>
 <body class="curso">

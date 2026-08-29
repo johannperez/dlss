@@ -140,13 +140,23 @@ clasificador(titulares[:20])
       <tr><td>Bill Gates reconoce que miles de personas morirán con la vacuna</td>
           <td class="c-error">FALSA</td><td>desinformación, esta vez sí</td></tr>
     </table>
-    <p style="font-size:.82em">Las dos primeras hablan de lo mismo y tienen etiquetas
-      opuestas. Cualquier clasificador de sentimiento les va a poner <b>NEG</b> a las dos.
-      Y bajo la misma etiqueta "falsa" conviven <strong>tres cosas distintas</strong>:
-      sátira, una afirmación desmentida y desinformación de verdad.</p>
+    <p style="font-size:.82em">Las dos primeras hablan de lo mismo —supuestos daños de la
+      vacuna del covid— y tienen etiquetas <strong>opuestas</strong>: la de arriba es el
+      desmentido, la de abajo es la afirmación desmentida, guardada en el corpus con el
+      nombre del <em>chequeador</em> que la desmintió. Cualquier clasificador de sentimiento
+      les va a poner <b>NEG</b> a las dos. Y bajo la misma etiqueta "falsa" conviven
+      <strong>tres cosas distintas</strong>: sátira, una afirmación desmentida y
+      desinformación de verdad.</p>
     <aside class="notes">
       4 min. Esta es la slide del giro, y todos los datos son reales (corpus de prensa
-      del curso, verificables en el CSV).
+      del curso, verificables en el CSV: los cuatro titulares, su etiqueta y su medio están
+      en `datos/muestras/prensa/titulares-prensa-es.csv`).
+      El detalle que más impresiona, si lo querés contar: la segunda fila viene de
+      **AFP Factual**, que es un servicio de chequeo. Lo que el corpus guardó no es el
+      chequeo: es el texto de la afirmación falsa que el chequeo desmiente, etiquetado
+      «falsa» y con el nombre del chequeador en la columna «fuente». Nadie hizo trampa:
+      así se arma un corpus de desinformación. Pero si entrenás sin mirar esto, tu modelo
+      puede terminar aprendiendo «¿esto lo publicó un chequeador?».
       Preguntá: "si entreno un modelo con estas etiquetas, ¿qué le estoy enseñando a
       detectar?" Dejá que se peleen un rato. Van a llegar solos a que la etiqueta mezcla
       constructos.
@@ -473,14 +483,15 @@ for epoca in range(3):
             lo que la búsqueda semántica encontró de más (ganancia) y lo que trajo
             de basura (costo). <b>Las dos listas.</b></li>
       </ol>
-      <strong>20 minutos.</strong> Si algo no corre, levantá la mano.
+      <strong>15 minutos.</strong> Si algo no corre, levantá la mano.
     </div>
     <aside class="notes">
-      20 min de práctico. Circulá. Lo que vas a ver:
+      15 min de notebook (del minuto 26 al 42 del plan; los otros 5 de la casilla son las
+      consignas y la puesta en común con la viz de la slide siguiente). Circulá. Lo que vas a ver:
       · Alguien busca una palabra que no está en el vocabulario y se frustra → es un
         hallazgo, no un error: "un modelo sólo conoce lo que vio".
       · Alguien va a mostrarte un resultado buenísimo. Pedile los falsos positivos.
-      A los 15 min avisá "cinco minutos" y pedí que dos o tres compartan su TODO 2.
+      A los 12 min avisá "faltan tres" y pedí que dos o tres compartan su TODO 2.
     </aside>
   </section>
 
