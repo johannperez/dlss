@@ -38,10 +38,14 @@
     display: flex; align-items: center; justify-content: center;
   }
   .reveal table.compacta { font-size: .62em; }
+  .reveal table.compacta td,
+  .reveal table.compacta th { line-height: 1.35; }
+  .reveal .numeron.chico { font-size: 1.9em; }
   .reveal .mapa-curso { display: grid; grid-template-columns: repeat(5, 1fr);
     gap: .5rem; margin: .6em 0; font-size: .72em; }
   .reveal .mapa-curso > div { background: var(--papel-2); border: 1px solid var(--borde);
-    border-top: 3px solid var(--c-modelo); border-radius: var(--r-chico); padding: .4rem .5rem; }
+    border-top: 3px solid var(--c-modelo); border-radius: var(--r-chico); padding: .4rem .5rem;
+    line-height: 1.32; }
   .reveal .mapa-curso > div b { display: block; color: var(--c-acento);
     font-family: var(--f-mono); font-size: .85em; }
   .reveal .mapa-curso > div.hoy { border-top-color: var(--c-error); background: var(--c-error-suave); }
@@ -127,7 +131,8 @@
   </table>
   <div class="ojo compacta">
     En <span class="c-error">rojo</span>: <strong>nombres propios</strong> de la política
-    mexicana de 2018-2021. Casi la mitad del top 20.
+    mexicana de 2018-2021. <strong>Cinco de los dieciséis</strong> que ves acá, y
+    <strong>seis de los veinte</strong> del top completo. Uno de cada tres.
   </div>
   <p>Este no es un detector de «política». Es un detector de
     <strong>¿aparecen nombres de la coyuntura mexicana reciente?</strong></p>
@@ -470,7 +475,7 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
   <div class="panel-metricas">
     <div><span class="numeron c-modelo">0,68</span><span class="et">F1 medio</span></div>
     <div><span class="numeron c-val">0,026</span><span class="et">desvío</span></div>
-    <div><span class="numeron c-error">0,63–0,73</span><span class="et">del peor al mejor</span></div>
+    <div><span class="numeron chico c-error">0,63–0,73</span><span class="et">del peor al mejor</span></div>
     <div><span class="numeron c-error">0,107</span><span class="et">el rango: tu ruido</span></div>
   </div>
   <div class="aha compacta">
@@ -545,8 +550,10 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
     <strong>mismo número exacto</strong>, y no es equidad.</p>
   <aside class="notes">
     6 min. Cambiá el sujeto en vivo con la caja de texto: escribí una oración del campo de
-    ellos. Mostrá primero la diferencia (0,346 contra 0,183 en la plantilla que viene) y dejá
-    el silencio. Y después, obligatorio, mostrá el cartel rojo: <b>una diferencia de puntaje
+    ellos. La viz abre en <b>género</b>: ahí «las médicas» saca 0,346 y «los empresarios»
+    0,257. Mostrá esa diferencia y dejá el silencio. Después pasá el selector a
+    <b>origen y región</b>, que es donde más se abre: «los migrantes» 0,344 contra
+    «los mexicanos» 0,183. Y después, obligatorio, mostrá el cartel rojo: <b>una diferencia de puntaje
     no prueba daño</b>. Esta viz es sobre rigor, no sobre indignación, y esa distinción es
     parte del contenido.
   </aside>

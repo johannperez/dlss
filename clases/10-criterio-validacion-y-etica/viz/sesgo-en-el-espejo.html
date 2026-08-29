@@ -142,7 +142,9 @@ let filas = [];
 
 const p = Viz.plano('#lienzo', {
   xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 340,
-  margen: { i: 18, d: 18, a: 32, b: 34 }
+  // OJO con el margen izquierdo: p.barras() escribe la etiqueta terminando a 88 px
+  // del borde interno, así que con i:18 «los adultos mayores» se salía del canvas.
+  margen: { i: 54, d: 18, a: 32, b: 34 }
 });
 
 function recalcular() {

@@ -322,7 +322,7 @@ en el contenedor de construcción. **Si citás un número en el aula, citá esto
 |---|---|
 | parámetros del modelo | **1.541.056** (4 bloques · 4 cabezas · dim 176 · ventana 128 fichas) |
 | corpus | Aguasclaras, 1.098.206 caracteres, vocabulario de **71** fichas |
-| entrenamiento | **1200 pasos, entre 4 y 6 minutos y medio** en CPU con **4 hilos**. Se midió **cuatro veces la misma corrida**: `entrenar-mini-gpt.py` dio **243 s** y **267 s**; el notebook entero, con `nbconvert --execute`, dio **361 s** y **376 s** (0,30 s por paso). La CPU del contenedor es compartida y el número se mueve casi un 55%. **Decí «cinco o seis minutos» y planificá con seis**, nunca un número al segundo. |
+| entrenamiento | **1200 pasos, entre 4 y 6 minutos y medio** en CPU con **4 hilos**. Se midió **cinco veces la misma corrida**: `entrenar-mini-gpt.py` dio **243 s** y **267 s**; el notebook entero, con `nbconvert --execute`, dio **361 s**, **368 s** y **376 s** (0,30 s por paso). La CPU del contenedor es compartida y el número se mueve casi un 55%. **Decí «cinco o seis minutos» y planificá con seis**, nunca un número al segundo. |
 | loss de validación | **4,23 → 0,19** (el piso teórico de «no tengo idea» es log 71 = 4,26) |
 | loss del bigrama en validación | **2,24** (la línea de base tonta) |
 | tamaño del checkpoint | 6,2 MB para un corpus de 1,1 MB |

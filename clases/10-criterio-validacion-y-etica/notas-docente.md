@@ -12,7 +12,8 @@
 
 1. Mostramos un clasificador que **anda**: accuracy 0,83, F1 0,68, le gana al piso por 0,11.
 2. Preguntamos al aula si tiene objeciones. No las tiene. **Esto se publica.**
-3. Miramos qué usa: la mitad del top 20 son **nombres propios mexicanos de 2018-2021**.
+3. Miramos qué usa: **seis de los veinte** términos que más pesan son **nombres propios
+   mexicanos de 2018-2021**. Uno de cada tres.
 4. Se lo aplicamos a discursos presidenciales argentinos, que son 100 % política: encuentra el **21 %**.
 5. Y decimos la frase incómoda: **el modelo no falló**. Falló la etiqueta que le colgamos.
 6. Nombramos la distinción: **desempeño** (¿acierta?) contra **validez** (¿mide lo que digo?).
@@ -242,11 +243,13 @@ publicable y a veces un hallazgo.
   un archivo, y evita que la mitad del aula se distraiga con la pantalla.
 - **La VIZ 3 guarda en `localStorage`.** Si vas a proyectarla en la máquina del aula, apretá
   *Vaciar* antes de empezar: si no, aparece lo que escribió el docente anterior.
-- **El notebook corre en 12 segundos** en CPU y sin red. No hace falta GPU ni Colab pago.
+- **El notebook corre entero en menos de 20 segundos** en CPU y sin red (medido acá: 13 s de
+  cómputo; el bloque más lento son las 25 particiones de la sección 4, 8 s). No hace falta GPU ni Colab pago.
   Si el wifi del aula falla, el notebook anda igual: todos los datos salen de `datos/muestras/`.
-- Los números de las slides salen de `medir-clase10.py`. Si tocás el notebook, **volvé a correr
-  el script y actualizá las slides.** Un número inventado en un curso sobre no inventar números
-  es el peor error posible.
+- Los números de las slides salen de `medir-clase10.py`, y las figuras de `figuras/` las
+  produce `exportar-figuras.py` **corriendo el notebook** (no copiando su código). Si tocás el
+  notebook, corré los dos y actualizá las slides. Un número inventado en un curso sobre no
+  inventar números es el peor error posible.
 - Si el aula pregunta por los datos: el corpus de prensa es **real** y CC BY 4.0; los discursos
   presidenciales son **reales** y de dominio público sin licencia declarada; Aguasclaras es
   **sintético** y hay que decirlo cada vez que aparece.
