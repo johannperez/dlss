@@ -501,7 +501,7 @@
   <table class="vecinos">
     <tr><td>córdoba − provincia + salta</td><td>= formosa, mendoza, catamarca… <em>otras provincias</em>, no «provincias». El barrio correcto, la casa no.</td></tr>
     <tr><td>escuelas − escuela + hospitales</td><td>= municipios, viviendas, centros. Plural→singular: no está.</td></tr>
-    <tr><td>mujeres − hombres + niños</td><td>= embarazadas, menores, hijo. «niñas» ni siquiera está en el corpus.</td></tr>
+    <tr><td>mujeres − hombres + niños</td><td>= embarazadas, menores, hijo. Esperábamos «niñas», que ni siquiera entra al vocabulario de 2.000 palabras.</td></tr>
   </table>
   <div class="ojo compacta">Con 347.714 palabras de corpus, la aritmética casi no
     funciona. Es una propiedad que aparece con <em>muchísimo</em> más texto. Decilo
@@ -511,8 +511,12 @@
     <b>cinco</b> primeras. Con el criterio estricto —que salga primera— acierta
     <b>una</b> de diez.</span></div>
   <aside class="notes">
-    Que «niñas» no exista en 35 discursos presidenciales es, por sí solo, un dato.
-    Dejá que caiga. 3 minutos. Si vas apretado, esta slide se recorta a la mitad.
+    El dato para dejar caer, con los números medidos: en 35 discursos de apertura
+    <b>«niños» aparece 78 veces y «niñas» 11; «chicos» 69 y «chicas» 2</b>. Por eso
+    «niñas» no entra al vocabulario de las 2.000 más frecuentes. No es que no exista
+    en el corpus: es que casi no se dice. Eso, solo, ya es un hallazgo, y sale de
+    contar. Dejá cinco segundos. 3 minutos. Si vas apretado, esta slide se recorta
+    a la mitad.
   </aside>
 </section>
 
@@ -642,6 +646,10 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <tr><td>aumento / reducción</td><td class="cifra">0,54</td></tr>
     <tr><td>gobierno / oposición</td><td class="cifra">0,48</td></tr>
   </table>
+  <p style="font-size:.68em;color:var(--tinta-3);margin:.1em 0 .4em">Para tener la vara:
+     entre <em>dos palabras cualesquiera</em> del vocabulario la similitud típica es
+     <b>0,23</b>. Los dos primeros pares están en el <b>0,1 % más alto</b> de todos los
+     pares posibles. Están medidos en el notebook, no estimados.</p>
   <p style="font-size:.8em">Si usás la similitud coseno entre documentos como medida
     de <em>acuerdo político</em>, dos discursos que dicen lo contrario sobre el mismo
     tema te van a dar altísimo. <strong>Es el error de interpretación número uno con
@@ -888,7 +896,6 @@ datos.vecinos("pobreza", V, palabras, k=6)
           renderMathInElement(deck.getSlidesElement(), {
             delimiters: [
               { left: '$$', right: '$$', display: true },
-              { left: '$',  right: '$',  display: false },
               { left: '\\[', right: '\\]', display: true },
               { left: '\\(', right: '\\)', display: false }
             ],

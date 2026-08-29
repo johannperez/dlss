@@ -63,6 +63,9 @@
   .veredicto.ok  { color: var(--c-ok); }
   .veredicto.mal { color: var(--c-error); }
   .aviso { font-size: .82rem; color: var(--c-error); margin: .3rem 0 0; }
+  /* el botón flotante «Tema» es position:fixed abajo a la derecha y se le monta
+     encima a la última línea del texto. Le dejamos aire. (Suelta, no embebida.) */
+  body.curso:not(.embebido) .viz-pagina { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body class="curso">
@@ -531,12 +534,15 @@ function pintarEje() {
     return;
   }
   const n = rankingActual.length;
-  const arriba = rankingActual.slice(0, 4), abajo = rankingActual.slice(-4);
+  // dentro de una slide entran menos filas: mostramos 3 en vez de 4 y así la
+  // lista no queda cortada por el borde del iframe.
+  const K = EMBEBIDO ? 3 : 4;
+  const arriba = rankingActual.slice(0, K), abajo = rankingActual.slice(-K);
   cajaListas.className = 'listas';
   cajaListas.innerHTML =
-    '<div class="lista"><h4>las 4 más cerca de «' + estado.ejePos + '»</h4><ol>' +
+    '<div class="lista"><h4>las ' + K + ' más cerca de «' + estado.ejePos + '»</h4><ol>' +
       arriba.map(d => li(d.w, d.v)).join('') + '</ol></div>' +
-    '<div class="lista"><h4>las 4 más cerca de «' + estado.ejeNeg + '»</h4><ol>' +
+    '<div class="lista"><h4>las ' + K + ' más cerca de «' + estado.ejeNeg + '»</h4><ol>' +
       abajo.slice().reverse().map(d => li(d.w, d.v)).join('') + '</ol></div>';
   cajaNota.innerHTML =
     '<b>Esto que acabás de hacer es la metodología de un paper de la ' +

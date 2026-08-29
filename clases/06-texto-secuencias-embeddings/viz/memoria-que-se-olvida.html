@@ -48,6 +48,9 @@
   .apuesta .barra { height: 8px; background: var(--papel-3); border-radius: 4px;
                     overflow: hidden; margin-top: .3rem; }
   .apuesta .barra > i { display: block; height: 100%; }
+  /* el botón flotante «Tema» es position:fixed abajo a la derecha y se le monta
+     encima a la última línea del texto. Le dejamos aire. (Suelta, no embebida.) */
+  body.curso:not(.embebido) .viz-pagina { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body class="curso">

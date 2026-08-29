@@ -55,6 +55,9 @@
   table.dist td.act { background: var(--c-acento-suave); font-weight: 700; }
   table.dist td.alto { color: var(--c-ok); font-weight: 700; }
   table.dist td.bajo { color: var(--c-error); }
+  /* el botón flotante «Tema» es position:fixed abajo a la derecha y se le monta
+     encima a la última línea del texto. Le dejamos aire. (Suelta, no embebida.) */
+  body.curso:not(.embebido) .viz-pagina { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body class="curso">
