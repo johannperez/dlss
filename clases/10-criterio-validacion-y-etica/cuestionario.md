@@ -8,6 +8,12 @@
 >
 > Tiempo estimado: **50 minutos** para las doce. Si sólo tenés media hora, hacé la 1, la 4,
 > la 5, la 9 y la 12.
+>
+> **Es el único cuestionario del curso que se sale de los 15 minutos**, y es a propósito: los
+> tres últimos ítems son de diseño y el doce es de una página. Para los 15 minutos de rutina en
+> el aula, usá las cinco de arriba; el resto sirve como integrador del curso o como una parte del
+> proyecto final (`recursos/GUIA-DEL-DOCENTE.md` §6). La desviación está declarada en
+> `PROGRAMA.md` §3.4.
 
 ---
 

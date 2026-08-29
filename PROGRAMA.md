@@ -88,6 +88,14 @@ Ninguna exposición dura más de 20 minutos seguidos. El ritmo base es:
 
 El plan minuto a minuto de cada clase respeta esta forma, con variaciones declaradas.
 
+> **Cuál documento manda cuando los minutos no coinciden.** Los planes de este programa son
+> el **presupuesto de diseño**; los de `clases/NN-slug/notas-docente.md` son el **plan operativo**,
+> medido contra las slides que existen. Cuando difieren —hoy pasa en dos clases: el práctico 2 de
+> la clase 2 corre de 90 a 107 en vez de 85 a 105, y el juicio de la clase 10 dura 20 minutos en
+> vez de 25— **manda el de la clase**, que declara y justifica la desviación en sus notas y dice
+> cómo volver al reloj original si el aula va holgada. Las diez clases siguen sumando 120 minutos
+> y **la pausa de 10 no se toca en ninguna**.
+
 ### 0.3 Convenciones de producción (para el equipo que construye)
 
 - **Todo offline.** Cero CDNs. `reveal.js` y KaTeX están vendoreados en `_shared/vendor/` y se
@@ -604,8 +612,13 @@ La regla: **una abstracción sólo se permite después de que hayan hecho a mano
 - **Cuestionario por clase** (`cuestionario.md` + soluciones): 8-12 ítems, mezcla de multiple choice
   conceptual, "qué pasa si...", lectura de gráfico, y **siempre al menos uno de criterio o ética
   aplicada**. Se resuelve en 15 minutos, no se corrige con nota: se usa para conversar.
+  > **Excepción declarada, clase 10.** Su cuestionario incluye tres ítems de diseño y uno de una
+  > página, y declara 50 minutos. **Manda el archivo de la clase**: para los 15 minutos de rutina
+  > se usan las cinco preguntas mínimas que el propio `cuestionario.md` lista, y el resto queda
+  > como integrador o como parte del proyecto final.
 - **Proyecto final opcional**: aplicar el pipeline de las clases 9-10 al corpus propio del
-  estudiante, con el checklist de la clase 10 como rúbrica.
+  estudiante, con el checklist de la clase 10 como rúbrica. **La consigna completa, en seis
+  puntos, y el criterio de corrección están en `recursos/GUIA-DEL-DOCENTE.md` §6.**
 
 ### 3.5 Glosario vivo
 

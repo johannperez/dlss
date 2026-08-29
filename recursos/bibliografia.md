@@ -26,8 +26,10 @@ de por qué se lee **ahí**.
 > No se le inventa un enlace, y no se le inventa un DOI.** Preferimos una
 > bibliografía corta y verdadera a una larga y falsa.
 
-**Total: 66 obras.** Todas las URLs que aparecen abajo fueron probadas con `curl`
-el **2026-08-29**; las que respondieron están marcadas y las que no, también.
+**85 obras.** Todas las URLs que aparecen abajo fueron probadas con `curl` el
+**2026-08-29**: **29** respondieron 200 y quedaron `[VERIFICADA]`, **11** más
+son espejos verificados de obras cuyo enlace canónico no se pudo abrir, y quedan
+**77** marcas `[VERIFICAR URL]` para alguien con red.
 
 ---
 
@@ -175,7 +177,7 @@ bibliografía entera y no pudimos cerrar:
   curso depende de ella. `[VERIFICAR — cita no confirmada]`
   **Si quien tenga red no la encuentra, se saca**: es la única entrada de esta
   bibliografía en esa situación.
-- Ninguna otra referencia se eliminó por sospecha de invención. Los 66 títulos
+- Ninguna otra referencia se eliminó por sospecha de invención. Los 85 títulos
   tienen autores, año y publicación completos y verificables; lo que falta son
   los enlaces, no los datos.
 
@@ -185,7 +187,7 @@ bibliografía entera y no pudimos cerrar:
 
 | Host | Estado | Consecuencia |
 |---|---|---|
-| `raw.githubusercontent.com` | **200** | Por acá entran todos los datos reales del curso y **28 de las 28 URLs verificadas** de esta bibliografía. |
+| `raw.githubusercontent.com` | **200** | Por acá entran todos los datos reales del curso y casi todas las URLs verificadas de esta bibliografía. Se probaron **58 URLs** en total: 52 dieron 200, dos (`github.com` en HTML) dan 403, y cuatro dan 404 porque son directorios o repos que no existen con ese nombre — ninguna de esas cuatro quedó en el archivo. |
 | `pypi.org`, `files.pythonhosted.org` | **200** | `pip install` funciona; las páginas de paquete sirven como cita verificable. |
 | `registry.npmjs.org` | **200** | — |
 | `github.com` (páginas HTML) | **403** | No se pueden verificar los repos desde acá, sólo los archivos crudos. |
