@@ -174,34 +174,35 @@ acá la tendencia lineal es débil y ruidosa. Los números salen de
 
 **(b) Respuestas buenas para lo que el modelo NO dice** (cualquiera de estas):
 
-- No dice que a los gobiernos les haya importado **menos** la educación: dice que le
-  dedicaron menos palabras en **ese** discurso.
-- No dice que la baja haya sido pareja. Un modelo lineal **impone** que sea pareja;
-  la serie real puede haber caído de golpe en un año y quedarse quieta.
+- No dice que a los gobiernos les haya importado **más** la educación: dice que le
+  dedicaron más palabras en **ese** discurso.
+- No dice que la suba haya sido pareja. Un modelo lineal **impone** que sea pareja;
+  la serie real puede haber saltado de golpe en un año y quedarse quieta después.
+  (Y de hecho no es pareja: la serie va de 0,03 % a 0,69 % dando tumbos.)
 - No dice nada sobre 2025: extrapolar fuera del rango de los datos es una decisión
   tuya, no del modelo.
-- No dice que la educación haya empeorado, ni mejorado. No mide política educativa:
+- No dice que la educación haya mejorado, ni empeorado. No mide política educativa:
   mide palabras.
 
-**Errores típicos:**
+**Errores típicos de (a) y (b):**
 
 - *«Cada año hay un 0,37 % más de educación»*: confunde el porcentaje de palabras con
   un porcentaje de otra cosa, y confunde 0,0037 con 0,37. Es un error de escala y hay
   que corregirlo con firmeza, porque es el mismo error que la trampa de
   `serie_menciones` (los valores **ya vienen en porcentaje**: 0,21 quiere decir
   «el 0,21 % de las palabras», no «el 21 %»).
+- *«A la educación se le dio más importancia»*: el salto ilegítimo del indicador al
+  constructo. Es exactamente el tema de la clase 10 y conviene celebrarlo como una
+  buena oportunidad, no como un error.
+- Contestar (b) con «no dice si es significativo»: es una respuesta correcta pero de
+  otra caja de herramientas. Aceptala y pedile una segunda que no use jerga
+  estadística.
 
 **(c)** Cambiaría el verbo —«baja» en vez de «sube»— y el signo del total del período.
 **No** cambiaría nada de lo demás: ni la unidad, ni el punto de partida en 1984, ni la
 advertencia de que el modelo **impone** que el cambio sea parejo año a año. Quien
 conteste sólo «cambiaría el signo» tiene razón pero se quedó en la aritmética; lo que
 buscamos es que note que la **forma de la afirmación** es la misma.
-- *«La educación bajó»*: el salto ilegítimo del indicador al constructo. Es
-  exactamente el tema de la clase 10 y conviene celebrarlo como una buena
-  oportunidad, no como un error.
-- Contestar (b) con «no dice si es significativo»: es una respuesta correcta pero de
-  otra caja de herramientas. Aceptala y pedile una segunda que no use jerga
-  estadística.
 
 ---
 

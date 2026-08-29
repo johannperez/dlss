@@ -11,7 +11,7 @@ Prerrequisitos: ninguno. Nivel de código de la audiencia: cero previo.
 
 ## 1. El arco narrativo en diez líneas
 
-1. Se proyectan cuarenta puntos sin ejes y se pregunta qué le pasó a este país.
+1. Se proyectan los treinta y seis puntos sin ejes y se pregunta qué le pasó a este país.
 2. Se revelan los ejes: es cuánto se habló de seguridad en los discursos de apertura.
 3. Se pregunta qué **línea** resumiría eso. La intención de modelar aparece sola.
 4. Para dibujar una recta hacen falta dos números. Ese es el curso entero.

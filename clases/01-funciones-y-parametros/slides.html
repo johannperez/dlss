@@ -34,6 +34,11 @@
   .reveal .abrir-suelta { font-size: .62em; color: var(--tinta-3); margin: .15em 0 0; }
   .reveal table.dos-tipos td, .reveal table.dos-tipos th { font-size: 1.02em; }
   .reveal table.dos-tipos td { height: 2.4em; }
+  /* OJO: `curso.css` estiliza `.reveal pre code` pero no le pone `display:block`,
+     y reveal.css tampoco. Sin esto el <code> queda inline, el <pre> mide una sola
+     linea de alto y el bloque de codigo aparece CORTADO en el proyector.
+     Lo mismo hizo el equipo de la clase 4; convendria arreglarlo en curso.css. */
+  .reveal pre code { display: block; overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -83,7 +88,7 @@
 <section>
   <h2>¿Qué le pasó a este país?</h2>
   <div class="viz-frame" style="padding:10px"><div id="fig-misterio"></div></div>
-  <p class="viz-pie">Cuarenta años de algo. Sin ejes, a propósito.</p>
+  <p class="viz-pie">Treinta y seis años de algo. Sin ejes, a propósito.</p>
   <aside class="notes">
     <b>3:00 — 4 min. Esta es la slide más importante del arranque: no la apures.</b><br>
     «Tómense un minuto. ¿Qué historia cuenta esto?» Y después <b>callate</b>. Contá hasta
@@ -726,7 +731,7 @@ def desajuste(a, b):
     <li><b>función</b><span>una máquina: le metés un número, sale otro</span></li>
     <li><b>variable</b><span>lo que entra. Cambia de un caso a otro de tu base</span></li>
     <li><b>parámetro</b><span>la perilla. Es la misma para toda la base</span></li>
-    <li><b>ajustar</b> <i>(to fit)</i><span>mover las perillas hasta que la figura se parezca
+    <li><b>ajustar</b><span><i>(to fit)</i> mover las perillas hasta que la figura se parezca
       a los datos</span></li>
     <li><b>optimización</b><span>mover perillas para minimizar un número. Nada más místico
       que eso</span></li>
