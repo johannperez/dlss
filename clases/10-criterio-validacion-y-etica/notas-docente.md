@@ -44,7 +44,7 @@ tocás uno, tocá el otro.
 | **69-71** | El sesgo como hallazgo | 25 | Antídoto contra la sobrecorrección. |
 | **71-76** | Reproducibilidad | 26-28 | El checklist (27) y los modelos cerrados (28). |
 | **76-85** | Ética aplicada | 29-30 | Los cuatro casos (7 min) y las cinco preguntas (2). |
-| **85-105** | **MANOS 2 · el juicio** | 31-32 | **12 de preparación + 8 de audiencia.** El veredicto (32) se arma durante la audiencia. |
+| **85-105** | **MANOS 2 · el juicio** | 31-32 | **12 de preparación + 8 de audiencia**, con los papers de `material-el-juicio.md`. El veredicto (32) se arma durante la audiencia. |
 | **105-108** | Cuándo NO usar deep learning | 33 | La slide más honesta. |
 | **108-111** | **VIZ 3 · el checklist** | 34 | En vivo, en el proyector. |
 | **111-113** | Las seis objeciones | 35 | La versión que se memoriza. |
@@ -243,15 +243,21 @@ publicable y a veces un hallazgo.
 
 ## 8. Cosas de producción, para el día
 
-- **Preparar dos papers cortos para el juicio**, uno defendible con reparos menores y otro con
-  un problema fatal de validez, y rotarlos entre cohortes. Pueden ser construidos ad hoc y
-  **rotulados como material didáctico**. Imprimilos: repartir papel es más rápido que compartir
-  un archivo, y evita que la mitad del aula se distraiga con la pantalla.
+- **Los dos papers del juicio ya están escritos**: `material-el-juicio.md`, en esta misma
+  carpeta. El **A** («índice de conflictividad en la prensa provincial») es defendible con
+  reparos menores; el **B** («populismo con un modelo de lenguaje») tiene un problema fatal
+  de validez escondido en una nota al pie. Los dos son **ficticios y están rotulados como
+  material didáctico** en la primera línea; no citan datos reales y no se pueden citar.
+  **Repartí uno solo por cohorte** y guardá el otro para la vez siguiente. Al final del
+  archivo está la clave de corrección, con cada objeción y su gravedad: no la leas en voz
+  alta antes de la actividad. Imprimilos: repartir papel es más rápido que compartir un
+  archivo, y evita que la mitad del aula se distraiga con la pantalla.
 - **La VIZ 3 guarda en `localStorage`.** Si vas a proyectarla en la máquina del aula, apretá
   *Vaciar* antes de empezar: si no, aparece lo que escribió el docente anterior.
 - **El notebook corre entero en menos de 20 segundos** en CPU y sin red (medido con
-  `nbconvert --execute`: **14 s** de punta a punta; el bloque más lento son las 25 particiones
-  de la sección 4, que el propio notebook cronometra en **4,2 s**). No hace falta GPU ni Colab pago.
+  `nbconvert --execute`, cuatro corridas: **entre 14 y 19 s** de punta a punta según cuán
+  cargada esté la máquina; el bloque más lento son las 25 particiones de la sección 4, que el
+  propio notebook cronometra en **4,2 s**). No hace falta GPU ni Colab pago.
   Si el wifi del aula falla, el notebook anda igual: todos los datos salen de `datos/muestras/`.
 - Los números de las slides salen de `medir-clase10.py`, y las figuras de `figuras/` las
   produce `exportar-figuras.py` **corriendo el notebook** (no copiando su código). Si tocás el

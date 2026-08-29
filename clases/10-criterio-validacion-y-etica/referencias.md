@@ -127,6 +127,12 @@ Recopilación de J. M. Diéguez, discursos de Casa Rosada 2015-2024:
 > escribile a los recopiladores. Que esa frase esté en un `referencias.md` en vez de estar
 > escondida también es parte de lo que enseña la clase.
 
+**`material-el-juicio.md`** — los dos papers del bloque práctico 2, en esta misma carpeta.
+> **Son ficticios y están rotulados como material didáctico en su primera línea.** No hay
+> autores, no hay revista, no hay datos: están escritos para esta clase con los errores puestos
+> a propósito, y **no se pueden citar**. El A es defendible con reparos menores; el B tiene un
+> problema fatal de validez. Al final del archivo está la clave de corrección para el docente.
+
 **`medir-clase10.py`** y **`exportar-figuras.py`** — en esta misma carpeta.
 > Todos los números de las slides y de las visualizaciones salen del primero, y las cinco
 > figuras salen del segundo, que **corre el notebook** en vez de copiarle el código. Los dos

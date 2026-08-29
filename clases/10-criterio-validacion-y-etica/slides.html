@@ -591,10 +591,11 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
 <section>
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 1 · la auditoría</h2>
-  <div class="manos">
+  <div class="manos compacta">
     Abrí <code>notebook.ipynb</code> y corré las secciones <strong>1 a 9</strong>.
     <strong>20 minutos</strong>, de a dos. Al final vas a tener una tabla que se puede pegar
-    en un apéndice.
+    en un apéndice. <em>Si el tiempo aprieta: el 1 y el 2 se hacen leyendo; los que hay que
+    escribir son el <code>TODO 5</code> —el corazón de todo— y el <code>TODO 6</code>.</em>
   </div>
   <ol class="lista-numerada">
     <li><code>TODO 1</code> · leé los 20 términos y escribí la frase honesta:
@@ -604,13 +605,10 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
     <li><code>TODO 5</code> · escribí <strong>tres pares mínimos de tu propia investigación</strong>.
       Uno que debería cambiar, uno que no, y uno límite.</li>
     <li><code>TODO 6</code> · interpretá la tabla de sesgo: ¿es grande?, ¿de dónde viene?,
-      ¿cambia según el uso? <em>El <code>TODO 5</code> es el importante: diseñar el test
-      es más difícil, y más útil, que correrlo.</em></li>
+      ¿cambia según el uso?</li>
   </ol>
-  <p class="c-acento"><strong>Si el tiempo aprieta:</strong> el 1 y el 2 se hacen leyendo;
-    los que hay que <em>escribir</em> sí o sí son el <code>TODO 5</code> y el <code>TODO 6</code>.</p>
   <aside class="notes">
-    20 min. Recorré las mesas. La consigna que más cuesta es el TODO 5: van a escribir pares
+    1 min de consignas y 20 de notebook. Recorré las mesas. La consigna que más cuesta es el TODO 5: van a escribir pares
     que cambian dos cosas a la vez. Corregilo en el momento, es el corazón del diseño
     experimental. Anotá en el pizarrón dos o tres pares buenos que veas para leerlos después
     de la pausa. A los 15 minutos avisá que quedan 5.
@@ -782,9 +780,11 @@ print(bloque_de_reproducibilidad(
 <section>
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2 · el juicio</h2>
-  <div class="manos">
-    Se reparte un paper corto que usa estas técnicas. <strong>Media aula lo defiende, media lo
-    revisa.</strong> 15 minutos de preparación, 10 de audiencia.
+  <div class="manos compacta">
+    Se reparte un paper corto que usa estas técnicas (está impreso: sale de
+    <code>material-el-juicio.md</code>, y es <strong>ficticio</strong>, escrito para hoy).
+    <strong>Media aula lo defiende, media lo revisa.</strong> 12 minutos de preparación,
+    8 de audiencia.
   </div>
   <div class="comparacion">
     <div>
@@ -802,7 +802,10 @@ print(bloque_de_reproducibilidad(
   </div>
   <p class="c-acento"><strong>Los dos bandos usan el mismo checklist. Por eso funciona.</strong></p>
   <aside class="notes">
-    20 min en total (12 de preparación + 8 de audiencia). Repartí el paper impreso: es más
+    20 min en total (12 de preparación + 8 de audiencia). Los dos papers están en
+    <b><code>material-el-juicio.md</code></b>, con la clave de corrección para vos al final:
+    el A es defendible con reparos, el B tiene un problema fatal. <b>Repartí uno solo por
+    cohorte</b> y guardá el otro para la vez que viene. Impreso: es más
     rápido que compartir un archivo. Mientras preparan, pasá por los dos grupos: a los
     revisores pediles que ordenen por gravedad desde el principio, y a los defensores
     recordales que declarar una limitación es una jugada fuerte, no una derrota.
