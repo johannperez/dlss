@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La ventana de contexto — Clase 8</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "Eso que está gris, para el modelo NO EXISTE. No es que le
+     preste poca atención: no está. Y en el momento exacto en que el dato clave
+     entra en la ventana, la respuesta se arregla de golpe."
+
+     SEGUNDO AHA, el incómodo: con la pista lejos, la curva es PLANA aunque la
+     pista esté adentro de la ventana. Estar adentro no alcanza. Es el
+     "lost in the middle" de los modelos grandes, en chiquito.
+
+     TODO LO QUE SE MUESTRA ES MEDIDO. Para cada tamaño de ventana se le volvió
+     a preguntar al modelo sobre 30 (caso cerca) y 24 (caso lejos) pasajes
+     REALES del corpus, y se guardó la proporción de aciertos.
+     Ver `entrenar-mini-gpt.py`, sección 2 del exportador — ahí está anotado por
+     qué esta viz se rehízo después de medir.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .texto-ventana {
+    font-family: var(--f-mono); font-size: .93rem; line-height: 1.75;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .7rem .85rem;
+    white-space: pre-wrap; word-break: break-word; min-height: 5.5em;
+  }
+  .texto-ventana .fuera { color: var(--tinta-3); opacity: .25; }
+  .texto-ventana .dentro { color: var(--tinta); }
+  .texto-ventana .pista-dentro {
+    background: var(--c-acento-suave); color: var(--c-acento); font-weight: 700;
+    border-radius: 4px; padding: 0 .15em;
+  }
+  .texto-ventana .pista-fuera {
+    color: var(--tinta-3); opacity: .3; text-decoration: line-through;
+  }
+  .texto-ventana .cursor {
+    border-left: 2px solid var(--c-parametro); margin-left: 1px;
+  }
+  .respuesta {
+    margin-top: .6rem; display: flex; align-items: baseline; gap: .6rem;
+    flex-wrap: wrap;
+  }
+  .respuesta .et { font-size: .76rem; text-transform: uppercase;
+                   letter-spacing: .09em; color: var(--tinta-3); }
+  .respuesta .txt {
+    font-family: var(--f-mono); font-size: 1.02rem; font-weight: 700;
+    padding: .18em .5em; border-radius: var(--r-chico);
+  }
+  .respuesta .txt.bien { color: var(--c-ok); background: var(--c-ok-suave); }
+  .respuesta .txt.mal  { color: var(--c-error); background: var(--c-error-suave); }
+  .cartel[hidden] { display: none; }
+  .cartel { margin-top: .55rem; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La ventana de contexto</h1>
+    <p>El modelo sólo puede mirar las últimas N fichas. Vos achicás esa ventana y ves,
+       ficha por ficha, en qué momento exacto deja de poder contestar.
+       <em>Antes de mover nada, apostá: ¿con qué tamaño de ventana se va a romper?</em></p>
+  </header>
+
+  <div>
+    <div class="texto-ventana" id="texto"></div>
+    <div class="respuesta">
+      <span class="et">el modelo contesta</span>
+      <span class="txt" id="respuesta"></span>
+      <span class="et" id="esperado"></span>
+    </div>
+    <div class="ojo compacta cartel" id="cartel" hidden>
+      <strong>Acabás de perder la información que hacía falta.</strong>
+      El dato que contesta la pregunta quedó <em>fuera</em> de la ventana. El modelo no
+      lo tiene degradado ni borroso: no lo tiene.
+    </div>
+    <div class="viz-frame" style="padding:10px; margin-top:.7rem">
+      <div id="lienzo"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Con la pista <b>cerca</b>: arrancá con la ventana en 4 y
+      andá agrandándola. Mientras el nombre esté tachado, el modelo tira cualquier cosa;
+      en cuanto entra en la ventana, la curva pega un salto. <b>No hay degradación suave:
+      hay un corte.</b>
+      <br><br>
+      Ahora cambiá a la pista <b>lejos</b>, y mirá la curva otra vez. <b>Es plana.</b>
+      Aunque la pista esté adentro de la ventana, este modelo no la usa: su horizonte
+      efectivo es más corto que su ventana. En los modelos grandes pasa lo mismo y tiene
+      nombre — <em>lost in the middle</em>: lo que queda en el medio de un contexto largo
+      se atiende peor que lo que queda en las puntas. Por eso, en un prompt largo,
+      <b>lo importante va al final</b>.
+    </div>
+    <p class="viz-pie">
+      Medición real sobre pasajes del corpus <b>Aguasclaras</b> con el mini-GPT de la
+      clase (1.541.056 parámetros, ventana de 128 fichas). País ficticio.
+      <span class="chip sintetico">sintético</span>
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-mini-gpt.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS_MINIGPT;
+const CASOS = D.ventana.casos;
+const CTX_MAX = D.ventana.contexto_maximo;
+const AZAR = D.ventana.azar;
+
+let iCaso = 0;
+function caso() { return CASOS[iCaso]; }
+function ejemplo() { return caso().ejemplo; }
+
+function delBarrido(k) {
+  const b = ejemplo().barrido;
+  let mejor = b[0];
+  for (const x of b) if (Math.abs(x.ventana - k) < Math.abs(mejor.ventana - k)) mejor = x;
+  return mejor;
+}
+function escapar(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* --- el texto, con la ventana resaltada ------------------------------------ */
+function pintarTexto(k) {
+  const e = ejemplo();
+  const t = e.texto;
+  const corte = Math.max(0, t.length - k);
+  const pa = e.tramo_pista[0], pb = e.tramo_pista[1];
+  const pistaAdentro = pa >= corte;
+  let html = '';
+  for (let i = 0; i < t.length;) {
+    const enPista = i >= pa && i < pb;
+    const dentro = i >= corte;
+    let j = i + 1;
+    while (j < t.length && ((j >= pa && j < pb) === enPista) && ((j >= corte) === dentro)) j++;
+    const clase = enPista ? (dentro ? 'pista-dentro' : 'pista-fuera')
+                          : (dentro ? 'dentro' : 'fuera');
+    html += '<span class="' + clase + '">' + escapar(t.slice(i, j)) + '</span>';
+    i = j;
+  }
+  document.getElementById('texto').innerHTML = html + '<span class="cursor"></span>';
+  return pistaAdentro;
+}
+
+/* --- la curva: aciertos sobre N casos reales -------------------------------- */
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: CTX_MAX + 4, ymin: 0, ymax: 1.04,
+  ejeX: 'cuántas fichas mira hacia atrás (tamaño de la ventana)',
+  ejeY: 'proporción de aciertos',
+  titulo: 'medido sobre pasajes reales del corpus, ventana por ventana',
+  alto: 260
+});
+
+p.alDibujar(() => {
+  const c = caso();
+  const k = ctl.valores.ventana;
+  p.fondo(); p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)),
+           formatoY: v => (v * 100).toFixed(0) + '%' });
+
+  // el piso del azar: seis bloques posibles
+  p.segmento(0, AZAR, CTX_MAX + 4, AZAR,
+             { color: 'verdad', grosor: 2, punteada: [7, 5] });
+  p.texto(6, AZAR, 'tirar a la suerte entre los 6 bloques',
+          { color: 'verdad', tam: 11, dy: -8, alinear: 'left', caja: true });
+
+  // en cuántos de los casos la pista entra en la ventana
+  p.linea(c.curva.map(d => ({ x: d.ventana, y: d.con_pista / d.n })),
+          { color: 'acento', grosor: 2, punteada: [5, 4] });
+  // los aciertos de verdad
+  p.linea(c.curva.map(d => ({ x: d.ventana, y: d.aciertos / d.n })),
+          { color: 'modelo', grosor: 3.5 });
+  p.puntos(c.curva.map(d => ({ x: d.ventana, y: d.aciertos / d.n })),
+           { color: 'modelo', r: 2.5 });
+
+  const act = c.curva.reduce((a, b) =>
+    Math.abs(b.ventana - k) < Math.abs(a.ventana - k) ? b : a, c.curva[0]);
+  p.punto(act.ventana, act.aciertos / act.n, { color: 'parametro', r: 8, halo: true });
+
+  p.leyenda([
+    { color: 'modelo', texto: 'acierta el bloque', forma: 'linea' },
+    { color: 'acento', texto: 'la pista está adentro', forma: 'linea', punteada: true },
+    { color: 'verdad', texto: 'el azar', forma: 'linea', punteada: true }
+  ], { pos: 'bd' });
+});
+
+/* --- el panel ---------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La ventana' },
+  { tipo: 'slider', id: 'ventana', etiqueta: 'cuántas fichas mira hacia atrás',
+    sub: 'todo lo anterior, para el modelo, no existe',
+    min: 4, max: CTX_MAX, paso: 4, valor: CTX_MAX, decimales: 0, color: 'parametro' },
+  { tipo: 'medidor', id: 'acc', etiqueta: 'aciertos con esta ventana' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Dónde está la pista' },
+  { tipo: 'botones', id: 'caso', etiqueta: 'el caso', valor: '0',
+    opciones: CASOS.map((c, i) => ({ valor: String(i),
+      texto: c.id === 'cerca' ? 'cerca (≈16 fichas)' : 'lejos (≈70 fichas)' })) },
+  { tipo: 'texto', id: 'explica', html: '' },
+  { tipo: 'boton', texto: 'Ventana al máximo', principal: true,
+    alClic: () => ctl.set('ventana', CTX_MAX) },
+  { tipo: 'boton', texto: 'Romperla (ventana 8)',
+    alClic: () => ctl.set('ventana', 8) },
+  { tipo: 'titulo', texto: 'Y esto para qué te sirve' },
+  { tipo: 'texto', id: 'practica', html:
+    'En un prompt largo, poné las instrucciones importantes <b>al final</b>. ' +
+    'Y si son muy importantes, <b>repetilas</b>. No es superstición: es lo que ' +
+    'estás viendo acá.' }
+], () => { iCaso = +ctl.valores.caso; actualizar(); });
+
+function actualizar() {
+  const c = caso(), e = ejemplo();
+  const k = ctl.valores.ventana;
+  const b = delBarrido(k);
+  const pistaAdentro = pintarTexto(k);
+
+  const caja = document.getElementById('respuesta');
+  caja.textContent = '«' + b.continuacion.slice(0, 26).replace(/\n/g, ' ⏎ ') + '»';
+  caja.className = 'txt ' + (b.acierta ? 'bien' : 'mal');
+  document.getElementById('esperado').textContent =
+    'lo correcto sería «' + e.objetivo.slice(0, 26) + '»';
+  document.getElementById('cartel').hidden = pistaAdentro;
+
+  const punto = c.curva.reduce((a, x) =>
+    Math.abs(x.ventana - k) < Math.abs(a.ventana - k) ? x : a, c.curva[0]);
+  const acc = punto.aciertos / punto.n;
+  ctl.medidor('acc', acc, punto.aciertos + '/' + punto.n);
+
+  ctl.texto('explica', '<b>' + c.titulo + '.</b> ' + c.explicacion);
+  ctl.texto('lectura',
+    (pistaAdentro
+      ? '<b>La pista está adentro de la ventana.</b> '
+      : '<b>La pista quedó afuera.</b> Lo que el modelo escribe ahora es lo ' +
+        '<em>plausible</em> en ese lugar del texto: no tiene con qué saberlo. ') +
+    'Con una ventana de <b>' + punto.ventana + '</b> fichas acierta <b>' +
+    punto.aciertos + ' de ' + punto.n + '</b> casos (' + (acc * 100).toFixed(0) + '%), ' +
+    'contra un ' + (AZAR * 100).toFixed(0) + '% de tirar a la suerte.' +
+    (c.id === 'lejos'
+      ? '<br><br><b>Y acá está lo incómodo:</b> la curva no sube ni cuando la pista ' +
+        'entra. Estar adentro de la ventana <em>no alcanza</em>.' +
+        (b.acierta
+          ? ' (Este ejemplo es <em>uno de los ' + punto.aciertos + ' que sí aciertan</em>. ' +
+            'Por eso miramos la curva sobre ' + punto.n + ' casos y no un caso suelto: ' +
+            'con un ejemplo elegido a dedo se puede demostrar cualquier cosa.)'
+          : '')
+      : ''));
+  p.redibujar();
+}
+
+ctl.disparar();
+Viz.botonTema();
+</script>
+</body>
+</html>

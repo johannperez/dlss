@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One-hot contra embedding — Clase 6</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "Alterná entre «diputados» y «senadores». A la izquierda se
+     mueve el 1 de lugar y nada más: los dos vectores están exactamente igual de
+     lejos. A la derecha el patrón de colores es CASI EL MISMO. Ahora poné
+     «trigo»: a la izquierda pasa exactamente lo mismo que antes; a la derecha
+     cambia todo."
+
+     El número que lo dice: cos(diputados, senadores) = 0,863 ·
+     cos(diputados, trigo) = 0,031. En one-hot las dos distancias son idénticas.
+
+     Datos reales de `medir-embeddings.py` sobre los discursos 1984-2019.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .dos { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.25fr);
+         gap: .9rem; align-items: start; }
+  @media (max-width: 760px) { .dos { grid-template-columns: minmax(0,1fr); } }
+  .caja { background: var(--papel-2); border: 1px solid var(--borde);
+          border-radius: var(--r-medio); padding: .7rem .8rem; }
+  .caja h3 { margin: 0 0 .1em; font-size: 1rem; }
+  .caja .sub { margin: 0 0 .6em; font-size: .8rem; color: var(--tinta-2); }
+
+  /* --- one-hot: la barra larguísima, comprimida --- */
+  .tira { display: flex; height: 34px; border: 1px solid var(--borde);
+          border-radius: var(--r-chico); overflow: hidden; background: var(--papel-3); }
+  .tira > i { display: block; flex: 1 1 0; }
+  .lupa { margin-top: .5rem; display: flex; gap: 2px; }
+  .lupa > i { width: 20px; height: 30px; border-radius: 3px; background: var(--papel-3);
+              display: flex; align-items: center; justify-content: center;
+              font: 700 11px/1 var(--f-mono); color: var(--tinta-3); }
+  .lupa > i.uno { background: var(--c-acento); color: var(--papel); }
+  .regla { font-size: .74rem; color: var(--tinta-3); font-family: var(--f-mono);
+           display: flex; justify-content: space-between; margin-top: .25rem; }
+
+  /* --- embedding: las 100 celdas --- */
+  .celdas { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; }
+  .celdas > i { display: block; padding-top: 100%; border-radius: 2px; }
+
+  .cuenta { font-size: .85rem; margin: .6rem 0 0; color: var(--tinta-2); }
+  .cuenta b { color: var(--tinta); font-family: var(--f-mono); }
+
+  table.dist { width: 100%; border-collapse: collapse; font-size: .82rem; margin-top: .3rem; }
+  table.dist th, table.dist td { padding: .25em .4em; border-bottom: 1px solid var(--borde);
+                                 text-align: right; font-family: var(--f-mono); }
+  table.dist th { color: var(--tinta-3); font-weight: 600; font-size: .74rem; }
+  table.dist td:first-child, table.dist th:first-child { text-align: left; }
+  table.dist td.act { background: var(--c-acento-suave); font-weight: 700; }
+  table.dist td.alto { color: var(--c-ok); font-weight: 700; }
+  table.dist td.bajo { color: var(--c-error); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Dos maneras de escribir una palabra con números</h1>
+    <p>Izquierda: <b>one-hot</b>, un casillero por palabra del vocabulario, todos en
+       cero menos uno. Derecha: <b>embedding</b>, cien números que valen cualquier
+       cosa. Cambiá de palabra con los botones y mirá qué se mueve de cada lado.</p>
+  </header>
+
+  <div>
+    <div class="dos">
+      <div class="caja">
+        <h3>one-hot</h3>
+        <p class="sub">un casillero por cada palabra del vocabulario</p>
+        <div class="tira" id="tira"></div>
+        <div class="regla"><span>0</span><span id="regla-fin"></span></div>
+        <p class="cuenta" style="margin-top:.7rem">Con lupa, alrededor del único 1:</p>
+        <div class="lupa" id="lupa"></div>
+        <p class="cuenta" id="cuenta-oh"></p>
+      </div>
+
+      <div class="caja">
+        <h3>embedding</h3>
+        <p class="sub">100 números, todos distintos de cero, aprendidos del corpus</p>
+        <div class="celdas" id="celdas"></div>
+        <p class="cuenta" id="cuenta-emb"></p>
+      </div>
+    </div>
+
+    <div class="caja" style="margin-top:.9rem">
+      <h3 style="font-size:.92rem">Qué tan parecidas son entre sí, según cada representación</h3>
+      <div id="tabla"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Alterná entre <b>diputados</b> y <b>senadores</b>.
+      A la izquierda el 1 se corre de casillero y <em>nada más</em>. A la derecha el
+      patrón de colores es casi el mismo. Ahora apretá <b>trigo</b>: del lado
+      izquierdo pasa <em>exactamente lo mismo</em> que antes —el 1 se corre—, y del
+      derecho cambia todo. En one-hot, «diputados» está tan lejos de «senadores»
+      como de «trigo»: las dos distancias valen √2, siempre, para cualquier par.
+      En el embedding, una vale <b>0,863</b> y la otra <b>0,031</b>.
+      <em>Ahí está toda la diferencia.</em>
+    </div>
+    <p class="viz-pie">
+      Vectores <b>reales</b>, calculados con coocurrencia + PPMI + SVD sobre 35
+      discursos de apertura de sesiones (Argentina, 1984-2019). Generados por
+      <code>medir-embeddings.py</code>. El vocabulario acá es de 2.000 palabras;
+      en un modelo de verdad son 50.000 o más, y la tira de la izquierda sería
+      25 veces más larga.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-texto.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS_TEXTO.onehot;
+const PAL = D.palabras, VEC = D.vec, ID = D.id, COS = D.coseno;
+const NVOC = D.dim_onehot, NDIM = D.dim_emb;
+
+const tira    = document.getElementById('tira');
+const lupa    = document.getElementById('lupa');
+const celdas  = document.getElementById('celdas');
+const tabla   = document.getElementById('tabla');
+document.getElementById('regla-fin').textContent = (NVOC - 1).toLocaleString('es-AR');
+
+// la tira comprimida: 120 tajaditas, una se prende
+const N_TAJADAS = 120;
+const tajadas = [];
+for (let k = 0; k < N_TAJADAS; k++) {
+  const i = document.createElement('i');
+  tira.appendChild(i); tajadas.push(i);
+}
+// la lupa: 11 casilleros alrededor del 1
+const cajitas = [];
+for (let k = 0; k < 11; k++) {
+  const i = document.createElement('i');
+  lupa.appendChild(i); cajitas.push(i);
+}
+// las 100 celdas del embedding
+const cuadros = [];
+for (let k = 0; k < NDIM; k++) {
+  const i = document.createElement('i');
+  celdas.appendChild(i); cuadros.push(i);
+}
+
+function pintar() {
+  const w = ctl.valores.palabra;
+  const j = PAL.indexOf(w);
+  const id = ID[j];
+  const v = VEC[j];
+
+  // --- one-hot ---
+  const tajadaViva = Math.floor(id / NVOC * N_TAJADAS);
+  tajadas.forEach((el, k) => {
+    el.style.background = k === tajadaViva ? Viz.color('acento') : 'transparent';
+  });
+  const centro = id;
+  cajitas.forEach((el, k) => {
+    const pos = centro - 5 + k;
+    const es1 = pos === centro;
+    el.className = es1 ? 'uno' : '';
+    el.textContent = pos < 0 || pos >= NVOC ? '' : (es1 ? '1' : '0');
+    el.title = 'posición ' + pos;
+  });
+  document.getElementById('cuenta-oh').innerHTML =
+    '<b>' + NVOC.toLocaleString('es-AR') + '</b> números para escribir una palabra, ' +
+    'y <b>' + (NVOC - 1).toLocaleString('es-AR') + '</b> de ellos son cero. ' +
+    'El único 1 está en la posición <b>' + id + '</b>, que es el orden alfabético ' +
+    'de nada: es simplemente el lugar donde quedó esta palabra en la lista.';
+
+  // --- embedding ---
+  const M = Math.max.apply(null, v.map(Math.abs));
+  cuadros.forEach((el, k) => {
+    const t = v[k] / M;                       // −1 .. 1
+    // misma convención que `graficos.grilla_de_filtros` de la clase 5:
+    // azul = negativo · casi blanco = cero · rojo = positivo
+    el.style.background = t >= 0
+      ? Viz.alfa('error',  Math.min(1, .10 + Math.abs(t) * .90))
+      : Viz.alfa('modelo', Math.min(1, .10 + Math.abs(t) * .90));
+    el.title = 'dimensión ' + k + ': ' + v[k];
+  });
+  const vecinas = window.DATOS_TEXTO.onehot.vecinos[w] || [];
+  document.getElementById('cuenta-emb').innerHTML =
+    '<b>' + NDIM + '</b> números, ninguno cero. ' +
+    '<span class="c-error">Rojo</span> es positivo, ' +
+    '<span class="c-modelo">azul</span> negativo, más fuerte = más grande ' +
+    '(la misma convención que los filtros de la clase 5). ' +
+    '<b>Ninguna dimensión suelta significa nada</b>: lo que significa es el patrón entero.' +
+    (vecinas.length
+      ? '<br>Las palabras que más se le parecen: <b>' +
+        vecinas.slice(0, 4).map(x => x[0]).join('</b>, <b>') + '</b>.'
+      : '');
+
+  // --- la tabla de parecidos ---
+  let html = '<table class="dist"><tr><th>parecido con…</th>' +
+    '<th>one-hot</th><th>embedding</th></tr>';
+  PAL.forEach((otra, k) => {
+    if (k === j) return;
+    const c = COS[j][k];
+    const clase = c > .4 ? 'alto' : (c < .15 ? 'bajo' : '');
+    html += '<tr><td>' + otra + '</td>' +
+            '<td>0.000</td>' +
+            '<td class="' + clase + '">' + Viz.num(c, 3) + '</td></tr>';
+  });
+  html += '</table><p class="cuenta">En one-hot <b>todos</b> los pares dan lo mismo: ' +
+    'coseno 0, distancia √2. No hay grados. Para ese esquema, «' + w + '» es ' +
+    'igual de distinta de todas las palabras del idioma, y eso es falso.</p>';
+  tabla.innerHTML = html;
+
+  ctl.texto('lectura',
+    'Estás viendo <b>«' + w + '»</b>. Cambiá de palabra y mirá los DOS lados a la vez: ' +
+    'a la izquierda siempre pasa lo mismo, a la derecha pasa algo distinto cada vez.');
+}
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué palabra mirar' },
+  { tipo: 'botones', id: 'palabra', etiqueta: 'la palabra', valor: PAL[0],
+    opciones: PAL.map(w => ({ valor: w, texto: w })) },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'La cuenta que importa' },
+  { tipo: 'texto', id: 'compara', html:
+    'Con este vocabulario de <b>' + NVOC.toLocaleString('es-AR') + '</b> palabras:<br>' +
+    '· one-hot ocupa <b>' + NVOC.toLocaleString('es-AR') + '</b> números por palabra<br>' +
+    '· el embedding ocupa <b>' + NDIM + '</b><br>' +
+    'Son <b>' + Math.round(NVOC / NDIM) + ' veces</b> menos. Y sin embargo el chiquito ' +
+    'sabe más, porque los números <em>dicen algo</em>.' }
+], () => pintar());
+
+pintar();
+Viz.botonTema();
+</script>
+</body>
+</html>

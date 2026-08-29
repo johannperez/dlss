@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La matriz de atención: qué suma 1 y qué no — Clase 7</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "las FILAS suman 1,00 siempre. Las columnas suman cualquier
+     cosa. O sea: cada palabra reparte su propio 100%, pero nada obliga a que
+     una palabra sea mirada en total 100%. Estaba leyendo el heatmap al revés."
+
+     Segundo aha, con el slider de posición: cuando el modelo está escribiendo
+     la palabra 7, sólo existen 7 columnas. Las de la derecha todavía no
+     pasaron. El triángulo no es un adorno: es el paso del tiempo.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  /* curso.css no declara `box-sizing: border-box` global, así que el padding de
+     .viz-frame y .panel se suma POR FUERA del ancho de su columna y el dibujo
+     termina tapándole el borde izquierdo al panel (se ve sobre todo embebido en
+     una slide, que es más angosto). Arreglo local, sin tocar el CSS compartido. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
+  #mapa { overflow-x: auto; }
+  table.matriz-at { border-collapse: collapse; font-size: 11px; margin: 0 auto; }
+  table.matriz-at th {
+    color: var(--tinta-2); font-weight: 500; border: none; padding: 3px 5px;
+    font-family: var(--f-texto); white-space: nowrap;
+  }
+  table.matriz-at th.col { writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px 1px; }
+  table.matriz-at th.fila { text-align: right; }
+  table.matriz-at th.rot {
+    font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-3);
+  }
+  table.matriz-at td { border: 1px solid var(--borde); padding: 0; }
+  table.matriz-at td.celda { cursor: crosshair; }
+  table.matriz-at td.suma {
+    border: none; font-family: var(--f-mono); font-size: 10.5px;
+    text-align: center; color: var(--tinta-2); padding: 0 5px; white-space: nowrap;
+  }
+  table.matriz-at td.suma.uno { color: var(--c-ok); font-weight: 700; }
+  table.matriz-at td.suma.varia { color: var(--c-error); font-weight: 700; }
+  table.matriz-at tr.resaltada th.fila { color: var(--c-acento); font-weight: 700; }
+  table.matriz-at .apagada { opacity: .28; }
+  .lectura-mapa {
+    margin: .6rem 0 0; min-height: 2.6em; font-size: .88rem; line-height: 1.45;
+    background: var(--papel); border: 1px dashed var(--borde-fuerte);
+    border-radius: var(--r-medio); padding: .5rem .7rem; color: var(--tinta-2);
+  }
+  .lectura-mapa b { color: var(--tinta); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La matriz de atención (y cómo se lee sin equivocarse)</h1>
+    <p>Cada <b>fila</b> es una palabra que pregunta. Cada <b>columna</b> es una palabra
+       mirada. Pasá el mouse por una celda. Y prestale atención a los dos números que
+       están al borde: la suma de cada fila y la suma de cada columna.</p>
+  </header>
+
+  <div class="viz-frame" style="padding:12px">
+    <div id="mapa"></div>
+    <div class="lectura-mapa" id="lectura-mapa">
+      Pasá el mouse por una celda.
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> La columna verde de la derecha dice <b>1,00</b> en todas
+      las filas, siempre, pase lo que pase. La fila roja de abajo dice cualquier cosa:
+      hay palabras miradas por todo el mundo (suman 4 o 5) y palabras que casi nadie mira
+      (0,3). <em>Cada palabra reparte su propio 100%; nadie garantiza que a vos te miren.</em>
+      Si leíste alguna vez una matriz de adyacencia de una red de citas, es exactamente lo
+      mismo: que A cite a B no implica que B cite a A.
+      <br>Ahora movés <b>«hasta qué palabra escribió»</b>: cuando el modelo va por la
+      palabra 5, sólo existen 5 columnas. El triángulo no es un adorno de diseño, es el
+      paso del tiempo.
+    </div>
+    <p class="viz-pie">
+      Pesos reales de un transformer de <span id="pie-param">—</span> parámetros entrenado
+      sobre los discursos de apertura de sesiones (1984-2019). Al apagar la máscara se
+      muestran <b>los mismos puntajes sin tapar el futuro</b>: el modelo nunca los usó
+      así — se entrenó siempre con la máscara puesta —, están para que se vea qué tapa.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-atencion.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = DATOS_ATENCION;
+
+const estado = { oracion: 0, capa: 1, cabeza: 0, mascara: true, pos: 0, numeros: false };
+
+const opcionesOracion = D.oraciones.map((o, i) => ({ valor: String(i), texto: o.fenomeno }));
+const opcionesCabeza = [];
+D.cabezas.forEach((fila, c) => fila.forEach((h, i) =>
+  opcionesCabeza.push({ valor: c + ':' + i,
+                        texto: 'bloque ' + (c + 1) + ' · cabeza ' + (i + 1) })));
+
+function oracion() { return D.oraciones[estado.oracion]; }
+function fichas() { return oracion().fichas; }
+function matrizCompleta() {
+  const f = estado.mascara ? oracion().atencion : oracion().atencion_sin_mascara;
+  return f[estado.capa][estado.cabeza];
+}
+
+/* ===========================================================================
+   La tabla. La escribimos a mano (en vez de Viz.matrizCalor) porque acá el
+   contenido pedagógico son las DOS SUMAS del borde, y para eso tienen que
+   estar alineadas con sus filas y columnas.
+   =========================================================================== */
+function dibujar() {
+  const A = matrizCompleta(), fs = fichas();
+  const n = fs.length;
+  const hasta = estado.mascara ? estado.pos : n;   // sin máscara no hay "todavía no pasó"
+  const pal = Viz.paleta('acento');
+
+  const cont = document.getElementById('mapa');
+  cont.innerHTML = '';
+  const t = document.createElement('table');
+  t.className = 'matriz-at';
+
+  // --- encabezado: las palabras miradas ---
+  const thead = t.createTHead();
+  const tr0 = thead.insertRow();
+  const esquina = document.createElement('th');
+  esquina.className = 'rot';
+  esquina.textContent = 'mira ↓ / mirada →';
+  tr0.appendChild(esquina);
+  for (let c = 0; c < n; c++) {
+    const th = document.createElement('th');
+    th.className = 'col' + (c >= hasta ? ' apagada' : '');
+    th.textContent = fs[c];
+    tr0.appendChild(th);
+  }
+  const thSum = document.createElement('th');
+  thSum.className = 'rot'; thSum.textContent = 'Σ fila';
+  tr0.appendChild(thSum);
+
+  // --- cuerpo ---
+  const tb = t.createTBody();
+  const celdas = [];
+  for (let f = 0; f < n; f++) {
+    const tr = tb.insertRow();
+    if (f >= hasta) tr.className = 'apagada';
+    const th = document.createElement('th');
+    th.className = 'fila'; th.textContent = fs[f];
+    tr.appendChild(th);
+    let suma = 0;
+    for (let c = 0; c < n; c++) {
+      const td = tr.insertCell();
+      const dentro = f < hasta && c < hasta;
+      const v = A[f][c];
+      if (dentro) suma += v;
+      td.className = 'celda' + (dentro ? '' : ' apagada');
+      td.style.width = '30px'; td.style.height = '26px';
+      td.style.background = dentro ? pal(Math.min(1, v * 1.6)) : 'transparent';
+      if (estado.numeros && dentro && v >= 0.005) {
+        td.textContent = Viz.num(v, 2).replace('0.', '.');
+        td.style.textAlign = 'center';
+        td.style.fontFamily = Viz.colores().mono;
+        td.style.fontSize = '9.5px';
+        td.style.color = v > .45 ? Viz.color('papel') : Viz.color('tinta');
+      }
+      td.dataset.f = f; td.dataset.c = c;
+      celdas.push(td);
+      td.addEventListener('mouseenter', () => resaltar(f, c, v, dentro));
+    }
+    const tds = document.createElement('td');
+    tds.className = 'suma' + (f < hasta ? ' uno' : '');
+    tds.textContent = f < hasta ? Viz.num(suma, 2) : '—';
+    tr.appendChild(tds);
+  }
+
+  // --- última fila: la suma de cada columna ---
+  const trS = tb.insertRow();
+  const thS = document.createElement('th');
+  thS.className = 'fila rot'; thS.textContent = 'Σ columna';
+  trS.appendChild(thS);
+  for (let c = 0; c < n; c++) {
+    let s = 0;
+    for (let f = 0; f < hasta; f++) if (c < hasta) s += A[f][c];
+    const td = trS.insertCell();
+    td.className = 'suma' + (c < hasta ? ' varia' : '');
+    td.textContent = c < hasta ? Viz.num(s, 2) : '—';
+  }
+  trS.insertCell().className = 'suma';
+
+  cont.appendChild(t);
+
+  t.addEventListener('mouseleave', () => {
+    celdas.forEach(o => { o.style.outline = 'none'; });
+    document.getElementById('lectura-mapa').innerHTML =
+      'Pasá el mouse por una celda.';
+  });
+
+  function resaltar(f, c, v, dentro) {
+    celdas.forEach(o => {
+      const mismo = (+o.dataset.f === f || +o.dataset.c === c);
+      o.style.outline = mismo ? '2px solid ' + Viz.color('acento') : 'none';
+      o.style.outlineOffset = '-2px';
+    });
+    const caja = document.getElementById('lectura-mapa');
+    if (!dentro) {
+      caja.innerHTML = estado.mascara
+        ? 'Esa celda está <b>tapada</b>: «' + fs[f] + '» todavía no puede mirar a ' +
+          '«' + fs[c] + '», porque «' + fs[c] + '» viene después. Espiar el futuro ' +
+          'sería hacer trampa.'
+        : 'Esa celda todavía no entra en el recorte de arriba.';
+      return;
+    }
+    let sumaF = 0, sumaC = 0;
+    for (let j = 0; j < hasta; j++) sumaF += A[f][j];
+    for (let i = 0; i < hasta; i++) sumaC += A[i][c];
+    caja.innerHTML =
+      '«<b>' + fs[f] + '</b>» le presta <b>' + Math.round(v * 100) + '%</b> de su ' +
+      'atención a «<b>' + fs[c] + '</b>».<br>' +
+      '<span style="font-size:.92em">La fila de «' + fs[f] + '» suma <b>' +
+      Viz.num(sumaF, 2) + '</b> (siempre 1). La columna de «' + fs[c] + '» suma <b>' +
+      Viz.num(sumaC, 2) + '</b> (lo que salga). Esa asimetría es todo el asunto.</span>';
+  }
+}
+
+/* ===========================================================================
+   Panel
+   =========================================================================== */
+const n0 = D.oraciones[0].fichas.length;
+estado.pos = n0;
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El mapa' },
+  { tipo: 'select', id: 'oracion', etiqueta: 'oración (del corpus real)',
+    opciones: opcionesOracion, valor: '0' },
+  { tipo: 'select', id: 'cabeza', etiqueta: 'qué cabeza mira',
+    opciones: opcionesCabeza, valor: '1:0' },
+  { tipo: 'checkbox', id: 'mascara', etiqueta: 'máscara causal (no espiar el futuro)',
+    valor: true },
+  { tipo: 'slider', id: 'pos', etiqueta: 'hasta qué palabra escribió',
+    sub: 'lo que existe cuando el modelo va por ahí',
+    min: 1, max: n0, paso: 1, valor: n0, decimales: 0, color: 'acento' },
+  { tipo: 'checkbox', id: 'numeros', etiqueta: 'mostrar los números en las celdas',
+    valor: false },
+  { tipo: 'texto', id: 'estado', html: '' }
+], (v, id) => {
+  if (id === 'oracion') {
+    estado.oracion = +v.oracion;
+    const n = fichas().length;
+    const nodo = ctl.nodos.pos.input;
+    nodo.max = n;
+    ctl.set('pos', n, true);
+    estado.pos = n;
+  }
+  if (id === 'cabeza') {
+    const p = v.cabeza.split(':');
+    estado.capa = +p[0]; estado.cabeza = +p[1];
+  }
+  estado.mascara = v.mascara;
+  estado.numeros = v.numeros;
+  estado.pos = Math.min(v.pos, fichas().length);
+  actualizar();
+});
+
+function actualizar() {
+  dibujar();
+  const info = D.cabezas[estado.capa][estado.cabeza];
+  const n = fichas().length;
+  ctl.texto('estado',
+    '<b>Esta cabeza:</b> ' + info.titulo + '.<br>' +
+    (estado.mascara
+      ? (estado.pos < n
+        ? 'El modelo va por la palabra <b>' + estado.pos + '</b> de ' + n +
+          ': existen ' + estado.pos + ' columnas, no ' + n + '.'
+        : 'Triángulo completo: la última palabra ya puede mirar a todas las anteriores.')
+      : '<span class="c-error">Máscara apagada.</span> Cada palabra ve también lo que ' +
+        'viene después. Un modelo que genera texto entrenado así <b>no aprende a ' +
+        'predecir: aprende a copiar</b>.'));
+}
+
+document.getElementById('pie-param').textContent =
+  D.meta.parametros.toLocaleString('es-AR');
+actualizar();
+Viz.botonTema();
+new MutationObserver(() => { Viz.recargarColores(); actualizar(); })
+  .observe(document.documentElement, { attributes: true, attributeFilter: ['data-tema'] });
+</script>
+</body>
+</html>

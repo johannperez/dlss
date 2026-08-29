@@ -16,6 +16,12 @@
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
 <style>
+  /* `.viz-frame` de curso.css es width:100% y el navegador no tiene box-sizing
+     global, asi que cualquier padding propio la hace 30px mas ancha que su
+     columna y se le monta encima al panel. Se arregla local, sin tocar el CSS
+     compartido que usan las otras nueve clases. */
+  .viz-frame { box-sizing: border-box; }
+
   .tres { display:grid; grid-template-columns: 1fr 190px 1fr; gap:14px; align-items:start; }
   .tres figure { margin:0; }
   .tres figcaption {

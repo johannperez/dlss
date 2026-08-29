@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 10 — Criterio: validez, sesgo, reproducibilidad y el revisor 2 | Deep Learning para Cientistas Sociales</title>
+
+<!-- ==========================================================================
+     CLASE 10 — la última. 40 slides para 120 minutos.
+     Todos los números que aparecen acá salen de medir-clase10.py corriendo
+     sobre los datos reales del curso, y son los mismos que produce el
+     notebook. Si cambiás el notebook, volvé a correr el script y actualizá
+     las slides: un número inventado en un curso sobre no inventar números
+     es el peor error posible.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  .reveal .numeron { font-family: var(--f-mono); font-size: 2.6em; font-weight: 700;
+                     line-height: 1; display: block; }
+  .reveal .panel-metricas { display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: .8rem; margin: .7em 0; }
+  .reveal .panel-metricas > div { background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .6rem .5rem; text-align: center; }
+  .reveal .panel-metricas .et { display: block; font-size: .62em; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--tinta-3); margin-top: .25em; }
+  .reveal .lista-numerada { counter-reset: paso; list-style: none; margin-left: 0; }
+  .reveal .lista-numerada > li { counter-increment: paso; position: relative;
+    padding-left: 2.1em; margin: .5em 0; }
+  .reveal .lista-numerada > li::before {
+    content: counter(paso); position: absolute; left: 0; top: -.05em;
+    width: 1.5em; height: 1.5em; border-radius: 50%;
+    background: var(--c-acento); color: var(--papel);
+    font-family: var(--f-mono); font-weight: 700; font-size: .8em;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .reveal table.compacta { font-size: .62em; }
+  .reveal .mapa-curso { display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: .5rem; margin: .6em 0; font-size: .72em; }
+  .reveal .mapa-curso > div { background: var(--papel-2); border: 1px solid var(--borde);
+    border-top: 3px solid var(--c-modelo); border-radius: var(--r-chico); padding: .4rem .5rem; }
+  .reveal .mapa-curso > div b { display: block; color: var(--c-acento);
+    font-family: var(--f-mono); font-size: .85em; }
+  .reveal .mapa-curso > div.hoy { border-top-color: var(--c-error); background: var(--c-error-suave); }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ======================= 1 · PORTADA ======================= -->
+<section class="portada">
+  <p class="num-clase">Clase 10 — la última</p>
+  <h1>Criterio: validez, sesgo, reproducibilidad<br>y el revisor 2</h1>
+  <div class="franja"></div>
+  <p class="gancho">Hacer andar el modelo es lo fácil y lo barato.
+    Demostrar <em>qué es lo que mide</em> es el trabajo profesional, y es tuyo.</p>
+  <aside class="notes">
+    2 min. No arranques con el temario. Arrancá diciendo: «si este curso tuviera una sola
+    clase, sería esta. Las nueve anteriores existen para que hoy podamos discutir con
+    autoridad». Y avisá que hoy no entrenamos nada: hoy auditamos.
+  </aside>
+</section>
+
+<!-- ======================= 2 · DE DÓNDE VENIMOS ======================= -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">Diez clases en cinco viñetas.</p>
+  <ul>
+    <li>Clases 1-4: una función es una <strong>máquina con perillas</strong>, y girarlas
+        sola cuesta abajo es todo el aprendizaje automático.</li>
+    <li>Clases 5-8: la arquitectura es un <strong>conjunto de supuestos</strong> sobre
+        cómo es el mundo. Convoluciones, embeddings, attention, un GPT que escribimos.</li>
+    <li>Clase 9: bajaste un modelo que entrenó otro, lo aplicaste a tu corpus, y al final
+        encontraste algo incómodo: <strong>la fuente predecía la etiqueta al 96 %</strong>.</li>
+    <li class="fragment">Ahí terminamos: con un F1 lindo y una sospecha.</li>
+    <li class="fragment"><strong>Hoy la sospecha se convierte en método.</strong></li>
+  </ul>
+  <aside class="notes">
+    3 min. Preguntá al aula: «¿alguien se acuerda qué aprendió el detector de noticias falsas
+    de la clase pasada?». Respuesta esperada: a reconocer sitios de sátira. Si nadie se acuerda,
+    recordáselo vos en diez segundos: es el puente entero de la clase.
+  </aside>
+</section>
+
+<!-- ======================= 3 · EL HALLAZGO ======================= -->
+<section>
+  <h2>Miren este resultado</h2>
+  <p class="bajada">Clasificador de «esta nota de prensa es sobre política».
+    1471 notas reales en castellano. 368 casos de test que el modelo nunca vio.</p>
+  <div class="panel-metricas">
+    <div><span class="numeron c-ok">0,83</span><span class="et">accuracy</span></div>
+    <div><span class="numeron c-modelo">0,73</span><span class="et">precisión</span></div>
+    <div><span class="numeron c-modelo">0,64</span><span class="et">recall</span></div>
+    <div><span class="numeron c-modelo">0,68</span><span class="et">F1</span></div>
+  </div>
+  <p>Y las cuatro frases en castellano se pueden decir en voz alta:
+    <em>«de cada 100 notas que el modelo llamó política, <strong>73</strong> lo eran.
+    De cada 100 que lo eran, encontró <strong>64</strong>».</em>
+    El piso —decir siempre «no»— da 0,72: le ganamos por <strong>+0,11</strong>.</p>
+  <p class="c-acento"><strong>¿Alguien tiene una objeción? Esto se publica.</strong></p>
+  <aside class="notes">
+    3 min, y son los tres minutos que arman la clase. Mostrá el panel, dejá el silencio, y
+    preguntá literalmente «¿alguien tiene una objeción?». Van a decir cosas razonables
+    (¿cuál es el piso? ¿cómo partieron?) y todas están contestadas. Ese es el punto:
+    <b>con este panel adelante, un revisor razonable lo aprueba.</b> No pases de slide hasta
+    que alguien diga «se ve bien».
+  </aside>
+</section>
+
+<!-- ======================= 4 · EL PLIEGUE ======================= -->
+<section>
+  <span class="marca">el pliegue</span>
+  <h3>Ahora mirá qué está usando</h3>
+  <p class="bajada">Los términos con más peso, leídos directamente de los coeficientes.</p>
+  <table class="compacta">
+    <tr><th>peso</th><th>término</th><th>peso</th><th>término</th><th>peso</th><th>término</th><th>peso</th><th>término</th></tr>
+    <tr><td>+1,10</td><td>presidencial</td><td class="c-error">+0,74</td><td class="c-error">lópez</td><td>+0,69</td><td>federal</td><td class="c-error">+0,66</td><td class="c-error">morena</td></tr>
+    <tr><td class="c-error">+0,92</td><td class="c-error">pri</td><td class="c-error">+0,73</td><td class="c-error">meade</td><td>+0,67</td><td>país</td><td>+0,65</td><td>ejecutivo</td></tr>
+    <tr><td>+0,86</td><td>caso</td><td>+0,70</td><td>políticos</td><td class="c-error">+0,67</td><td class="c-error">amlo</td><td>+0,64</td><td>candidato</td></tr>
+    <tr><td>+0,84</td><td>gobierno</td><td>+0,70</td><td>presidente</td><td>+0,67</td><td>va</td><td>+0,62</td><td>gobernador</td></tr>
+  </table>
+  <div class="ojo compacta">
+    En <span class="c-error">rojo</span>: <strong>nombres propios</strong> de la política
+    mexicana de 2018-2021. Casi la mitad del top 20.
+  </div>
+  <p>Este no es un detector de «política». Es un detector de
+    <strong>¿aparecen nombres de la coyuntura mexicana reciente?</strong></p>
+  <aside class="notes">
+    3 min. Leé los términos en voz alta, despacio. Que el aula escuche «pri, lópez, meade,
+    amlo, morena». Preguntá: «¿esto es una señal del concepto o es una guía telefónica?».
+    No des vos la conclusión: dejá que la digan.
+  </aside>
+</section>
+
+<!-- ======================= 5 · EL SEGUNDO PLIEGUE ======================= -->
+<section>
+  <span class="marca">el segundo pliegue</span>
+  <h3>Y ahora el golpe</h3>
+  <p>Agarramos <strong>600 fragmentos de discursos presidenciales argentinos</strong>
+     (2015-2024, reales) y se los damos al mismo modelo, sin tocarle nada.
+     Son, por definición, <strong>100 % política</strong>.</p>
+  <div class="comparacion contra">
+    <div>
+      <h4>En su propio test</h4>
+      <p><span class="numeron">64</span> de cada 100 notas de política encontradas.</p>
+    </div>
+    <div>
+      <h4>En un corpus 100 % político</h4>
+      <p><span class="numeron">21</span> de cada 100. <em>Tendría que dar 100.</em></p>
+    </div>
+  </div>
+  <div class="aha compacta">
+    El modelo no cambió ni una coma. Cambió <strong>dónde lo medimos</strong>.
+  </div>
+  <aside class="notes">
+    2 min. Este es el momento de la clase. Dejá tres segundos de silencio después de mostrar
+    el 21. Si alguien dice «pero eso es porque es otro país», tenés razón y ese ES el hallazgo:
+    el modelo mide vocabulario de una coyuntura, y por eso no sirve para comparar corpus.
+  </aside>
+</section>
+
+<!-- ======================= 6 · EL MODELO NO FALLÓ ======================= -->
+<section>
+  <h2>El modelo no falló</h2>
+  <div class="intuicion">
+    Hizo <strong>exactamente</strong> lo que le pedimos: separar dos montones de textos con
+    la mayor exactitud posible. Y lo hizo bien. Lo que falló es la
+    <strong>etiqueta sustantiva que le colgamos encima</strong>: la frase «esto mide contenido
+    político» que escribimos al lado del número.
+  </div>
+  <p>Y por eso <strong>no se arregla con más datos ni con un modelo mejor</strong>. Un
+     transformer entrenado sobre el mismo corpus con las mismas etiquetas aprendería el mismo
+     atajo, más rápido y con un F1 más alto.</p>
+  <p class="c-acento"><strong>Este es el error que vamos a atacar hoy.</strong></p>
+  <aside class="notes">
+    2 min. Insistí con esto porque es contraintuitivo: la reacción natural del aula es
+    «entonces hay que usar un modelo mejor». No. El problema no está en el modelo, está en
+    la inferencia. Un modelo mejor lo empeora, porque encuentra el atajo más rápido.
+  </aside>
+</section>
+
+<!-- ======================= 7 · DOS PREGUNTAS ======================= -->
+<section>
+  <h2>Dos preguntas que se parecen y no son la misma</h2>
+  <div class="comparacion">
+    <div>
+      <h4>¿Acierta?</h4>
+      <p><strong>Desempeño.</strong> Se mide con precisión, recall, F1, matriz de confusión.
+        Es lo de la clase 9, y hay bibliotecas que te lo calculan.</p>
+      <p class="c-modelo"><em>Pregunta cerrada, respuesta numérica.</em></p>
+    </div>
+    <div>
+      <h4>¿Mide lo que digo que mide?</h4>
+      <p><strong>Validez.</strong> No hay ninguna métrica que te la dé. Se demuestra con
+        <strong>intervenciones</strong>: le hacés cosas a los datos y al diseño, y mirás si
+        el número sobrevive.</p>
+      <p class="c-error"><em>Pregunta abierta, respuesta argumentativa.</em></p>
+    </div>
+  </div>
+  <p>Un modelo puede tener <strong>desempeño perfecto y validez nula</strong>. Acabamos de ver uno.</p>
+  <aside class="notes">
+    2 min. La frase que hay que dejar clavada: «la métrica te dice que el modelo reproduce
+    tus etiquetas. No te dice nada sobre si tus etiquetas miden tu concepto». Repetila dos veces.
+  </aside>
+</section>
+
+<!-- ======================= 8 · USTEDES TIENEN VENTAJA ======================= -->
+<section>
+  <h2>Y acá ustedes tienen ventaja</h2>
+  <p class="bajada">Esto no es vocabulario nuevo. Es el de ustedes.</p>
+  <div class="tarjetas cuatro">
+    <div><h4>de constructo</h4>¿la cosa que medís es la cosa de la que hablás?</div>
+    <div><h4>de contenido</h4>¿cubre todas las dimensiones del concepto?</div>
+    <div><h4>externa</h4>¿funciona fuera de donde lo hiciste?</div>
+    <div><h4>criterial</h4>¿coincide con una medida independiente?</div>
+  </div>
+  <div class="ss">
+    Cronbach &amp; Meehl, <em>Construct Validity in Psychological Tests</em>, <strong>1955</strong>.
+    Setenta años. La literatura técnica lo está redescubriendo ahora, con otros nombres y peor.
+    Jacobs &amp; Wallach (2021) escribieron el puente explícito, y son gente del campo técnico.
+  </div>
+  <p class="c-acento"><strong>Esto que ustedes van a decir en una reunión con ingenieros no lo
+    va a poder decir nadie más en esa sala. Y vale más que saber PyTorch.</strong></p>
+  <aside class="notes">
+    3 min. Decilo con todas las letras y sin falsa modestia: en esta discusión la disciplina
+    de ellos tiene ventaja sobre la formación técnica. Les sube la autoridad y les cambia la
+    relación con la herramienta, que es media clase. Si hay gente de metodología en el aula,
+    pedile que cuente cómo se valida una escala de actitudes: es exactamente esto.
+  </aside>
+</section>
+
+<!-- ======================= 9 · VALIDEZ DE CONSTRUCTO ======================= -->
+<section>
+  <h3>Validez de constructo, dibujada</h3>
+  <div class="comparacion">
+    <div>
+      <h4>El concepto</h4>
+      <p style="font-size:1.15em">«contenido político»</p>
+      <p>Vive en tu marco teórico. Tiene bordes discutibles y una literatura atrás.</p>
+    </div>
+    <div>
+      <h4>La medida</h4>
+      <p style="font-size:1.15em">un clasificador con 6.534 pesos</p>
+      <p>Vive en tu computadora. Devuelve un número entre 0 y 1.</p>
+    </div>
+  </div>
+  <div class="ojo">
+    <strong>Entre los dos hay un abismo, y llenarlo es tu trabajo.</strong> No el del modelo,
+    no el de la biblioteca, no el del revisor. Todo el resto de la clase son
+    <em>procedimientos para medir ese abismo</em>.
+  </div>
+  <aside class="notes">
+    2 min. Dibujá en el pizarrón dos círculos y la brecha entre ellos; es la figura entera de
+    la clase. Preguntá: «¿cómo demostrarías que una escala de anomia mide anomia?». Las
+    respuestas que den son, literalmente, los cinco procedimientos que vienen.
+  </aside>
+</section>
+
+<!-- ======================= 10 · VIZ 1 ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Tres casos donde la métrica es buena y la conclusión es falsa</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/validez-de-constructo.html" title="tres casos de validez de constructo" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> apretá <em>aplicar el arreglo</em> en cada caso.
+    En el 1 el número se derrumba al medirlo donde se usa; en el 2 el arreglo
+    <strong>no existe</strong> con esos datos; en el 3 la medida no distinguía dos corpus opuestos.</p>
+  <aside class="notes">
+    8 min. Recorré los tres vos, sin apuro, y en cada uno pedí que apuesten antes de apretar
+    «aplicar el arreglo». Caso 2 es el más difícil y el más valioso: Macri habla 2015-2019,
+    Fernández 2020-2023, cero años compartidos. Preguntá «¿cómo lo arreglarían?» y dejá que
+    propongan; después mostrá que ninguna propuesta funciona con esos datos y que <b>lo único
+    honesto es escribirlo en el paper</b>. Eso es una lección de honestidad metodológica que
+    no se enseña en ningún tutorial.
+  </aside>
+</section>
+
+<!-- ======================= 11 · CONTENIDO Y EXTERNA ======================= -->
+<section>
+  <h3>Las otras dos, en treinta segundos cada una</h3>
+  <div class="comparacion">
+    <div>
+      <h4>Validez de contenido</h4>
+      <p>¿Tu medida cubre <strong>todas</strong> las dimensiones del concepto, o sólo la más
+        fácil de detectar?</p>
+      <p class="c-error">Si «polarización» incluye tono, contenido y estructura de la
+        interacción, y tu modelo sólo ve tono: medís un tercio y lo llamás por el nombre
+        completo.</p>
+    </div>
+    <div>
+      <h4>Validez externa</h4>
+      <p>¿Funciona fuera del corpus, del período y del país donde lo entrenaste?</p>
+      <p class="c-error">El corpus de entrenamiento <strong>es tu muestra</strong>. Todo lo
+        que saben sobre generalizar desde una muestra aplica igual, sin cambiar una coma.</p>
+    </div>
+  </div>
+  <div class="ss compacta">
+    Y ojo con el reflejo automático de decir «entonces uso un corpus más grande». Más datos
+    del <em>mismo</em> lugar no compran validez externa: compran precisión sobre ese lugar.
+  </div>
+  <aside class="notes">
+    2 min. La frase «el corpus de entrenamiento es su muestra» suele producir una cara de
+    alivio en el aula: de golpe todo lo que saben de muestreo vuelve a servir. Aprovechala.
+  </aside>
+</section>
+
+<!-- ======================= 12 · LAS CINCO ======================= -->
+<section>
+  <span class="marca">fotografíen esta</span>
+  <h2>Cómo se valida, en la práctica</h2>
+  <ol class="lista-numerada">
+    <li><strong>La muestra leída a mano.</strong> 100-200 casos, estratificados por la
+        predicción del modelo, etiquetados a ciegas.</li>
+    <li><strong>El análisis de los falsos positivos.</strong> Leer 30 errores, uno por uno,
+        y armar una tipología.</li>
+    <li><strong>El test de placebo</strong> (y su hermano, el <strong>control positivo</strong>).</li>
+    <li><strong>Los casos límite construidos a mano.</strong> Pares mínimos: la misma oración
+        cambiando una cosa.</li>
+    <li><strong>La validación externa.</strong> Contrastar con una medida independiente.</li>
+  </ol>
+  <p class="c-acento"><strong>Ninguno es opcional en un paper serio. Y ninguno necesita
+    aprender nada nuevo: son diseño de investigación.</strong></p>
+  <aside class="notes">
+    2 min. Decí «esta es la slide que se fotografía» y esperá tres segundos a que la
+    fotografíen. En serio: funciona y fija la lista. Aclarar que los cinco se <b>diseñan
+    antes de entrenar</b>, no después. Es la confusión número uno.
+  </aside>
+</section>
+
+<!-- ======================= 13 · MUESTRA A MANO ======================= -->
+<section>
+  <h3>1 · La muestra leída a mano</h3>
+  <p><strong>100 a 200 casos</strong>, elegidos al azar pero <strong>estratificados por la
+     predicción del modelo</strong> (tantos que el modelo dijo que sí, tantos que dijo que no),
+     leídos y etiquetados <strong>a ciegas</strong> por vos.</p>
+  <div class="comparacion">
+    <div><h4>Cuánto cuesta</h4><p>200 casos × 30 segundos ≈ <strong>1,7 horas</strong>.
+      Más un 20 % doblemente codificado para poder reportar acuerdo: 20 minutos más.</p></div>
+    <div><h4>Qué comprás</h4><p>El derecho a decir cualquier cosa sobre las 40.000 restantes.
+      Sin esto, tu F1 mide acuerdo con quien etiquetó el corpus, no validez.</p></div>
+  </div>
+  <div class="ss compacta">Es la parte cara y es la que hace investigación. Nadie publicaría
+    un análisis de contenido sin haber leído nada.</div>
+  <aside class="notes">
+    2 min. Preguntá: «¿cuántas horas de codificación pueden pagar en su proyecto?». La
+    respuesta suele ser «ninguna», y ahí conviene decir que 1,7 horas no es «ninguna»:
+    es una tarde. La objeción real casi nunca es el tiempo, es que da miedo mirar.
+  </aside>
+</section>
+
+<!-- ======================= 14 · FALSOS POSITIVOS ======================= -->
+<section>
+  <h3>2 · Los falsos positivos son donde está el conocimiento</h3>
+  <p class="bajada">Los aciertos no enseñan nada: el modelo hizo lo que esperabas.</p>
+  <table class="compacta">
+    <tr><th>score</th><th>tema real</th><th>titular</th></tr>
+    <tr><td>0,99</td><td>Sociedad</td><td>Feministas protestan frente a Palacio Nacional contra candidatura de F…</td></tr>
+    <tr><td>0,95</td><td>Covid-19</td><td>España inyectará 13.380 millones de dólares para apoyar a empresas…</td></tr>
+    <tr><td>0,94</td><td>Sociedad</td><td>Abuelas que cuidan a sus nietos pueden solicitar apoyo alimentario</td></tr>
+    <tr><td>0,89</td><td>Deporte</td><td>Profeco advierte de fraude en boletos para el Mundial</td></tr>
+    <tr><td>0,72</td><td>Internacional</td><td>Joe Biden gana oficialmente la elección presidencial al obtener votos…</td></tr>
+  </table>
+  <div class="aha compacta">
+    Leelos otra vez. <strong>¿Cuántos de esos son errores del modelo?</strong> Una protesta
+    feminista frente a Palacio Nacional, una elección presidencial, un subsidio a empresas:
+    el modelo tiene razón y <strong>la etiqueta está discutible</strong>.
+  </div>
+  <aside class="notes">
+    4 min, y hay que hacerlo en vivo. Leé los cinco titulares en voz alta y preguntá caso por
+    caso «¿esto es política?» a mano alzada. El aula se va a partir en el de Biden y en el de
+    las abuelas. Ahí decís la frase clave: <b>«cuando eso pasa, tu F1 está midiendo el
+    desacuerdo entre vos y quien etiquetó el corpus, no la calidad del modelo»</b>.
+  </aside>
+</section>
+
+<!-- ======================= 15 · PLACEBO ======================= -->
+<section>
+  <h3>3 · El test de placebo, y el control positivo</h3>
+  <div class="comparacion">
+    <div>
+      <h4>Placebo</h4>
+      <p>Aplicalo donde el fenómeno <strong>no debería</strong> aparecer.</p>
+      <p class="c-error"><em>Si tu detector de discurso de odio marca el boletín oficial,
+        algo pasa.</em></p>
+    </div>
+    <div>
+      <h4>Control positivo</h4>
+      <p>Aplicalo donde el fenómeno <strong>tiene que</strong> aparecer.</p>
+      <p class="c-error"><em>Si no lo encuentra ahí, tampoco lo estaba encontrando antes.</em></p>
+    </div>
+  </div>
+  <pre><code class="language-python" data-trim>
+# el control positivo de hoy, tal cual está en el notebook (sección 7)
+marcados = modelo.predict(vec.transform(fragmentos))
+print(f"{len(fragmentos)} fragmentos de discursos presidenciales argentinos.")
+print(f"Son 100 % política: el modelo TENDRÍA que marcar el 100 %.")
+print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
+</code></pre>
+  <div class="ss compacta">El control positivo casi nunca aparece en un paper, y casi siempre
+    es el que más duele. Por eso vale la pena hacerlo <strong>antes</strong> de escribir.</div>
+  <aside class="notes">
+    3 min. El código es el mismo que corre en el notebook, sección 7. Aclarar que el placebo
+    barato de todos —barajar las palabras— con una bolsa de palabras da 100 % de predicciones
+    idénticas por construcción, y que ese mismo test corrido sobre un transformer sí es
+    informativo. Es el puente con la clase 7.
+  </aside>
+</section>
+
+<!-- ======================= 16 · PARES MÍNIMOS ======================= -->
+<section>
+  <h3>4 · Los casos límite, construidos a mano</h3>
+  <p class="bajada">Los otros tests son observacionales. Este es un <strong>experimento</strong>:
+    vos fabricás los casos y cambiás una sola cosa por vez.</p>
+  <table class="compacta">
+    <tr><th>qué cambia</th><th>A</th><th>B</th><th>Δ</th></tr>
+    <tr><td>negación · «aprobó» → «no aprobó»</td><td>0,800</td><td>0,759</td><td class="c-ok">−0,04</td></tr>
+    <tr><td>cambio de país · Morena → Frente Amplio</td><td>0,773</td><td>0,516</td><td class="c-error">−0,26</td></tr>
+    <tr><td>cambio de agente · ministro → cantante</td><td>0,546</td><td>0,392</td><td class="c-error">−0,15</td></tr>
+    <tr><td><strong>mismo tema, otras palabras</strong></td><td>0,713</td><td>0,317</td><td class="c-error">−0,40</td></tr>
+  </table>
+  <div class="ojo compacta">
+    La <strong>negación no mueve nada</strong> (es una bolsa de palabras: no lee, cuenta).
+    Y la misma noticia contada con <strong>otras palabras</strong> se cae del otro lado del
+    umbral. Las dos cosas dicen lo mismo: mide vocabulario, no tema.
+  </div>
+  <aside class="notes">
+    3 min. La última fila es la más fuerte: «el congreso debate la reforma electoral» (0,71)
+    contra «la cámara discute los cambios al sistema de votación» (0,32). Misma noticia,
+    sinónimos, y cruza el umbral. Preguntá al aula: «¿cuál de las dos escribiría un diario
+    uruguayo?». Ahí se ve el problema de validez externa en una oración.
+  </aside>
+</section>
+
+<!-- ======================= 17 · VALIDACIÓN EXTERNA ======================= -->
+<section>
+  <h3>5 · La validación externa</h3>
+  <p>Contrastá tu medida con <strong>una medida independiente</strong> que no venga del mismo
+    modelo ni del mismo corpus:</p>
+  <ul>
+    <li>Datos de <strong>encuesta</strong> sobre el mismo período.</li>
+    <li>Una <strong>codificación de otro equipo</strong>, con otra definición operativa.</li>
+    <li>Un <strong>evento conocido</strong>: si tu índice de conflictividad no sube en los
+        meses en que todos sabemos que hubo conflicto, tenés un problema.</li>
+  </ul>
+  <div class="ojo compacta">
+    <strong>Y si no hay ninguna disponible, eso también se escribe.</strong> «No fue posible
+    validar externamente porque no existe una medida independiente para este corpus» es una
+    limitación declarada. No decir nada es otra cosa.
+  </div>
+  <aside class="notes">
+    2 min. El test del evento conocido es el que más engancha porque no requiere ningún dato
+    nuevo. Pediles un evento de su campo que <i>tenga</i> que aparecer en su serie. Si no se
+    les ocurre ninguno, esa es una señal interesante sobre la serie.
+  </aside>
+</section>
+
+<!-- ======================= 18 · LA BANDA DE RUIDO ======================= -->
+<section>
+  <span class="marca">antes de todo lo anterior</span>
+  <h3>Cuánto se mueve tu número <em>sin hacer nada</em></h3>
+  <p class="bajada">Repetimos todo <strong>25 veces</strong> cambiando una sola cosa: la
+     semilla de la partición. Mismo corpus, mismo modelo, mismo código.</p>
+  <div class="panel-metricas">
+    <div><span class="numeron c-modelo">0,68</span><span class="et">F1 medio</span></div>
+    <div><span class="numeron c-val">0,026</span><span class="et">desvío</span></div>
+    <div><span class="numeron c-error">0,63–0,73</span><span class="et">del peor al mejor</span></div>
+    <div><span class="numeron c-error">0,107</span><span class="et">el rango: tu ruido</span></div>
+  </div>
+  <div class="aha compacta">
+    Y el chiste malo: <strong>la ablación</strong> —el test que recomienda toda la literatura—
+    movió el F1 como mucho <strong>0,033</strong>. <em>Menos de un tercio del ruido.</em>
+  </div>
+  <p class="c-acento"><strong>Un test que se mueve menos que el ruido no es un test.</strong></p>
+  <aside class="notes">
+    4 min, y es probablemente la slide más útil de la clase para su trabajo diario. Es
+    estadística que ya saben —no se interpreta una diferencia sin su error— aplicada a un
+    lugar donde nadie la aplica. Preguntá: «¿cuántos papers vieron que reporten un F1 con
+    intervalo?». Silencio. Ese silencio es el punto.
+  </aside>
+</section>
+
+<!-- ======================= 19 · SECCIÓN SESGO ======================= -->
+<section class="portada">
+  <p class="num-clase">Segunda parte</p>
+  <h1>La auditoría de sesgo</h1>
+  <div class="franja"></div>
+  <p class="gancho">No lo vamos a discutir. Lo vamos a medir, y vamos a salir con una tabla.</p>
+  <aside class="notes">
+    30 segundos. El cambio de tono importa: lo anterior era validez, esto es sesgo, y son
+    cosas distintas aunque se toquen.
+  </aside>
+</section>
+
+<!-- ======================= 20 · TRES SESGOS ======================= -->
+<section>
+  <h2>Tres sesgos que no son lo mismo</h2>
+  <div class="comparacion tres">
+    <div>
+      <h4>del mundo</h4>
+      <p>La realidad que medís <strong>es</strong> desigual.</p>
+      <p class="c-error"><em>No se «arregla»: se estudia.</em> Si tu modelo la refleja, el
+        problema no es el modelo: es qué vas a hacer con él.</p>
+    </div>
+    <div>
+      <h4>del corpus</h4>
+      <p>Tu muestra <strong>no representa</strong> el mundo.</p>
+      <p class="c-error">Se ataca con muestreo, ponderación, o más datos de donde faltan.
+        <em>Acá sí sirve balancear.</em></p>
+    </div>
+    <div>
+      <h4>introducido</h4>
+      <p>Lo pusiste <strong>vos</strong>: el umbral, la loss, la métrica que elegiste reportar.</p>
+      <p class="c-error">Se ataca revisando esas decisiones. Son cinco y todas son discutibles.</p>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>«El sesgo se arregla balanceando los datos» es falso dos veces:</strong> no toca
+    el del mundo, no toca el introducido, y encima puede distorsionar la estimación de
+    prevalencia, que muchas veces era justo lo que querías medir.
+  </div>
+  <aside class="notes">
+    4 min. La analogía que funciona: un termómetro mal calibrado y un país que realmente hace
+    calor son dos problemas distintos, y confundirlos produce tanto negación («es sólo el
+    reflejo de la realidad») como magia («arreglemos el modelo y arreglamos el mundo»).
+    Pedí un ejemplo de cada tipo del campo de ellos.
+  </aside>
+</section>
+
+<!-- ======================= 21 · VIZ 2 ======================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>La misma oración, distinto sujeto</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/sesgo-en-el-espejo.html" title="auditoría de sesgo con pares mínimos" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> primero la diferencia entre el de arriba y el de abajo.
+    Después prendé <em>marcar los que el modelo no conoce</em>: varios sujetos sacan el
+    <strong>mismo número exacto</strong>, y no es equidad.</p>
+  <aside class="notes">
+    6 min. Cambiá el sujeto en vivo con la caja de texto: escribí una oración del campo de
+    ellos. Mostrá primero la diferencia (0,346 contra 0,183 en la plantilla que viene) y dejá
+    el silencio. Y después, obligatorio, mostrá el cartel rojo: <b>una diferencia de puntaje
+    no prueba daño</b>. Esta viz es sobre rigor, no sobre indignación, y esa distinción es
+    parte del contenido.
+  </aside>
+</section>
+
+<!-- ======================= 22 · CEGUERA NO ES EQUIDAD ======================= -->
+<section>
+  <h3>Un número idéntico no siempre es una buena noticia</h3>
+  <table class="compacta">
+    <tr><th>sujeto</th><th>puntaje</th><th>¿lo conoce el modelo?</th></tr>
+    <tr><td>los docentes</td><td>0,265</td><td class="c-error">no: «docentes» no está en el vocabulario</td></tr>
+    <tr><td>los enfermeros</td><td>0,265</td><td class="c-error">no: «enfermeros» no está</td></tr>
+    <tr><td>los campesinos</td><td>0,265</td><td class="c-error">no: «campesinos» no está</td></tr>
+    <tr><td>los indígenas</td><td>0,265</td><td class="c-error">no: «indígenas» no está</td></tr>
+  </table>
+  <div class="aha compacta">
+    Cuatro sujetos, el mismo número hasta el último decimal. No los trata igual de bien:
+    <strong>no los vio nunca</strong>. <strong>Un modelo no puede ser justo con un grupo que
+    no está en sus datos.</strong> Ausencia no es neutralidad.
+  </div>
+  <div class="ojo compacta">
+    Y al revés: buena parte del «efecto de género» de esa viz sale del <strong>artículo</strong>
+    («los» pesa −0,34; «las» −0,14), no del sustantivo. Reportarlo sin decirlo sería
+    técnicamente cierto y sustantivamente engañoso.
+  </div>
+  <aside class="notes">
+    3 min. Esta slide es la que distingue una auditoría hecha con criterio de una hecha por
+    trámite. Preguntá: «si les muestro una tabla donde todos los grupos sacan el mismo puntaje,
+    ¿qué concluyen?». La respuesta ingenua es «no hay sesgo». La correcta es «primero fijate
+    si el modelo conoce esas palabras».
+  </aside>
+</section>
+
+<!-- ======================= 23 · MANOS 1 ======================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1 · la auditoría</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code> y corré las secciones <strong>1 a 9</strong>.
+    <strong>30 minutos</strong>, de a dos. Al final vas a tener una tabla que se puede pegar
+    en un apéndice.
+  </div>
+  <ol class="lista-numerada">
+    <li><code>TODO 1</code> · leé los 20 términos y escribí la frase honesta:
+      <em>«este clasificador detecta…»</em>, sin usar la palabra «política».</li>
+    <li><code>TODO 3</code> · clasificá 10 falsos positivos en categorías tuyas.
+      ¿Cuántos son errores del modelo y cuántos desacuerdos con la etiqueta?</li>
+    <li><code>TODO 5</code> · escribí <strong>tres pares mínimos de tu propia investigación</strong>.
+      Uno que debería cambiar, uno que no, y uno límite.</li>
+    <li><code>TODO 6</code> · interpretá la tabla de sesgo: ¿es grande?, ¿de dónde viene?,
+      ¿cambia según el uso? <em>El <code>TODO 5</code> es el importante: diseñar el test
+      es más difícil, y más útil, que correrlo.</em></li>
+  </ol>
+  <aside class="notes">
+    30 min. Recorré las mesas. La consigna que más cuesta es el TODO 5: van a escribir pares
+    que cambian dos cosas a la vez. Corregilo en el momento, es el corazón del diseño
+    experimental. Anotá en el pizarrón dos o tres pares buenos que veas para leerlos después
+    de la pausa. A los 25 minutos avisá que quedan 5.
+  </aside>
+</section>
+
+<!-- ======================= 24 · PAUSA ======================= -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    10 minutos. En serio. Es la última clase y hay tentación de comérsela: no lo hagas, la
+    segunda mitad tiene la actividad más exigente del curso.
+  </aside>
+</section>
+
+<!-- ======================= 25 · EL SESGO COMO HALLAZGO ======================= -->
+<section>
+  <h3>Y a veces el sesgo <em>es</em> el hallazgo</h3>
+  <p class="bajada">Callback a la clase 6: el mapa de palabras.</p>
+  <div class="comparacion contra">
+    <div>
+      <h4>Para decidir</h4>
+      <p>Un modelo que asocia sistemáticamente ciertos grupos con ciertas categorías y
+        <strong>decide</strong> sobre personas: eso es un problema, y grande.</p>
+    </div>
+    <div>
+      <h4>Para medir</h4>
+      <p>El <strong>mismo</strong> modelo, usado para <strong>describir</strong> qué
+        asociaciones circulan en un corpus, es un instrumento valioso: es medir la ideología
+        del texto, que es tu objeto de estudio.</p>
+    </div>
+  </div>
+  <div class="ss compacta">
+    Es la metodología de Kozlowski, Taddy &amp; Evans (2019) en la <em>American Sociological
+    Review</em>: los embeddings como <strong>instrumento para medir cultura</strong>.
+    <strong>Depende enteramente de para qué lo usás: la misma tabla, dos conclusiones
+    opuestas.</strong>
+  </div>
+  <aside class="notes">
+    3 min. Es un buen antídoto contra la sobrecorrección («entonces esto no sirve para nada»),
+    que es el fracaso pedagógico típico del final de un curso crítico. Y conecta con el TODO 6
+    del notebook, que pregunta exactamente esto.
+  </aside>
+</section>
+
+<!-- ======================= 26 · SECCIÓN REPRO ======================= -->
+<section class="portada">
+  <p class="num-clase">Tercera parte</p>
+  <h1>Reproducibilidad</h1>
+  <div class="franja"></div>
+  <p class="gancho">Nada de esto es difícil. Es sólo disciplina, y hay que hacerla desde el
+    día uno porque después no se puede reconstruir.</p>
+  <aside class="notes">30 segundos.</aside>
+</section>
+
+<!-- ======================= 27 · EL CHECKLIST ======================= -->
+<section>
+  <h3>Seis cosas, y una función que las genera sola</h3>
+  <div class="tarjetas">
+    <div><h4>semilla</h4>Fijada en <code>random</code>, <code>numpy</code> y <code>torch</code>.</div>
+    <div><h4>versiones</h4>La salida de <code>pip freeze</code>, al apéndice.</div>
+    <div><h4>datos</h4>Disponibles, o la descripción exacta de cómo obtenerlos.</div>
+    <div><h4>código</h4>En un repositorio, con los notebooks que corren.</div>
+    <div><h4>ficha del modelo</h4>Qué mide, con qué se entrenó, sus límites.</div>
+    <div><h4>prompts exactos</h4>Si usaste un LLM: el prompt literal, en el apéndice.</div>
+  </div>
+  <pre><code class="language-python" data-trim>
+print(bloque_de_reproducibilidad(
+    SEMILLA, modelo=modelo,
+    datos_descriptos="Spanish Fake News Corpus 2.0 (CC BY 4.0), prensa nov-2020 a mar-2021",
+    n_casos=len(notas), textos=documentos))
+# -> fecha, semilla, versiones, hash del corpus, hash de los pesos, n de parámetros
+</code></pre>
+  <div class="ojo compacta">
+    <strong>«Reproducible» no es «el código está en GitHub».</strong> Sin la semilla, las
+    versiones y los datos (o su procedencia exacta), ese código no reproduce nada.
+  </div>
+  <aside class="notes">
+    4 min. La función está en la sección 10 del notebook y es literalmente para copiar y pegar
+    en sus proyectos. Mencioná el TODO 7 —correr el notebook entero de nuevo y comparar
+    números— porque casi siempre encuentra una fuente de aleatoriedad suelta, y esa
+    experiencia enseña más que esta slide.
+  </aside>
+</section>
+
+<!-- ======================= 28 · MODELOS CERRADOS ======================= -->
+<section>
+  <h3>El problema específico de los modelos cerrados</h3>
+  <div class="intuicion compacta">
+    Un resultado obtenido con una API en <strong>marzo</strong> puede no reproducirse en
+    <strong>junio</strong>: el modelo cambió y no te avisaron. Y las versiones viejas se
+    despublican. Consecuencia: <strong>si tu análisis depende de un modelo que puede
+    desaparecer, tu paper tiene fecha de vencimiento.</strong>
+  </div>
+  <div class="comparacion">
+    <div><h4>Lo mínimo</h4><p>Nombre del modelo <strong>y su revisión exacta</strong>, la fecha
+      de la corrida, el prompt literal, y las salidas crudas guardadas.
+      <em>Citar un modelo sin versión es citar un libro sin edición.</em></p></div>
+    <div><h4>Lo mejor</h4><p>Un modelo abierto con versión fija, que podés volver a bajar en
+      tres años. La ventaja no es ideológica: es <strong>metodológica</strong>.</p></div>
+  </div>
+  <aside class="notes">
+    3 min. Si alguien objeta que los modelos abiertos son peores, la respuesta honesta es:
+    a veces sí, y ese es el <i>trade-off</i> que hay que declarar en el paper, no esconder.
+    La pregunta útil: «¿cuánta calidad estás dispuesto a resignar a cambio de que tu resultado
+    exista dentro de tres años?».
+  </aside>
+</section>
+
+<!-- ======================= 29 · ÉTICA APLICADA: LOS CASOS ======================= -->
+<section>
+  <span class="marca">cuarta parte · ética aplicada</span>
+  <h2>Cuatro casos. Dos minutos cada uno. Sin sermón.</h2>
+  <div class="tarjetas cuatro">
+    <div><h4>1 · scraping</h4>Scrapear perfiles <strong>públicos</strong> de redes para
+      estudiar polarización. ¿Público es lo mismo que consentido?</div>
+    <div><h4>2 · autoría</h4>Publicar un modelo que <strong>identifica la autoría</strong> de
+      textos anónimos. ¿Y si el corpus de prueba son denuncias anónimas?</div>
+    <div><h4>3 · riesgo</h4>Un clasificador de riesgo en una <strong>oficina pública</strong>
+      que prioriza a quién se atiende primero.</div>
+    <div><h4>4 · reúso</h4>Entrenar sobre <strong>entrevistas cedidas para otro fin</strong>,
+      con consentimiento firmado hace ocho años.</div>
+  </div>
+  <div class="ojo">
+    <strong>El caso 3 esconde el problema más grave y menos visible.</strong> Un sistema que
+    despriorizó un caso, y que nadie revisó nunca, <strong>no genera evidencia de su propio
+    error</strong>. Sólo observás los casos que pasaron el filtro. Es selección en la muestra,
+    con consecuencias sobre personas.
+  </div>
+  <aside class="notes">
+    11 min, dos por caso más tres de cierre. Anunciá que no hay respuesta correcta y que
+    vos tampoco la tenés. Manejalo como discusión, no como exposición:
+    pedí una mano a favor y una en contra por caso. El desacuerdo real del aula es la
+    demostración de que esto es sustantivo y no un trámite del comité de ética. Guardá el
+    <i>feedback</i> invisible del caso 3 para el final: es probablemente la lección de mayor
+    valor práctico del curso entero para quien vaya a trabajar en el Estado o en una ONG.
+  </aside>
+</section>
+
+<!-- ======================= 30 · LOS CRITERIOS ======================= -->
+<section>
+  <span class="marca">llevate estas cinco</span>
+  <h2>Los criterios que sí sirven</h2>
+  <ol class="lista-numerada">
+    <li>¿Quién <strong>soporta el costo</strong> del error? ¿Vos, o el sujeto?</li>
+    <li>¿El sujeto puede <strong>apelar</strong>? ¿Hay alguien que revise?</li>
+    <li>¿Habría dado <strong>consentimiento para este uso</strong>, no para el original?</li>
+    <li>¿El resultado permite <strong>re-identificar</strong> a alguien?</li>
+    <li>¿<strong>A quién le sirve</strong> el hallazgo? ¿Y a quién le sirve que exista la herramienta?</li>
+  </ol>
+  <div class="ss">
+    Cinco preguntas. Se las hacen <strong>antes de empezar</strong>, no antes de publicar.
+    Después de publicar ya no son preguntas: son problemas.
+  </div>
+  <aside class="notes">
+    3 min. Contraponé estas cinco al formulario del comité de ética: el formulario pregunta si
+    hay consentimiento; estas preguntan si el consentimiento cubre <i>este</i> uso. La
+    diferencia es todo.
+  </aside>
+</section>
+
+<!-- ======================= 31 · EL JUICIO ======================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 · el juicio</h2>
+  <div class="manos">
+    Se reparte un paper corto que usa estas técnicas. <strong>Media aula lo defiende, media lo
+    revisa.</strong> 15 minutos de preparación, 10 de audiencia.
+  </div>
+  <div class="comparacion">
+    <div>
+      <h4>La defensa</h4>
+      <p>Prepará las respuestas a <strong>las seis objeciones</strong> antes de que te las
+        hagan. Si algo no lo podés defender, la jugada correcta es
+        <strong>declararlo como limitación</strong>, no esconderlo.</p>
+    </div>
+    <div>
+      <h4>La revisión</h4>
+      <p>Usá el checklist. Cada objeción tiene que decir <strong>qué falta</strong>,
+        <strong>por qué importa</strong> y <strong>qué habría que hacer</strong>.
+        «No me convence» no es un comentario de revisor.</p>
+    </div>
+  </div>
+  <p class="c-acento"><strong>Los dos bandos usan el mismo checklist. Por eso funciona.</strong></p>
+  <aside class="notes">
+    25 min en total (15 de preparación + 10 de audiencia). Repartí el paper impreso: es más
+    rápido que compartir un archivo. Mientras preparan, pasá por los dos grupos: a los
+    revisores pediles que ordenen por gravedad desde el principio, y a los defensores
+    recordales que declarar una limitación es una jugada fuerte, no una derrota.
+  </aside>
+</section>
+
+<!-- ======================= 32 · VEREDICTO ======================= -->
+<section>
+  <h3>Veredicto: ¿cuáles son fatales y cuáles no?</h3>
+  <div class="comparacion contra">
+    <div>
+      <h4>Fatal · hay que rehacer análisis</h4>
+      <ul>
+        <li>No hay <strong>ninguna</strong> validación manual.</li>
+        <li>La partición mete <strong>fuga</strong> (mismo medio, mismo autor, mismo texto).</li>
+        <li>No hay <strong>piso</strong> de comparación.</li>
+        <li>El constructo <strong>no está definido</strong>.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Menor · se arregla escribiendo</h4>
+      <ul>
+        <li>Falta el número exacto de casos por partición.</li>
+        <li>Falta la versión de una biblioteca.</li>
+        <li>No se justificó el umbral.</li>
+        <li>No hay validación externa <em>y se explica por qué</em>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>Saber distinguirlas es lo que hace a un buen revisor.</strong> Tratar todo como
+    fatal es tan malo como no ver nada: bloquea trabajo bueno y quema tu credibilidad para
+    cuando encuentres algo que sí lo es.
+  </div>
+  <aside class="notes">
+    Va durante la audiencia. Anotá las objeciones en el pizarrón mientras salen y al final
+    ordenalas entre las dos columnas con el aula. Esa clasificación colectiva es la evaluación
+    real de la clase: si la hacen bien, entendieron todo.
+  </aside>
+</section>
+
+<!-- ======================= 33 · CUÁNDO NO ======================= -->
+<section>
+  <span class="marca">la slide más honesta del curso</span>
+  <h2>Cuándo <em>no</em> usar deep learning</h2>
+  <table class="compacta">
+    <tr><th>situación</th><th>qué usar en su lugar</th></tr>
+    <tr><td><strong>n chico</strong> (cientos de casos, que es la mayoría de la investigación social)</td><td>regresión, diccionario, análisis de contenido a mano</td></tr>
+    <tr><td>Necesitás <strong>coeficientes interpretables</strong> porque el argumento del paper es el coeficiente</td><td>modelos lineales, y decilo con orgullo</td></tr>
+    <tr><td>Una <strong>regresión o un diccionario ya lo resuelven</strong></td><td>eso, y el tiempo que ahorrás lo ponés en validar</td></tr>
+    <tr><td>El <strong>costo del error es alto</strong> y no hay revisión humana</td><td>no automatices esa decisión</td></tr>
+    <tr><td><strong>No tenés cómo validar</strong> (no podés leer casos, no hay medida externa)</td><td>no lo hagas todavía: conseguí primero cómo validar</td></tr>
+    <tr><td>El problema es que <strong>la categoría está mal definida</strong></td><td>volvé al escritorio. Ningún modelo arregla un concepto</td></tr>
+  </table>
+  <p class="c-acento"><strong>Si esta lista los hace usar menos deep learning, el curso fue
+    exitoso. En serio.</strong></p>
+  <aside class="notes">
+    4 min. Esta slide da más credibilidad que todas las demás juntas, y hay que decirla sin
+    ironía. La última fila es la más importante y la más difícil de aceptar: si tu categoría
+    está mal definida, el modelo no es la solución, es una manera cara de posponer el problema.
+  </aside>
+</section>
+
+<!-- ======================= 34 · VIZ 3 ======================= -->
+<section>
+  <span class="marca">viz · el entregable</span>
+  <h3>Qué le contestás al revisor 2</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/checklist-revisor.html" title="checklist y generador del párrafo de métodos" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> apretá <em>modo revisor</em> con el formulario vacío y
+    mirá las objeciones. Después <em>completar con el ejemplo de hoy</em> y mirá el párrafo de
+    métodos armándose solo. <strong>Esto se lo llevan y lo usan el lunes.</strong></p>
+  <aside class="notes">
+    6 min. Completá dos o tres campos en vivo, en el proyector, para que vean el párrafo
+    cambiando. La demostración fuerte es la inversa: mostrá el formulario vacío en modo
+    revisor. <b>«Este formulario es un detector de proyectos mal llevados, y es mejor
+    descubrirlo hoy que en la revisión.»</b> Decí también que lo escrito se guarda en el
+    navegador, así lo pueden completar para su propio proyecto en el momento.
+  </aside>
+</section>
+
+<!-- ======================= 35 · LAS SEIS OBJECIONES ======================= -->
+<section>
+  <span class="marca">memorizalas</span>
+  <h2>Las seis objeciones que te van a hacer</h2>
+  <ol class="lista-numerada">
+    <li>¿Cómo sabemos que <strong>mide lo que decís</strong> que mide?</li>
+    <li>¿Cuál es el <strong>baseline</strong>? ¿Cuánto le ganás a lo simple?</li>
+    <li>¿Cómo <strong>partiste los datos</strong>? ¿Hay fuga?</li>
+    <li>¿Cuánta <strong>validación humana</strong> hay? ¿Cuántos casos leyeron?</li>
+    <li>¿Es <strong>reproducible</strong>? Semilla, versiones, datos.</li>
+    <li>¿Qué pasa con los <strong>errores</strong>, y a quién afectan?</li>
+  </ol>
+  <div class="ss compacta">
+    Las seis. Siempre. Si tu paper las contesta <strong>en el texto</strong> —no en la
+    respuesta a la revisión— vas a tener una revisión mucho más tranquila, y de paso vas a
+    escribir un paper mejor.
+  </div>
+  <aside class="notes">
+    2 min. Es la versión corta del checklist, la que se memoriza. Sugerí que la peguen arriba
+    del escritorio. Y aclarar: no son las objeciones de un revisor malo. Son las de uno bueno.
+  </aside>
+</section>
+
+<!-- ======================= 36 · EL MAPA DEL CURSO ======================= -->
+<section>
+  <span class="marca">de dónde salieron</span>
+  <h2>El mapa completo</h2>
+  <div class="mapa-curso">
+    <div><b>1</b>una función es una máquina con perillas</div>
+    <div><b>2</b>componer funciones dibuja lo imposible</div>
+    <div><b>3</b>estar equivocado es un número con pendiente</div>
+    <div><b>4</b>dibujar no es calcar</div>
+    <div><b>5</b>la CNN pinta sobre la imagen</div>
+    <div><b>6</b>las palabras viven en un mapa</div>
+    <div><b>7</b>cada palabra arma su propio resumen</div>
+    <div><b>8</b>el mini-GPT, y por qué alucina</div>
+    <div><b>9</b>usar lo que dibujó otro</div>
+    <div class="hoy"><b>10</b><strong>¿de qué es esto un dibujo?</strong></div>
+  </div>
+  <div class="aha">
+    Durante diez clases aprendimos a <strong>dibujar</strong>. Hoy aprendimos a pararnos frente
+    a un dibujo y preguntar: <strong>¿de qué es esto un dibujo?</strong>
+    Un modelo siempre dibuja algo. Tu trabajo es demostrar qué.
+  </div>
+  <p>En la clase 1 movíamos <strong>dos sliders</strong>. Miren de dónde salieron.</p>
+  <aside class="notes">
+    3 min. Recorré las diez en voz alta, una frase cada una, sin detenerte. El efecto es
+    acumulativo y el aula se sorprende del recorrido. Terminá en la clase 1: «dos sliders».
+  </aside>
+</section>
+
+<!-- ======================= 37 · GLOSARIO ======================= -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista">
+    <li><b>construct validity</b><span>validez de constructo — ¿lo que medís es la cosa de la que hablás?</span></li>
+    <li><b>shortcut learning</b><span>atajo — separa las clases, pero no es el concepto</span></li>
+    <li><b>ablation</b><span>ablación — sacarle algo al corpus y ver cuánto cae el número</span></li>
+    <li><b>placebo test</b><span>test de placebo — aplicarlo donde el fenómeno no debería estar</span></li>
+    <li><b>minimal pair</b><span>par mínimo — dos textos idénticos salvo por una cosa</span></li>
+    <li><b>out-of-distribution</b><span>fuera de dominio — datos que no se parecen a los del entrenamiento</span></li>
+    <li><b>model card</b><span>ficha del modelo — la media página que acompaña al instrumento</span></li>
+  </ul>
+  <p>En el texto quedan así:
+    <span class="glosario"><span class="en">shortcut learning</span><span class="es">atajo</span></span>.
+    Los siete, más <em>datasheet</em>, están en <code>recursos/glosario.md</code>.</p>
+  <aside class="notes">
+    1 min. No la leas entera: señalá las dos que más usaron hoy (ablación y par mínimo) y seguí.
+  </aside>
+</section>
+
+<!-- ======================= 38 · QUÉ TE LLEVÁS ======================= -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás</h2>
+  <ol class="lista-numerada">
+    <li><strong>Desempeño no es validez.</strong> La métrica dice que el modelo reproduce tus
+      etiquetas. No dice nada sobre si tus etiquetas miden tu concepto.</li>
+    <li><strong>La validez se demuestra con intervenciones, no con métricas.</strong> Y antes
+      de cualquier intervención, medí tu banda de ruido.</li>
+    <li><strong>El instrumento se reporta.</strong> Ficha del modelo, semilla, versiones,
+      auditoría por subgrupo, y para qué <em>no</em> hay que usarlo.</li>
+  </ol>
+  <div class="manos">
+    <strong>El lunes.</strong> Agarrá el último análisis que hiciste con un modelo —tuyo o de
+    otro— y corréle dos cosas: <strong>el control positivo</strong> (aplicalo donde el
+    fenómeno tiene que estar) y <strong>tres pares mínimos</strong> escritos a mano.
+    Veinte minutos. Si sobrevive, tenés un párrafo nuevo de métodos. Si no sobrevive,
+    te enteraste vos antes que el revisor 2.
+  </div>
+  <aside class="notes">
+    3 min. Sólo tres ideas: si decís siete, no se llevan ninguna. El bloque del lunes es
+    deliberadamente chiquito y cronometrado (veinte minutos) porque una tarea grande no se hace.
+  </aside>
+</section>
+
+<!-- ======================= 39 · ADÓNDE SEGUIR ======================= -->
+<section>
+  <h2>Adónde seguir</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Si te quedaste con ganas</h4>
+      <p>Grimmer &amp; Stewart sobre validación permanente; Kapoor &amp; Narayanan sobre fuga
+        y la crisis de reproducibilidad; <em>Bit by Bit</em> de Salganik para ética y datos
+        masivos. Todo en <code>referencias.md</code>.</p>
+    </div>
+    <div>
+      <h4>Si te vas a meter en serio</h4>
+      <p>Jacobs &amp; Wallach sobre medición y <em>fairness</em>; las fichas de modelo de
+        Mitchell y las de dataset de Gebru; Selbst y por qué «arreglar el modelo» no arregla
+        el sistema.</p>
+    </div>
+  </div>
+  <div class="ss">
+    <strong>La sugerencia principal, y es una sola: no hagas otro curso.</strong> Hacé un
+    proyecto chico con <em>tus</em> datos, uno que puedas terminar en un mes. Con su semilla,
+    su ficha y su párrafo de métodos. Aprendés más en ese mes que en tres cursos.
+  </div>
+  <aside class="notes">
+    2 min. Si el aula tiene grupo de trabajo, este es el momento de proponer que se junten a
+    presentar esos proyectos en dos meses. Funciona mucho mejor que un curso avanzado.
+  </aside>
+</section>
+
+<!-- ======================= 40 · CIERRE ======================= -->
+<section class="portada">
+  <p class="num-clase">Fin</p>
+  <h1>Lo que aprendiste no es a usar una biblioteca.<br>Es a no dejarte impresionar.</h1>
+  <div class="franja"></div>
+  <p class="gancho">Gracias. Ahora vayan a auditar algo.</p>
+  <aside class="notes">
+    1 min. Dejala en pantalla y no digas nada más. La frase se sostiene sola.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+</script>
+</body>
+</html>

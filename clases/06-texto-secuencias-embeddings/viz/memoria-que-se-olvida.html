@@ -170,7 +170,8 @@ p.alDibujar(() => {
 
   // dónde está parada la lectura
   p.segmento(c, 0, c, 1.06, { color: 'acento', grosor: 2, punteada: [5, 4] });
-  p.texto(c, 1.02, 'voy leyendo acá', { color: 'acento', tam: 11, peso: '700',
+  // abajo, no arriba: arriba a la izquierda vive la leyenda
+  p.texto(c, 0.06, 'voy leyendo acá', { color: 'acento', tam: 11, peso: '700',
     alinear: c > N * 0.6 ? 'right' : 'left', dx: c > N * 0.6 ? -8 : 8, caja: true });
 
   // la palabra clave
@@ -190,7 +191,7 @@ p.alDibujar(() => {
     { color: 'datos', texto: 'una palabra cualquiera', forma: 'linea' },
     { color: 'parametro', texto: 'la palabra que hace falta al final', forma: 'linea' },
     { color: 'acento', texto: 'dónde va la lectura', forma: 'linea', punteada: true }
-  ], { pos: 'ad' });
+  ], { pos: 'ai' });
 });
 
 // --- 5. la apuesta del modelo ----------------------------------------------

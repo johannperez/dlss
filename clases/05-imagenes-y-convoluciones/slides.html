@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 5 — La forma de los datos manda: imágenes | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* `.viz-frame` de curso.css es width:100% y el navegador no tiene box-sizing
+     global, asi que cualquier padding propio la hace 30px mas ancha que su
+     columna y se le monta encima al panel. Se arregla local, sin tocar el CSS
+     compartido que usan las otras nueve clases. */
+  .viz-frame { box-sizing: border-box; }
+
+  .fila-figs { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; align-items:start; }
+  .fila-figs figcaption { font-size:.5em; color:var(--tinta-3); text-transform:uppercase;
+    letter-spacing:.04em; margin-bottom:.25em; }
+  .fila-figs figure { margin:0; }
+  .grilla-num { display:inline-grid; grid-template-columns:repeat(3, 1fr); gap:3px; }
+  .grilla-num span { display:flex; align-items:center; justify-content:center;
+    width:2.1em; height:1.7em; font:600 .62em var(--f-mono); border:1px solid var(--borde);
+    border-radius:4px; }
+  .cuenta-params { display:grid; grid-template-columns:1fr auto; gap:.35em 1.2em;
+    align-items:center; font-size:.78em; max-width:26em; }
+  .riel { height:15px; border-radius:8px; background:var(--papel-2);
+    border:1px solid var(--borde); overflow:hidden; }
+  .riel > i { display:block; height:100%; }
+  table.comp { width:100%; border-collapse:collapse; font-size:.68em; }
+  table.comp th, table.comp td { padding:.42em .6em; border-bottom:1px solid var(--borde);
+    text-align:right; }
+  table.comp th:first-child, table.comp td:first-child { text-align:left; }
+  table.comp thead th { color:var(--tinta-3); text-transform:uppercase; font-size:.82em;
+    letter-spacing:.04em; }
+  table.comp td.bien { color:var(--c-ok); font-weight:700; }
+  table.comp td.mal  { color:var(--c-error); font-weight:700; }
+  .diagrama { width:100%; height:auto; }
+  .pooling { display:flex; align-items:center; gap:1.1em; justify-content:center; }
+  .pooling .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; }
+  .pooling .g2 { display:grid; grid-template-columns:repeat(2,1fr); gap:2px; }
+  .pooling .g4, .pooling .g2 { width:max-content; }
+  .pooling .g4 > span, .pooling .g2 > span { display:flex; align-items:center;
+    justify-content:center; width:2em; height:1.7em; font:600 .6em var(--f-mono);
+    border-radius:4px; border:1px solid var(--borde); }
+  .pooling .flecha { font-size:1.4em; color:var(--tinta-3); }
+  /* el glosario de hoy son diez términos: en dos columnas entra en una slide */
+  .glosario-lista.dos { display:grid; grid-template-columns:1fr 1fr; column-gap:1.8em; }
+  .glosario-lista.dos li { font-size:.72em; grid-template-columns:minmax(7.5em, 40%) 1fr; }
+  .cuadro-chico  { max-width:270px; margin:0 auto; }
+  .cuadro-medio  { max-width:400px; margin:0 auto; }
+  .par-fotos { display:grid; grid-template-columns:1fr 1fr; gap:22px; max-width:720px; margin:0 auto; }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ================= 1 · PORTADA ================= -->
+<section class="portada">
+  <p class="num-clase">Clase 5</p>
+  <h1>La forma de los datos manda: imágenes</h1>
+  <div class="franja"></div>
+  <p class="gancho">La arquitectura de una red no es una decisión técnica:
+    es <strong>una teoría sobre cómo está armado el mundo</strong>.</p>
+  <aside class="notes">
+    2 min. No leas el temario. Decí una sola cosa: "hoy vamos a ver que elegir una
+    arquitectura es hacer una afirmación sobre el mundo, del mismo tipo que las que
+    ustedes hacen cuando eligen un modelo estadístico". Y pasá rápido a la foto.
+  </aside>
+</section>
+
+<!-- ================= 2 · DE DÓNDE VENIMOS ================= -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">El módulo 1, entero, en cuatro viñetas.</p>
+  <ul>
+    <li>Clase 1: una función es una <strong>máquina con perillas</strong>.</li>
+    <li>Clase 2: apilando rampas se dibuja <strong>cualquier figura</strong>.</li>
+    <li>Clase 3: la máquina <strong>encuentra sola</strong> las perillas, bajando por un valle.</li>
+    <li>Clase 4: el ciclo de entrenamiento, y la diferencia entre <strong>dibujar y calcar</strong>.</li>
+    <li class="fragment"><strong>Y salió una máquina que puede dibujar cualquier cosa.</strong>
+      Hoy vamos a ver por qué eso es un problema.</li>
+  </ul>
+  <div class="ss compacta fragment">Una máquina que no supone nada sobre el mundo no es más
+    objetiva: es más <em>hambrienta de datos</em> y más fácil de engañar. Igual que una
+    investigación sin marco teórico no es más neutral, es más desorientada.</div>
+  <aside class="notes">
+    3 min. Preguntá: "¿alguien se acuerda qué pasaba cuando le poníamos 32 rampas a la
+    curva de la clase 2?" (calcaba). Enganchá: esa flexibilidad total es lo que hoy vamos
+    a poner en duda. El fragment final es LA frase de la clase; decila textual.
+  </aside>
+</section>
+
+<!-- ================= 3 · GANCHO ================= -->
+<section>
+  <span class="marca">gancho</span>
+  <h2>¿Cuánta gente hay en esta foto?</h2>
+  <div class="viz-frame" style="padding:10px"><div class="cuadro-medio" id="gancho-foto"></div></div>
+  <p class="viz-pie">Una foto de archivo, en baja resolución.
+    <span class="chip sintetico">esquema sintético</span> Estimá a ojo. Nadie va a controlar.</p>
+  <div class="intuicion fragment">Contestaste en dos segundos y sin pensar.
+    <strong>Guardá eso</strong>: lo que acabás de hacer sin esfuerzo es exactamente
+    lo que le vamos a pedir a la máquina.</div>
+  <aside class="notes">
+    2 min. Que tiren números en voz alta. No corrijas a nadie. La pregunta no es cuántos
+    hay: es que TODOS pudieron contestar algo en dos segundos, sin pensar. Guardá eso.
+  </aside>
+</section>
+
+<!-- ================= 4 · LA MISMA FOTO, CORRIDA ================= -->
+<section>
+  <h2>La misma foto, corrida unos píxeles</h2>
+  <div class="viz-frame" style="padding:10px">
+    <div class="par-fotos">
+      <figure style="margin:0"><figcaption style="font-size:.5em;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.04em;text-align:center;margin-bottom:.3em">la foto</figcaption><div id="g-a"></div></figure>
+      <figure style="margin:0"><figcaption style="font-size:.5em;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.04em;text-align:center;margin-bottom:.3em">la misma foto, corrida 3 píxeles</figcaption><div id="g-b"></div></figure>
+    </div>
+  </div>
+  <div class="intuicion">¿Cambió algo para vos? No. Para el modelo de la clase 4
+    <strong>le cambiaron todas las variables de entrada al mismo tiempo</strong>.</div>
+  <aside class="notes">
+    3 min. Preguntá literal: "¿es la misma foto?". Todos dicen que sí. Entonces:
+    "para la red de la clase 4 esto son 784 variables, y les moví las 784". Instalá la
+    pregunta del día: ¿cómo se le enseña a una máquina algo que para nosotros es tan
+    obvio que ni lo pensamos? No la respondas todavía.
+  </aside>
+</section>
+
+<!-- ================= 5 · UNA IMAGEN ES UNA TABLA ================= -->
+<section>
+  <h3>Una imagen es una tabla de números</h3>
+  <div class="viz-con-panel">
+    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto"></div></div>
+    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-zoom"></div></div>
+  </div>
+  <p class="viz-pie">Cada casilla es un número de <b>0 a 255</b>: cuánta materia hay ahí.
+    Acá lo dibujamos como <b>tinta sobre papel</b> —más número, más oscuro— para que se lea
+    en el proyector; en el archivo original el 255 es blanco. <b>Esto es lo único que ve la
+    computadora:</b> el dibujo no está "adentro", el dibujo <em>es</em> la tabla.</p>
+  <aside class="notes">
+    2 min. Señalá un número del recorte y preguntá qué es. Respuesta: cuánta luz hay en
+    ese punto. Nada más. Si alguien pregunta por color: son tres tablas apiladas (rojo,
+    verde, azul) y les vamos a decir "canales". Todo lo demás es igual.
+  </aside>
+</section>
+
+<!-- ================= 6 · CÓMO LA COMÍA LA CLASE 4 ================= -->
+<section>
+  <h3>Cómo se la dábamos al modelo de la clase 4</h3>
+  <div class="viz-frame" style="padding:10px"><div id="desenrollada"></div></div>
+  <p class="viz-pie"><b>Aplanar</b> (<code>nn.Flatten</code>): agarrás la grilla de 28×28 y la
+    estirás en una fila de <b>784 números</b>. Es exactamente lo que hicimos la clase pasada.</p>
+  <div class="ojo compacta">Al estirarla, la fila 1 y la fila 2 quedan a 28 lugares de
+    distancia. Dos píxeles que en la foto están pegados, para el modelo son las variables
+    número 30 y 58. <strong>Y ahí se perdió algo enorme.</strong></div>
+  <aside class="notes">
+    3 min. Mostrá con el dedo: acá arriba la grilla, acá abajo la fila. Preguntá:
+    "¿qué información tenía la grilla que la fila no tiene?" Alguien va a decir "la
+    posición" o "quién está al lado de quién". Esa es la palabra. Escribila en el pizarrón.
+  </aside>
+</section>
+
+<!-- ================= 7 · LA APUESTA ================= -->
+<section class="pregunta">
+  <h2>Si barajo los píxeles de <em>todas</em> las imágenes con la misma
+    permutación y reentreno, ¿qué pasa?</h2>
+  <div class="opciones">
+    <div><b>A</b> el modelo empeora muchísimo</div>
+    <div><b>B</b> empeora un poco</div>
+    <div><b>C</b> queda igual</div>
+  </div>
+  <aside class="notes">
+    2 min. VOTACIÓN A MANO ALZADA, EN SERIO. Contá los votos en voz alta y anotalos en el
+    pizarrón. La mayoría vota A. Sin esta apuesta, la viz que viene es un dibujito lindo.
+    Aclará dos veces: es UNA sola permutación, la misma para todas las imágenes, y se
+    reentrena desde cero.
+  </aside>
+</section>
+
+<!-- ================= 8 · VIZ BARAJADO ================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Barajemos</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/vecindad-de-pixeles.html" title="barajar los píxeles" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> las dos tiras de abajo tienen los mismos 784 números.
+    La red densa saca <b>85,6&nbsp;%</b> con la foto revuelta y <b>85,8&nbsp;%</b> con la
+    foto entera. Ni se enteró.</p>
+  <aside class="notes">
+    5 min. Movelo vos. Orden: (1) apretá "Barajar" y dejá correr la animación —marcá que
+    no se pierde ni un píxel, sólo se mudan; (2) mostrá las dos tiras; (3) recién ahí
+    revelá las barras. Preguntá quién había votado A. Después pasá a la pestaña
+    "correrla unos píxeles": ahí la densa se cae a 32,3 % y la CNN se queda en 74,1 %.
+    Esa segunda pestaña responde la foto corrida del principio.
+  </aside>
+</section>
+
+<!-- ================= 9 · LA CONCLUSIÓN INCÓMODA ================= -->
+<section>
+  <h2>La conclusión incómoda</h2>
+  <div class="aha">La red densa <strong>nunca supo que había una grilla</strong>.
+    Para ella, los 784 números eran 784 variables sueltas, como las columnas de un CSV.</div>
+  <p>Vos reconocés una cara en cualquier parte de la foto. La red densa tendría que
+     aprender <em>"cara arriba a la izquierda"</em>, <em>"cara en el medio"</em>,
+     <em>"cara en la esquina"</em> por separado, con muchísimos ejemplos de cada posición.</p>
+  <div class="ojo compacta">Honestidad: la CNN también pierde <em>poco</em> (4,6 puntos).
+    Lo contundente no es cuánto pierde la CNN — es que la densa <b>no pierde nada</b>.
+    Y la prueba más fuerte es la foto corrida: 85,8&nbsp;% → 32,3&nbsp;%.</div>
+  <aside class="notes">
+    3 min. Este es el corazón de la primera mitad. No lo apures. Si alguien dice "entonces
+    la CNN es mejor", frená: la CNN es mejor PARA DATOS CON GRILLA. Sobre una tabla de
+    encuesta es peor que casi todo, y eso lo vemos después de la pausa.
+  </aside>
+</section>
+
+<!-- ================= 10 · LO QUE SABEMOS Y ELLA NO ================= -->
+<section>
+  <h2>Tres cosas que nosotros sabemos y ella no</h2>
+  <div class="tarjetas">
+    <div><h4>1 · Vecindad</h4>Dos píxeles que están pegados tienen que ver entre sí.
+      El de al lado no es una variable cualquiera.</div>
+    <div><h4>2 · Repetición</h4>Un patrón significa lo mismo en cualquier parte de la
+      imagen. Un borde es un borde en el centro y en la esquina.</div>
+    <div><h4>3 · Composición</h4>Las cosas grandes están hechas de cosas chicas.
+      Bordes → texturas → partes → objetos.</div>
+  </div>
+  <div class="intuicion">Estas tres cosas se las vamos a <strong>regalar</strong> al modelo.
+    No se las enseñamos con ejemplos: <strong>se las metemos en la estructura</strong>.
+    Eso tiene nombre en inglés: <span class="glosario"><span class="en">inductive bias</span><span class="es">sesgo inductivo</span></span>.</div>
+  <aside class="notes">
+    3 min. La analogía disciplinar, decila textual: "esto es lo mismo que un marco teórico.
+    No es que el modelo sea menos objetivo por tener supuestos: es que sin supuestos
+    necesita una cantidad de datos que nadie tiene". Ojo con el falso amigo: acá "bias" NO
+    es sesgo social ni el parámetro b. Es "de qué lado se inclina el modelo por diseño".
+  </aside>
+</section>
+
+<!-- ================= 11 · MIRAR DE A PEDACITOS ================= -->
+<section>
+  <h3>La idea: mirar de a pedacitos</h3>
+  <div class="comparacion">
+    <div style="display:flex;align-items:center;justify-content:center">
+      <div style="width:100%;max-width:280px" id="lupa"></div>
+    </div>
+    <div>
+      <h4>Mirar de a nueve</h4>
+      <div class="intuicion compacta">En vez de mirar los 784 números de una, miramos
+        <strong>de a nueve</strong>: una ventanita de 3×3.</div>
+      <p>En cada posición hacemos una cuenta sola: multiplicar los nueve píxeles por nueve
+        números y sumar. <strong>Un número por posición.</strong></p>
+    </div>
+  </div>
+  <aside class="notes">
+    2 min. Hacé el gesto con la mano: una ventanita chiquita. "Miramos de a nueve".
+    Todavía no digas "convolución": el gesto primero, el nombre después.
+  </aside>
+</section>
+
+<!-- ================= 12 · Y DESLIZARLA ================= -->
+<section>
+  <h3>Y deslizarla, con los <em>mismos</em> nueve números</h3>
+  <div class="fila-figs">
+    <figure><figcaption>posición 1</figcaption><div id="desl-1"></div></figure>
+    <figure><figcaption>posición 2</figcaption><div id="desl-2"></div></figure>
+    <figure><figcaption>posición 3</figcaption><div id="desl-3"></div></figure>
+    <figure><figcaption>el dibujo que va saliendo</figcaption><div id="desl-4"></div></figure>
+  </div>
+  <p class="viz-pie">La misma ventana, con los <b>mismos</b> nueve números, recorre toda la
+    imagen. Por eso lo que aprendió en una esquina vale en todas: es el supuesto 2, hecho
+    estructura. Eso es una <span class="glosario"><span class="en">convolution</span><span class="es">convolución</span></span>.</p>
+  <aside class="notes">
+    3 min. Subrayá "los mismos". Ahí está la magia y ahí está el ahorro de parámetros.
+    Si alguien pregunta por qué el dibujo de salida es más chico: la ventana no se puede
+    asomar afuera de la foto, así que pierde un píxel de cada lado. Es todo.
+  </aside>
+</section>
+
+<!-- ================= 13 · VIZ KERNEL ================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movés el filtro vos</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/kernel-deslizante.html" title="el filtro que se desliza" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> poné el preset <b>borde vertical</b> y mirá el panel 3.
+    Se encienden sólo los contornos verticales. <b>Con nueve números hiciste un detector</b>,
+    y no escribiste ninguna regla sobre bordes.</p>
+  <aside class="notes">
+    6 min. Guion: (1) borde vertical sobre el afiche de campaña —se encienden los palotes
+    de las letras—; (2) "todo cero": no aparece nada; (3) "identidad": sale la imagen igual;
+    (4) apretá "Filtro al azar" DIEZ VECES y contá en voz alta cuántas dan algo útil.
+    Casi ninguna. Ese es el pie para la slide que sigue. Vocabulario firme: el FILTRO son
+    los nueve números; el MAPA DE ACTIVACIÓN es el dibujo que sale.
+  </aside>
+</section>
+
+<!-- ================= 14 · EL FILTRO ES UN PINCEL ================= -->
+<section>
+  <span class="marca">callback dibujo</span>
+  <h3>El filtro es un pincel</h3>
+  <div class="comparacion">
+    <div><h4>En la clase 2</h4><p>Sumábamos rampas para <strong>dibujar una curva</strong>.
+      Cada rampa era una pieza; la suma era la figura.</p></div>
+    <div><h4>Acá</h4><p>El modelo <strong>dibuja sobre la imagen</strong>: cada filtro produce
+      un dibujo nuevo —el mapa de activación— que resalta lo que ese filtro busca.</p></div>
+  </div>
+  <div class="ss">Es una <strong>regla de codificación</strong> aplicada exhaustivamente:
+    "marcá cada vez que aparezca este patrón". Una CNN es un ejército de codificadores con
+    libro de códigos propio, que revisa las 40.000 fotos sin cansarse. La diferencia con la
+    codificación humana: <em>el libro de códigos no está escrito en castellano</em>.
+    Ese es el problema de interpretabilidad de la clase 10.</div>
+  <aside class="notes">
+    2 min. Esta analogía es la que compra a la audiencia de análisis de contenido.
+    Decila mirándolos, no leyendo. Y dejá plantada la incomodidad del final: es la semilla
+    de la clase 10.
+  </aside>
+</section>
+
+<!-- ================= 15 · LOS PINCELES SE APRENDEN ================= -->
+<section>
+  <h3>Y los pinceles se aprenden</h3>
+  <p>Los nueve números de un filtro son <strong>parámetros</strong>: perillas, como la
+    pendiente de la clase 1. Se mueven con la misma <span class="glosario"><span class="en">loss</span><span class="es">pérdida</span></span>
+    y el mismo descenso por gradiente de la clase 3.</p>
+  <div class="aha">Acabás de ver que casi todos los filtros al azar dan porquería.
+    Por eso <strong>no se eligen a mano: se aprenden</strong>.</div>
+  <p><strong>No hay nada nuevo en el mecanismo.</strong> Lo único nuevo es
+     <em>qué forma tiene la máquina</em>.</p>
+  <aside class="notes">
+    2 min. Esta slide sólo funciona si antes apretaste "filtro al azar" diez veces.
+    Si te la salteaste, volvé a la viz. La frase "no hay nada nuevo en el mecanismo" baja
+    muchísimo la ansiedad del aula: no hay que aprender otra matemática.
+  </aside>
+</section>
+
+<!-- ================= 16 · LA CUENTA QUE IMPORTA ================= -->
+<section>
+  <h3>La cuenta que importa</h3>
+  <div class="comparacion">
+    <div>
+      <h4>Cuántas perillas</h4>
+      <div class="cuenta-params">
+        <span>capa densa de 784 → 64 (la de la clase 4)</span>
+        <b class="c-datos">50.176 pesos</b>
+        <div class="riel" style="grid-column:1/-1"><i style="width:100%;background:var(--c-datos)"></i></div>
+        <span>capa convolucional, 32 filtros de 3×3</span>
+        <b class="c-modelo">288 pesos</b>
+        <div class="riel" style="grid-column:1/-1"><i style="width:0.6%;background:var(--c-modelo)"></i></div>
+      </div>
+      <p style="font-size:.8em;margin-top:.6em">Ciento setenta veces menos perillas.</p>
+    </div>
+    <div>
+      <h4>Y sin embargo</h4>
+      <div class="intuicion compacta">Y anda <strong>mejor</strong>. No porque sea más grande:
+        porque le dijimos algo <em>verdadero</em> sobre el mundo, y así no tiene que
+        descubrirlo sola con millones de ejemplos.</div>
+      <div class="ojo compacta">Menos parámetros no es "peor modelo". Es
+        <b>menos libertad para calcar</b> — la conversación de la clase 4, otra vez.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    3 min. Escribí los dos números en el pizarrón. 784×64 = 50.176 contra 32×3×3 = 288.
+    Preguntá: "¿de dónde sale que 288 alcancen?" Respuesta: porque los mismos 9 números se
+    reusan en las 784 posiciones. A eso se le dice compartir parámetros.
+  </aside>
+</section>
+
+<!-- ================= 17 · BLOQUE PRÁCTICO 1 ================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 1</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code>, secciones <b>1 a 3</b>. Quince minutos.
+    <ol>
+      <li>Mirá la imagen y su tabla de números.</li>
+      <li>Corré el experimento del barajado y escribí el <code>TODO 1</code>.</li>
+      <li><code>TODO 2</code>: <strong>inventá un filtro que detecte diagonales</strong>.</li>
+      <li><code>TODO 3</code>: ¿qué filtro deja la imagen igual?</li>
+    </ol>
+  </div>
+  <p class="viz-pie">Los chequeos del notebook <b>nunca explotan</b>: si no sale, te dicen qué
+    mirar. Si algo se rompe de verdad, levantá la mano.</p>
+  <aside class="notes">
+    15 min de trabajo. Recorré el aula. Los dos atascos previsibles: (a) confunden filtro
+    con mapa de activación —repetí el vocabulario—; (b) errores de forma. Enseñales a LEER
+    el error: "expected 4-dimensional input" te está diciendo que falta la cuaterna
+    (batch, canales, alto, ancho). Anotá quién hizo un filtro lindo: lo proyectamos después.
+  </aside>
+</section>
+
+<!-- ================= PAUSA ================= -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, este es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    10 min. EN SERIO. No la recortes: si la comés, la segunda mitad —que es la que tiene
+    el contenido de ciencias sociales— se atropella. Poné alarma.
+  </aside>
+</section>
+
+<!-- ================= 18 · VOLVIMOS ================= -->
+<section>
+  <span class="marca">discusión</span>
+  <h2>Volvimos: ¿qué filtro inventaron?</h2>
+  <p class="bajada">Dos o tres del aula, proyectados.</p>
+  <ul>
+    <li>¿Qué se enciende con el tuyo?</li>
+    <li>¿Le pusiste positivos de un lado y negativos del otro? ¿Por qué funciona eso?</li>
+    <li>¿A alguien le salió algo que no sabe explicar? <strong>Eso también es un resultado.</strong></li>
+  </ul>
+  <aside class="notes">
+    4 min. Proyectá el notebook de alguien, no el tuyo. Si nadie quiere, usá el tuyo pero
+    decí que es tuyo. El objetivo es que vean que "detector de bordes" no es una categoría
+    mágica: es un patrón de signos.
+  </aside>
+</section>
+
+<!-- ================= 19 · APILAR FILTROS ================= -->
+<section>
+  <h3>Apilar: la segunda capa no mira la imagen</h3>
+  <div class="viz-frame" style="padding:14px">
+    <svg class="diagrama" viewBox="0 0 900 200" role="img"
+         aria-label="la imagen entra a la capa 1, sus mapas entran a la capa 2, y así">
+      <g fill="none" stroke-width="2">
+        <rect x="14" y="55" width="86" height="86" rx="6" fill="var(--papel-2)" stroke="var(--borde-fuerte)"/>
+        <g stroke="var(--c-modelo)" fill="var(--c-modelo)" fill-opacity=".10">
+          <rect x="200" y="30" width="66" height="66" rx="5"/>
+          <rect x="212" y="52" width="66" height="66" rx="5"/>
+          <rect x="224" y="74" width="66" height="66" rx="5"/>
+        </g>
+        <g stroke="var(--c-modelo)" fill="var(--c-modelo)" fill-opacity=".18">
+          <rect x="430" y="30" width="66" height="66" rx="5"/>
+          <rect x="442" y="52" width="66" height="66" rx="5"/>
+          <rect x="454" y="74" width="66" height="66" rx="5"/>
+        </g>
+        <g stroke="var(--c-modelo)" fill="var(--c-modelo)" fill-opacity=".28">
+          <rect x="660" y="30" width="66" height="66" rx="5"/>
+          <rect x="672" y="52" width="66" height="66" rx="5"/>
+          <rect x="684" y="74" width="66" height="66" rx="5"/>
+        </g>
+      </g>
+      <g stroke="var(--c-parametro)" stroke-width="2.5" fill="none" marker-end="url(#pf)">
+        <path d="M108 98 L190 98"/><path d="M300 98 L420 98"/><path d="M530 98 L650 98"/>
+      </g>
+      <defs><marker id="pf" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <path d="M0 0 L9 4.5 L0 9 z" fill="var(--c-parametro)"/></marker></defs>
+      <g font-size="13" fill="var(--tinta-2)" text-anchor="middle">
+        <text x="57" y="168">la foto</text>
+        <text x="245" y="176">capa 1: bordes</text>
+        <text x="475" y="176">capa 2: texturas</text>
+        <text x="705" y="176">capa 3: partes</text>
+        <text x="149" y="88" fill="var(--c-parametro)">conv</text>
+        <text x="360" y="88" fill="var(--c-parametro)">conv</text>
+        <text x="590" y="88" fill="var(--c-parametro)">conv</text>
+      </g>
+    </svg>
+  </div>
+  <div class="intuicion">La segunda capa <strong>no mira la imagen</strong>: mira los dibujos
+    que hizo la primera. Y la tercera mira los de la segunda.</div>
+  <aside class="notes">
+    3 min. Insistí: la capa 2 tiene como entrada un montón de mapas de activación, no
+    píxeles. Por eso puede detectar cosas más grandes sin usar ventanas más grandes:
+    su ventanita de 3×3 sobre un mapa ya resumido cubre un pedazo mayor de la foto original.
+  </aside>
+</section>
+
+<!-- ================= 20 · VIZ JERARQUÍA ================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>La jerarquía</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/jerarquia.html" title="jerarquía de representaciones" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> hacé clic en <b>la rueda</b> de la capa 3. Se encienden un
+    arco, un círculo y una unión en T de la capa 2; y detrás, bordes de la capa 1.
+    <b>Nadie programó "rueda".</b> Apareció porque servía para bajar la loss.</p>
+  <aside class="notes">
+    5 min. Clickeá "la rueda" y bajá por la composición. Después "la multitud", que es el
+    caso que les interesa. Decí en voz alta que el dibujo es un ESQUEMA ilustrativo basado
+    en la literatura de visualización de features, no una foto de un modelo real — está
+    escrito en el pie de la viz. Los filtros de verdad los miran en el notebook.
+  </aside>
+</section>
+
+<!-- ================= 21 · POR QUÉ PROFUNDO ================= -->
+<section>
+  <span class="marca">promesa cumplida</span>
+  <h3>Ahora sí: por qué "profundo"</h3>
+  <p>En la clase 2 dijimos <em>"las piezas están hechas de piezas"</em> y quedó ahí, como
+     una promesa. <strong>Esto es.</strong></p>
+  <div class="comparacion">
+    <div><h4>Ancho</h4><p>Muchas piezas en un solo nivel. Podés dibujar cualquier cosa,
+      pero cada pieza tiene que aprenderse entera y por separado.</p></div>
+    <div><h4>Profundo</h4><p>Pocas piezas por nivel, pero cada nivel <strong>reusa</strong>
+      las del anterior. Lo complejo sale de combinar lo simple.</p></div>
+  </div>
+  <div class="ss compacta">Micro → meso → macro. El modelo arma sus propios niveles
+    intermedios, y —como en la teoría social— los niveles intermedios son donde está
+    lo interesante <em>y</em> lo difícil de interpretar.</div>
+  <aside class="notes">
+    2 min. Cobrá la promesa explícitamente: "esto se los debía desde la clase 2".
+    Las siembras que se cobran son lo que hace que un curso se sienta un curso.
+  </aside>
+</section>
+
+<!-- ================= 22 · POOLING ================= -->
+<section>
+  <h3>Pooling, en treinta segundos</h3>
+  <div class="pooling">
+    <div>
+      <div class="g4" id="pool-in"></div>
+      <p style="font-size:.55em;color:var(--tinta-3);text-align:center;margin:.4em 0 0">el mapa</p>
+    </div>
+    <span class="flecha">→</span>
+    <div>
+      <div class="g2" id="pool-out"></div>
+      <p style="font-size:.55em;color:var(--tinta-3);text-align:center;margin:.4em 0 0">el máximo de cada cuadrante</p>
+    </div>
+  </div>
+  <p style="text-align:center">Achica el mapa y se queda con <strong>lo más fuerte</strong> de
+    cada cuadrante. Sirve para que la capa siguiente vea un pedazo más grande del mundo.</p>
+  <div class="ojo compacta"><strong>Esto es plomería, no un concepto.</strong>
+    Padding, stride y pooling se googlean el día que armes una red. No los estudies.</div>
+  <aside class="notes">
+    2 min. Literalmente treinta segundos de explicación. Si el aula se engancha con los
+    detalles, cortá: "es plomería". Lo que sí conviene decir: quedarse con el máximo es
+    otra forma de decir "¿apareció esto en algún lado?", sin importar dónde. Es la
+    invariancia otra vez.
+  </aside>
+</section>
+
+<!-- ================= 23 · UNA CNN COMPLETA ================= -->
+<section>
+  <h3>Una CNN completa, la que vas a entrenar</h3>
+  <div class="viz-frame" style="padding:14px">
+    <svg class="diagrama" viewBox="0 0 940 150" role="img" aria-label="diagrama de la CNN del notebook">
+      <g font-size="12" text-anchor="middle">
+        <g fill="var(--papel-2)" stroke="var(--borde-fuerte)" stroke-width="1.5">
+          <rect x="10"  y="40" width="92" height="46" rx="7"/>
+        </g>
+        <g fill="var(--c-modelo)" fill-opacity=".14" stroke="var(--c-modelo)" stroke-width="1.5">
+          <rect x="130" y="40" width="120" height="46" rx="7"/>
+          <rect x="278" y="40" width="120" height="46" rx="7"/>
+          <rect x="426" y="40" width="120" height="46" rx="7"/>
+        </g>
+        <g fill="var(--c-acento)" fill-opacity=".14" stroke="var(--c-acento)" stroke-width="1.5">
+          <rect x="574" y="40" width="150" height="46" rx="7"/>
+        </g>
+        <g fill="var(--c-parametro)" fill-opacity=".14" stroke="var(--c-parametro)" stroke-width="1.5">
+          <rect x="752" y="40" width="120" height="46" rx="7"/>
+        </g>
+        <g fill="var(--tinta)">
+          <text x="56"  y="60">la foto</text><text x="56" y="76">1×28×28</text>
+          <text x="190" y="60">conv + pool</text><text x="190" y="76">16×14×14</text>
+          <text x="338" y="60">conv + pool</text><text x="338" y="76">32×7×7</text>
+          <text x="486" y="60">conv</text><text x="486" y="76">64×7×7</text>
+          <text x="649" y="60">¿apareció?</text><text x="649" y="76">máx de cada mapa → 64</text>
+          <text x="812" y="60">densa</text><text x="812" y="76">64 → 10</text>
+        </g>
+        <g stroke="var(--tinta-3)" stroke-width="1.5" fill="none">
+          <path d="M104 63 L127 63"/><path d="M252 63 L275 63"/><path d="M400 63 L423 63"/>
+          <path d="M548 63 L571 63"/><path d="M726 63 L749 63"/>
+        </g>
+        <text x="338" y="120" fill="var(--c-modelo)" font-size="13">la parte convolucional EXTRAE</text>
+        <text x="812" y="120" fill="var(--c-parametro)" font-size="13">la densa DECIDE</text>
+      </g>
+    </svg>
+  </div>
+  <p class="viz-pie">Al final <b>siempre</b> hay una capa densa como las de la clase 4.
+    Lo nuevo está adelante.</p>
+  <aside class="notes">
+    3 min. Señalá la caja "¿apareció?": es un max global, y es la invariancia traslacional
+    hecha estructura ("me da igual DÓNDE apareció"). Es también por qué esta misma red
+    después va a poder comer imágenes de 32×32 sin cambiarle una línea.
+    Este es el modelo exacto del notebook: 23.946 perillas contra 50.890 de la densa.
+  </aside>
+</section>
+
+<!-- ================= 24 · LA ARQUITECTURA ES UNA TEORÍA ================= -->
+<section>
+  <h2>La arquitectura es una teoría</h2>
+  <p class="bajada">Los tres supuestos de una CNN, enunciados como afirmaciones sobre el mundo:</p>
+  <ul>
+    <li><strong>Localidad.</strong> «Lo que importa pasa entre vecinos.»</li>
+    <li><strong>Invariancia traslacional.</strong> «Un patrón significa lo mismo esté donde esté.»</li>
+    <li><strong>Jerarquía composicional.</strong> «Lo grande está hecho de lo chico.»</li>
+  </ul>
+  <div class="aha">Cuando elegís una arquitectura estás <strong>afirmando cómo creés que está
+    estructurado tu fenómeno</strong>. Es una decisión teórica disfrazada de decisión técnica.</div>
+  <div class="ss compacta">«Vale igual esté donde esté» es el mismo tipo de supuesto que
+    «esta pregunta significa lo mismo en todas las provincias»:
+    <strong>equivalencia de medición</strong>.</div>
+  <aside class="notes">
+    4 min. LA slide de la clase. Leela despacio. Preguntá al aula: "¿alguien puede darme un
+    supuesto de este tipo en su propio trabajo?" Suele salir: comparabilidad entre países,
+    entre olas de panel, entre codificadores. Enganchalo: es exactamente lo mismo.
+  </aside>
+</section>
+
+<!-- ================= 25 · VIZ SUPUESTOS ================= -->
+<section>
+  <span class="marca">viz</span>
+  <h3>¿Y cuándo son falsos?</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/supuestos-de-arquitectura.html" title="supuestos de cada arquitectura" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> elegí <b>«una tabla de encuesta»</b>. No se pone verde
+    <em>ninguna</em> fila, ni la arquitectura más nueva. Y aparece el cartel incómodo:
+    para datos tabulares, un modelo de árboles suele ganarle a una red neuronal.</p>
+  <aside class="notes">
+    6 min. Empezá por "fotos satelitales" (verde en CNN) y después pasá a "una tabla de
+    encuesta". Ahí frená y dejá que se haga el silencio. Esta es la honestidad que compra
+    a esta audiencia: la mayoría trabaja con tablas. Decí: "poner una CNN sobre una tabla
+    es afirmar que la columna 12 es vecina de la 13. ¿Lo es? Si reordenás las columnas del
+    CSV, ¿cambió algo?" Las filas de RNN y Transformer están grises: se desbloquean en las
+    clases 6 y 7, y volvemos a esta misma página.
+  </aside>
+</section>
+
+<!-- ================= 26 · BLOQUE PRÁCTICO 2 ================= -->
+<section>
+  <span class="marca">a las manos</span>
+  <h2>Bloque práctico 2 — de a dos</h2>
+  <div class="manos">
+    Notebook, secciones <b>4 y 5</b>. Veinte minutos, de a dos.
+    <ol>
+      <li>Verificá que <code>nn.Conv2d</code> da <strong>lo mismo</strong> que tu doble <code>for</code>.</li>
+      <li>Mirá los <strong>16 filtros que la CNN aprendió sola</strong> (<code>TODO 4</code>):
+        ¿alguno se parece a los tuyos?</li>
+      <li>Entrená el clasificador sobre el archivo fotográfico y hacé el
+        <code>TODO 5</code>: <strong>mirá los errores</strong> y escribí qué tienen en común.</li>
+    </ol>
+  </div>
+  <div class="ojo compacta">El <code>TODO 5</code> es el más importante del notebook y el que
+    más se saltea. Es un hábito profesional, no un ejercicio técnico:
+    <strong>el conocimiento está en los errores, no en los aciertos</strong>.</div>
+  <aside class="notes">
+    20 min. Pasá por las mesas y preguntá una sola cosa: "¿qué tienen en común los errores?"
+    Si contestan "son difíciles", repreguntá: "¿difíciles para vos o para el modelo?".
+    La respuesta que buscamos: los errores se amontonan en el follaje.
+  </aside>
+</section>
+
+<!-- ================= 27 · EL RESULTADO ================= -->
+<section>
+  <h3>Lo que midieron</h3>
+  <table class="comp">
+    <thead><tr><th>modelo</th><th>perillas</th><th>foto normal</th><th>píxeles barajados</th><th>foto corrida 3 px</th></tr></thead>
+    <tbody>
+      <tr><td>red densa (clase 4)</td><td>50.890</td><td>85,8&nbsp;%</td><td class="mal">85,6&nbsp;%</td><td class="mal">32,3&nbsp;%</td></tr>
+      <tr><td>CNN (clase 5)</td><td>23.946</td><td class="bien">87,8&nbsp;%</td><td>83,2&nbsp;%</td><td class="bien">74,1&nbsp;%</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:.78em;color:var(--tinta-2)">FashionMNIST · 12.000 imágenes de
+    entrenamiento · 12 pasadas · semilla 1983 · corrida real, <code>medir-experimentos.py</code>.</p>
+  <div class="aha">Menos de la mitad de perillas, mejor resultado, y encima
+    <strong>aguanta que le muevas la foto</strong>. Eso último es lo que se compró con el supuesto.</div>
+  <div class="ojo compacta">Leelo bien: que la densa saque <b>85,6&nbsp;%</b> con los píxeles
+    barajados no es un logro. Es la confesión de que nunca los miró como grilla.</div>
+  <aside class="notes">
+    3 min. Los números son de la corrida real; si el aula corrió el notebook, les tienen
+    que haber dado idénticos (misma semilla). Si a alguien le dio distinto, preguntá si
+    cambió la semilla: es una buena excusa para repetir por qué se fija.
+  </aside>
+</section>
+
+<!-- ================= 28 · EL CASO ================= -->
+<section>
+  <span class="marca">el caso</span>
+  <h2>Pobreza desde el espacio</h2>
+  <p><strong>Jean et al. (2016), <em>Science</em>.</strong> Hay países donde no hay encuestas
+    de hogares recientes. La propuesta: predecir consumo y riqueza a partir de
+    <strong>imágenes satelitales diurnas</strong>, usando las <strong>luces nocturnas</strong>
+    como señal intermedia para entrenar cuando faltan etiquetas.</p>
+  <ul>
+    <li>Se entrena una CNN a predecir luminosidad nocturna desde la foto diurna.</li>
+    <li>Esa red aprende sola a mirar techos, caminos, densidad de construcción, cultivos.</li>
+    <li>Con pocas encuestas reales se ajusta el último tramo y se predice consumo.</li>
+  </ul>
+  <div class="ss compacta">Esto se publicó en <em>Science</em> y es genuinamente importante:
+    produce datos donde no había ninguno. No vinimos a demolerlo. Vinimos a leerlo bien.</div>
+  <aside class="notes">
+    3 min. Dejá claro que el trabajo es serio y útil. Si arrancás burlándote, el aula
+    aprende a despreciar en vez de a evaluar, que es lo contrario de lo que queremos.
+    La cita completa está en referencias.md.
+  </aside>
+</section>
+
+<!-- ================= 29 · LAS TRES PREGUNTAS ================= -->
+<section>
+  <h2>Las tres preguntas</h2>
+  <div class="tarjetas">
+    <div><h4>1</h4>¿Qué está midiendo <strong>realmente</strong> el modelo?</div>
+    <div><h4>2</h4>¿Valen <strong>acá</strong> los supuestos de la arquitectura?</div>
+    <div><h4>3</h4>¿Qué pasa <strong>fuera</strong> de donde se entrenó?</div>
+  </div>
+  <p class="bajada">Estas tres se le hacen a cualquier paper de este tipo —y a tu propio
+    trabajo, antes de que te las haga el revisor 2.</p>
+  <aside class="notes">
+    2 min. Que las copien. Literalmente decí "copien estas tres". Son el entregable
+    conceptual de la clase para quien no va a entrenar nada nunca.
+  </aside>
+</section>
+
+<!-- ================= 30 · LAS RESPUESTAS INCÓMODAS ================= -->
+<section>
+  <h2>Las respuestas incómodas</h2>
+  <ol>
+    <li><strong>Qué mide.</strong> Puede estar midiendo techos de chapa, densidad de
+      construcción o presencia de rutas. Las tres correlacionan con pobreza
+      <em>en el país donde se entrenó</em>. Es el mismo problema que vieron en el
+      notebook: el modelo aprendió «muchas manchitas chiquitas», no «gente».</li>
+    <li><strong>Los supuestos.</strong> La invariancia traslacional vale: un techo es un
+      techo esté donde esté. La invariancia de <em>escala</em> y de <em>región</em>
+      no vienen de regalo.</li>
+    <li><strong>Fuera de muestra.</strong> Transferir a otro país es una apuesta fuerte,
+      y hay literatura que muestra que el desempeño se degrada.</li>
+  </ol>
+  <div class="ss">Nada de esto invalida el trabajo. Todo esto <strong>tiene que estar
+    discutido en el paper</strong>. Si no está, ahí está tu comentario de revisor.</div>
+  <aside class="notes">
+    5 min. Enlazá explícitamente con el TODO 5 que acaban de hacer: ellos mismos
+    encontraron un proxy que se rompe. Es el mismo fenómeno, a otra escala.
+    Nombre técnico, para que lo tengan: validez de constructo. Se retoma en la clase 10.
+  </aside>
+</section>
+
+<!-- ================= 31 · EL LUNES ================= -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás para el lunes</h2>
+  <div class="comparacion">
+    <div><h4>Si vas a leer</h4>
+      <p>Ante un paper que clasifica imágenes, pedí tres cosas: la partición
+        <strong>geográfica</strong> (o por archivo, o por época), el desempeño
+        <strong>fuera de muestra</strong>, y <strong>quiénes</strong> son los falsos positivos.</p></div>
+    <div><h4>Si tenés imágenes</h4>
+      <p>Etiquetá 100 por categoría a mano —es una tarde—. Definí la partición
+        <em>antes</em>. Y escribí tu <strong>baseline</strong>: si «siempre no» acierta 85 %,
+        un modelo de 88 % no es una noticia.</p></div>
+  </div>
+  <div class="ss compacta">Con un archivo fotográfico o de prensa gráfica esto es aplicable
+    con pocos ejemplos etiquetados, apoyándose en un modelo ya entrenado por otro.
+    Eso lo vemos en la clase 9.</div>
+  <aside class="notes">
+    3 min. Es concreto y es para esta semana. Si alguien tiene un archivo de fotos,
+    ofrecé hablar en el recreo: de ahí salen las mejores monografías del curso.
+  </aside>
+</section>
+
+<!-- ================= 32 · OTROS USOS ================= -->
+<section>
+  <h3>Dónde aparece esto en ciencias sociales</h3>
+  <div class="tarjetas">
+    <div><h4>Archivos históricos</h4>Digitalización y OCR de censos y padrones manuscritos.
+      Ojo: los errores de reconocimiento tienen sesgo (nombres poco frecuentes, caligrafías regionales).</div>
+    <div><h4>Actas electorales</h4>Detección de alteraciones sobre imágenes de actas escaneadas.
+      Hay trabajo publicado en ciencia política sobre esto.</div>
+    <div><h4>Prensa gráfica</h4>Clasificar décadas de fotografía de diarios: qué se
+      fotografía, a quién, cómo cambia el encuadre.</div>
+    <div><h4>Conteo de multitudes</h4>Estimar tamaño de movilizaciones. Con todos los
+      problemas de medición que ya conocés, ahora automatizados.</div>
+    <div><h4>Uso del suelo</h4>Cambio urbano, expansión de frontera agrícola, informalidad
+      vista desde arriba.</div>
+    <div><h4>Material etnográfico</h4>Organizar y buscar en corpus visuales grandes.
+      No para concluir: para <em>encontrar</em>.</div>
+  </div>
+  <aside class="notes">
+    2 min. Rápido. "Si tienen imágenes en su investigación, hablemos en el recreo."
+    La distinción final —usarlo para encontrar, no para concluir— es importante y suele
+    aliviar a los cualitativos.
+  </aside>
+</section>
+
+<!-- ================= 33 · QUÉ TE LLEVÁS ================= -->
+<section>
+  <h2>Tres ideas, y no más</h2>
+  <ol>
+    <li><strong>La arquitectura es una teoría sobre el mundo.</strong> La CNN dice: lo que
+      importa es local, y un patrón vale igual en cualquier lado.</li>
+    <li><strong>Cuando esa teoría es cierta, ganás muchísimo</strong> —menos parámetros,
+      menos datos, más robustez—. <strong>Cuando es falsa, el modelo te miente con
+      seguridad.</strong></li>
+    <li><strong>La exactitud no dice qué mide el modelo. Los errores sí.</strong>
+      Si los errores se concentran en un subgrupo, ahí está tu sección de limitaciones.</li>
+  </ol>
+  <aside class="notes">
+    2 min. Tres, no cuatro. Si te sobra tiempo NO agregues una cuarta: repetí la primera.
+  </aside>
+</section>
+
+<!-- ================= 34 · GLOSARIO ================= -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista dos">
+    <li><b>pixel</b><span>píxel — una casilla de la grilla, con un número de 0 a 255</span></li>
+    <li><b>channel</b><span>canal — cada tabla apilada; gris tiene 1, color tiene 3</span></li>
+    <li><b>filter / kernel</b><span>filtro — los nueve números. El pincel</span></li>
+    <li><b>convolution</b><span>convolución — deslizar el filtro: multiplicar de a nueve y sumar</span></li>
+    <li><b>feature map</b><span>mapa de activación — el dibujo que produce un filtro</span></li>
+    <li><b>pooling</b><span>submuestreo — achicar el mapa quedándose con lo más fuerte</span></li>
+    <li><b>CNN</b><span>red convolucional — la arquitectura de hoy</span></li>
+    <li><b>translation invariance</b><span>invariancia traslacional — «vale igual esté donde esté»</span></li>
+    <li><b>inductive bias</b><span>sesgo inductivo — lo que el modelo supone por diseño, antes de ver un dato</span></li>
+    <li><b>feature hierarchy</b><span>jerarquía de representaciones — bordes → texturas → partes → objetos</span></li>
+  </ul>
+  <aside class="notes">
+    2 min. Ojo con el falso amigo: <em>inductive bias</em> no es sesgo social ni el
+    parámetro <em>b</em>. Está en recursos/glosario.md con la tabla de falsos amigos.
+  </aside>
+</section>
+
+<!-- ================= 35 · PUENTE ================= -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 6: la forma de los datos manda (II) — texto</h1>
+  <div class="franja"></div>
+  <p class="gancho">«La comisión rechazó al ministro» y «el ministro rechazó a la comisión»
+    tienen exactamente las mismas palabras. El texto no es una grilla: es una
+    <strong>secuencia</strong>, y el significado depende de cosas que están lejos.</p>
+  <aside class="notes">
+    2 min. Dejalos con la frase dando vueltas. Decí la promesa concreta: la clase que viene
+    convertimos un discurso en números SIN perder el orden. Y anticipá que vamos a volver
+    a la viz de supuestos con la fila de RNN desbloqueada.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="datos-experimentos.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true, slideNumber: 'c/t', controls: true, progress: true,
+    center: false, width: 1280, height: 760, margin: 0.06,
+    minScale: 0.2, maxScale: 2.0,
+    transition: 'fade', transitionSpeed: 'fast', backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+/* ===========================================================================
+   Las figuritas de las slides. Todas usan los MISMOS datos medidos que las
+   viz y el notebook (datos-experimentos.js). Ningún número dibujado a ojo.
+   =========================================================================== */
+(function () {
+  // OJO: `const DATOS_EXP` de datos-experimentos.js NO queda colgado de window
+  // (los const de un script clásico no son propiedades del objeto global).
+  const D = (typeof DATOS_EXP !== 'undefined') ? DATOS_EXP : {};
+  const planos = [];
+  const cero = () => { const m = []; for (let f = 0; f < 28; f++) m.push(new Array(28).fill(0)); return m; };
+  const norm = px => px ? px.map(f => f.map(v => v / 255)) : cero();
+
+  const FOTO   = norm((D.muestras && D.muestras[1] && D.muestras[1].px) || null);   // una prenda
+  const MULT   = norm((D.esquemas && D.esquemas.multitud) || null);                 // la multitud
+  const AFICHE = norm((D.esquemas && D.esquemas.afiche) || null);
+
+  function imagen(sel, M, extra) {
+    const p = Viz.plano(sel, { xmin: 0, xmax: M[0].length, ymin: 0, ymax: M.length,
+                               cuadrado: true, margen: { i: 3, d: 3, a: 3, b: 3 } });
+    p.alDibujar(() => {
+      p.fondo({ marco: false });
+      p.celdas(M, { paleta: 'grises', min: 0, max: 1, borde: false });
+      if (extra) extra(p);
+    });
+    p.redibujar(); planos.push(p); return p;
+  }
+
+  function corrida(M, d) {
+    return M.map(f => f.map((_, c) => (c - d >= 0 ? f[c - d] : 0)));
+  }
+
+  function ventana(p, N, fila, col, lado, color) {
+    const x = col, y = N - fila - lado;
+    p.poligono([[x, y], [x + lado, y], [x + lado, y + lado], [x, y + lado]],
+               { relleno: false, borde: Viz.color(color || 'parametro'), grosor: 3 });
+  }
+
+  // --- slide 3 y 4: el gancho -----------------------------------------------
+  imagen('#gancho-foto', MULT);
+  imagen('#g-a', MULT);
+  imagen('#g-b', corrida(MULT, 3));
+
+  // --- slide 5: la imagen es una tabla --------------------------------------
+  imagen('#tabla-foto', FOTO, p => ventana(p, 28, 10, 8, 8, 'acento'));
+  (function () {
+    const rec = [];
+    for (let f = 10; f < 18; f++) rec.push(FOTO[f].slice(8, 16));
+    const p = Viz.plano('#tabla-zoom', { xmin: 0, xmax: 8, ymin: 0, ymax: 8, cuadrado: true,
+                                         margen: { i: 3, d: 3, a: 3, b: 3 } });
+    p.alDibujar(() => {
+      p.fondo({ marco: false });
+      p.celdas(rec, { paleta: 'grises', min: 0, max: 1, borde: true,
+                      texto: v => String(Math.round(v * 255)) });
+    });
+    p.redibujar(); planos.push(p);
+  })();
+
+  // --- slide 6: la grilla desenrollada --------------------------------------
+  (function () {
+    const cont = document.querySelector('#desenrollada');
+    if (!cont) return;
+    cont.innerHTML = '<div style="display:grid;grid-template-columns:170px 1fr;gap:14px;' +
+                     'align-items:center"><div id="des-grilla"></div>' +
+                     '<div><div id="des-tira"></div>' +
+                     '<p style="font-size:.5em;color:var(--tinta-3);margin:.4em 0 0;' +
+                     'text-align:center">los mismos 784 números, en una fila</p></div></div>';
+    imagen('#des-grilla', FOTO);
+    const fila = [];
+    for (let f = 0; f < 28; f++) for (let c = 0; c < 28; c++) fila.push(FOTO[f][c]);
+    const p = Viz.plano('#des-tira', { xmin: 0, xmax: 784, ymin: 0, ymax: 1, alto: 34,
+                                       margen: { i: 0, d: 0, a: 0, b: 0 } });
+    p.alDibujar(() => {
+      p.fondo({ marco: false });
+      p.celdas([fila], { paleta: 'grises', min: 0, max: 1, borde: false });
+    });
+    p.redibujar(); planos.push(p);
+  })();
+
+  // --- slide 11: la lupa ----------------------------------------------------
+  imagen('#lupa', AFICHE, p => ventana(p, 28, 8, 7, 3));
+
+  // --- slide 12: la ventana en tres posiciones y el mapa --------------------
+  const K = [[1, 0, -1], [2, 0, -2], [1, 0, -1]];       // borde vertical
+  function convolucion(M) {
+    const n = M.length, out = [];
+    for (let f = 0; f < n - 2; f++) {
+      const fila = [];
+      for (let c = 0; c < n - 2; c++) {
+        let s = 0;
+        for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) s += M[f + j][c + i] * K[j][i];
+        fila.push(s);
+      }
+      out.push(fila);
+    }
+    return out;
+  }
+  imagen('#desl-1', AFICHE, p => ventana(p, 28, 6, 4, 3));
+  imagen('#desl-2', AFICHE, p => ventana(p, 28, 6, 11, 3));
+  imagen('#desl-3', AFICHE, p => ventana(p, 28, 14, 18, 3));
+  (function () {
+    const mapa = convolucion(AFICHE);
+    let lim = 0;
+    for (const f of mapa) for (const v of f) lim = Math.max(lim, Math.abs(v));
+    const p = Viz.plano('#desl-4', { xmin: 0, xmax: 26, ymin: 0, ymax: 26, cuadrado: true,
+                                     margen: { i: 3, d: 3, a: 3, b: 3 } });
+    p.alDibujar(() => {
+      p.fondo({ marco: false });
+      p.celdas(mapa, { paleta: 'divergente', min: -lim, max: lim, borde: false });
+    });
+    p.redibujar(); planos.push(p);
+  })();
+
+  // --- slide 22: pooling ----------------------------------------------------
+  (function () {
+    const inn = document.querySelector('#pool-in'), out = document.querySelector('#pool-out');
+    if (!inn) return;
+    const M = [[1, 3, 2, 0], [4, 2, 1, 1], [0, 1, 5, 2], [2, 0, 3, 1]];
+    const pal = Viz.paleta('acento');
+    const maxis = [[4, 2], [2, 5]];
+    for (let f = 0; f < 4; f++) for (let c = 0; c < 4; c++) {
+      const s = document.createElement('span');
+      s.textContent = M[f][c];
+      const esMax = M[f][c] === maxis[f >> 1][c >> 1];
+      s.style.background = pal(M[f][c] / 5 * .8);
+      if (esMax) { s.style.outline = '2px solid ' + Viz.color('acento'); s.style.fontWeight = '800'; }
+      inn.appendChild(s);
+    }
+    for (let f = 0; f < 2; f++) for (let c = 0; c < 2; c++) {
+      const s = document.createElement('span');
+      s.textContent = maxis[f][c];
+      s.style.background = pal(maxis[f][c] / 5 * .8);
+      s.style.fontWeight = '800';
+      out.appendChild(s);
+    }
+  })();
+
+  // los canvas se redibujan al cambiar de slide y al redimensionar el proyector
+  const repintar = () => planos.forEach(p => { p.redimensionar && p.redimensionar(); p.redibujar(); });
+  Reveal.on('slidechanged', repintar);
+  Reveal.on('resize', repintar);
+  window.addEventListener('resize', repintar);
+  setTimeout(repintar, 250);
+})();
+</script>
+</body>
+</html>

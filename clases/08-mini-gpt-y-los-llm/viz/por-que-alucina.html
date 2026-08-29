@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Por qué alucina — Clase 8</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "Cuando acierta y cuando inventa, el modelo está IGUAL de
+     seguro. Si no puedo distinguirlas mirando la salida, entonces la seguridad
+     del modelo no me sirve como señal de verdad. Nunca."
+
+     Esto sólo se puede hacer con Aguasclaras: como el corpus lo generamos
+     nosotros, tenemos el padrón de la verdad al lado y se puede verificar en
+     cinco segundos si un diputado existe. Con un corpus real habría que ir a
+     chequear a mano cada afirmación — que es, justamente, el problema.
+
+     Todo sale de `entrenar-mini-gpt.py` -> `datos-mini-gpt.js`.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .dos-col { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr);
+             gap: .9rem; align-items: start; }
+  @media (max-width: 900px) { .dos-col { grid-template-columns: minmax(0,1fr); } }
+
+  .generacion {
+    font-family: var(--f-mono); font-size: .9rem; line-height: 1.7;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .7rem .85rem;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .generacion .prompt { color: var(--c-acento); font-weight: 700; }
+  .generacion .inventado {
+    background: var(--c-error-suave); color: var(--c-error); font-weight: 700;
+    border-radius: 4px; padding: 0 .15em;
+  }
+  .generacion .confirmado {
+    background: var(--c-ok-suave); color: var(--c-ok); font-weight: 700;
+    border-radius: 4px; padding: 0 .15em;
+  }
+  .generacion .resto { color: var(--tinta-2); }
+
+  .padron {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .65rem .8rem;
+  }
+  .padron h3 { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+               color: var(--tinta-3); margin: 0 0 .45rem; }
+  .padron .lista {
+    font-family: var(--f-mono); font-size: .74rem; line-height: 1.5;
+    max-height: 168px; overflow-y: auto; color: var(--tinta-2);
+    border: 1px dashed var(--borde); border-radius: var(--r-chico); padding: .4rem .5rem;
+  }
+  .veredicto { margin-top: .55rem; padding: .55rem .7rem; border-radius: var(--r-medio);
+               font-size: .87rem; line-height: 1.5; }
+  .veredicto.no { background: var(--c-error-suave); border: 1px solid var(--c-error);
+                  color: var(--tinta); }
+  .veredicto.si { background: var(--c-ok-suave); border: 1px solid var(--c-ok);
+                  color: var(--tinta); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Hacelo alucinar</h1>
+    <p>A la izquierda, lo que escribe el mini-GPT. A la derecha, <b>el padrón de la
+       verdad</b>: la lista completa de diputados, partidos y leyes que existen en
+       Aguasclaras, porque el corpus lo generamos nosotros. Probá los cuatro prompts
+       y fijate si podés distinguir, <em>mirando sólo la salida</em>, cuándo el
+       modelo está diciendo algo verdadero y cuándo se lo inventó.</p>
+  </header>
+
+  <div>
+    <div class="dos-col">
+      <div>
+        <div class="generacion" id="generacion"></div>
+        <div class="viz-frame" style="padding:10px; margin-top:.6rem">
+          <div id="lienzo"></div>
+        </div>
+      </div>
+      <div>
+        <div class="padron">
+          <h3 id="padron-titulo">El padrón de la verdad</h3>
+          <div class="lista" id="padron-lista"></div>
+          <div class="veredicto" id="veredicto"></div>
+        </div>
+        <div class="viz-frame" style="padding:8px; margin-top:.6rem">
+          <div id="lienzo-conf"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Alterná entre el primer prompt (un diputado que
+      existe) y el segundo (uno que nos inventamos). Mirá las barras de abajo a la
+      izquierda: en los dos casos hay una que se lleva casi todo. Y mirá el gráfico
+      de la derecha: <b>las cuatro barras miden más o menos lo mismo</b>. El modelo
+      está igual de seguro cuando dice la verdad que cuando fabrica una diputada que
+      no existe. No hay ninguna señal en la salida que las separe: por eso la
+      confianza de un LLM <b>no</b> es evidencia de nada.
+    </div>
+    <p class="viz-pie">
+      Corrida real del mini-GPT de la clase (1.541.056 parámetros) sobre el corpus
+      <b>Aguasclaras</b> — país ficticio, personas ficticias, leyes ficticias.
+      <span class="chip sintetico">sintético</span>
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-mini-gpt.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+const D = window.DATOS_MINIGPT;
+const A = D.alucinacion;
+const CASOS = A.casos;
+let iCaso = 0;
+
+function caso() { return CASOS[iCaso]; }
+function escapar(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function rotulo(f) {
+  if (f === ' ') return '␣';
+  if (f === '\n') return '⏎';
+  return '«' + f + '»';
+}
+
+/** La "seguridad" del modelo: probabilidad típica por ficha de lo que escribió.
+ *  Media geométrica de las 18 primeras: si una sola ficha fuera una sorpresa,
+ *  este número se hunde. Que NO se hunda es el punto de la viz. */
+function seguridad(c) {
+  let s = 0;
+  for (const f of c.confianza) s += Math.log(Math.max(f.prob, 1e-9));
+  return Math.exp(s / c.confianza.length);
+}
+
+/* --- ¿lo que dijo está en el padrón? --------------------------------------- */
+function chequear(c) {
+  const gen = c.generado;
+  if (c.id === 'existe') {
+    const nombre = c.prompt.replace(/^Diputad[oa]\s+/, '').replace(/\s*\($/, '');
+    const partido = c.verdad.split(' — ')[0];
+    const provincia = c.verdad.split(' — ')[1] || '';
+    const escrito = gen.split(')')[0];
+    const okPartido = gen.indexOf(partido) === 0;
+    const okProv = escrito.indexOf(provincia) >= 0;
+    return {
+      entidad: nombre, esta: true, bien: okPartido && okProv,
+      okPartido: okPartido, okProv: okProv,
+      partido: partido, provincia: provincia, escrito: escrito,
+      texto: 'A <b>' + escapar(nombre) + '</b> lo encontrás en el padrón: es del ' +
+             'bloque <b>' + escapar(partido) + '</b>, provincia <b>' +
+             escapar(provincia) + '</b>.<br>El modelo escribió <b>«' +
+             escapar(escrito) + '»</b>: ' +
+             (okPartido && okProv
+               ? 'las dos cosas bien. <b>Acertó.</b>'
+               : (okPartido
+                  ? 'le acertó el <b class="c-ok">bloque</b> y le erró la ' +
+                    '<b class="c-error">provincia</b>. <b>Y las dos mitades suenan ' +
+                    'exactamente igual.</b> Media verdad dicha con total soltura es ' +
+                    'lo más difícil de auditar que hay.'
+                  : 'se equivocó, con la misma soltura con la que acierta.')),
+      largo: escrito.length
+    };
+  }
+  if (c.id === 'no-existe') {
+    const nombre = c.prompt.replace(/^Diputad[oa]\s+/, '').replace(/\s*\($/, '');
+    return {
+      entidad: nombre, esta: false, bien: false,
+      texto: '<b>' + escapar(nombre) + '</b> no figura entre los <b>' +
+             A.total_diputados + '</b> diputados del padrón. No existe. ' +
+             'Todo lo que el modelo escriba sobre ella es invención — y fijate ' +
+             'que lo escribe con el mismo formato impecable que el caso anterior.',
+      largo: 18
+    };
+  }
+  if (c.id === 'ley') {
+    const m = c.prompt.match(/Ley\s+(\d+)/);
+    return {
+      entidad: 'Ley ' + (m ? m[1] : '?'), esta: false, bien: false,
+      texto: 'En el padrón hay <b>' + A.padron.leyes.length + '</b> leyes y la ' +
+             '<b>Ley ' + (m ? m[1] : '?') + '</b> no es ninguna de ellas. El modelo ' +
+             'igual le pone título, tema y año: aprendió la <em>forma</em> de una ' +
+             'ley, que es lo más regular que hay en el corpus.',
+      largo: 24
+    };
+  }
+  return {
+    entidad: 'una cita textual', esta: false, bien: false,
+    texto: 'Una cita no se puede chequear contra ningún padrón, y ese es justamente ' +
+           'el problema. El <b>formato</b> de una cita es lo más predecible que hay ' +
+           'en un texto; el <b>contenido</b>, lo menos. Por eso los LLMs producen ' +
+           'referencias bibliográficas con formato perfecto y datos inventados.',
+    largo: 30
+  };
+}
+
+/* --- pintar la generación ---------------------------------------------------- */
+function pintarGeneracion() {
+  const c = caso(), chk = chequear(c);
+  const n = Math.min(chk.largo, c.generado.length);
+  let cuerpo;
+  if (c.id === 'existe') {
+    // el bloque y la provincia se pintan por separado: pueden estar una bien
+    // y la otra mal, y eso es justamente lo que hay que ver
+    const corte = chk.partido.length;
+    cuerpo = '<span class="' + (chk.okPartido ? 'confirmado' : 'inventado') + '">' +
+             escapar(c.generado.slice(0, corte)) + '</span>' +
+             '<span class="' + (chk.okProv ? 'confirmado' : 'inventado') + '">' +
+             escapar(c.generado.slice(corte, n)) + '</span>';
+  } else {
+    cuerpo = '<span class="inventado">' + escapar(c.generado.slice(0, n)) + '</span>';
+  }
+  document.getElementById('generacion').innerHTML =
+    '<span class="prompt">' + escapar(c.prompt) + '</span>' + cuerpo +
+    '<span class="resto">' + escapar(c.generado.slice(n)) + '</span>';
+
+  const lista = document.getElementById('padron-lista');
+  const tit = document.getElementById('padron-titulo');
+  if (c.id === 'ley') {
+    tit.textContent = 'Las ' + A.padron.leyes.length + ' leyes que existen';
+    lista.innerHTML = A.padron.leyes.map(l =>
+      escapar(l.numero + ' ' + l.titulo)).join('<br>');
+  } else if (c.id === 'cita') {
+    tit.textContent = 'Las ' + A.padron.provincias.length + ' provincias que existen';
+    lista.innerHTML = A.padron.provincias.map(escapar).join('<br>');
+  } else {
+    tit.textContent = 'Los ' + A.total_diputados + ' diputados que existen';
+    lista.innerHTML = A.padron.diputados.map(nom => {
+      const marca = chk.entidad && nom === chk.entidad;
+      return marca ? '<b style="color:var(--c-ok)">' + escapar(nom) + ' ←</b>'
+                   : escapar(nom);
+    }).join('<br>');
+    // que se vea el nombre marcado sin tener que buscarlo a mano
+    // en el próximo frame, cuando la lista ya tiene su alto definitivo (adentro
+    // de un iframe el primer render todavía no lo tiene)
+    requestAnimationFrame(() => {
+      const marcado = lista.querySelector('b');
+      if (!marcado) return;
+      const dy = marcado.getBoundingClientRect().top - lista.getBoundingClientRect().top;
+      lista.scrollTop = Math.max(0, lista.scrollTop + dy - lista.clientHeight / 2);
+    });
+  }
+
+  const ver = document.getElementById('veredicto');
+  ver.className = 'veredicto ' + ((chk.esta && chk.bien) ? 'si' : 'no');
+  ver.innerHTML = chk.texto;
+}
+
+/* --- la distribución del momento de la decisión ------------------------------ */
+const p = Viz.plano('#lienzo', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 250,
+  titulo: 'qué tan segura estaba la primera ficha',
+  margen: { i: 14, d: 16, a: 30, b: 14 }
+});
+p.alDibujar(() => {
+  p.fondo();
+  const c = caso();
+  p.barras(c.distribucion.map((d, i) => ({
+    etiqueta: rotulo(d.ficha), valor: d.prob,
+    color: i === 0 ? (chequear(c).bien ? 'ok' : 'error') : 'acento'
+  })), { horizontal: true, max: 1, formato: v => (v * 100).toFixed(1) + '%' });
+});
+
+/* --- la comparación: los cuatro casos, uno al lado del otro ------------------ */
+const p2 = Viz.plano('#lienzo-conf', {
+  xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 210,
+  titulo: 'seguridad del modelo en los cuatro casos',
+  margen: { i: 14, d: 16, a: 30, b: 26 }
+});
+p2.alDibujar(() => {
+  p2.fondo();
+  p2.barras(CASOS.map((c, i) => ({
+    etiqueta: (c.id === 'existe' ? 'existe ✓' :
+               c.id === 'no-existe' ? 'inventada' :
+               c.id === 'ley' ? 'ley falsa' : 'cita falsa'),
+    valor: seguridad(c),
+    color: i === iCaso ? 'parametro' : (c.id === 'existe' ? 'ok' : 'error')
+  })), { horizontal: false, max: 1, formato: v => (v * 100).toFixed(0) + '%' });
+});
+
+/* --- el panel ---------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué le preguntamos' },
+  { tipo: 'botones', id: 'caso', etiqueta: 'el prompt', valor: '0',
+    opciones: CASOS.map((c, i) => ({ valor: String(i), texto: c.titulo })) },
+  { tipo: 'medidor', id: 'seg', etiqueta: 'seguridad del modelo' },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'titulo', texto: 'Un número honesto' },
+  { tipo: 'texto', id: 'padron-stat', html:
+    'De los <b>' + A.total_diputados + '</b> diputados que existen de verdad, el ' +
+    'modelo le acierta el bloque a <b>' + A.aciertos_partido + '</b> y la provincia ' +
+    'a <b>' + A.aciertos_provincia + '</b>. O sea: <b>sabe cosas</b>. El problema no ' +
+    'es que no sepa nada — es que no hay manera de saber, mirando la salida, si ' +
+    'este caso es uno de los que sabe.' }
+], () => { iCaso = +ctl.valores.caso; actualizar(); });
+
+function actualizar() {
+  const c = caso(), s = seguridad(c), chk = chequear(c);
+  pintarGeneracion();
+  ctl.medidor('seg', s, (s * 100).toFixed(0) + '%');
+  const veredicto = c.id !== 'existe'
+    ? 'Acá <b class="c-error">inventó</b>.'
+    : (chk.bien ? 'Acá <b class="c-ok">acertó</b>.'
+                : (chk.okPartido
+                   ? 'Acá acertó <b class="c-ok">una mitad</b> e inventó ' +
+                     '<b class="c-error">la otra</b>.'
+                   : 'Acá <b class="c-error">se equivocó</b>.'));
+  ctl.texto('lectura',
+    'Probabilidad típica por ficha de lo que escribió: <b>' + (s * 100).toFixed(0) +
+    '%</b>. ' + veredicto +
+    ' Compará este número con el de los otros tres prompts: son parecidos. ' +
+    '<b>La seguridad no distingue acertar de inventar.</b>');
+  p.redibujar(); p2.redibujar();
+}
+
+ctl.disparar();
+Viz.botonTema();
+</script>
+</body>
+</html>

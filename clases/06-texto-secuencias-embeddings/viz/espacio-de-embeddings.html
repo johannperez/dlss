@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El mapa donde viven las palabras — Clase 6</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA (doble, y el segundo es el que deja el aula en silencio):
+
+     (1) "Buscá «pobreza» y mirá quiénes son sus vecinas. Nadie le dijo al
+          programa qué significa nada: la vecindad salió de con quién aparece."
+
+     (2) Modo EJE, con «mujeres» y «hombres»: las ocupaciones se ordenan solas.
+          "Esto no es un error del modelo. El modelo aprendió cómo se habla en
+          el corpus. El sesgo estaba en el corpus, o sea, en nosotros."
+          Y esa es, tal cual, la metodología de Kozlowski, Taddy & Evans (2019)
+          en la American Sociological Review.
+
+     Y el contra-veneno, que es igual de importante: el botón
+     "ejemplos que NO funcionan" de la aritmética. De 10 analogías con una
+     expectativa escrita de antemano, aciertan 2. La divulgación exageró esto
+     muchísimo y acá se ve.
+
+     Todos los números salen de `medir-embeddings.py` sobre el corpus REAL de
+     discursos de apertura 1984-2019. Cero datos inventados.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .entradas { display: flex; flex-wrap: wrap; gap: .5rem; align-items: flex-end;
+              margin-bottom: .6rem; }
+  .campo { display: flex; flex-direction: column; gap: .18rem; }
+  .campo label { font-size: .72rem; letter-spacing: .07em; text-transform: uppercase;
+                 color: var(--tinta-3); font-weight: 700; }
+  .campo input, .campo select {
+    font-family: var(--f-mono); font-size: .95rem;
+    color: var(--tinta); background: var(--papel-2);
+    border: 1px solid var(--borde); border-radius: var(--r-chico);
+    padding: .35rem .5rem; min-width: 9.5rem;
+  }
+  .campo input:focus, .campo select:focus { outline: 2px solid var(--c-acento); outline-offset: 1px; }
+  .campo input.malo { border-color: var(--c-error); }
+  .signo { font-family: var(--f-mono); font-size: 1.3rem; color: var(--tinta-3);
+           padding-bottom: .35rem; }
+
+  .listas { display: grid; grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: .7rem; margin-top: .7rem; }
+  .listas.una { grid-template-columns: minmax(0,1fr); }
+  .lista { background: var(--papel-2); border: 1px solid var(--borde);
+           border-radius: var(--r-medio); padding: .55rem .7rem; font-size: .88rem; }
+  .lista h4 { margin: 0 0 .35em; font-size: .74rem; letter-spacing: .07em;
+              text-transform: uppercase; color: var(--tinta-3); font-family: var(--f-texto); }
+  .lista ol, .lista ul { margin: 0; padding-left: 1.3em; }
+  .lista li { margin: .12em 0; }
+  .lista .w { font-family: var(--f-mono); }
+  .lista .s { color: var(--tinta-3); font-family: var(--f-mono); font-size: .82em; }
+  .lista li.nuevo .w { color: var(--c-ok); font-weight: 700; }
+  .lista li.se-fue .w { color: var(--c-error); text-decoration: line-through; }
+  .nota { font-size: .84rem; color: var(--tinta-2); margin: .45rem 0 0; }
+  .veredicto { font-weight: 700; }
+  .veredicto.ok  { color: var(--c-ok); }
+  .veredicto.mal { color: var(--c-error); }
+  .aviso { font-size: .82rem; color: var(--c-error); margin: .3rem 0 0; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El mapa donde viven las palabras</h1>
+    <p>Cada punto es una palabra de los discursos presidenciales de apertura
+       (Argentina, 1984-2019). Nadie le dijo al programa qué significa ninguna:
+       la única información que usó es <em>con quién aparece cada palabra</em>.
+       Buscá una, mirá sus vecinas, y después probá el modo <b>eje</b>.</p>
+  </header>
+
+  <div>
+    <div class="entradas" id="entradas"></div>
+
+    <div class="viz-frame" style="padding:8px">
+      <div id="lienzo"></div>
+    </div>
+
+    <div class="listas" id="listas"></div>
+    <p class="nota" id="nota"></p>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Primero, modo <em>explorar</em>: buscá
+      <b>pobreza</b>. Sus vecinas son <em>indigencia, desocupación, inflación,
+      hambre</em>. Nadie escribió esa lista: salió sola de con quién aparece la
+      palabra. Ahora pasá a modo <em>eje</em> y dejá el eje que viene puesto,
+      <b>mujeres ←→ hombres</b>, con la lista de <em>conceptos</em>.
+      Mirá dónde caen <em>niños</em>, <em>protección</em> y <em>familia</em>,
+      y dónde caen <em>poder</em> y <em>fuerza</em>. Eso no lo inventó el
+      modelo: estaba en cómo se habló durante treinta y cinco años.
+      Y antes de irte, apretá <em>«los que NO funcionan»</em> en el modo
+      aritmética: de diez analogías, aciertan dos.
+    </div>
+    <p class="viz-pie">
+      Datos <b>reales</b>: 35 discursos de apertura de sesiones (1984-2019),
+      347.714 palabras, vocabulario de 2.000. Vectores de 100 dimensiones
+      calculados con coocurrencia + PPMI + SVD (<code>ssdl.datos.embeddings_ppmi_svd</code>),
+      sin red y sin modelos bajados. <b>El mapa que ves es una sombra:</b> las dos
+      direcciones dibujadas explican el <b>7,4 %</b> de la variación de las 100.
+      Dos palabras pueden verse pegadas acá y estar lejísimos de verdad.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-embeddings.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* =========================================================================
+   1. Los datos
+   ========================================================================= */
+const D    = window.DATOS_EMB;
+const PAL  = D.mapa.palabras;                 // 2000 palabras, por frecuencia
+const XY   = D.mapa.xy;                       // proyección 2D (PCA)
+const VEC  = D.mapa.vec;                      // 2000 x 100, norma 1
+const FREC = D.mapa.frec;
+const FUNC = D.mapa.funcion;                  // 1 = palabra de función
+const TEMA = D.mapa.tema;                     // '' o el tema del léxico
+const ETIQ = new Set(D.mapa.etiquetadas);     // cuáles llevan el nombre escrito
+const IDX  = new Map(PAL.map((w, i) => [w, i]));
+const DIM  = VEC[0].length;
+
+const COLOR_TEMA = {
+  'seguridad':    'error',
+  'economía':     'val',
+  'educación':    'modelo',
+  'trabajo':      'parametro',
+  'salud':        'ok',
+  'instituciones':'acento'
+};
+
+/* --- álgebra mínima (las tres líneas que hacen todo) --------------------- */
+function punto(a, b) { let s = 0; for (let i = 0; i < DIM; i++) s += a[i] * b[i]; return s; }
+function normalizar(v) {
+  let n = 0; for (let i = 0; i < DIM; i++) n += v[i] * v[i];
+  n = Math.sqrt(n) + 1e-9;
+  return v.map(x => x / n);
+}
+/** Las k palabras más parecidas a un vector cualquiera. */
+function masParecidas(v, k, excluir) {
+  excluir = excluir || new Set();
+  const sim = new Array(PAL.length);
+  for (let i = 0; i < PAL.length; i++) sim[i] = punto(VEC[i], v);
+  const orden = Array.from(sim.keys()).sort((a, b) => sim[b] - sim[a]);
+  const out = [];
+  for (const j of orden) {
+    if (excluir.has(j)) continue;
+    if (estado.sinFuncion && FUNC[j]) continue;
+    out.push({ i: j, w: PAL[j], s: sim[j] });
+    if (out.length >= k) break;
+  }
+  return out;
+}
+function vecinos(w, k) {
+  const i = IDX.get(w);
+  return masParecidas(VEC[i], k, new Set([i]));
+}
+
+/* =========================================================================
+   2. Estado
+   ========================================================================= */
+const estado = {
+  modo: 'explorar',
+  palabra: 'pobreza',
+  a: 'inflación', b: 'precios', c: 'desempleo',   // aritmética
+  ejePos: 'mujeres', ejeNeg: 'hombres',
+  listaEje: 'conceptos',
+  epocaPalabra: 'seguridad',
+  sinFuncion: true,
+  soloLexico: false,
+  zoom: 1, cx: 0, cy: 0,
+  resaltados: [],          // [{i, color, etiqueta}]
+  arcos: []                // [{de, a, color}]
+};
+
+/* =========================================================================
+   3. El plano
+   ========================================================================= */
+// Adentro de una slide hay menos alto disponible: el mapa se achica para que
+// las listas de vecinas entren igual. Un archivo, dos presentaciones.
+const EMBEBIDO = Viz.detectarEmbebido();
+const ALTO_MAPA = EMBEBIDO ? 300 : 430;
+
+const p = Viz.plano('#lienzo', {
+  xmin: -1.05, xmax: 1.05, ymin: -1.05, ymax: 1.05,
+  alto: ALTO_MAPA, margen: { i: 46, d: 16, a: 26, b: 40 }
+});
+
+function encuadre() {
+  const r = 1.05 / estado.zoom;
+  p.limites(estado.cx - r, estado.cx + r, estado.cy - r, estado.cy + r);
+}
+
+/* --- el mapa ------------------------------------------------------------- */
+function dibujarMapa() {
+  if (p.altoFijo !== ALTO_MAPA) { p.altoFijo = ALTO_MAPA; p.redimensionar(); }
+  p.titulo = 'las 2.000 palabras del corpus, proyectadas a dos dimensiones';
+  p.ejeX = ''; p.ejeY = '';
+  encuadre();
+  p.fondo();
+  p.grilla();
+
+  const res = new Map(estado.resaltados.map(r => [r.i, r]));
+  const cajas = [];   // para no encimar rótulos
+
+  // 1) los puntos
+  const pts = [];
+  for (let i = 0; i < PAL.length; i++) {
+    if (estado.sinFuncion && FUNC[i] && !res.has(i)) continue;
+    if (estado.soloLexico && !TEMA[i] && !res.has(i)) continue;
+    const t = TEMA[i];
+    pts.push({ x: XY[i][0], y: XY[i][1],
+               r: res.has(i) ? 6 : (t ? 3.4 : 2.2),
+               color: res.has(i) ? res.get(i).color : (t ? COLOR_TEMA[t] : 'verdad') });
+  }
+  p.puntos(pts, { borde: false });
+
+  // 2) las líneas / flechas: del buscador a sus vecinas, o la relación de la analogía
+  for (const arco of estado.arcos) {
+    if (arco.flecha) {
+      p.flecha(XY[arco.de][0], XY[arco.de][1], XY[arco.a][0], XY[arco.a][1],
+               { color: arco.color, grosor: 3, cabeza: 12 });
+    } else {
+      p.segmento(XY[arco.de][0], XY[arco.de][1], XY[arco.a][0], XY[arco.a][1],
+                 { color: arco.color || 'acento', grosor: 2.2, opacidad: .8 });
+    }
+  }
+
+  // 3) los rótulos: primero los resaltados, después los frecuentes que entren
+  const ctx = p.ctx;
+  function rotular(i, color, peso, tam, forzar, dy) {
+    dy = dy === undefined ? -10 : dy;
+    const X = p.px(XY[i][0]), Y = p.py(XY[i][1]) + dy;
+    if (X < p.L - 30 || X > p.R + 30 || Y < p.T - 20 || Y > p.B + 20) return false;
+    ctx.font = peso + ' ' + tam + 'px ' + Viz.colores().fuente;
+    const w = ctx.measureText(PAL[i]).width;
+    const caja = { x: X - w / 2 - 3, y: Y - tam, w: w + 6, h: tam + 4 };
+    if (!forzar) {
+      for (const c of cajas) {
+        if (caja.x < c.x + c.w && caja.x + caja.w > c.x &&
+            caja.y < c.y + c.h && caja.y + caja.h > c.y) return false;
+      }
+    }
+    cajas.push(caja);
+    p.texto(XY[i][0], XY[i][1], PAL[i],
+            { color: color, tam: tam, peso: peso, alinear: 'center', dy: dy,
+              caja: res.has(i) ? true : false });
+    return true;
+  }
+  // los resaltados van primero y, si hacen falta, se pisan: son los que importan
+  estado.resaltados.forEach((r, k) => {
+    rotular(r.i, r.color, '700', 14, !!r.forzar,
+            r.forzar ? (k % 2 ? 16 : -12) : -10);
+  });
+  for (let i = 0; i < PAL.length; i++) {
+    if (res.has(i)) continue;
+    if (!ETIQ.has(i)) continue;
+    if (estado.sinFuncion && FUNC[i]) continue;
+    if (estado.soloLexico && !TEMA[i]) continue;
+    rotular(i, TEMA[i] ? COLOR_TEMA[TEMA[i]] : 'tinta3', TEMA[i] ? '600' : '400', 11);
+  }
+
+  p.textoPx(p.R - 6, p.T + 4,
+            'las dos direcciones dibujadas explican el 7,4 % de la variación',
+            { alinear: 'right', tam: 10, color: 'tinta3' });
+}
+
+/* --- el ranking de un eje ------------------------------------------------ */
+let rankingActual = [];
+function dibujarEje() {
+  const iPos = IDX.get(estado.ejePos), iNeg = IDX.get(estado.ejeNeg);
+  if (iPos === undefined || iNeg === undefined) { rankingActual = []; return; }
+  const eje = normalizar(VEC[iPos].map((x, k) => x - VEC[iNeg][k]));
+  const lista = LISTAS[estado.listaEje].filter(w => IDX.has(w));
+  rankingActual = lista.map(w => ({ w: w, v: punto(VEC[IDX.get(w)], eje) }))
+                       .sort((a, b) => b.v - a.v);
+
+  const M = Math.max(0.05, Math.max.apply(null, rankingActual.map(d => Math.abs(d.v))) * 1.45);
+  const altoQueQuiero = Math.max(EMBEBIDO ? 260 : 300,
+                                rankingActual.length * (EMBEBIDO ? 20 : 25) + 84);
+  if (p.altoFijo !== altoQueQuiero) { p.altoFijo = altoQueQuiero; p.redimensionar(); }
+  p.limites(-M, M, -0.7, rankingActual.length - 0.3);
+  p.titulo = 'cada palabra proyectada sobre el eje ' + estado.ejeNeg + ' ←→ ' + estado.ejePos;
+  p.ejeX = ''; p.ejeY = '';
+  p.fondo();
+  p.grilla({ ticksY: [] });
+  p.ejes({ ticksY: [], formatoX: v => Viz.num(v, 2) });
+
+  // el cero, que es la frontera
+  p.segmento(0, -0.5, 0, rankingActual.length - 0.5,
+             { color: 'tinta3', grosor: 1.4, punteada: [5, 5], opacidad: .8 });
+
+  for (let k = 0; k < rankingActual.length; k++) {
+    const d = rankingActual[k];
+    const y = rankingActual.length - 1 - k;
+    const col = d.v >= 0 ? 'parametro' : 'val';
+    p.segmento(0, y, d.v, y, { color: col, grosor: 9, opacidad: .5 });
+    p.punto(d.v, y, { color: col, r: 4.5 });
+    p.texto(d.v, y, d.w, { color: 'tinta', tam: 12, peso: '600',
+                           alinear: d.v >= 0 ? 'left' : 'right',
+                           dx: d.v >= 0 ? 10 : -10 });
+  }
+  p.textoPx(p.L + 4, p.B + 25, '← más cerca de «' + estado.ejeNeg + '»',
+            { tam: 12, color: 'val', peso: '700' });
+  p.textoPx(p.R - 4, p.B + 25, 'más cerca de «' + estado.ejePos + '» →',
+            { tam: 12, color: 'parametro', peso: '700', alinear: 'right' });
+}
+
+p.alDibujar(() => {
+  if (estado.modo === 'eje') dibujarEje();
+  else dibujarMapa();
+});
+
+/* --- zoom y paneo (sólo en el mapa) -------------------------------------- */
+p.canvas.addEventListener('wheel', ev => {
+  if (estado.modo === 'eje') return;
+  ev.preventDefault();
+  const f = ev.deltaY < 0 ? 1.18 : 1 / 1.18;
+  estado.zoom = Viz.acotar(estado.zoom * f, 1, 14);
+  if (estado.zoom === 1) { estado.cx = 0; estado.cy = 0; }
+  p.redibujar();
+}, { passive: false });
+
+let arrastre = null;
+p.canvas.addEventListener('pointerdown', ev => {
+  if (estado.modo === 'eje') return;
+  arrastre = { x: ev.clientX, y: ev.clientY, cx: estado.cx, cy: estado.cy };
+  p.canvas.setPointerCapture(ev.pointerId);
+});
+p.canvas.addEventListener('pointermove', ev => {
+  if (!arrastre) return;
+  const esc = (p.xmax - p.xmin) / (p.R - p.L);
+  estado.cx = arrastre.cx - (ev.clientX - arrastre.x) * esc;
+  estado.cy = arrastre.cy + (ev.clientY - arrastre.y) * esc;
+  p.redibujar();
+});
+p.canvas.addEventListener('pointerup', () => { arrastre = null; });
+p.canvas.addEventListener('pointercancel', () => { arrastre = null; });
+
+// tooltip: qué palabra hay bajo el mouse
+p.tooltip(w => {
+  if (estado.modo === 'eje') {
+    const k = Math.round(rankingActual.length - 1 - w.y);
+    const d = rankingActual[k];
+    return d ? d.w + '\nproyección ' + Viz.num(d.v, 3) : null;
+  }
+  let mejor = null, dmin = Infinity;
+  const tol = (p.xmax - p.xmin) * 0.02;
+  for (let i = 0; i < PAL.length; i++) {
+    if (estado.sinFuncion && FUNC[i]) continue;
+    const dx = XY[i][0] - w.x, dy = XY[i][1] - w.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < dmin) { dmin = d2; mejor = i; }
+  }
+  if (mejor === null || Math.sqrt(dmin) > tol) return null;
+  return PAL[mejor] + '\naparece ' + FREC[mejor].toLocaleString('es-AR') + ' veces';
+});
+
+/* =========================================================================
+   4. Las listas de palabras para el modo eje
+   ========================================================================= */
+const LISTAS = {
+  conceptos: ['familia', 'hogar', 'cuidado', 'hijos', 'niños', 'trabajo', 'empresa',
+              'fuerza', 'casa', 'escuela', 'salario', 'poder', 'protección',
+              'derechos', 'violencia', 'salud', 'seguridad'],
+  ocupaciones: ['docentes', 'maestros', 'médicos', 'científicos', 'trabajadores',
+                'empresarios', 'obreros', 'jueces', 'militares', 'diputados',
+                'senadores', 'ministros', 'dirigentes', 'productores', 'estudiantes',
+                'profesionales', 'investigadores', 'jubilados', 'industriales'],
+  temas: ['inflación', 'seguridad', 'educación', 'salud', 'trabajo', 'pobreza',
+          'justicia', 'deuda', 'vivienda', 'jubilaciones', 'inversión', 'exportaciones',
+          'corrupción', 'derechos', 'ciencia', 'energía']
+};
+
+/* =========================================================================
+   5. Las entradas (cambian según el modo)
+   ========================================================================= */
+const cajaEntradas = document.getElementById('entradas');
+const cajaListas   = document.getElementById('listas');
+const cajaNota     = document.getElementById('nota');
+
+// una sola datalist con las 2000 palabras, para que autocompletar ayude
+const dl = document.createElement('datalist');
+dl.id = 'todas-las-palabras';
+for (const w of PAL) { const o = document.createElement('option'); o.value = w; dl.appendChild(o); }
+document.body.appendChild(dl);
+
+function campo(etiqueta, valor, alCambiar) {
+  const d = document.createElement('div'); d.className = 'campo';
+  const l = document.createElement('label'); l.textContent = etiqueta; d.appendChild(l);
+  const i = document.createElement('input');
+  i.type = 'text'; i.value = valor; i.spellcheck = false;
+  i.setAttribute('list', 'todas-las-palabras');
+  i.addEventListener('input', () => {
+    const w = i.value.trim().toLowerCase();
+    i.classList.toggle('malo', w !== '' && !IDX.has(w));
+    if (IDX.has(w)) alCambiar(w);
+  });
+  d.appendChild(i); cajaEntradas.appendChild(d);
+  return i;
+}
+function signo(t) {
+  const s = document.createElement('span'); s.className = 'signo'; s.textContent = t;
+  cajaEntradas.appendChild(s);
+}
+
+function armarEntradas() {
+  cajaEntradas.innerHTML = '';
+  if (estado.modo === 'explorar') {
+    campo('buscá una palabra', estado.palabra, w => { estado.palabra = w; actualizar(); });
+  } else if (estado.modo === 'aritmetica') {
+    campo('esta palabra', estado.a, w => { estado.a = w; actualizar(); });
+    signo('−');
+    campo('menos esta', estado.b, w => { estado.b = w; actualizar(); });
+    signo('+');
+    campo('más esta', estado.c, w => { estado.c = w; actualizar(); });
+    signo('=');
+  } else if (estado.modo === 'eje') {
+    campo('extremo izquierdo', estado.ejeNeg, w => { estado.ejeNeg = w; actualizar(); });
+    signo('←→');
+    campo('extremo derecho', estado.ejePos, w => { estado.ejePos = w; actualizar(); });
+  } else if (estado.modo === 'epocas') {
+    campo('la palabra a comparar', estado.epocaPalabra, w => { estado.epocaPalabra = w; actualizar(); });
+  }
+}
+
+/* =========================================================================
+   6. Los resultados
+   ========================================================================= */
+function li(w, s, clase) {
+  return '<li' + (clase ? ' class="' + clase + '"' : '') + '><span class="w">' + w +
+         '</span> <span class="s">' + (s === undefined ? '' : Viz.num(s, 3)) + '</span></li>';
+}
+
+function pintarExplorar() {
+  const w = estado.palabra;
+  if (!IDX.has(w)) {
+    cajaListas.className = 'listas una';
+    cajaListas.innerHTML = '<div class="lista"><h4>no está</h4><p>«' + w +
+      '» no está en el vocabulario. Sólo entraron las 2.000 palabras más ' +
+      'frecuentes del corpus, y <b>las tildes cuentan</b>: está ' +
+      '<code>educación</code>, no <code>educacion</code>.</p></div>';
+    estado.resaltados = []; estado.arcos = [];
+    return;
+  }
+  const i = IDX.get(w);
+  const vs = vecinos(w, 10);
+  estado.resaltados = [{ i: i, color: 'acento', forzar: true }].concat(
+    vs.map(v => ({ i: v.i, color: 'parametro' })));
+  estado.arcos = vs.map(v => ({ de: i, a: v.i, color: 'acento' }));
+
+  cajaListas.className = 'listas';
+  cajaListas.innerHTML =
+    '<div class="lista"><h4>las 10 vecinas de «' + w + '»</h4><ol>' +
+      vs.map(v => li(v.w, v.s)).join('') + '</ol></div>' +
+    '<div class="lista"><h4>lo que hay que saber</h4>' +
+      '<p>«' + w + '» aparece <b>' + FREC[i].toLocaleString('es-AR') +
+      '</b> veces en los 35 discursos.</p>' +
+      '<p>El número de al lado es la <b>similitud coseno</b>: 1 es "se usan ' +
+      'exactamente en los mismos contextos", 0 es "no tienen nada que ver".</p>' +
+      '<p><b>Ojo:</b> vecinas quiere decir <em>que se usan parecido</em>. No ' +
+      'quiere decir que signifiquen lo mismo, y muchas veces son opuestas.</p>' +
+    '</div>';
+  cajaNota.innerHTML = 'Las líneas del mapa van de «' + w + '» a sus diez vecinas. ' +
+    'Fijate que algunas se dibujan <b>lejos</b>: es que el mapa es una sombra de ' +
+    '100 dimensiones en 2, y aplasta cosas que en realidad están cerca.';
+}
+
+function pintarAritmetica() {
+  const { a, b, c } = estado;
+  if (!IDX.has(a) || !IDX.has(b) || !IDX.has(c)) {
+    cajaListas.className = 'listas una';
+    cajaListas.innerHTML = '<div class="lista"><h4>faltan palabras</h4>' +
+      '<p>Las tres tienen que estar en el vocabulario de 2.000 palabras.</p></div>';
+    return;
+  }
+  const ia = IDX.get(a), ib = IDX.get(b), ic = IDX.get(c);
+  const v = normalizar(VEC[ia].map((x, k) => x - VEC[ib][k] + VEC[ic][k]));
+  const res = masParecidas(v, 5, new Set([ia, ib, ic]));
+  const guardado = (D.aritmetica || []).find(x => x.a === a && x.b === b && x.c === c);
+
+  estado.resaltados = [
+    { i: ia, color: 'modelo', forzar: true }, { i: ib, color: 'val', forzar: true },
+    { i: ic, color: 'modelo', forzar: true }, { i: res[0].i, color: 'error', forzar: true }];
+  estado.arcos = [{ de: ib, a: ia, color: 'val', flecha: true },
+                  { de: ic, a: res[0].i, color: 'error', flecha: true }];
+
+  cajaListas.className = 'listas';
+  cajaListas.innerHTML =
+    '<div class="lista"><h4>lo que devuelve el modelo</h4><ol>' +
+      res.map(r => li(r.w, r.s)).join('') + '</ol></div>' +
+    '<div class="lista"><h4>¿acertó?</h4>' +
+      (guardado
+        ? '<p>Antes de mirar, una persona esperaría <b>«' + guardado.esperado + '»</b>' +
+          (guardado.esperado_en_vocab ? '' :
+            ' <span class="aviso">(y esa palabra ni siquiera está en el corpus)</span>') +
+          '.</p><p class="veredicto ' + (guardado.acierta ? 'ok">acertó' : 'mal">no acertó') +
+          '</p><p>' + guardado.nota + '.</p>'
+        : '<p>Esta combinación la armaste vos. Preguntate <b>antes</b> de mirar ' +
+          'qué esperabas, y después fijate si está en la lista.</p>') +
+    '</div>';
+  cajaNota.innerHTML = 'En el mapa: la flecha naranja es la relación «' + b + ' → ' + a +
+    '», la roja es «' + c + ' → ' + res[0].w + '». ' +
+    '<b>Si la analogía funcionara, las dos flechas serían paralelas y del mismo largo.</b> ' +
+    'Mirá si lo son.';
+}
+
+function pintarEje() {
+  estado.resaltados = []; estado.arcos = [];
+  if (!IDX.has(estado.ejePos) || !IDX.has(estado.ejeNeg)) {
+    cajaListas.className = 'listas una';
+    cajaListas.innerHTML = '<div class="lista"><h4>faltan palabras</h4><p>Las dos ' +
+      'puntas del eje tienen que estar en el vocabulario.</p></div>';
+    return;
+  }
+  const n = rankingActual.length;
+  const arriba = rankingActual.slice(0, 4), abajo = rankingActual.slice(-4);
+  cajaListas.className = 'listas';
+  cajaListas.innerHTML =
+    '<div class="lista"><h4>las 4 más cerca de «' + estado.ejePos + '»</h4><ol>' +
+      arriba.map(d => li(d.w, d.v)).join('') + '</ol></div>' +
+    '<div class="lista"><h4>las 4 más cerca de «' + estado.ejeNeg + '»</h4><ol>' +
+      abajo.slice().reverse().map(d => li(d.w, d.v)).join('') + '</ol></div>';
+  cajaNota.innerHTML =
+    '<b>Esto que acabás de hacer es la metodología de un paper de la ' +
+    '<em>American Sociological Review</em></b> (Kozlowski, Taddy &amp; Evans, 2019): ' +
+    'definir un eje con dos palabras y proyectar el vocabulario sobre él para ' +
+    'medir cómo se estructura culturalmente un corpus. ' +
+    'Los números son chicos —van de ' + Viz.num(abajo[abajo.length - 1].v, 2) + ' a ' +
+    Viz.num(arriba[0].v, 2) + '— porque el eje es una dirección entre cien. ' +
+    'Lo que importa es <b>el orden</b>, no la escala.';
+}
+
+function pintarEpocas() {
+  estado.arcos = [];
+  const E = D.epocas, w = estado.epocaPalabra;
+  estado.resaltados = IDX.has(w) ? [{ i: IDX.get(w), color: 'acento', forzar: true }] : [];
+  const va = E.vecinos[E.nombres[0]][w], vb = E.vecinos[E.nombres[1]][w];
+  if (!va || !vb) {
+    cajaListas.className = 'listas una';
+    cajaListas.innerHTML = '<div class="lista"><h4>no se puede comparar</h4><p>«' + w +
+      '» no aparece bastante en las <b>dos</b> mitades del período. ' +
+      'Para comparar épocas hace falta que la palabra exista en las dos. ' +
+      'Probá con: ' + E.palabras.slice(0, 12).join(', ') + '…</p></div>';
+    cajaNota.textContent = '';
+    return;
+  }
+  const sa = new Set(va.map(x => x[0])), sb = new Set(vb.map(x => x[0]));
+  const siguen = va.filter(x => sb.has(x[0])).length;
+  cajaListas.className = 'listas';
+  cajaListas.innerHTML =
+    '<div class="lista"><h4>vecinas de «' + w + '» en ' + E.nombres[0] + '</h4><ol>' +
+      va.map(x => li(x[0], x[1], sb.has(x[0]) ? '' : 'se-fue')).join('') + '</ol></div>' +
+    '<div class="lista"><h4>vecinas de «' + w + '» en ' + E.nombres[1] + '</h4><ol>' +
+      vb.map(x => li(x[0], x[1], sa.has(x[0]) ? '' : 'nuevo')).join('') + '</ol></div>';
+  cajaNota.innerHTML = 'De las <b>' + va.length + '</b> vecinas que «' + w +
+    '» tenía en ' + E.nombres[0] + ', <b>' + siguen + '</b> siguen siéndolo en ' +
+    E.nombres[1] + '. <span class="c-error">Tachadas</span>: las que se fueron. ' +
+    '<span class="c-ok">En verde</span>: las que llegaron. ' +
+    'Eso es <b>cambio semántico medido</b>, y es una tesis. ' +
+    '<em>Recaudo:</em> son dos corpus chicos (16 y 15 discursos), así que parte ' +
+    'del cambio es ruido. Un paper serio repite esto con remuestreo.';
+}
+
+/* =========================================================================
+   7. El panel
+   ========================================================================= */
+const PRESETS_EJE = (D.ejes || []).map(e => ({ pos: e.pos, neg: e.neg, texto: e.etiqueta }));
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Qué querés hacer' },
+  { tipo: 'botones', id: 'modo', etiqueta: 'el modo', valor: 'explorar',
+    opciones: [
+      { valor: 'explorar',   texto: 'explorar' },
+      { valor: 'aritmetica', texto: 'aritmética' },
+      { valor: 'eje',        texto: 'eje' },
+      { valor: 'epocas',     texto: 'dos épocas' }
+    ] },
+  { tipo: 'texto', id: 'ayuda', html: '' },
+  { tipo: 'titulo', texto: 'Atajos' },
+  { tipo: 'texto', id: 'atajos', html: '' },
+  { tipo: 'titulo', texto: 'El mapa' },
+  { tipo: 'checkbox', id: 'sinFuncion',
+    etiqueta: 'esconder las palabras de función («de», «que», «la»)', valor: true },
+  { tipo: 'checkbox', id: 'soloLexico',
+    etiqueta: 'mostrar sólo el léxico político y económico', valor: false },
+  { tipo: 'slider', id: 'zoom', etiqueta: 'cuánto acercar', sub: 'o usá la rueda del mouse',
+    min: 1, max: 14, paso: .1, valor: 1, decimales: 1, formato: v => Viz.num(v, 1) + '×',
+    color: 'acento' },
+  { tipo: 'boton', texto: 'Volver a encuadrar', alClic: () => {
+      estado.zoom = 1; estado.cx = 0; estado.cy = 0;
+      ctl.set('zoom', 1, true); p.redibujar();
+    } },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], (v, id) => {
+  estado.sinFuncion = v.sinFuncion;
+  estado.soloLexico = v.soloLexico;
+  if (id === 'zoom') { estado.zoom = v.zoom; }
+  if (id === 'modo' && v.modo !== estado.modo) { estado.modo = v.modo; armarEntradas(); }
+  actualizar();
+});
+
+/* --- los atajos, que cambian con el modo --------------------------------- */
+const cajaAtajos = ctl.nodos.atajos;
+function armarAtajos() {
+  cajaAtajos.innerHTML = '';
+  const grupo = document.createElement('div');
+  grupo.className = 'grupo-botones';
+  function boton(texto, alClic, principal) {
+    const b = document.createElement('button');
+    b.textContent = texto;
+    if (principal) b.className = 'principal';
+    b.addEventListener('click', alClic);
+    grupo.appendChild(b);
+  }
+  if (estado.modo === 'explorar') {
+    for (const w of Object.keys(D.vecinos_ejemplo)) {
+      boton(w, () => { estado.palabra = w; armarEntradas(); actualizar(); });
+    }
+  } else if (estado.modo === 'aritmetica') {
+    boton('los 2 que funcionan', () => rotarAnalogia(true), true);
+    boton('los 8 que NO funcionan', () => rotarAnalogia(false));
+  } else if (estado.modo === 'eje') {
+    for (const e of PRESETS_EJE) {
+      boton(e.texto, () => { estado.ejePos = e.pos; estado.ejeNeg = e.neg;
+                             armarEntradas(); actualizar(); });
+    }
+    boton('oficialismo ←→ oposición', () => {
+      estado.ejePos = 'oposición'; estado.ejeNeg = 'oficialismo';
+      armarEntradas(); actualizar();
+    });
+  } else {
+    for (const w of ['seguridad', 'trabajo', 'estado', 'derechos', 'crecimiento', 'justicia']) {
+      boton(w, () => { estado.epocaPalabra = w; armarEntradas(); actualizar(); });
+    }
+  }
+  cajaAtajos.appendChild(grupo);
+
+  if (estado.modo === 'eje') {
+    const sel = document.createElement('div');
+    sel.className = 'grupo-botones';
+    for (const nombre of Object.keys(LISTAS)) {
+      const b = document.createElement('button');
+      b.textContent = 'lista: ' + nombre;
+      b.className = estado.listaEje === nombre ? 'activo' : '';
+      b.addEventListener('click', () => { estado.listaEje = nombre; armarAtajos(); actualizar(); });
+      sel.appendChild(b);
+    }
+    cajaAtajos.appendChild(sel);
+  }
+}
+
+let iAnalogia = { true: 0, false: 0 };
+function rotarAnalogia(funciona) {
+  const cands = (D.aritmetica || []).filter(x => x.acierta === funciona);
+  if (!cands.length) return;
+  const k = iAnalogia[funciona] % cands.length;
+  iAnalogia[funciona] = k + 1;
+  const x = cands[k];
+  estado.a = x.a; estado.b = x.b; estado.c = x.c;
+  armarEntradas(); actualizar();
+}
+
+const AYUDA = {
+  explorar: 'Escribí una palabra arriba del mapa y mirá sus diez vecinas. ' +
+            'La vecindad la decidió <b>con quién aparece</b>, nada más.',
+  aritmetica: 'La cuenta famosa: <code>rey − hombre + mujer</code>. Acá con ' +
+              'vocabulario del corpus. <b>Casi nunca funciona</b>, y eso es el punto: ' +
+              'la divulgación exageró muchísimo este resultado.',
+  eje: 'Dos palabras definen una dirección y todas las demás se ordenan sobre ' +
+       'ella. <b>Este es el modo que mide sesgo</b>, y es el más útil para una tesis.',
+  epocas: 'Dos embeddings entrenados por separado: uno con los discursos de ' +
+          '1984-1999 y otro con los de 2004-2019. Comparamos las vecinas.'
+};
+
+/* =========================================================================
+   8. Actualizar todo
+   ========================================================================= */
+function actualizar() {
+  ctl.texto('ayuda', AYUDA[estado.modo]);
+  armarAtajos();
+  if (estado.modo === 'explorar')        pintarExplorar();
+  else if (estado.modo === 'aritmetica') pintarAritmetica();
+  else if (estado.modo === 'epocas')     pintarEpocas();
+  p.redibujarYa();                       // el eje necesita el ranking recién calculado
+  if (estado.modo === 'eje') pintarEje();
+  ctl.texto('lectura',
+    estado.modo === 'eje'
+      ? 'El mapa está mostrando el <b>ranking sobre el eje</b>. Volvé a «explorar» ' +
+        'para ver la nube otra vez.'
+      : 'Rueda del mouse para acercar, arrastrás para moverte. ' +
+        '<b>' + PAL.length.toLocaleString('es-AR') + '</b> palabras dibujadas, ' +
+        '<b>' + D.mapa.etiquetadas.length + '</b> con el nombre escrito ' +
+        '(si estuvieran todos no se leería ninguno).');
+}
+
+// La slide puede pedir un modo directamente: viz/espacio-de-embeddings.html#eje
+const MODO_PEDIDO = (location.hash || '').replace('#', '');
+if (['explorar', 'aritmetica', 'eje', 'epocas'].indexOf(MODO_PEDIDO) >= 0) {
+  estado.modo = MODO_PEDIDO;
+  ctl.set('modo', MODO_PEDIDO, true);
+}
+
+armarEntradas();
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>
