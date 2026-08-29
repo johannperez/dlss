@@ -19,8 +19,14 @@ lo mismo si tu máquina es vieja.
 **Los tres pasos:**
 
 1. Andá a [colab.research.google.com](https://colab.research.google.com).
-2. `Archivo` → `Abrir cuaderno` → pestaña **GitHub**. Pegá:
-   `https://github.com/johannperez/dlss` y elegí la rama del curso.
+2. `Archivo` → `Abrir cuaderno` → pestaña **GitHub**. Pegá la dirección del
+   repositorio del curso —**tu docente te la pasa**— y elegí la rama.
+   > **Nota para quien dicta:** la dirección que viene escrita en el repo
+   > (`https://github.com/johannperez/dlss`) es un **marcador de posición**: está
+   > en la celda de bootstrap de los diez notebooks, en la plantilla y acá abajo.
+   > Antes de publicar el curso hay que reemplazarla por la dirección real, en
+   > los 12 lugares. Los notebooks corren igual si esa dirección no existe (caen
+   > a los datos de muestra), pero el `[EL LUNES]` queda cojo.
    Abrí el notebook de la clase: `clases/01-funciones-y-parametros/notebook.ipynb`.
 3. Corré la primera celda (la que dice **BOOTSTRAP**) con `Shift + Enter`.
    Va a tardar unos veinte segundos la primera vez: está bajando el repo del
