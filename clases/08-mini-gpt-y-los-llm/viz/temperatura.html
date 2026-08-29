@@ -163,6 +163,7 @@ function mostrarUna() {
   const lista = pr.generaciones[claveT(tempActual())];
   const txt = lista[tirada % lista.length];
   rotSalida.textContent = 'Texto generado con temperatura ' + claveT(tempActual());
+  cajaSalida.hidden = false;
   cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
                          '<span class="cont">' + escapar(txt) + '</span>';
   cajaTiradas.innerHTML = '';
@@ -171,10 +172,9 @@ function mostrarUna() {
 function mostrarCinco() {
   const pr = promptActual();
   const lista = pr.generaciones[claveT(tempActual())];
-  rotSalida.textContent = 'Cinco tiradas con el MISMO prompt y temperatura ' +
-                          claveT(tempActual());
-  cajaSalida.innerHTML = '<span class="prompt">' + escapar(pr.texto) + '</span>' +
-    '<span class="cont">…</span>';
+  rotSalida.textContent = 'Cinco tiradas con el MISMO prompt («' + pr.texto.trim() +
+                          '») y temperatura ' + claveT(tempActual());
+  cajaSalida.hidden = true;              // el prompt ya está en el rótulo: sin caja vacía
   cajaTiradas.innerHTML = lista.map((t, i) =>
     '<div class="fila"><b>tirada ' + (i + 1) + ':</b> ' +
     escapar(t.slice(0, 150)) + '</div>').join('');
@@ -204,7 +204,9 @@ const ctl = Viz.controles('#panel', [
     alClic: () => { modo = 'una'; tirada++; pintarTexto(); } },
   { tipo: 'boton', texto: '5 veces con el mismo prompt',
     alClic: () => { modo = 'cinco'; pintarTexto(); } },
-  { tipo: 'texto', id: 'lectura2', html: '' }
+  { tipo: 'texto', id: 'lectura2', html:
+    'Apretá <b>«5 veces con el mismo prompt»</b> y mirá si las cinco salidas son ' +
+    'iguales o distintas. Probalo en <b>0,0</b> y después en <b>1,2</b>.' }
 ], (v, id) => {
   iPrompt = +v.prompt;
   if (id === 'prompt') { tirada = 0; modo = 'una'; }
