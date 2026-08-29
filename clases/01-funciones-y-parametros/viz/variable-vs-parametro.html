@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variable o parámetro — Clase 1</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA:
+       "Ah: el rastro de la derecha son TODAS las funciones posibles.
+        Elegir el parámetro es elegir una de esa familia. Aprender es elegir."
+
+     Y el aha chiquito que va antes:
+       "Son dos movimientos que no se parecen en nada, aunque en la fórmula
+        `a` y `x` estén escritos igual, uno al lado del otro."
+
+     La misma función en los dos paneles: f(x) = a · x².
+     Izquierda: se mueve x  -> la curva queda quieta, corre la bolita.
+     Derecha:   se mueve a  -> la bolita queda quieta, se retuerce la curva.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .dos-paneles { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  @media (max-width: 900px) { .dos-paneles { grid-template-columns: 1fr; } }
+  .frase {
+    margin: .5rem 0 0; padding: .55rem .7rem; font-size: .86rem; line-height: 1.4;
+    border-radius: var(--r-medio); background: var(--papel-2);
+    border: 1px solid var(--borde); color: var(--tinta-2);
+  }
+  .frase b { color: var(--tinta); }
+  .frase .titular { display: block; font-size: .95rem; margin-bottom: .2rem; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Mover la variable no es lo mismo que mover el parámetro</h1>
+    <p>La misma función en los dos paneles: <code>f(x) = a · x²</code>. A la izquierda movés
+       <b>x</b>; a la derecha movés <b>a</b>. En la fórmula están escritos igual, uno al lado
+       del otro. Fijate si hacen lo mismo.</p>
+  </header>
+
+  <div>
+    <div class="dos-paneles">
+      <div>
+        <div class="viz-frame" style="padding:8px"><div id="izq"></div></div>
+        <p class="frase" id="frase-izq"></p>
+      </div>
+      <div>
+        <div class="viz-frame" style="padding:8px"><div id="der"></div></div>
+        <p class="frase" id="frase-der"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Mirá el <b>rastro violeta</b> del panel derecho: eso que
+      queda dibujado no es un adorno, son <em>todas las curvas que tu modelo podría dibujar</em>.
+      Elegir el parámetro es elegir una de esa familia, y nada más que una.
+      Aprender, en este curso entero, va a ser exactamente eso: elegir.
+    </div>
+    <p class="viz-pie">
+      <b>La regla del dedo</b>, para el lunes: agarrá tu base de datos y preguntate por cada
+      número «¿esto cambia de una fila a la otra?». Si cambia, es una <b>variable</b>
+      (el año, la edad, el municipio). Si es el mismo para toda la base, es un
+      <b>parámetro</b> (un coeficiente, una tasa, un peso). Los dos son números y por eso
+      se confunden; pero uno lo pone el mundo y el otro lo elegís vos.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   Estado
+   =========================================================================== */
+const A_FIJO   = 0.8;    // el parámetro del panel izquierdo: NO se toca
+const X_FIJO   = 2.0;    // la variable del panel derecho: NO se toca
+const RASTRO   = [];     // las últimas 8 posiciones de `a`, para el fantasma
+let x = -2.2;            // la variable, panel izquierdo
+let a = 0.8;             // el parámetro, panel derecho
+
+const LIM = { xmin: -3.2, xmax: 3.2, ymin: -3.5, ymax: 11 };
+
+/* ===========================================================================
+   Panel izquierdo: se mueve la VARIABLE
+   =========================================================================== */
+const pI = Viz.plano('#izq', Object.assign({}, LIM, {
+  ejeX: 'x  (la variable: un caso)', ejeY: 'f(x)',
+  titulo: 'Movés la variable  x', alto: 330
+}));
+
+pI.alDibujar(() => {
+  pI.fondo(); pI.grilla(); pI.ejes();
+
+  // la curva está QUIETA: se dibuja tenue justamente para que no llame la atención
+  pI.curva(t => A_FIJO * t * t, { color: 'modelo', grosor: 3, opacidad: .30 });
+
+  const y = A_FIJO * x * x;
+
+  // las líneas punteadas que leen el par (x, f(x))
+  pI.segmento(x, LIM.ymin, x, y, { color: 'acento', grosor: 1.4, punteada: true, opacidad: .8 });
+  pI.segmento(LIM.xmin, y, x, y, { color: 'acento', grosor: 1.4, punteada: true, opacidad: .8 });
+
+  pI.punto(x, y, { color: 'acento', r: 8, halo: true });
+  pI.texto(x, y, '(' + Viz.num(x, 2) + ' , ' + Viz.num(y, 2) + ')',
+           { color: 'acento', tam: 12, peso: '700', dx: 10, dy: -16, caja: true });
+  pI.texto(x, LIM.ymin, 'x', { color: 'acento', tam: 12, peso: '700', dy: -12, alinear: 'center' });
+
+  pI.textoPx(pI.L + 8, pI.T + 6, 'la curva no se mueve: a = ' + A_FIJO,
+             { color: 'modelo', tam: 11, peso: '700', caja: true });
+});
+
+/* ===========================================================================
+   Panel derecho: se mueve el PARÁMETRO
+   =========================================================================== */
+const pD = Viz.plano('#der', Object.assign({}, LIM, {
+  ejeX: 'x  (la variable: quieta en 2)', ejeY: 'f(x)',
+  titulo: 'Movés el parámetro  a', alto: 330
+}));
+
+pD.alDibujar(() => {
+  pD.fondo(); pD.grilla(); pD.ejes();
+
+  // el rastro: TODAS las curvas por las que pasaste. Es el corazón de la viz.
+  RASTRO.forEach((av, i) => {
+    const fuerza = (i + 1) / (RASTRO.length + 1);
+    pD.curva(t => av * t * t, { color: 'parametro', grosor: 1.6, opacidad: .10 + .28 * fuerza });
+  });
+
+  // la vertical de x = 2: la variable acá NO se mueve
+  pD.segmento(X_FIJO, LIM.ymin, X_FIJO, LIM.ymax,
+              { color: 'acento', grosor: 1.4, punteada: true, opacidad: .55 });
+
+  pD.curva(t => a * t * t, { color: 'modelo', grosor: 3.4 });
+
+  const y = a * X_FIJO * X_FIJO;
+  pD.punto(X_FIJO, y, { color: 'acento', r: 8, halo: true });
+  pD.texto(X_FIJO, y, 'f(2) = ' + Viz.num(y, 2),
+           { color: 'acento', tam: 12, peso: '700', alinear: 'right',
+             dx: -14, dy: -14, caja: true });
+
+  pD.textoPx(pD.L + 8, pD.T + 6, 'la bolita no se mueve de x = 2',
+             { color: 'acento', tam: 11, peso: '700', caja: true });
+});
+
+/* ===========================================================================
+   Las frases: la mitad del valor de esta viz está acá abajo
+   =========================================================================== */
+const fI = document.getElementById('frase-izq');
+const fD = document.getElementById('frase-der');
+
+function frases() {
+  fI.innerHTML =
+    '<b class="titular">Estoy mirando <span class="c-acento">otro caso</span> de la misma teoría.</b>' +
+    'La teoría es siempre la misma (<b>a = ' + A_FIJO + '</b>). Lo que cambia es a quién le pregunto: ' +
+    'el caso <b>x = ' + Viz.num(x, 2) + '</b> tiene un valor de <b>' + Viz.num(A_FIJO * x * x, 2) + '</b>.';
+  fD.innerHTML =
+    '<b class="titular">Estoy proponiendo <span class="c-parametro">otra teoría</span>.</b>' +
+    'El caso es siempre el mismo (<b>x = 2</b>). Lo que cambia es qué afirmo sobre el mundo: ' +
+    'con <b>a = ' + Viz.num(a, 2) + '</b> mi teoría dice que ese caso vale <b>' +
+    Viz.num(a * X_FIJO * X_FIJO, 2) + '</b>.';
+}
+
+/* ===========================================================================
+   El panel de control
+   =========================================================================== */
+function guardarRastro(v) {
+  if (RASTRO.length && Math.abs(RASTRO[RASTRO.length - 1] - v) < 1e-9) return;
+  RASTRO.push(v);
+  while (RASTRO.length > 8) RASTRO.shift();
+}
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Panel izquierdo' },
+  { tipo: 'slider', id: 'x', etiqueta: 'qué caso estoy mirando',
+    sub: 'la variable x — corre la bolita', min: -3, max: 3, paso: 0.05,
+    valor: x, decimales: 2, color: 'acento' },
+
+  { tipo: 'titulo', texto: 'Panel derecho' },
+  { tipo: 'slider', id: 'a', etiqueta: 'qué tan cerrada es la curva',
+    sub: 'el parámetro a — deforma el dibujo', min: -0.6, max: 1.2, paso: 0.02,
+    valor: a, decimales: 2, color: 'parametro' },
+  { tipo: 'checkbox', id: 'rastro', etiqueta: 'dejar el rastro de las curvas', valor: true },
+  { tipo: 'boton', texto: 'Borrar el rastro', alClic: () => { RASTRO.length = 0; actualizar(); } },
+  { tipo: 'texto', id: 'ayuda', html:
+      'Movelos de a uno. Primero el de arriba hasta el final, después el de abajo. ' +
+      '<b>La pregunta:</b> ¿cuál de los dos cambia lo que tu modelo <i>afirma</i> sobre el mundo?' }
+], () => actualizar());
+
+/* ===========================================================================
+   La animación: los dos al mismo tiempo, para verlos en contraste
+   =========================================================================== */
+const anim = Viz.animacion({
+  cadaMs: 40,
+  paso: (i) => {
+    const t = (i % 120) / 120;                 // 0..1
+    const vaiven = t < 0.5 ? t * 2 : 2 - t * 2; // triángulo 0..1..0
+    ctl.set('x', -3 + 6 * vaiven, true);
+    ctl.set('a', -0.6 + 1.8 * vaiven, true);
+    actualizar();
+    return true;
+  },
+  reset: () => {
+    ctl.set('x', -2.2, true); ctl.set('a', 0.8, true);
+    RASTRO.length = 0; actualizar();
+  }
+});
+Viz.controlesAnimacion('#panel', anim, {
+  textoPlay: 'Animar los dos', textoPausa: 'Frenar',
+  textoPaso: 'Un paso', textoReset: 'Reiniciar'
+});
+
+/* ===========================================================================
+   Actualizar
+   =========================================================================== */
+function actualizar() {
+  x = ctl.valores.x;
+  a = ctl.valores.a;
+  if (ctl.valores.rastro) guardarRastro(a); else RASTRO.length = 0;
+  frases();
+  pI.redibujar();
+  pD.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

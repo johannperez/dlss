@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La recta imposible — Clase 2</title>
+
+<!-- ==========================================================================
+       MOMENTO AHA: "le puse cinco perillas y sigue siendo LA MISMA recta.
+                     Más parámetros no es más flexibilidad."
+
+     Ésta es la viz del gancho. El aula grita valores, el docente los pone, y el
+     desajuste no baja de un piso. Después viene el segundo golpe: agregarle
+     perillas a la recta no sirve para nada, porque todas se colapsan a dos
+     números.
+
+     NÚMEROS MEDIDOS sobre la serie real (media móvil de 3 años de las menciones
+     a «inflación», 1984-2019, n = 36):
+       · la mejor recta posible ........ MSE 0.001496 · pendiente +0,00043 por año
+       · una raya en el promedio ....... MSE 0.001516
+       · r = 0,115  →  R² = 1,3 %
+     Es decir: la mejor recta explica el 1,3 % de la variación. Ese número es el
+     gancho de la clase entera.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .colapso {
+    font-family: var(--f-mono); font-size: .82rem; text-align: center;
+    background: var(--papel-3); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .5rem .4rem; margin: .1rem 0 .2rem;
+  }
+  .colapso b { color: var(--c-modelo); }
+
+  /* Adentro de una slide hay 610 px de alto y nada más: el panel se compacta
+     para que todos los controles entren sin scrollear. */
+  body.embebido .panel { font-size: .9em; padding: .6rem .65rem .7rem; }
+  body.embebido .panel > h2 { margin-bottom: .45rem; }
+  body.embebido .ctrl { margin-bottom: .42rem; }
+  body.embebido .ctrl input[type="range"] { margin-top: .2rem; }
+  body.embebido .ctrl.tipo-checkbox { margin-bottom: .3rem; }
+  body.embebido .lectura { font-size: .76rem; line-height: 1.35; padding: .4rem .55rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .68rem; }
+
+  /* Ventana muy angosta (alguien lo abre en el celular): menos padding y una
+     sola columna, para que no aparezca scroll horizontal. */
+  @media (max-width: 560px) {
+    .viz-pagina { padding: .7rem; }
+    .taller { grid-template-columns: 1fr; max-height: none; }
+    .dos-columnas, .bloques, .par { grid-template-columns: 1fr; }
+  }
+
+  /* curso.css no declara box-sizing global, así que el padding de .viz-pagina
+     se suma al ancho y en una ventana angosta aparece scroll horizontal.
+     Lo arreglamos acá, localmente, para no tocar la hoja compartida. */
+  .viz-pagina, .panel, .viz-frame { box-sizing: border-box; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Ajustale una recta. Dale, la mejor recta posible.</h1>
+    <p>Esto es real: cuánto se habló de <b>inflación</b> en cada discurso
+       presidencial de apertura de sesiones, del 84 al 2019. Movele las dos
+       perillas y tratá de bajar el desajuste. Cuando te canses, probá el botón
+       de <em>más perillas</em>.</p>
+  </header>
+
+  <div class="viz-frame" style="padding:10px">
+    <div id="lienzo"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Primero, el piso: por más que muevas, el
+      desajuste no baja de <b>0.00150</b>, y una raya horizontal en el promedio
+      da <b>0.00152</b>. O sea que <em>la mejor recta posible casi no mejora
+      sobre no hacer nada</em>: explica el 1,3 % de la variación.
+      Y ahora el golpe de verdad: pasá a <b>3</b> y a <b>5 perillas</b>. Movelas
+      todas. El desajuste no baja ni un poquito, porque las cinco se colapsan
+      siempre a los mismos dos números. <b>Más parámetros no es más
+      flexibilidad.</b> Acordate de esto cuando alguien te venda un modelo por su
+      tamaño.
+    </div>
+    <p class="viz-pie">
+      Datos <b>reales</b>: porcentaje de palabras del discurso de apertura de
+      sesiones que pertenecen al léxico de «inflación», media móvil de 3 años.
+      El léxico lo escribimos nosotros y está a la vista en
+      <code>datos/preparar_corpus.py</code>: la serie mide <em>ese</em> léxico,
+      no «la inflación». Ver <code>datos/README.md</code>.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+// Adentro de una slide hay menos alto: los textos largos se acortan.
+const EMBEBIDO = document.body.classList.contains('embebido');
+
+const ANIO_0 = 1984, ANIO_1 = 2019;
+const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+               0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
+               0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
+               0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
+               0.1440, 0.1837, 0.1321, 0.1268];
+const objetivo = SERIE.map((v, i) => ({ x: ANIO_0 + i, y: v }));
+const PROMEDIO = SERIE.reduce((a, b) => a + b, 0) / SERIE.length;
+
+// Medidos, no estimados (ver la cabecera del archivo).
+const MEJOR_RECTA = 0.001496;
+const MEJOR_A = 0.00043156;                 // pendiente por año
+const MEJOR_B = 0.06242;                    // valor en 1984
+const SOLO_PROMEDIO = 0.001516;
+
+// El modelo: SIEMPRE una recta, aunque le pongamos más perillas.
+// 2 perillas:  a·(x−1984) + b
+// 3 perillas:  a·(x−1984) + b + c
+// 5 perillas:  a·(x−1984) + b + c·1 + d·2 + e·(x−1984)
+function coeficientes() {
+  const v = ctl.valores;
+  const n = +v.perillas;
+  let pend = v.a, orden = v.b;
+  if (n >= 3) orden += v.c;
+  if (n >= 5) { orden += 2 * v.d; pend += v.e; }
+  return { pend: pend, orden: orden };
+}
+function modelo(x) { const c = coeficientes(); return c.pend * (x - ANIO_0) + c.orden; }
+function desajuste() {
+  let s = 0;
+  for (const d of objetivo) { const e = d.y - modelo(d.x); s += e * e; }
+  return s / objetivo.length;
+}
+
+const p = Viz.plano('#lienzo', {
+  xmin: ANIO_0 - 1, xmax: ANIO_1 + 1, ymin: -0.01, ymax: 0.21,
+  ejeX: 'año', ejeY: '% de palabras del discurso',
+  titulo: 'menciones a «inflación» en la apertura de sesiones',
+  alto: EMBEBIDO ? 296 : 320
+});
+
+p.alDibujar(() => {
+  p.fondo(); p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+
+  if (ctl.valores.errores) {
+    for (const d of objetivo) {
+      p.segmento(d.x, d.y, d.x, modelo(d.x), { color: 'error', grosor: 2, opacidad: .85 });
+    }
+  }
+  if (ctl.valores.promedio) {
+    p.curva(() => PROMEDIO, { color: 'verdad', grosor: 2, punteada: [7, 5] });
+    p.texto(ANIO_0 + 1, PROMEDIO, 'el promedio, sin mirar el año',
+      { color: 'verdad', tam: 11, dy: -12, caja: true });
+  }
+
+  p.linea(objetivo, { color: 'datos', grosor: 3 });
+  p.puntos(objetivo, { color: 'datos', r: 3.4 });
+  p.curva(modelo, { color: 'modelo', grosor: 3.6 });
+
+  p.leyenda([
+    { color: 'datos', texto: 'lo observado', forma: 'linea' },
+    { color: 'modelo', texto: 'tu recta', forma: 'linea' },
+    { color: 'error', texto: 'el desajuste', forma: 'linea' }
+  ], { pos: 'ai' });
+});
+
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Las perillas de la recta' },
+  { tipo: 'botones', id: 'perillas', etiqueta: 'cuántas perillas le doy', valor: '2',
+    opciones: [{ valor: '2', texto: '2' }, { valor: '3', texto: '3' }, { valor: '5', texto: '5' }] },
+  { tipo: 'slider', id: 'a', etiqueta: 'qué tan empinada', sub: 'cuánto sube por año',
+    min: -0.004, max: 0.004, paso: 0.00002, valor: 0, decimales: 5, color: 'parametro' },
+  { tipo: 'slider', id: 'b', etiqueta: 'dónde arranca', sub: 'el valor en 1984',
+    min: 0, max: 0.2, paso: 0.001, valor: 0.10, decimales: 3, color: 'parametro' },
+  { tipo: 'medidor', id: 'des', etiqueta: 'desajuste' },
+  { tipo: 'boton', texto: 'Poner la mejor recta posible', principal: true, alClic: () => mejor() },
+  { tipo: 'boton', texto: 'Empezar de nuevo', alClic: () => reiniciar() },
+  { tipo: 'texto', id: 'colapso', html: '' },
+  { tipo: 'slider', id: 'c', etiqueta: 'perilla de más nº 1', sub: 'suma un número fijo',
+    min: -0.05, max: 0.05, paso: 0.001, valor: 0, decimales: 3, color: 'parametro' },
+  { tipo: 'slider', id: 'd', etiqueta: 'perilla de más nº 2', sub: 'suma el doble de otro número fijo',
+    min: -0.025, max: 0.025, paso: 0.0005, valor: 0, decimales: 4, color: 'parametro' },
+  { tipo: 'slider', id: 'e', etiqueta: 'perilla de más nº 3', sub: 'otra que multiplica el año',
+    min: -0.002, max: 0.002, paso: 0.00002, valor: 0, decimales: 5, color: 'parametro' },
+  { tipo: 'checkbox', id: 'errores', etiqueta: 'mostrar los errores', valor: true },
+  { tipo: 'checkbox', id: 'promedio', etiqueta: 'mostrar el promedio (no mirar el año)', valor: false },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => actualizar());
+
+function mejor() {
+  ctl.set('a', MEJOR_A, true); ctl.set('b', MEJOR_B, true);
+  ctl.set('c', 0, true); ctl.set('d', 0, true); ctl.set('e', 0, true);
+  actualizar();
+}
+function reiniciar() {
+  ctl.set('perillas', '2', true);
+  ctl.set('a', 0, true); ctl.set('b', 0.10, true);
+  ctl.set('c', 0, true); ctl.set('d', 0, true); ctl.set('e', 0, true);
+  actualizar();
+}
+
+// Los sliders de más se esconden cuando no están en juego: si están a la vista
+// y no hacen nada, parece un bug de la página y no una propiedad de las rectas.
+function mostrarSliders() {
+  const n = +ctl.valores.perillas;
+  const ver = (id, si) => {
+    const nodo = ctl.nodos[id].input.parentNode;
+    nodo.style.display = si ? '' : 'none';
+  };
+  ver('c', n >= 3); ver('d', n >= 5); ver('e', n >= 5);
+}
+
+function actualizar() {
+  mostrarSliders();
+  const c = coeficientes();
+  const d = desajuste();
+  const n = +ctl.valores.perillas;
+
+  ctl.medidor('des', Math.min(1, d / (SOLO_PROMEDIO * 1.6)), d.toFixed(5));
+
+  ctl.texto('colapso',
+    '<div class="colapso">' + n + ' perillas &nbsp;→&nbsp; <b>y = ' +
+    Viz.num(c.pend, 5) + '·(año−1984) ' + (c.orden < 0 ? '− ' : '+ ') +
+    Viz.num(Math.abs(c.orden), 3) + '</b></div>' +
+    (n > 2 ? '<div style="font-size:.8rem;line-height:1.4">Las <b>' + n +
+      '</b> se colapsan a <b>dos</b> números, siempre. Movelas todas: la forma no cambia.</div>' : ''));
+
+  let msg = EMBEBIDO
+    ? 'Piso de cualquier recta: <b>' + MEJOR_RECTA.toFixed(5) + '</b>. ' +
+      'Sólo el promedio: <b>' + SOLO_PROMEDIO.toFixed(5) + '</b>.'
+    : 'El piso de <b>cualquier</b> recta sobre estos datos es <b>' +
+      MEJOR_RECTA.toFixed(5) + '</b>.<br>Una raya horizontal en el promedio da <b>' +
+      SOLO_PROMEDIO.toFixed(5) + '</b>: la mejor recta explica el <b>1,3 %</b> de la variación.';
+  if (d <= MEJOR_RECTA * 1.02) {
+    msg += '<br><span class="c-error">Ya llegaste al piso. No es que lo estés haciendo mal: ' +
+      '<b>no se puede</b>.</span>';
+  }
+  ctl.texto('lectura', msg);
+  p.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

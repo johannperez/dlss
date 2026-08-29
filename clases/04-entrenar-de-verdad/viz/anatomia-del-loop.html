@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anatomía de un paso de entrenamiento — Clase 4</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "ah, ANOTAR no mueve nada. Sólo anota para dónde habría que
+     moverse. Recién MOVER mueve."
+
+     La viz existe para desarmar UNA confusión concreta y muy común: creer que
+     `perdida.backward()` cambia el modelo. No lo cambia. Por eso las perillas
+     se dibujan con un halo cuando cambian, y cuando corrés ANOTAR el halo NO
+     aparece: aparecen los dos gradientes, y las perillas se quedan quietas.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .fila-arriba { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: .55rem; }
+  .fila-abajo  { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-top: .55rem; }
+  @media (max-width: 760px) {
+    .fila-arriba, .fila-abajo { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* --- la tabla de números vivos --- */
+  #numeros { font-family: var(--f-mono); font-size: .74rem; }
+  #numeros table { width: 100%; border-collapse: collapse; }
+  #numeros td { padding: .09em .3em; border-bottom: 1px solid var(--borde); }
+  #numeros td.et { font-family: var(--f-texto); color: var(--tinta-2); font-size: .95em; }
+  #numeros td.v  { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #numeros tr.cambio td { background: var(--c-acento-suave); }
+  #numeros tr.apagado td.v { color: var(--tinta-3); font-weight: 400; }
+  #numeros tr.grad td.v { color: var(--c-parametro); }
+  #numeros tr.grad.apagado td.v { color: var(--tinta-3); }
+  #numeros tr.loss td.v { color: var(--c-error); }
+  #numeros tr.loss.apagado td.v { color: var(--tinta-3); }
+  #numeros .rotulo { font-family: var(--f-texto); font-size: .68rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--tinta-3); margin: .3rem 0 .1rem; }
+  #numeros .nota { font-family: var(--f-texto); font-size: .73rem; line-height: 1.35;
+    color: var(--tinta-2); margin-top: .35rem; min-height: 2.4em; }
+  #numeros .nota b { color: var(--tinta); }
+
+  /* --- el recuadro de código --- */
+  #codigo { font-family: var(--f-mono); font-size: .75rem; line-height: 1.45; margin-top: .4rem; }
+  #codigo .ln { display: flex; gap: .5rem; padding: .06em .35em; border-radius: var(--r-chico);
+    color: var(--tinta-3); align-items: baseline; }
+  #codigo .ln .n { width: 1.1em; text-align: right; font-size: .8em; opacity: .7; }
+  #codigo .ln .c { flex: 1 1 auto; white-space: pre; overflow-x: auto; }
+  #codigo .ln .q { font-family: var(--f-texto); font-size: .78em; color: var(--tinta-3); }
+  #codigo .ln.activa { background: var(--c-acento-suave); color: var(--tinta);
+    box-shadow: inset 3px 0 0 var(--c-acento); font-weight: 600; }
+  #codigo .ln.activa .q { color: var(--c-acento); font-weight: 700; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Anatomía de un paso de entrenamiento</h1>
+    <p>Cinco estaciones, en círculo, para siempre. Apretá <strong>«una estación»</strong> y
+       fijate qué número cambia en cada una. La pregunta que tenés que poder contestar
+       al final: <em>¿en qué momento exacto se mueven las perillas?</em></p>
+  </header>
+
+  <div>
+    <div class="fila-arriba">
+      <div class="viz-frame" style="padding:6px"><div id="diagrama"></div></div>
+      <div class="viz-frame" style="padding:.6rem .75rem"><div id="numeros"></div></div>
+    </div>
+
+    <div class="viz-frame" style="padding:.5rem .6rem"><div id="codigo"></div></div>
+
+    <div class="fila-abajo">
+      <div class="viz-frame" style="padding:6px"><div id="ajuste"></div></div>
+      <div class="viz-frame" style="padding:6px"><div id="curva-loss"></div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Andá parando en <b>ANOTAR</b>. Aparecen los dos gradientes
+      —los dos números violetas— y las perillas <em>no se mueven ni un poquito</em>.
+      Recién cuando apretás otra vez y llegás a <b>MOVER</b>, las perillas cambian y los
+      gradientes se quedan igual. Esa separación es todo el misterio de
+      <code>perdida.backward()</code> contra <code>optimizador.step()</code>:
+      uno anota, el otro camina.
+    </div>
+    <p class="viz-pie">
+      Datos: menciones a «seguridad» en el discurso presidencial de apertura de sesiones,
+      Argentina, ocho años entre 1984 y 2019 (% de palabras del discurso). <b>Datos reales</b>.
+      Son ocho y no treinta y seis para que los números entren en la pantalla: el modelo,
+      la cuenta y el orden de las estaciones son exactamente los del notebook.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. LOS DATOS (reales, ocho años elegidos para que la tabla se lea)
+   =========================================================================== */
+const ANIOS = [1984, 1990, 1996, 2001, 2006, 2011, 2016, 2019];
+const Y     = [0.0782, 0.0522, 0.1044, 0.3873, 0.1645, 0.2338, 0.4267, 0.2453];
+// centramos el año para que las dos perillas no queden pegadas (clase 3)
+const X = ANIOS.map(a => (a - 2001) / 10);
+const N = X.length;
+
+/* ===========================================================================
+   2. EL ESTADO: las dos perillas y lo que se va anotando en la vuelta
+   =========================================================================== */
+const A0 = 0.0, B0 = 0.0;
+let a = A0, b = B0;              // las perillas
+let pred = null;                 // lo que salió de PREDECIR
+let perdida = null;              // lo que salió de COMPARAR
+let ga = null, gb = null;        // lo anotado en ANOTAR
+let estacion = -1;               // -1 = todavía no empezó; 0..4 = la que acaba de correr
+let iteracion = 0;
+let historia = [];               // [{it, loss}] para la curva de abajo
+let resaltar = { a: false, b: false, ga: false, gb: false, perdida: false, pred: false };
+
+const ESTACIONES = [
+  { nom: 'PREDECIR', sub: 'forward',   col: 'modelo' },
+  { nom: 'COMPARAR', sub: 'la loss',   col: 'error' },
+  { nom: 'BORRAR',   sub: 'zero_grad', col: 'tinta3' },
+  { nom: 'ANOTAR',   sub: 'backward',  col: 'parametro' },
+  { nom: 'MOVER',    sub: 'step',      col: 'ok' }
+];
+
+const CODIGO = [
+  { c: 'prediccion  = modelo(x)',                 q: 'dibujá con las perillas de ahora' },
+  { c: 'perdida     = criterio(prediccion, y)',   q: '¿qué tan mal la estás dibujando?' },
+  { c: 'optimizador.zero_grad()',                 q: 'borrá lo anotado la vuelta pasada' },
+  { c: 'perdida.backward()',                      q: 'anotá para dónde habría que ir' },
+  { c: 'optimizador.step()',                      q: 'recién ahora: caminá' }
+];
+
+const NOTAS = [
+  'Con las perillas de <b>ahora</b> el modelo dibujó su recta y sacó los ocho números que predice. Todavía no sabe si están bien.',
+  'Los ocho errores, al cuadrado, promediados: eso es la <b>loss</b>. Un solo número para "qué tan mal la estoy dibujando".',
+  'Se borran los gradientes de la vuelta anterior. Si te olvidás esta línea se <b>suman</b> a los nuevos y el modelo se va a cualquier lado.',
+  'Acá se anotó para dónde habría que moverse. <b>Mirá las perillas: siguen exactamente iguales.</b> Anotar no es caminar.',
+  'Ahora sí. Cada perilla se movió un pasito en contra de su gradiente. Los gradientes siguen ahí, ya viejos: la vuelta que viene se borran.'
+];
+
+/* ===========================================================================
+   3. LA CUENTA (la misma que hace PyTorch, escrita a mano)
+   =========================================================================== */
+function modelo(xx) { return a * xx + b; }
+function calcularPred() { return X.map(modelo); }
+function calcularPerdida(p) {
+  let s = 0;
+  for (let i = 0; i < N; i++) s += (p[i] - Y[i]) * (p[i] - Y[i]);
+  return s / N;
+}
+function calcularGradientes(p) {
+  let sa = 0, sb = 0;
+  for (let i = 0; i < N; i++) { const e = p[i] - Y[i]; sa += 2 * e * X[i]; sb += 2 * e; }
+  return [sa / N, sb / N];
+}
+
+/* ===========================================================================
+   4. LOS TRES DIBUJOS
+   =========================================================================== */
+
+// --- 4.1 el círculo de las cinco estaciones --------------------------------
+const dia = Viz.plano('#diagrama', {
+  xmin: -1.55, xmax: 1.55, ymin: -1.28, ymax: 1.28, alto: 205, margen: { i: 6, d: 6, a: 6, b: 6 }
+});
+
+// las cinco estaciones, en círculo, arrancando arriba y girando como el reloj
+function posEstacion(i) {
+  const ang = Math.PI / 2 - i * 2 * Math.PI / 5;
+  return { x: Math.cos(ang) * 0.95, y: Math.sin(ang) * 0.82 };
+}
+const CAJA_W = 0.72, CAJA_H = 0.38;
+// dónde corta la flecha el borde de la caja: si no se calcula, la flecha arranca
+// adentro de la caja y queda un muñón de dos píxeles
+function salidaCaja(ux, uy) {
+  const tx = Math.abs(ux) > 1e-9 ? (CAJA_W / 2) / Math.abs(ux) : Infinity;
+  const ty = Math.abs(uy) > 1e-9 ? (CAJA_H / 2) / Math.abs(uy) : Infinity;
+  return Math.min(tx, ty) * 1.14;
+}
+
+dia.alDibujar(() => {
+  dia.fondo();
+  // las flechas del círculo, de estación a estación
+  for (let i = 0; i < 5; i++) {
+    const p1 = posEstacion(i), p2 = posEstacion((i + 1) % 5);
+    const dx = p2.x - p1.x, dy = p2.y - p1.y, L = Math.hypot(dx, dy);
+    const ux = dx / L, uy = dy / L, rec = salidaCaja(ux, uy);
+    const viva = estacion === i;
+    dia.flecha(p1.x + ux * rec, p1.y + uy * rec, p2.x - ux * rec, p2.y - uy * rec,
+               { color: viva ? 'acento' : 'borde', grosor: viva ? 2.6 : 1.5, cabeza: 9 });
+  }
+  // las cajas
+  for (let i = 0; i < 5; i++) {
+    const q = posEstacion(i), e = ESTACIONES[i], viva = estacion === i;
+    const caja = [[q.x - CAJA_W / 2, q.y - CAJA_H / 2], [q.x + CAJA_W / 2, q.y - CAJA_H / 2],
+                  [q.x + CAJA_W / 2, q.y + CAJA_H / 2], [q.x - CAJA_W / 2, q.y + CAJA_H / 2]];
+    dia.poligono(caja, {
+      relleno: viva ? Viz.color(e.col) : Viz.color('papel3'),
+      borde: viva ? 'acento' : 'borde', grosor: viva ? 2 : 1
+    });
+    dia.texto(q.x, q.y + 0.065, (i + 1) + '. ' + e.nom,
+              { color: viva ? 'papel' : 'tinta2', tam: 11, peso: '700', alinear: 'center' });
+    dia.texto(q.x, q.y - 0.085, e.sub,
+              { color: viva ? 'papel' : 'tinta3', tam: 9.5, alinear: 'center', mono: true });
+  }
+  dia.texto(0, 0.10, 'vuelta n°', { color: 'tinta3', tam: 10, alinear: 'center' });
+  dia.texto(0, -0.11, String(iteracion),
+            { color: 'acento', tam: 24, peso: '700', alinear: 'center' });
+});
+
+// --- 4.2 los datos y la recta de ahora --------------------------------------
+const aj = Viz.plano('#ajuste', {
+  xmin: 1981, xmax: 2022, ymin: -0.05, ymax: 0.52, alto: 152,
+  ejeX: 'año', ejeY: '% de palabras', titulo: 'lo que dibuja el modelo'
+});
+aj.alDibujar(() => {
+  aj.fondo(); aj.grilla(); aj.ejes({ formatoX: v => String(Math.round(v)) });
+  for (let i = 0; i < N; i++) {
+    aj.segmento(ANIOS[i], Y[i], ANIOS[i], modelo(X[i]),
+                { color: 'error', grosor: 1.6, opacidad: .85 });
+  }
+  aj.puntos(ANIOS.map((an, i) => ({ x: an, y: Y[i] })), { color: 'datos', r: 4.5 });
+  aj.curva(an => modelo((an - 2001) / 10), { color: 'modelo', grosor: 3 });
+});
+
+// --- 4.3 la curva de loss ---------------------------------------------------
+const cl = Viz.plano('#curva-loss', {
+  xmin: 0, xmax: 20, ymin: 0, ymax: 0.07, alto: 152,
+  ejeX: 'vuelta (epoch)', ejeY: 'loss', titulo: 'qué tan mal, vuelta a vuelta'
+});
+cl.alDibujar(() => {
+  cl.fondo(); cl.grilla(); cl.ejes({ formatoX: v => String(Math.round(v)) });
+  if (historia.length) {
+    cl.linea(historia.map(h => ({ x: h.it, y: h.loss })), { color: 'error', grosor: 2.5 });
+    cl.puntos(historia.slice(-1).map(h => ({ x: h.it, y: h.loss })), { color: 'error', r: 4 });
+  }
+  cl.texto(cl.xmax * 0.98, cl.ymax * 0.93,
+           perdida === null ? 'sin medir todavía' : 'loss = ' + Viz.num(perdida, 5),
+           { color: 'error', tam: 12, peso: '700', alinear: 'right', caja: true });
+});
+
+/* ===========================================================================
+   5. LA TABLA DE NÚMEROS Y EL CÓDIGO
+   =========================================================================== */
+const cajaNum = Viz.nodo('#numeros');
+const cajaCod = Viz.nodo('#codigo');
+
+// Viz.num pasa a notación científica con números diminutos (1.39e-17), que en
+// una tabla de clase asusta y no dice nada. Cuando el gradiente ya es polvo, se
+// muestra como cero.
+function nfmt(v, dec) { return Math.abs(v) < 5e-5 ? (0).toFixed(dec) : Viz.num(v, dec); }
+
+function fila(et, valor, clase) {
+  return '<tr class="' + (clase || '') + '"><td class="et">' + et +
+         '</td><td class="v">' + valor + '</td></tr>';
+}
+
+function pintarNumeros() {
+  const p3 = pred ? Viz.num(pred[3], 4) : '—';
+  let h = '';
+  h += '<div class="rotulo">las perillas</div><table>';
+  h += fila('a &nbsp;<span style="color:var(--tinta-3)">cuánto sube por década</span>',
+            Viz.num(a, 4), resaltar.a ? 'cambio' : '');
+  h += fila('b &nbsp;<span style="color:var(--tinta-3)">valor en 2001</span>',
+            Viz.num(b, 4), resaltar.b ? 'cambio' : '');
+  h += '</table>';
+
+  h += '<div class="rotulo">lo que salió de la vuelta</div><table>';
+  h += fila('lo que predijo para 2001', p3, resaltar.pred ? 'cambio' : (pred ? '' : 'apagado'));
+  h += fila('<b>loss</b> (los 8 errores²)', perdida === null ? '—' : Viz.num(perdida, 5),
+            'loss ' + (resaltar.perdida ? 'cambio' : (perdida === null ? 'apagado' : '')));
+  h += '</table>';
+
+  h += '<div class="rotulo">lo anotado (gradientes)</div><table>';
+  h += fila('para a', ga === null ? '—' : nfmt(ga, 4),
+            'grad ' + (resaltar.ga ? 'cambio' : (ga === null ? 'apagado' : '')));
+  h += fila('para b', gb === null ? '—' : nfmt(gb, 4),
+            'grad ' + (resaltar.gb ? 'cambio' : (gb === null ? 'apagado' : '')));
+  h += '</table>';
+
+  h += '<div class="nota">' +
+       (estacion < 0 ? 'Apretá <b>«una estación»</b> para arrancar la primera vuelta.'
+                     : NOTAS[estacion]) + '</div>';
+  cajaNum.innerHTML = h;
+}
+
+function pintarCodigo() {
+  let h = '';
+  for (let i = 0; i < 5; i++) {
+    h += '<div class="ln' + (estacion === i ? ' activa' : '') + '">' +
+         '<span class="n">' + (i + 1) + '</span>' +
+         '<span class="c">' + CODIGO[i].c + '</span>' +
+         '<span class="q">' + CODIGO[i].q + '</span></div>';
+  }
+  cajaCod.innerHTML = h;
+}
+
+/* ===========================================================================
+   6. LA MÁQUINA DE ESTADOS: una estación por vez
+   =========================================================================== */
+function limpiarResaltados() {
+  resaltar = { a: false, b: false, ga: false, gb: false, perdida: false, pred: false };
+}
+
+function unaEstacion() {
+  limpiarResaltados();
+  estacion = (estacion + 1) % 5;
+  const lr = ctl.valores.lr;
+
+  if (estacion === 0) {                       // PREDECIR
+    pred = calcularPred();
+    resaltar.pred = true;
+  } else if (estacion === 1) {                // COMPARAR
+    perdida = calcularPerdida(pred);
+    resaltar.perdida = true;
+    historia.push({ it: iteracion, loss: perdida });
+    if (iteracion + 1 > cl.xmax) cl.limites(0, Math.max(20, iteracion + 5), 0, cl.ymax);
+  } else if (estacion === 2) {                // BORRAR
+    ga = null; gb = null;
+  } else if (estacion === 3) {                // ANOTAR
+    const g = calcularGradientes(pred);
+    ga = g[0]; gb = g[1];
+    resaltar.ga = true; resaltar.gb = true;
+  } else {                                    // MOVER
+    a -= lr * ga; b -= lr * gb;
+    resaltar.a = true; resaltar.b = true;
+    iteracion++;
+  }
+  dibujarTodo();
+}
+
+function unaVuelta() {
+  // deja el ciclo parado justo después de MOVER
+  let seguro = 0;
+  do { unaEstacion(); seguro++; } while (estacion !== 4 && seguro < 12);
+}
+
+function correrMuchas(n) {
+  for (let k = 0; k < n; k++) unaVuelta();
+}
+
+function reiniciar() {
+  a = A0; b = B0; pred = null; perdida = null; ga = null; gb = null;
+  estacion = -1; iteracion = 0; historia = [];
+  limpiarResaltados();
+  cl.limites(0, 20, 0, 0.07);
+  dibujarTodo();
+}
+
+function dibujarTodo() {
+  dia.redibujar(); aj.redibujar(); cl.redibujar();
+  pintarNumeros(); pintarCodigo();
+  const conv = perdida === null ? '—' : Viz.num(perdida, 5);
+  ctl.texto('lectura',
+    'Vuelta <b>' + iteracion + '</b> · loss <b>' + conv + '</b><br>' +
+    'La recta de ahora dice: <b>cada década sube ' + Viz.num(a, 3) +
+    '</b> puntos de porcentaje, y en 2001 valía <b>' + Viz.num(b, 3) + '</b>.' +
+    (iteracion === 0 ? '<br><span style="color:var(--c-error)">Arranca en cero: una recta ' +
+                       'horizontal pegada al piso. Es adrede.</span>' : ''));
+}
+
+/* ===========================================================================
+   7. LOS CONTROLES
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El ciclo' },
+  { tipo: 'boton', texto: 'Una estación', principal: true, alClic: () => unaEstacion() },
+  { tipo: 'boton', texto: 'Una vuelta entera', alClic: () => unaVuelta() },
+  { tipo: 'boton', texto: 'Correr 50 vueltas', alClic: () => correrMuchas(50) },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => reiniciar() },
+  { tipo: 'titulo', texto: 'El tamaño del paso' },
+  { tipo: 'slider', id: 'lr', etiqueta: 'qué tan largo es el paso',
+    sub: 'learning rate — de la clase 3', min: 0.01, max: 1.2, escala: 'log',
+    valor: 0.3, formato: v => v.toFixed(3), color: 'parametro' },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => { dia.redibujar(); });
+
+reiniciar();
+Viz.botonTema();
+</script>
+</body>
+</html>

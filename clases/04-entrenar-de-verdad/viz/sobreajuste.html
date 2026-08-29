@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dibujar o calcar — Clase 4</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "con capacidad 60 la curva salta como loca cada vez que
+     saco otra muestra, y siempre pasa por todos los puntos. No está aprendiendo
+     el fenómeno: está aprendiendo la muestra."
+
+     Segundo aha, igual de importante: la curva AZUL (loss de entrenamiento)
+     BAJA SIEMPRE. O sea que el número que tenés a mano no te sirve para decidir.
+     El que decide es el naranja, y el naranja sólo existe si guardaste datos.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .semaforo { display: inline-block; width: .72em; height: .72em; border-radius: 50%;
+    margin-right: .35em; vertical-align: -1px; }
+  .panel .lectura + .lectura { margin-top: .5rem; }
+  #diagnostico { font-size: .84rem; line-height: 1.45; color: var(--tinta-2); }
+  #diagnostico b { color: var(--tinta); }
+  .cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin-bottom: .45rem; }
+  .cifras > div { background: var(--papel); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .3rem .35rem; text-align: center; }
+  .cifras .et { font-size: .62rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--tinta-3); display: block; line-height: 1.25; min-height: 2.3em; }
+  .cifras .nu { font-family: var(--f-mono); font-size: .95rem; font-weight: 700;
+    font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Dibujar o calcar</h1>
+    <p>Un fenómeno con forma (la línea gris), unas mediciones con ruido (los puntos oscuros) y
+       un modelo al que le podés dar más o menos libertad. Subí <strong>la capacidad</strong> despacio
+       y mirá <em>las dos curvas de abajo</em>: no la azul, que siempre te va a decir que sí.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:6px"><div id="principal"></div></div>
+    <div class="viz-frame" style="padding:6px; margin-top:.5rem"><div id="curvas"></div></div>
+    <div class="viz-frame" id="diagnostico" style="padding:.55rem .65rem; margin-top:.5rem"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Arrancá subiendo la capacidad despacio y mirá las dos curvas
+      de abajo: la azul <em>siempre</em> baja; la naranja baja, toca fondo y empieza a subir.
+      Después poné la capacidad en <b>60</b> y apretá <b>«otra muestra»</b> cinco veces seguidas:
+      la curva salta como loca —cada vez dibuja otra cosa— y <em>siempre</em> pasa por todos los
+      puntos. Las curvas fantasma que quedan atrás son las cinco figuras distintas que el mismo
+      modelo "aprendió" del mismo fenómeno. Ahora bajá la capacidad a <b>8</b> y repetí: casi no
+      se mueve. Esa es la diferencia entre aprender el fenómeno y aprenderse la muestra.
+    </div>
+    <p class="viz-pie">
+      Datos: menciones a «protesta» en la prensa de <b>Aguasclaras</b>, por trimestre.
+      <span class="chip sintetico">sintético</span> País ficticio, proceso generador conocido
+      y escrito en este archivo: por eso —y sólo por eso— podemos dibujar la verdad en gris.
+      Con datos reales esa línea no existe, y ahí está todo el problema.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. EL PROCESO GENERADOR (lo conocemos porque lo escribimos nosotros)
+   =========================================================================== */
+const T0 = 2000, T1 = 2024;                 // el eje x, en años
+function verdad(t) {                        // t normalizado a [0,1]
+  return 0.34
+       + 0.58 * Math.exp(-((t - 0.22) * (t - 0.22)) / 0.014)
+       + 0.44 * Math.exp(-((t - 0.70) * (t - 0.70)) / 0.026)
+       - 0.16 * t;
+}
+const aAnio = t => T0 + t * (T1 - T0);
+const aT    = x => (x - T0) / (T1 - T0);
+
+function muestrear(n, ruido, semilla) {
+  const r = Viz.azar(semilla), g = Viz.gauss(semilla + 7919);
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = r();
+    pts.push({ t: t, x: aAnio(t), y: verdad(t) + g() * ruido });
+  }
+  pts.sort((a, b) => a.t - b.t);
+  return pts;
+}
+
+/* ===========================================================================
+   2. EL MODELO: una suma de rampas (la red de la clase 2, resuelta de una)
+   Capacidad K = cuántas rampas. Los parámetros son K+2 (las K alturas, más la
+   recta de base). Se resuelven por mínimos cuadrados con un pelín de
+   regularización para que la cuenta no explote; el resultado es el mismo que
+   daría entrenar con descenso mucho rato.
+   =========================================================================== */
+function base(t, K) {
+  const f = [1, t];
+  // cada rampa se escala por (K+1) para que todas las piezas midan más o menos
+  // lo mismo. Si no, con muchas rampas las últimas quedan tan chiquitas que la
+  // cuenta las apaga sola y el sobreajuste no aparece: sería hacer trampa a
+  // favor de la moraleja.
+  for (let j = 1; j <= K; j++) f.push((K + 1) * Math.max(0, t - j / (K + 1)));
+  return f;
+}
+
+function ajustar(pts, K) {
+  const d = K + 2, lam = 1e-4 * pts.length;
+  const A = [];
+  for (let i = 0; i < d; i++) A.push(new Array(d + 1).fill(0));
+  for (const p of pts) {
+    const f = base(p.t, K);
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) A[i][j] += f[i] * f[j];
+      A[i][d] += f[i] * p.y;
+    }
+  }
+  for (let i = 0; i < d; i++) A[i][i] += lam;
+  // Gauss-Jordan con pivoteo parcial
+  for (let c = 0; c < d; c++) {
+    let piv = c;
+    for (let r = c + 1; r < d; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
+    const tmp = A[c]; A[c] = A[piv]; A[piv] = tmp;
+    const pv = A[c][c] || 1e-12;
+    for (let r = 0; r < d; r++) {
+      if (r === c) continue;
+      const f = A[r][c] / pv;
+      if (!f) continue;
+      for (let j = c; j <= d; j++) A[r][j] -= f * A[c][j];
+    }
+  }
+  const w = [];
+  for (let i = 0; i < d; i++) w.push(A[i][d] / (A[i][i] || 1e-12));
+  return w;
+}
+
+function predecir(w, t, K) {
+  const f = base(t, K);
+  let s = 0;
+  for (let i = 0; i < f.length; i++) s += w[i] * f[i];
+  return s;
+}
+function mse(w, pts, K) {
+  let s = 0;
+  for (const p of pts) { const e = predecir(w, p.t, K) - p.y; s += e * e; }
+  return s / pts.length;
+}
+
+/* ===========================================================================
+   3. ESTADO
+   =========================================================================== */
+const CAP_MAX = 60;
+let semilla = 101;
+let entrenamiento = [], validacion = [];
+let sweepTrain = [], sweepVal = [], pesos = [];   // una entrada por capacidad 1..CAP_MAX
+let fantasmas = [];                              // curvas de muestras anteriores
+
+function nuevaMuestra(cambiarSemilla) {
+  if (cambiarSemilla) semilla = (semilla * 1103515245 + 12345) % 2147483647;
+  const n = Math.round(ctl.valores.n);
+  const ruido = ctl.valores.ruido;
+  entrenamiento = muestrear(n, ruido, semilla);
+  // la validación sale del MISMO proceso, con otro ruido: son casos que existen
+  // y que el modelo no vio. Su tamaño es fijo para que la comparación sea justa.
+  validacion = muestrear(90, ruido, semilla + 555);
+  recalcular();
+}
+
+function recalcular() {
+  sweepTrain = []; sweepVal = []; pesos = [];
+  for (let K = 1; K <= CAP_MAX; K++) {
+    const w = ajustar(entrenamiento, K);
+    pesos.push(w);
+    sweepTrain.push(mse(w, entrenamiento, K));
+    sweepVal.push(mse(w, validacion, K));
+  }
+}
+
+const capActual = () => Math.round(ctl.valores.cap);
+const wActual   = () => pesos[capActual() - 1];
+const mejorCap  = () => sweepVal.indexOf(Math.min.apply(null, sweepVal)) + 1;
+
+/* ===========================================================================
+   4. PANEL PRINCIPAL: los datos, la verdad y lo que dibuja el modelo
+   =========================================================================== */
+const P = Viz.plano('#principal', {
+  xmin: T0 - 0.5, xmax: T1 + 0.5, ymin: -0.15, ymax: 1.18, alto: 250,
+  ejeX: 'año', ejeY: 'menciones (%)',
+  titulo: 'lo que pasó, lo que medimos y lo que el modelo dibuja'
+});
+
+P.alDibujar(() => {
+  P.fondo(); P.grilla(); P.ejes({ formatoX: v => String(Math.round(v)) });
+
+  // los fantasmas: lo que el MISMO modelo dibujó con otras muestras
+  for (const f of fantasmas) {
+    P.linea(poli(f.w, f.K, f.r), { color: 'modelo', grosor: 1.4, opacidad: .28 });
+  }
+
+  if (ctl.valores.verdad) {
+    P.curva(x => verdad(aT(x)), { color: 'verdad', grosor: 3, punteada: [7, 5] });
+  }
+
+  if (ctl.valores.verVal) {
+    P.puntos(validacion, { color: 'val', r: 3.2, hueco: true, grosor: 1.8 });
+  }
+  P.puntos(entrenamiento, { color: 'datos', r: 4.2 });
+
+  P.linea(poli(wActual(), capActual()), { color: 'modelo', grosor: 3.2 });
+
+  P.leyenda([
+    { color: 'verdad', texto: 'la verdad (sólo la sabemos acá)', forma: 'linea', punteada: true },
+    { color: 'datos', texto: 'lo que el modelo vio (entrenamiento)' },
+    { color: 'val', texto: 'lo que NO vio (validación)' },
+    { color: 'modelo', texto: 'lo que el modelo dibuja', forma: 'linea' }
+  ], { pos: 'ad' });
+});
+
+// El modelo se dibuja SÓLO entre el primer y el último caso que vio. Afuera de
+// ahí no hay información: extrapolar sería inventar, y este curso trata de eso.
+function poli(w, K, rango) {
+  const t0 = rango ? rango[0] : entrenamiento[0].t;
+  const t1 = rango ? rango[1] : entrenamiento[entrenamiento.length - 1].t;
+  const pts = [];
+  for (let i = 0; i <= 260; i++) {
+    const t = t0 + (t1 - t0) * i / 260;
+    pts.push({ x: aAnio(t), y: predecir(w, t, K) });
+  }
+  return pts;
+}
+
+P.tooltip(w => 'año ' + Math.round(w.x) + '\nmodelo ' +
+              Viz.num(predecir(wActual(), aT(w.x), capActual()), 3) +
+              '\nverdad ' + Viz.num(verdad(aT(w.x)), 3));
+
+/* ===========================================================================
+   5. PANEL DE CURVAS: la loss contra la capacidad
+   =========================================================================== */
+const C = Viz.plano('#curvas', {
+  xmin: 0, xmax: CAP_MAX + 1, ymin: 0, ymax: 0.05, alto: 162,
+  ejeX: 'capacidad (cuántas rampas tiene el modelo)', ejeY: 'loss (error²)',
+  titulo: 'la azul siempre baja; la naranja es la que decide'
+});
+
+C.alDibujar(() => {
+  // el techo del gráfico: alto como para que se vea la U, pero sin que un pico
+  // suelto (que los hay: el sobreajuste es ruidoso) aplaste todo lo demás
+  const orden = sweepVal.slice().sort((x, y) => x - y);
+  const p90 = orden[Math.floor(orden.length * 0.9)];
+  const tope = Math.min(0.20, Math.max(0.012, 1.2 * Math.max(sweepVal[0], p90)));
+  C.limites(0, CAP_MAX + 1, 0, tope);
+  const seSalen = sweepVal.filter(v => v > tope).length;
+  C.fondo(); C.grilla(); C.ejes({ formatoX: v => String(Math.round(v)) });
+
+  const K = capActual(), mejor = mejorCap();
+
+  // la línea vertical del óptimo, y la del punto donde estás parado
+  C.segmento(mejor, 0, mejor, tope, { color: 'ok', grosor: 2, punteada: [5, 4], opacidad: .9 });
+  C.texto(mejor, tope * 0.97, 'el mejor: ' + mejor,
+          { color: 'ok', tam: 11, peso: '700', alinear: 'center', caja: true });
+  C.segmento(K, 0, K, tope, { color: 'acento', grosor: 2, opacidad: .55 });
+
+  C.linea(sweepTrain.map((v, i) => ({ x: i + 1, y: v })), { color: 'modelo', grosor: 2.8 });
+  C.linea(sweepVal.map((v, i) => ({ x: i + 1, y: v })), { color: 'val', grosor: 2.8 });
+
+  C.punto(K, sweepTrain[K - 1], { color: 'modelo', r: 5 });
+  C.punto(K, sweepVal[K - 1], { color: 'val', r: 5 });
+
+  C.leyenda([
+    { color: 'modelo', texto: 'sobre lo que vio (train)', forma: 'linea' },
+    { color: 'val', texto: 'sobre lo que no vio (validación)', forma: 'linea' }
+  ], { pos: 'ad' });
+  if (seSalen) {
+    C.textoPx(C.L + 8, C.B - 8, '↑ ' + seSalen + ' punto' + (seSalen > 1 ? 's' : '') +
+              ' de la naranja se va del gráfico: ahí es todavía peor',
+              { color: 'val', tam: 10.5, peso: '700', base: 'bottom' });
+  }
+});
+
+/* ===========================================================================
+   6. LA LECTURA EN CASTELLANO
+   =========================================================================== */
+function actualizarLectura() {
+  const K = capActual();
+  const lt = sweepTrain[K - 1], lv = sweepVal[K - 1];
+  const brecha = lv - lt;
+  const mejor = mejorCap(), mejorVal = sweepVal[mejor - 1];
+  // Qué tan lejos estás de lo MEJOR que se puede conseguir con estos datos.
+  // Es la comparación que hace la curva naranja, que es la única que decide.
+  const exceso = mejorVal > 1e-12 ? lv / mejorVal : 1;
+
+  let col, veredicto, diag;
+  if (exceso < 1.18) {
+    col = 'ok'; veredicto = 'en el punto justo';
+    diag = 'El modelo anda casi igual sobre lo que vio y sobre lo que no. ' +
+           'Eso —y nada más que eso— es lo que te autoriza a decir que <b>aprendió</b>.';
+  } else if (K < mejor) {
+    col = exceso < 1.6 ? 'val' : 'error';
+    veredicto = 'demasiado rígido';
+    diag = 'Te estás perdiendo estructura que <b>está ahí</b>. Mirá la línea gris y mirá ' +
+           'la azul: hay forma real que tu modelo no puede copiar aunque quiera.';
+  } else {
+    col = exceso < 1.6 ? 'val' : 'error';
+    veredicto = exceso < 1.6 ? 'empezando a calcar' : 'calcando';
+    diag = exceso < 1.6
+      ? 'Se está abriendo la tijera. Todavía sirve, pero ya estás pagando libertad de más: ' +
+        'con <b>' + mejor + '</b> rampas te iba mejor sobre lo que no vio.'
+      : 'Tu modelo aprendió particularidades de <b>esta</b> muestra. Con otra muestra del ' +
+        'mismo fenómeno te va a dar otra cosa: <b>no va a replicar</b>. Apretá «otra muestra» ' +
+        'y comprobalo.';
+  }
+
+  ctl.medidor('brecha', Math.min(1, (exceso - 1) / 1.2), '×' + Viz.num(exceso, 2));
+
+  Viz.nodo('#diagnostico').innerHTML =
+    '<div class="cifras">' +
+    '<div><span class="et">loss sobre lo que vio</span>' +
+      '<span class="nu" style="color:var(--c-modelo)">' + Viz.num(lt, 4) + '</span></div>' +
+    '<div><span class="et">loss sobre lo que no vio</span>' +
+      '<span class="nu" style="color:var(--c-val)">' + Viz.num(lv, 4) + '</span></div>' +
+    '<div><span class="et">la brecha entre las dos</span>' +
+      '<span class="nu" style="color:var(--c-' + col + ')">' + Viz.num(brecha, 4) + '</span></div>' +
+    '<div><span class="et">perillas / casos</span>' +
+      '<span class="nu">' + (K + 2) + ' / ' + entrenamiento.length + '</span></div>' +
+    '</div>' +
+    '<span class="semaforo" style="background:var(--c-' + col + ')"></span><b>' +
+    veredicto + '</b> — ' + diag;
+}
+
+function redibujar() { P.redibujar(); C.redibujar(); actualizarLectura(); }
+
+/* ===========================================================================
+   7. CONTROLES
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El modelo' },
+  { tipo: 'slider', id: 'cap', etiqueta: 'capacidad', sub: 'cuántas rampas puede usar',
+    min: 1, max: CAP_MAX, paso: 1, valor: 3, decimales: 0, color: 'parametro' },
+
+  { tipo: 'titulo', texto: 'Los datos' },
+  { tipo: 'slider', id: 'n', etiqueta: 'cuántos casos tenés', sub: 'el tamaño de tu muestra',
+    min: 10, max: 400, paso: 5, valor: 25, decimales: 0, color: 'datos' },
+  { tipo: 'slider', id: 'ruido', etiqueta: 'cuánto ruido tienen las mediciones',
+    sub: 'error de medición, no del fenómeno',
+    min: 0, max: 0.25, paso: 0.01, valor: 0.09, decimales: 2, color: 'error' },
+  { tipo: 'boton', texto: 'Otra muestra', principal: true,
+    alClic: () => {
+      // guardamos la curva anterior como fantasma antes de tirar otra muestra
+      fantasmas.push({ w: wActual(), K: capActual(),
+                       r: [entrenamiento[0].t, entrenamiento[entrenamiento.length - 1].t] });
+      if (fantasmas.length > 6) fantasmas.shift();
+      nuevaMuestra(true); redibujar();
+    } },
+  { tipo: 'boton', texto: 'Borrar fantasmas',
+    alClic: () => { fantasmas = []; redibujar(); } },
+
+  { tipo: 'checkbox', id: 'verdad', etiqueta: 'mostrar la verdad', valor: true },
+  { tipo: 'checkbox', id: 'verVal', etiqueta: 'mostrar los casos de validación', valor: false },
+
+  { tipo: 'medidor', id: 'brecha', etiqueta: 'cuánto peor que el mejor posible' }
+], (v, id) => {
+  if (id === 'n' || id === 'ruido') { nuevaMuestra(false); }
+  redibujar();
+});
+
+nuevaMuestra(false);
+redibujar();
+Viz.botonTema();
+</script>
+</body>
+</html>

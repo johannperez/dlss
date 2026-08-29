@@ -45,15 +45,18 @@ de por qué se lee **ahí**.
 
 ## 2. Ciencias sociales computacionales (el marco del curso)
 
-- **Grimmer, J., Roberts, M. & Stewart, B.** (2022), *Text as Data: A New Framework for Machine Learning and the Social Sciences*, Princeton University Press. **El libro de cabecera del curso.** `[VERIFICAR]` · *clases 1, 5, 6, 9, 10*
+- **Grimmer, J., Roberts, M. & Stewart, B.** (2022), *Text as Data: A New Framework for Machine Learning and the Social Sciences*, Princeton University Press. **El libro de cabecera del curso.** `[VERIFICAR]` · *clases 1, 2, 5, 6, 9, 10*
 - **Grimmer, J. & Stewart, B.** (2013), *Text as Data: The Promise and Pitfalls of Automatic Content Analysis Methods for Political Texts*, Political Analysis 21(3). `[VERIFICAR]` · *clases 9, 10*
-- **Molina, M. & Garip, F.** (2019), *Machine Learning for Sociology*, Annual Review of Sociology 45. `[VERIFICAR]` · *clase 1*
-- **Breiman, L.** (2001), *Statistical Modeling: The Two Cultures*, Statistical Science 16(3). **Fundamenta el "camino A vs camino B" de la clase 1.** `[VERIFICAR URL]` · *clase 1*
-- **Yarkoni, T. & Westfall, J.** (2017), *Choosing Prediction Over Explanation in Psychology*, Perspectives on Psychological Science. `[VERIFICAR]` · *clase 4*
+- **Molina, M. & Garip, F.** (2019), *Machine Learning for Sociology*, Annual Review of Sociology 45. `[VERIFICAR]` · *clases 1, 2*
+- **Breiman, L.** (2001), *Statistical Modeling: The Two Cultures*, Statistical Science 16(3). **Fundamenta el "camino A vs camino B" de la clase 1**, y es la mejor lectura para acompañar la incomodidad que deja la clase 2. `[VERIFICAR URL]` · *clases 1, 2*
+- **Yarkoni, T. & Westfall, J.** (2017), *Choosing Prediction Over Explanation in Psychology*, Perspectives on Psychological Science. **La mejor lectura existente para traducir la distinción ajuste/predicción al vocabulario de las ciencias sociales; se asigna en la clase 4.** `[VERIFICAR]` · *clase 4*
+- **Salganik, M. et al.** (2020), *Measuring the predictability of life outcomes with a scientific mass collaboration*, PNAS 117(15). 160 equipos, los mismos datos de panel, y **ninguno predijo bien**: pone en escala la lección de la clase 4 (a veces el fenómeno no es predecible, y eso también se reporta). `[VERIFICAR]` · *clases 4, 10*
+- **Lundberg, I., Brand, J. E. & Jeon, N.** (2022), *Researcher reasoning meets computational capacity: Machine learning for social science*, Social Science Research 108. Cuándo el aprendizaje automático agrega algo a una pregunta social y cuándo es un adorno caro. `[VERIFICAR]` · *clases 4, 10*
 - **Ziems, C. et al.** (2024), *Can Large Language Models Transform Computational Social Science?*, Computational Linguistics. `[VERIFICAR]` · *clase 8*
 - **Barberá, P. et al.** (2021), *Automated Text Classification of News Articles: A Practical Guide*, Political Analysis. `[VERIFICAR]` · *clase 9*
 - **Barrie, C., Palmer, A. & Spirling, A.** (2024), sobre reproducibilidad con LLMs en investigación. `[VERIFICAR]` · *clase 8*
 - **Simon, H.** (1955), *A Behavioral Model of Rational Choice*, QJE — para fundamentar la discusión sobre elegir la función de pérdida. `[VERIFICAR]` · *clase 3*
+- **Ragin, C. & Becker, H.** (eds.) (1992), *What Is a Case? Exploring the Foundations of Social Inquiry*, Cambridge University Press — la tradición del caso desviado es, dicha en el vocabulario de hoy, la decisión de darle mucho peso al outlier: MSE contra MAE. `[VERIFICAR]` · *clase 3*
 
 ## 3. Estudios empíricos que usamos como caso
 
@@ -71,13 +74,14 @@ de por qué se lee **ahí**.
 - **Wiegreffe, S. & Pinter, Y.** (2019), *Attention is not not Explanation*, EMNLP — la réplica. Mencionar las dos es parte del punto. `[VERIFICAR]` · *clase 7*
 - **Bolukbasi, T. et al.** (2016), *Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings*, NeurIPS. `[VERIFICAR]` · *clases 6, 10*
 - **Rodriguez, P. & Spirling, A.** (2022), *Word Embeddings: What Works, What Doesn't, and How to Tell the Difference for Applied Research*, Journal of Politics. `[VERIFICAR]` · *clase 6*
+- **Jacobs, A. Z. & Wallach, H.** (2021), *Measurement and Fairness*, FAccT '21. Pone nombre a la distancia entre el constructo que querés medir y el número que sale; **se cita ya en la clase 1** (el «% de palabras dedicadas a seguridad») y se cobra en la 10. `[VERIFICAR]` · *clases 1, 10*
 - **Krippendorff, K.**, *Content Analysis: An Introduction to Its Methodology* — marco de fiabilidad entre codificadores (kappa, alpha). `[VERIFICAR]` · *clases 9, 10*
 - **Liu, N. et al.** (2023), *Lost in the Middle: How Language Models Use Long Contexts*, TACL. `[VERIFICAR]` · *clase 8*
 
 ## 5. Técnico (para el docente, no para el aula)
 
 - **Vaswani, A. et al.** (2017), *Attention Is All You Need*, NeurIPS. Se muestra la primera página, no se lee. `[VERIFICAR URL]` · *clase 7*
-- **Goodfellow, I., Bengio, Y. & Courville, A.**, *Deep Learning*, MIT Press (gratis online). `[VERIFICAR URL]` · *clase 3*
+- **Goodfellow, I., Bengio, Y. & Courville, A.**, *Deep Learning*, MIT Press (gratis online). El cap. 6 (§6.1-6.4) es la versión formal de la clase 2. `[VERIFICAR URL]` · *clases 2, 3*
 - **Hastie, T., Tibshirani, R. & Friedman, J.**, *The Elements of Statistical Learning*, cap. 7 (model assessment and selection). `[VERIFICAR URL]` · *clase 4*
 - **Cybenko, G.** (1989), *Approximation by superpositions of a sigmoidal function*, MCSS 2(4). Sólo la referencia: **no se dicta el teorema.** `[VERIFICAR]` · *clase 2*
 - **Hornik, K.** (1991), *Approximation capabilities of multilayer feedforward networks*, Neural Networks 4(2). `[VERIFICAR]` · *clase 2*
@@ -86,6 +90,9 @@ de por qué se lee **ahí**.
 - **Elhage, N. et al.**, *A Mathematical Framework for Transformer Circuits* — sólo para el docente. `[VERIFICAR URL]` · *clase 7*
 - **Grinsztajn, L., Oyallon, E. & Varoquaux, G.** (2022), *Why do tree-based models still outperform deep learning on tabular data?*, NeurIPS. **Es la referencia honesta para decir "acá no uses deep learning".** `[VERIFICAR]` · *clases 5, 10*
 - **Firth, J.R.** (1957), para la cita de la hipótesis distribucional. `[VERIFICAR]` · *clase 6*
+- **Ruder, S.** (2016), *An overview of gradient descent optimization algorithms* — el recorrido más claro de SGD → momento → Adagrad → RMSprop → Adam, con la intuición antes de la fórmula. `[VERIFICAR URL]` · *clase 3*
+- **Goh, G.** (2017), *Why Momentum Really Works*, Distill — por qué un valle alargado hace zigzaguear al descenso. Es la continuación de la última celda del notebook de la clase 3. `[VERIFICAR URL]` · *clase 3*
+- **Stigler, S. M.** (1986), *The History of Statistics*, Harvard University Press, cap. 1 — de dónde sale que el MSE sea el default: tenía solución cerrada. La anécdota de la slide 8 de la clase 3. `[VERIFICAR]` · *clase 3*
 
 ## 6. Modelos y herramientas en castellano
 
@@ -100,8 +107,8 @@ Detalle completo, licencias y trampas en **`datos/README.md`**.
 
 | Corpus | Fuente | Licencia | Verificado |
 |---|---|---|---|
-| Discursos de apertura de sesiones (Argentina, 1854-2019) | `github.com/jmdieguez/discursos` | sin licencia declarada; los textos son actos oficiales | `[VERIFICADA]` vía `raw.githubusercontent.com` |
-| Discursos de Casa Rosada (2015-2024) | `github.com/lucariel/discursos_presidenciales` | sin licencia declarada | `[VERIFICADA]` vía `raw.githubusercontent.com` |
+| Discursos de apertura de sesiones (Argentina, 1854-2019) | `github.com/lucariel/discursos_presidenciales` | sin licencia declarada; los textos son actos oficiales | `[VERIFICADA]` vía `raw.githubusercontent.com` |
+| Discursos de Casa Rosada (2015-2024) | `github.com/jmdieguez/discursos` | sin licencia declarada | `[VERIFICADA]` vía `raw.githubusercontent.com` |
 | Fake News Corpus Spanish | `github.com/jpposadas/FakeNewsCorpusSpanish` | **CC BY 4.0** | `[VERIFICADA]` vía `raw.githubusercontent.com` |
 | Fashion-MNIST | Zalando Research | MIT | `[VERIFICADA]` |
 | **Aguasclaras** | **sintético, generado para este curso** | del curso | — |

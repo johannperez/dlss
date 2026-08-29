@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El valle de la loss — Clase 3</title>
+
+<!-- ==========================================================================
+     LA VIZ CENTRAL DE LA CLASE 3.
+
+     MOMENTO AHA (tres, en este orden):
+       1. "un punto acá ES una recta allá";
+       2. "la flecha siempre apunta para arriba, y por eso vamos al revés";
+       3. "los pasos se van acortando solos cuando el terreno se aplana".
+     Y al subir el paso a 1.5: "se fue del mapa".
+
+     DETALLE CRÍTICO: el panel de la derecha se actualiza MIENTRAS se arrastra,
+     no al soltar. La sincronización en vivo es toda la viz.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .fila-paneles { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  @media (max-width: 700px) { .fila-paneles { grid-template-columns: 1fr; } }
+  #caja-curva { margin-top: .6rem; }
+  .lectura-grande { font-family: var(--f-mono); font-variant-numeric: tabular-nums;
+    font-size: 1.35rem; font-weight: 700; color: var(--c-error); }
+  .par-perillas { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin: .1rem 0 .3rem; }
+  .par-perillas > div { background: var(--papel); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .35em .5em; text-align: center; }
+  .par-perillas .cab { font-size: .64rem; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--tinta-3); font-weight: 700; display: block; }
+  .par-perillas .n { font-family: var(--f-mono); font-size: .98rem; font-weight: 700;
+    color: var(--c-parametro); font-variant-numeric: tabular-nums; }
+
+  /* Adentro de la slide el marco mide 610 px y el panel no entra entero:
+     lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
+     Abierta suelta, la página se ve completa y esta regla no hace nada. */
+  body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El valle de la loss</h1>
+    <p>Dos dibujos que son <strong>el mismo dibujo</strong>. A la izquierda, el mapa de
+       todas las rectas posibles: cada punto del mapa <em>es</em> una recta entera, y su
+       altura es qué tan mal le va. A la derecha, la recta que corresponde a donde estás
+       parado, sobre los datos de verdad. Arrastrá el punto violeta y mirá los dos paneles
+       a la vez. Después soltá la pelota y no toques nada.</p>
+  </header>
+
+  <div>
+    <div class="fila-paneles">
+      <div class="viz-frame" style="padding:8px"><div id="caja-mapa"></div></div>
+      <div class="viz-frame" style="padding:8px"><div id="caja-datos"></div></div>
+    </div>
+    <div class="viz-frame" id="caja-curva" style="padding:8px; display:none">
+      <div id="lienzo-curva"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Primero arrastrá el punto violeta despacio por el mapa y
+      mirá <em>la recta de la derecha</em>: no se mueve ningún dato, se mueve la recta. En
+      el mapa no hay años ni porcentajes: hay <b>rectas</b>. Después soltá la pelota con el
+      paso en <b>0.15</b> y mirá el rastro: <em>los puntitos arrancan separados y terminan
+      pegados</em>, sin que nadie los frene. Se frenan solos porque el terreno se aplana.
+      Y ahora subí el paso a <b>1.5</b> y volvé a soltarla.
+    </div>
+    <p class="viz-pie">
+      Datos: menciones a «seguridad» en los discursos presidenciales de apertura de
+      sesiones, Argentina 1984-2019 (% de palabras del discurso). <b>Datos reales</b>;
+      ver <code>datos/README.md</code>. El año va centrado y en décadas
+      (<code>x = (año − 2001,5) / 10</code>), que es lo que hace que el valle salga
+      redondo en vez de ser una zanja diagonal. El «paisaje con dos pozos» sí es
+      inventado, y está rotulado como tal.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   1. LOS DATOS
+   --------------------------------------------------------------------------- */
+const ANIOS = [1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,
+               1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,
+               2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019];
+const Y = [0.0782,0.1166,0.0382,0.0082,0.0660,0.0324,0.0522,0.0516,0.2441,0.0765,
+           0.0578,0.1120,0.1044,0.2250,0.4357,0.1468,0.4138,0.3873,0.0000,0.0246,
+           0.1958,0.1645,0.1645,0.1006,0.3806,0.0000,0.0928,0.2338,0.0750,0.1626,
+           0.0535,0.0488,0.4267,0.2496,0.3112,0.2453];
+const X = ANIOS.map(function (t) { return (t - 2001.5) / 10; });
+const N = X.length;
+
+// medido, no estimado: el fondo del valle de estos datos
+const A_OPT = 0.042427, B_OPT = 0.154908, LOSS_MIN = 0.014547;
+
+/* ---------------------------------------------------------------------------
+   2. LOS DOS PAISAJES
+   --------------------------------------------------------------------------- */
+function lossDatos(a, b) {
+  let s = 0;
+  for (let i = 0; i < N; i++) { const e = Y[i] - (a * X[i] + b); s += e * e; }
+  return s / N;
+}
+function gradDatos(a, b) {
+  let ga = 0, gb = 0;
+  for (let i = 0; i < N; i++) {
+    const e = Y[i] - (a * X[i] + b);
+    ga += -2 * X[i] * e; gb += -2 * e;
+  }
+  return [ga / N, gb / N];
+}
+
+/* Un paisaje inventado con DOS pozos: uno hondo y uno menos hondo. Sirve para
+   una sola cosa: mostrar que de dónde arrancás decide dónde terminás. */
+function lossDificil(a, b) {
+  // dos pozos: el de la izquierda es menos hondo (0,106) que el de la derecha
+  // (0,065). Las anchuras están elegidas para que la curvatura sea parecida a
+  // la del valle de verdad, así el mismo tamaño de paso sirve en los dos.
+  const u = (a + 0.26) / 0.20, v = (b - 0.14) / 0.26;
+  const u2 = (a - 0.28) / 0.22, v2 = (b - 0.17) / 0.28;
+  return 0.14 + 0.35 * ((a - 0.02) * (a - 0.02) + (b - 0.15) * (b - 0.15))
+         - 0.055 * Math.exp(-(u * u + v * v))
+         - 0.095 * Math.exp(-(u2 * u2 + v2 * v2));
+}
+function gradNumerico(f, a, b) {
+  const h = 1e-4;
+  return [(f(a + h, b) - f(a - h, b)) / (2 * h), (f(a, b + h) - f(a, b - h)) / (2 * h)];
+}
+
+const estado = {
+  a: -0.30, b: 0.40, lr: 0.15,
+  flecha: true, curva: false, paisaje: 'datos',
+  rastro: [], perdidas: [], semilla: 7
+};
+
+function loss(a, b) { return estado.paisaje === 'datos' ? lossDatos(a, b) : lossDificil(a, b); }
+function grad(a, b) {
+  return estado.paisaje === 'datos' ? gradDatos(a, b) : gradNumerico(lossDificil, a, b);
+}
+
+/* ---------------------------------------------------------------------------
+   3. EL MAPA (izquierda)
+   --------------------------------------------------------------------------- */
+// El ancho en `a` y el alto en `b` están elegidos para que el valle salga
+// REDONDO en pantalla: así la flecha se ve perpendicular a las curvas de nivel,
+// que es exactamente lo que queremos que se entienda.
+const mapa = Viz.plano('#caja-mapa', {
+  xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445,
+  ejeX: 'qué tan empinada (puntos por década)',
+  ejeY: 'dónde arranca',
+  titulo: 'el mapa: cada punto es una recta entera',
+  alto: 300
+});
+
+const puntoP = { x: estado.a, y: estado.b };
+
+mapa.alDibujar(function () {
+  mapa.fondo();
+  mapa.mapaDeCalor(loss, { n: 130, paleta: 'loss', log: true });
+  mapa.contornos(loss, { niveles: 11, color: 'tinta3', opacidad: .35 });
+  mapa.ejes({ formatoX: function (v) { return Viz.num(v, 2); },
+              formatoY: function (v) { return Viz.num(v, 2); } });
+
+  // el fondo del valle, cuando lo conocemos
+  if (estado.paisaje === 'datos') {
+    mapa.punto(A_OPT, B_OPT, { color: 'ok', r: 5 });
+    mapa.texto(A_OPT, B_OPT, 'el fondo', { color: 'ok', tam: 11, peso: '700',
+                                           dx: 10, dy: -12, caja: true });
+  }
+
+  // el rastro: puntitos, uno por paso
+  if (estado.rastro.length > 1) {
+    mapa.linea(estado.rastro, { color: 'parametro', grosor: 1.4, opacidad: .55 });
+    mapa.puntos(estado.rastro, { color: 'parametro', r: 2.6, borde: false });
+  }
+
+  // la flecha: −gradiente, o sea "para dónde bajar"
+  if (estado.flecha) {
+    const g = grad(estado.a, estado.b);
+    const k = 0.22;
+    const largo = Math.hypot(g[0], g[1]);
+    if (largo > 1e-6) {
+      mapa.flecha(estado.a, estado.b, estado.a - k * g[0], estado.b - k * g[1],
+                  { color: 'tinta', grosor: 2.6, cabeza: 11, etiqueta: '−gradiente' });
+      mapa.flecha(estado.a, estado.b, estado.a + k * g[0] * .35, estado.b + k * g[1] * .35,
+                  { color: 'error', grosor: 1.6, cabeza: 7, opacidad: .5 });
+    }
+  }
+
+  mapa.punto(estado.a, estado.b, { color: 'parametro', r: 8, halo: true });
+
+  if (estado.paisaje !== 'datos') {
+    mapa.textoPx(mapa.L + 8, mapa.B - 8, 'paisaje inventado', {
+      color: 'val', tam: 11, peso: '700', base: 'bottom', caja: true });
+  }
+});
+
+mapa.arrastrables([puntoP], {
+  radio: 22,
+  acotarX: [-0.40, 0.49], acotarY: [-0.13, 0.44],
+  alArrastrar: function (q) {
+    estado.a = q.x; estado.b = q.y;
+    estado.rastro = []; estado.perdidas = [];
+    refrescar();                 // EN VIVO: los dos paneles, mientras se arrastra
+  }
+});
+mapa.tooltip(function (w) {
+  return 'esta es la recta\ny = ' + Viz.num(w.x, 3) + '·x + ' + Viz.num(w.y, 3) +
+         '\ndesajuste ' + Viz.num(loss(w.x, w.y), 4);
+});
+mapa.alClic(function (w) {
+  estado.a = Viz.acotar(w.x, -0.40, 0.49);
+  estado.b = Viz.acotar(w.y, -0.13, 0.44);
+  puntoP.x = estado.a; puntoP.y = estado.b;
+  estado.rastro = []; estado.perdidas = [];
+  refrescar();
+});
+
+/* ---------------------------------------------------------------------------
+   4. EL MUNDO REAL (derecha)
+   --------------------------------------------------------------------------- */
+const datos = Viz.plano('#caja-datos', {
+  xmin: 1982, xmax: 2021, ymin: -0.06, ymax: 0.50,
+  ejeX: 'año', ejeY: '% de palabras',
+  titulo: 'la recta que corresponde a ese punto',
+  alto: 300
+});
+
+datos.alDibujar(function () {
+  datos.fondo(); datos.grilla();
+  datos.ejes({ formatoX: function (v) { return String(Math.round(v)); },
+               formatoY: function (v) { return Viz.num(v, 2); } });
+
+  const recta = function (anio) { return estado.a * ((anio - 2001.5) / 10) + estado.b; };
+
+  if (estado.paisaje === 'datos') {
+    for (let i = 0; i < N; i++) {
+      datos.segmento(ANIOS[i], Y[i], ANIOS[i], estado.a * X[i] + estado.b,
+                     { color: 'error', grosor: 1.5, opacidad: .75 });
+    }
+  }
+  if (estado.paisaje === 'datos') {
+    datos.puntos(ANIOS.map(function (t, i) { return { x: t, y: Y[i] }; }),
+                 { color: 'datos', r: 4, borde: false });
+    datos.curva(recta, { color: 'modelo', grosor: 3.5 });
+    datos.textoPx(datos.R - 8, datos.T + 8,
+      'desajuste ' + Viz.num(lossDatos(estado.a, estado.b), 4),
+      { color: 'error', tam: 16, peso: '700', alinear: 'right', caja: true });
+  } else {
+    datos.textoPx((datos.L + datos.R) / 2, (datos.T + datos.B) / 2,
+      'paisaje inventado: acá no hay recta que mirar',
+      { color: 'val', tam: 13, peso: '700', alinear: 'center', base: 'middle', caja: true });
+    datos.textoPx((datos.L + datos.R) / 2, (datos.T + datos.B) / 2 + 22,
+      'soltá la pelota desde dos lugares distintos y comparalos',
+      { color: 'tinta2', tam: 11, alinear: 'center', base: 'middle', caja: true });
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   5. LA CURVA DE LOSS (abajo, opcional)
+   --------------------------------------------------------------------------- */
+const curva = Viz.plano('#lienzo-curva', {
+  xmin: 0, xmax: 60, ymin: 0, ymax: 0.12,
+  ejeX: 'iteración', ejeY: 'loss',
+  titulo: 'la curva que vas a ver en TODOS los entrenamientos del resto del curso',
+  alto: 150, margen: { i: 84, d: 14, a: 28, b: 40 }
+});
+
+curva.alDibujar(function () {
+  curva.fondo(); curva.grilla();
+  curva.ejes({ formatoY: function (v) { return Viz.num(v, 3); } });
+  if (estado.perdidas.length > 1) {
+    curva.linea(estado.perdidas.map(function (v, i) { return { x: i, y: v }; }),
+                { color: 'error', grosor: 2.5 });
+    curva.puntos(estado.perdidas.map(function (v, i) { return { x: i, y: v }; }),
+                 { color: 'error', r: 2.2, borde: false });
+  } else {
+    curva.textoPx((curva.L + curva.R) / 2, (curva.T + curva.B) / 2,
+      'soltá la pelota y mirá cómo baja', { color: 'tinta3', tam: 12,
+      alinear: 'center', base: 'middle' });
+  }
+  if (estado.paisaje === 'datos') {
+    curva.linea([[0, LOSS_MIN], [curva.xmax, LOSS_MIN]],
+                { color: 'ok', grosor: 1.5, punteada: true });
+    curva.texto(curva.xmax, LOSS_MIN, 'el fondo', { color: 'ok', tam: 10, peso: '700',
+                 alinear: 'right', dy: -9, caja: true });
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   6. EL DESCENSO
+   --------------------------------------------------------------------------- */
+function unPaso() {
+  if (estado.rastro.length === 0) {
+    estado.rastro.push({ x: estado.a, y: estado.b });
+    estado.perdidas.push(loss(estado.a, estado.b));
+  }
+  const g = grad(estado.a, estado.b);
+  estado.a -= estado.lr * g[0];
+  estado.b -= estado.lr * g[1];
+  if (!isFinite(estado.a)) estado.a = 1e6;
+  if (!isFinite(estado.b)) estado.b = 1e6;
+  estado.rastro.push({ x: estado.a, y: estado.b });
+  estado.perdidas.push(loss(estado.a, estado.b));
+  puntoP.x = estado.a; puntoP.y = estado.b;
+}
+
+const anim = Viz.animacion({
+  cadaMs: 90,
+  paso: function (i) { unPaso(); refrescar(); return i < 45; },
+  reset: function () {
+    estado.a = -0.30; estado.b = 0.40;
+    puntoP.x = estado.a; puntoP.y = estado.b;
+    estado.rastro = []; estado.perdidas = [];
+    refrescar();
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   7. EL PANEL
+   --------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La pelota' },
+  { tipo: 'slider', id: 'lr', etiqueta: 'tamaño del paso',
+    sub: 'el learning rate: cuánto te movés cada vez',
+    min: 0.0001, max: 2.0, escala: 'log', valor: 0.15, color: 'acento',
+    formato: function (v) { return Viz.num(v, 4); } },
+  { tipo: 'texto', id: 'perillas', html: '' },
+  { tipo: 'texto', id: 'frase', html: '' },
+  { tipo: 'checkbox', id: 'flecha', etiqueta: 'mostrar la flecha del gradiente', valor: true },
+  { tipo: 'checkbox', id: 'curva', etiqueta: 'mostrar la curva de loss', valor: false },
+  { tipo: 'botones', id: 'paisaje', etiqueta: 'qué paisaje', valor: 'datos',
+    opciones: [{ valor: 'datos', texto: 'el de nuestros datos' },
+               { valor: 'dificil', texto: 'uno con dos pozos' }] },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], function (v, id) {
+  estado.lr = v.lr;
+  estado.flecha = v.flecha;
+  estado.curva = v.curva;
+  if (id === 'paisaje' && v.paisaje !== estado.paisaje) {
+    estado.paisaje = v.paisaje;
+    anim.pausa();
+    estado.a = v.paisaje === 'datos' ? -0.30 : -0.34;
+    estado.b = v.paisaje === 'datos' ? 0.40 : 0.38;
+    puntoP.x = estado.a; puntoP.y = estado.b;
+    estado.rastro = []; estado.perdidas = [];
+  }
+  document.getElementById('caja-curva').style.display = v.curva ? 'block' : 'none';
+  if (v.curva) { curva.redimensionar(); }
+  refrescar();
+});
+
+Viz.controlesAnimacion('#panel', anim, {
+  textoPlay: 'Soltar la pelota', textoPausa: 'Frenar',
+  textoPaso: 'Un paso', textoReset: 'Volver arriba'
+});
+
+const extra = Viz.controles('#panel', [
+  { tipo: 'boton', texto: 'Soltarla desde otro lugar', alClic: function () {
+      const r = Viz.azar(estado.semilla++);
+      anim.pausa();
+      estado.a = -0.38 + r() * 0.85;
+      estado.b = -0.11 + r() * 0.53;
+      puntoP.x = estado.a; puntoP.y = estado.b;
+      estado.rastro = []; estado.perdidas = [];
+      refrescar();
+    } }
+]);
+
+/* ---------------------------------------------------------------------------
+   8. REFRESCAR TODO (esto es lo que corre mientras se arrastra)
+   --------------------------------------------------------------------------- */
+function refrescar() {
+  const L = loss(estado.a, estado.b);
+  const g = grad(estado.a, estado.b);
+
+  ctl.texto('perillas',
+    '<div class="par-perillas">' +
+      '<div><span class="cab">qué tan empinada</span><span class="n">' +
+        Viz.num(estado.a, 3) + '</span></div>' +
+      '<div><span class="cab">dónde arranca</span><span class="n">' +
+        Viz.num(estado.b, 3) + '</span></div>' +
+    '</div>');
+
+  if (estado.paisaje === 'datos') {
+    ctl.texto('frase',
+      '<div style="font-size:.82rem;line-height:1.5">Esta recta afirma: «las menciones a ' +
+      'seguridad ' + (estado.a >= 0 ? 'suben' : 'bajan') + ' <b>' +
+      Viz.num(Math.abs(estado.a), 3) + '</b> puntos por década, y en 2001 valían <b>' +
+      Viz.num(estado.b, 3) + '</b>».<br>Desajuste: <span class="lectura-grande">' +
+      Viz.num(L, 4) + '</span></div>');
+  } else {
+    ctl.texto('frase',
+      '<div style="font-size:.82rem;line-height:1.5">Altura en este paisaje inventado: ' +
+      '<span class="lectura-grande">' + Viz.num(L, 4) + '</span></div>');
+  }
+
+  let msg;
+  if (!isFinite(L) || L > 50) {
+    msg = '<b class="c-error">Se fue del mapa.</b> El paso era tan grande que en vez de bajar ' +
+          'saltó al otro lado del valle, más arriba de donde estaba, y así cada vez. ' +
+          'Bajá el paso y volvé a soltarla.';
+  } else if (estado.paisaje !== 'datos') {
+    msg = 'Acordate de dónde arrancaste. Ahora apretá «Soltarla desde otro lugar» y volvé a ' +
+          'soltarla: <b>no siempre terminás en el mismo pozo</b>. El descenso no promete ' +
+          'el mejor lugar del mundo; promete un lugar bajo cerca de donde estabas.';
+  } else if (Math.hypot(g[0], g[1]) < 0.006) {
+    msg = 'La flecha se hizo chiquita: estás en el fondo. <b>Nadie frenó la pelota</b>: ' +
+          'se frenó sola porque acá el terreno es plano y no hay para dónde bajar.';
+  } else {
+    msg = 'La flecha negra apunta <b>para donde hay que ir</b>, que es justo al revés de ' +
+          'la roja: la roja es la dirección en la que la loss <em>sube</em> más rápido. ' +
+          'Todo el gradiente es eso.';
+  }
+  ctl.texto('lectura', msg);
+
+  if (estado.perdidas.length > 1) {
+    let mx = 0;
+    for (const v of estado.perdidas) if (isFinite(v) && v > mx) mx = v;
+    curva.limites(0, Math.max(20, estado.perdidas.length - 1), 0, Math.max(0.05, mx * 1.1));
+  }
+
+  mapa.redibujar(); datos.redibujar();
+  if (estado.curva) curva.redibujar();
+}
+
+refrescar();
+Viz.botonTema();
+</script>
+</body>
+</html>

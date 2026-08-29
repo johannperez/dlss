@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El zoo de funciones — Clase 1</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA:
+       "Con la recta no puedo hacer la curva del desafío 3 ni loco.
+        La forma de la función es una restricción sobre lo que puedo afirmar."
+
+     Y el aha final, que es el GANCHO DE LA CLASE 2:
+       "El desafío 3 no lo saca NINGUNA de las seis. Ninguna sola."
+
+     Diseño deliberado: el desafío 3 es imposible para las seis formas. Los
+     números de «lo mejor que puede esta forma» no son estimaciones: salen del
+     barrido de medir-referencias.py sobre la misma grilla que usan los sliders.
+     Si tocás una fórmula o un rango, volvé a correr ese script.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .zoo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+  @media (max-width: 1150px) { .zoo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 700px)  { .zoo { grid-template-columns: minmax(0, 1fr); } }
+
+  .tarjeta-zoo {
+    background: var(--papel-2); border: 2px solid var(--borde);
+    border-radius: var(--r-grande); padding: .6rem .65rem .7rem;
+    transition: border-color .15s ease;
+  }
+  .tarjeta-zoo .cabecera { display: flex; align-items: baseline; justify-content: space-between; gap: .4rem; }
+  .tarjeta-zoo h3 { margin: 0; font-size: .95rem; color: var(--c-acento); }
+  .tarjeta-zoo .insignia {
+    font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--c-ok); opacity: 0;
+  }
+  .tarjeta-zoo.acertada { border-color: var(--c-ok); }
+  .tarjeta-zoo.acertada .insignia { opacity: 1; }
+  .tarjeta-zoo .sub { margin: .1rem 0 .45rem; font-size: .76rem; color: var(--tinta-3); line-height: 1.3; }
+  .tarjeta-zoo .formula {
+    font-family: var(--f-mono); font-size: .74rem; color: var(--tinta-3); margin: .35rem 0 0;
+  }
+  .mini-panel { margin-top: .45rem; }
+  .mini-panel .ctrl { margin-bottom: .45rem; }
+  .mini-panel .ctrl-etiqueta { font-size: .76rem; }
+  .mini-panel .ctrl-etiqueta .sub { font-size: .68rem; }
+  .lectura-mini {
+    margin: .35rem 0 0; font-size: .76rem; font-family: var(--f-mono);
+    color: var(--tinta-2); font-variant-numeric: tabular-nums;
+  }
+  .lectura-mini b { color: var(--tinta); }
+  .techo { color: var(--c-error); }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El zoo de funciones</h1>
+    <p>Seis formas básicas, dos perillas cada una. Movelas y mirá qué puede dibujar cada
+       forma… y qué no. Después probá los tres desafíos: aparece una curva gris y hay que
+       taparla. Ojo con el tercero.</p>
+  </header>
+
+  <div><div class="zoo" id="zoo"></div></div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Antes de tocar cada desafío, <b>apostá</b>: ¿cuántas de las
+      seis formas van a poder tapar la curva gris? Anotá tu número y recién después movete.
+      En el desafío 2 vas a insistir con la recta un buen rato: insistí, hace falta convencerse.
+      Y en el desafío 3, cuando ya te hayas cansado, apretá <em>«mostrar el techo de cada
+      forma»</em>: ese número está medido y dice, en negro sobre blanco, que no es culpa tuya.
+      Elegir una forma es aceptar de antemano qué vas a poder afirmar y qué no.
+    </div>
+    <p class="viz-pie">
+      Los números de <b>«lo mejor que puede esta forma»</b> están <b>medidos</b>: un barrido por
+      la misma grilla que recorren los sliders, en
+      <code>clases/01-funciones-y-parametros/medir-referencias.py</code>. Ninguno es una
+      estimación. La <b>rampa</b> viene sin explicación a propósito: es la protagonista de la
+      clase que viene.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ===========================================================================
+   1. LAS SEIS FORMAS
+   =========================================================================== */
+const XMIN = 0, XMAX = 10, YMIN = -1, YMAX = 9.5;
+const UMBRAL = 0.02;                        // por debajo de esto: «¡esa es!»
+const MUESTRAS = Viz.linspace(XMIN, XMAX, 60);
+
+const FORMAS = [
+  {
+    id: 'recta', nombre: 'La recta', formula: 'f(x) = a·x + b',
+    frase: 'Cambio constante por unidad. «Creció linealmente» quiere decir esto.',
+    f: (x, p1, p2) => p1 * x + p2,
+    c1: { etiqueta: 'qué tan empinada', sub: 'cuánto sube por unidad',
+          min: -1.5, max: 1.5, paso: 0.05, valor: 0.30, decimales: 2 },
+    c2: { etiqueta: 'dónde arranca', sub: 'el valor en x = 0',
+          min: -1, max: 9, paso: 0.1, valor: 2.0, decimales: 1 }
+  },
+  {
+    id: 'parabola', nombre: 'La parábola', formula: 'f(x) = 4 + a·(x − v)²',
+    frase: 'Sube y después baja (o al revés). La U invertida de toda la vida.',
+    f: (x, p1, p2) => 4 + p1 * (x - p2) * (x - p2),
+    c1: { etiqueta: 'qué tan abierta y para dónde', sub: 'negativo = U invertida',
+          min: -0.5, max: 0.5, paso: 0.02, valor: -0.20, decimales: 2 },
+    c2: { etiqueta: 'dónde está el vértice', sub: 'el punto de giro',
+          min: 0, max: 10, paso: 0.2, valor: 5.0, decimales: 1 }
+  },
+  {
+    id: 'exponencial', nombre: 'La exponencial', formula: 'f(x) = c · e^(r·x)',
+    frase: 'Crecimiento explosivo. Nuestro cerebro es malísimo para esto.',
+    f: (x, p1, p2) => p2 * Math.exp(p1 * x),
+    c1: { etiqueta: 'qué tan rápido explota', sub: 'negativo = se apaga',
+          min: -0.5, max: 0.5, paso: 0.02, valor: 0.30, decimales: 2 },
+    c2: { etiqueta: 'de qué valor parte', sub: 'el valor en x = 0',
+          min: 0.05, max: 3, paso: 0.05, valor: 0.50, decimales: 2 }
+  },
+  {
+    id: 'sigmoide', nombre: 'La sigmoide  ★', formula: 'f(x) = 8 / (1 + e^(−k·(x − m)))',
+    frase: 'Empieza lento, se acelera y se satura. Guardá esta: vuelve en la 2, en la 3 y en la 9.',
+    f: (x, p1, p2) => 8 / (1 + Math.exp(-p1 * (x - p2))),
+    c1: { etiqueta: 'qué tan empinado el salto', sub: 'grande = casi un escalón',
+          min: 0.1, max: 4, paso: 0.05, valor: 1.00, decimales: 2 },
+    c2: { etiqueta: 'dónde está el salto', sub: 'el punto de mitad de camino',
+          min: 0, max: 10, paso: 0.2, valor: 5.0, decimales: 1 }
+  },
+  {
+    id: 'seno', nombre: 'El seno', formula: 'f(x) = 4 + A · sen(2π·x / T)',
+    frase: 'Todo lo que se repite: el ciclo electoral, la estacionalidad de la agenda.',
+    f: (x, p1, p2) => 4 + p2 * Math.sin(2 * Math.PI * x / p1),
+    c1: { etiqueta: 'cada cuánto se repite', sub: 'el largo de una vuelta',
+          min: 1, max: 20, paso: 0.25, valor: 5.00, decimales: 2 },
+    c2: { etiqueta: 'qué tan grande es la ola', sub: 'de la cresta al valle',
+          min: 0, max: 4, paso: 0.1, valor: 2.0, decimales: 1 }
+  },
+  {
+    id: 'rampa', nombre: 'La rampa', formula: 'f(x) = 1 + h · máx(0, x − c)',
+    frase: 'Plana hasta un punto y después arranca. Sin explicación por ahora: es la protagonista de la clase que viene.',
+    f: (x, p1, p2) => 1 + p2 * Math.max(0, x - p1),
+    c1: { etiqueta: 'dónde está el codo', sub: 'el punto de quiebre',
+          min: 0, max: 10, paso: 0.2, valor: 4.0, decimales: 1 },
+    c2: { etiqueta: 'qué tan empinada', sub: 'cuánto sube después del codo',
+          min: -1.5, max: 1.5, paso: 0.05, valor: 0.80, decimales: 2 }
+  }
+];
+
+/* ===========================================================================
+   2. LOS TRES DESAFÍOS
+   =========================================================================== */
+const DESAFIOS = {
+  libre: { nombre: 'modo libre', objetivo: null,
+    texto: 'Movele las perillas a cada forma y mirá qué puede y qué no puede dibujar. ' +
+           'Cuando te aburras, probá los desafíos.' },
+  d1: {
+    nombre: 'Desafío 1 — una tendencia constante',
+    objetivo: x => 0.55 * x + 1.0,
+    texto: 'Objetivo: algo que sube siempre igual. ¿Cuántas formas te parece que la pueden tapar? ' +
+           'Apostá <b>antes</b> de mover nada.'
+  },
+  d2: {
+    nombre: 'Desafío 2 — una S',
+    objetivo: x => 8 / (1 + Math.exp(-1.6 * (x - 5))),
+    texto: 'Objetivo: arranca lento, se acelera, se satura. La curva de adopción de cualquier ' +
+           'innovación. Probá primero con la recta, en serio, hasta convencerte.'
+  },
+  d3: {
+    nombre: 'Desafío 3 — dos picos y un valle',
+    objetivo: x => 4 + 2.2 * Math.exp(-Math.pow((x - 2.3) / 1.0, 2))
+                     - 1.6 * Math.exp(-Math.pow((x - 5.5) / 1.1, 2))
+                     + 1.9 * Math.exp(-Math.pow((x - 8.5) / 0.9, 2)),
+    texto: 'Objetivo: dos picos y un valle. Esto se parece bastante a una serie real de ' +
+           'menciones a un tema en cuarenta años de discursos. Suerte.'
+  }
+};
+
+// El techo de cada forma en cada desafío. MEDIDO con medir-referencias.py,
+// barriendo la misma grilla que recorren los sliders. No son estimaciones.
+const TECHOS = {
+  d1: { recta: 0.0000, parabola: 1.0622, exponencial: 0.0918,
+        sigmoide: 0.0092, seno: 2.6688, rampa: 0.0000 },
+  d2: { recta: 1.3345, parabola: 7.0861, exponencial: 2.6372,
+        sigmoide: 0.0000, seno: 12.0655, rampa: 1.2050 },
+  d3: { recta: 1.1883, parabola: 1.0221, exponencial: 1.8033,
+        sigmoide: 1.5864, seno: 0.2132, rampa: 4.2578 }
+};
+
+let desafio = 'libre';
+let mostrarTechos = false;
+
+/* ===========================================================================
+   3. ARMAR LAS SEIS TARJETAS
+   =========================================================================== */
+const zoo = document.getElementById('zoo');
+
+for (const forma of FORMAS) {
+  const tarjeta = Viz.el('div', { class: 'tarjeta-zoo' }, zoo);
+  const cab = Viz.el('div', { class: 'cabecera' }, tarjeta);
+  Viz.el('h3', { texto: forma.nombre }, cab);
+  Viz.el('span', { class: 'insignia', texto: '¡esa es!' }, cab);
+  Viz.el('p', { class: 'sub', texto: forma.frase }, tarjeta);
+
+  const marco = Viz.el('div', { class: 'viz-frame' }, tarjeta);
+  marco.style.padding = '6px';
+  const caja = Viz.el('div', {}, marco);
+
+  const cajaPanel = Viz.el('div', { class: 'mini-panel' }, tarjeta);
+  const lectura = Viz.el('p', { class: 'lectura-mini' }, tarjeta);
+  Viz.el('p', { class: 'formula', texto: forma.formula }, tarjeta);
+
+  forma.tarjeta = tarjeta;
+  forma.lectura = lectura;
+
+  forma.plano = Viz.plano(caja, {
+    xmin: XMIN, xmax: XMAX, ymin: YMIN, ymax: YMAX, alto: 150,
+    margen: { i: 34, d: 10, a: 10, b: 26 }
+  });
+
+  forma.plano.alDibujar(() => {
+    const p = forma.plano;
+    p.fondo(); p.grilla(); p.ejes();
+    const obj = DESAFIOS[desafio].objetivo;
+    if (obj) p.curva(obj, { color: 'verdad', grosor: 3, punteada: [7, 5] });
+    p.curva(x => forma.f(x, forma.ctl.valores.p1, forma.ctl.valores.p2),
+            { color: 'modelo', grosor: 3 });
+  });
+
+  forma.ctl = Viz.controles(cajaPanel, [
+    Object.assign({ tipo: 'slider', id: 'p1', color: 'parametro' }, forma.c1),
+    Object.assign({ tipo: 'slider', id: 'p2', color: 'parametro' }, forma.c2)
+  ], () => actualizar());
+}
+
+/* ===========================================================================
+   4. EL PANEL GENERAL
+   =========================================================================== */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El desafío' },
+  { tipo: 'botones', id: 'desafio', etiqueta: 'qué hay que tapar', valor: 'libre',
+    opciones: [
+      { valor: 'libre', texto: 'libre' },
+      { valor: 'd1', texto: '1' },
+      { valor: 'd2', texto: '2' },
+      { valor: 'd3', texto: '3' }
+    ] },
+  { tipo: 'texto', id: 'consigna', html: '' },
+  { tipo: 'medidor', id: 'cuantas', etiqueta: 'formas que la sacaron' },
+  { tipo: 'texto', id: 'veredicto', html: '' },
+  { tipo: 'boton', id: 'btechos', texto: 'Mostrar el techo de cada forma', alClic: () => {
+      mostrarTechos = !mostrarTechos;
+      ctl.nodos.btechos.textContent = mostrarTechos
+        ? 'Ocultar el techo de cada forma' : 'Mostrar el techo de cada forma';
+      actualizar();
+    } },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => {
+      for (const forma of FORMAS) {
+        forma.ctl.set('p1', forma.c1.valor, true);
+        forma.ctl.set('p2', forma.c2.valor, true);
+      }
+      actualizar();
+    } }
+], (v, id) => {
+  if (id === 'desafio') desafio = v.desafio;
+  actualizar();
+});
+
+/* ===========================================================================
+   5. ACTUALIZAR
+   =========================================================================== */
+function mse(forma, obj) {
+  let s = 0;
+  const p1 = forma.ctl.valores.p1, p2 = forma.ctl.valores.p2;
+  for (const x of MUESTRAS) { const e = obj(x) - forma.f(x, p1, p2); s += e * e; }
+  return s / MUESTRAS.length;
+}
+
+function actualizar() {
+  const def = DESAFIOS[desafio];
+  const obj = def.objetivo;
+  let acertadas = 0;
+
+  for (const forma of FORMAS) {
+    if (!obj) {
+      forma.tarjeta.classList.remove('acertada');
+      forma.lectura.innerHTML = 'modo libre — nada que tapar todavía';
+    } else {
+      const d = mse(forma, obj);
+      const bien = d < UMBRAL;
+      if (bien) acertadas++;
+      forma.tarjeta.classList.toggle('acertada', bien);
+      let txt = 'desajuste <b>' + Viz.num(d, 3) + '</b>';
+      if (mostrarTechos) {
+        const techo = TECHOS[desafio][forma.id];
+        txt += ' · <span class="techo">techo ' + Viz.num(techo, 3) + '</span>';
+      }
+      forma.lectura.innerHTML = txt;
+    }
+    forma.plano.redibujar();
+  }
+
+  ctl.texto('consigna', '<b>' + def.nombre + '.</b> ' + def.texto);
+
+  if (!obj) {
+    ctl.medidor('cuantas', 0, '—');
+    ctl.texto('veredicto',
+      'Una idea para el rato libre: poné la sigmoide bien empinada. ' +
+      '¿En qué se convierte? ¿Y si la estirás hasta el final?');
+  } else {
+    ctl.medidor('cuantas', acertadas / 6, acertadas + ' de 6');
+    let v;
+    if (desafio === 'd1') {
+      v = acertadas === 0
+        ? 'Todavía ninguna. Empezá por la recta: es la más directa.'
+        : (acertadas >= 3
+            ? 'Tres formas distintas dibujan la misma figura. Que una familia contenga tu figura ' +
+              'no quiere decir que sea <i>la</i> familia correcta.'
+            : 'Vas bien. Seguí: hay más de una forma que la puede tapar.');
+    } else if (desafio === 'd2') {
+      v = acertadas === 0
+        ? 'Probá con la recta hasta convencerte de que no se puede. Después mirá la sigmoide.'
+        : 'Una sola. La forma de la función es una <b>restricción sobre lo que podés afirmar</b>.';
+    } else {
+      v = 'Ninguna de las seis la saca, y no es culpa tuya: está medido. ' +
+          'Mirá el techo de cada forma y fijate que el mejor (el seno, 0.213) igual se ve mal. ' +
+          '<b>Guardate esta frustración para la clase que viene.</b>';
+    }
+    ctl.texto('veredicto', v);
+  }
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

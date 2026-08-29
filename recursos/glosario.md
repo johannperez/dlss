@@ -65,8 +65,12 @@ te acordás de la analogía, te acordás del concepto.
 
 | Término | En castellano | La analogía de clase |
 |---|---|---|
+| **training loop** | el ciclo de entrenamiento | Las cinco líneas que se repiten: predecir, comparar, borrar, anotar, mover. |
 | **época** (*epoch*) | época, pasada | Una pasada completa por todos los datos de entrenamiento. |
+| **batch** | lote | El puñado de casos que el modelo mira por vez. Con 1200 casos y lotes de 200, una época son 6 iteraciones. |
+| **iteración** | iteración, paso | Una vuelta al ciclo: una actualización de las perillas. No es lo mismo que una época, salvo que los datos entren en un solo lote. |
 | **tensor** | tensor | Una tabla de números con la cantidad de dimensiones que haga falta. Un número es un tensor; una foto también. |
+| **autograd** | derivación automática | La maquinaria de PyTorch que calcula todas las pendientes sola. Es la resta de la clase 3, hecha exacta y para millones de perillas. |
 | **forward** | paso hacia adelante | Meter el dato y sacar la predicción. |
 | **backward** | paso hacia atrás | Calcular de quién es la culpa del error. |
 | **optimizador** | optimizador | El que efectivamente mueve las perillas con lo que dijo el `backward`. |
@@ -77,6 +81,10 @@ te acordás de la analogía, te acordás del concepto.
 | **fuga de datos** (*data leakage*) | fuga | Cuando algo del test se coló en el train. La causa número uno de resultados demasiado buenos para ser ciertos. |
 | **regularización** | regularización | Cualquier cosa que le ate las manos al modelo para que no calque. |
 | **capacidad** | capacidad | Cuánta libertad tiene el modelo para deformarse. Más capacidad = más riesgo de calcar. |
+| **dropout** | apagado al azar | Apagar neuronas al azar mientras se entrena, para que el modelo no dependa de ninguna en particular. |
+| **baseline** | línea de base | El modelo tonto contra el que hay que ganar (predecir siempre el promedio, o siempre la clase mayoritaria). Sin baseline, un número no significa nada. |
+| **partición temporal** | partir por tiempo | Entrenar con el pasado y testear con el futuro. La partición honesta cuando la pregunta es predictiva. |
+| **partición por grupo** | partir por grupo | Que cada unidad repetida (persona, medio, provincia) caiga entera de un solo lado. La defensa contra la fuga más común en ciencias sociales. |
 
 ## Clase 5 — La forma de los datos manda: imágenes
 

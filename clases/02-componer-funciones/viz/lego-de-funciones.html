@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El lego de funciones — Clase 2</title>
+
+<!-- ==========================================================================
+       MOMENTO AHA: "cambié el orden de los dos bloques y me dio otra cosa.
+                     Componer no es sumar."
+
+     El botón «intercambiar el bloque 1 y el 2» es el que produce el aha. Sin
+     ese botón esto es una cadena de montaje linda y nada más.
+
+     Los números por defecto son los mismos del notebook (duplicar y sumar 10
+     sobre el 3): 16 en un orden, 26 en el otro.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .col-izq { display: flex; flex-direction: column; gap: .7rem; min-width: 0; }
+
+  /* la bolita viajando: entra, y el valor en cada etapa */
+  .cinta {
+    display: flex; align-items: stretch; gap: .3rem; flex-wrap: wrap;
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-grande); padding: .55rem .7rem;
+  }
+  .cinta .paso {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-width: 74px; padding: .1rem .4rem;
+  }
+  .cinta .paso .num {
+    font-family: var(--f-mono); font-size: 1.35rem; font-weight: 700; line-height: 1.1;
+  }
+  .cinta .paso .que {
+    font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3);
+    margin-top: .15rem; text-align: center;
+  }
+  .cinta .flecha { align-self: center; color: var(--c-acento); font-size: 1.3rem; font-weight: 700; }
+
+  .bloques { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  @media (max-width: 820px) { .bloques { grid-template-columns: 1fr; } }
+  .bloque {
+    background: var(--papel-2); border: 1px solid var(--borde);
+    border-radius: var(--r-grande); padding: .5rem .6rem .6rem;
+  }
+  .bloque .titulo-bloque {
+    font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--tinta-3); font-weight: 700; margin: 0 0 .35rem;
+  }
+  .bloque canvas { display: block; width: 100%; height: 132px; border-radius: 6px; }
+  .bloque .ctrl { margin: .45rem 0 0; }
+  .bloque .ctrl-etiqueta { font-size: .74rem; }
+  .bloque select { margin-bottom: .1rem; }
+  .formula {
+    font-family: var(--f-mono); font-size: .78rem; color: var(--tinta-2);
+    margin: .35rem 0 0; text-align: center;
+  }
+  .formula b { color: var(--c-modelo); }
+
+  /* Adentro de una slide hay 610 px de alto y nada más: el panel se compacta
+     para que todos los controles entren sin scrollear. */
+  body.embebido .panel { font-size: .9em; padding: .6rem .65rem .7rem; }
+  body.embebido .panel > h2 { margin-bottom: .45rem; }
+  body.embebido .ctrl { margin-bottom: .42rem; }
+  body.embebido .ctrl input[type="range"] { margin-top: .2rem; }
+  body.embebido .ctrl.tipo-checkbox { margin-bottom: .3rem; }
+  body.embebido .lectura { font-size: .76rem; line-height: 1.35; padding: .4rem .55rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .68rem; }
+
+  /* Ventana muy angosta (alguien lo abre en el celular): menos padding y una
+     sola columna, para que no aparezca scroll horizontal. */
+  @media (max-width: 560px) {
+    .viz-pagina { padding: .7rem; }
+    .taller { grid-template-columns: 1fr; max-height: none; }
+    .dos-columnas, .bloques, .par { grid-template-columns: 1fr; }
+  }
+
+  /* curso.css no declara box-sizing global, así que el padding de .viz-pagina
+     se suma al ancho y en una ventana angosta aparece scroll horizontal.
+     Lo arreglamos acá, localmente, para no tocar la hoja compartida. */
+  .viz-pagina, .panel, .viz-frame { box-sizing: border-box; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El lego de funciones</h1>
+    <p>Tres cajas en fila. Lo que sale de una <b>entra</b> a la siguiente.
+       Elegí qué hace cada caja, movele la perilla, y seguí el número mientras
+       viaja. Después apretá <em>intercambiar el bloque 1 y el 2</em> y mirá lo
+       que pasa.</p>
+  </header>
+
+  <div class="col-izq">
+    <div class="cinta" id="cinta"></div>
+    <div class="bloques" id="bloques"></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Con <code>multiplicar por 2</code> y después
+      <code>sumar 10</code>, el 3 sale <b>16</b>. Intercambiá los dos bloques —los
+      <em>mismos</em> dos bloques, las <em>mismas</em> perillas— y el 3 sale
+      <b>26</b>. Si componer fuera sumar, el orden no importaría. Componer no es
+      sumar: es <em>encadenar</em>, y en una cadena el orden es todo.
+    </div>
+    <p class="viz-pie">
+      <b>Esto ya lo hacés.</b> Respuestas crudas → recodificación de categorías →
+      índice sumado → estandarización → tipología. Cinco funciones compuestas, en
+      papel, todos los días. Y como acá: si una etapa distorsiona, todo lo que
+      viene después hereda la distorsión.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ================================================================ catálogo */
+// Cada pieza: nombre, la cuenta, el rótulo de su perilla y su rango.
+const PIEZAS = {
+  nada:      { nombre: 'no hacer nada', f: (x) => x,
+               perilla: null, formula: () => 'z' },
+  duplicar:  { nombre: 'multiplicar', f: (x, k) => k * x,
+               perilla: { etiqueta: 'por cuánto multiplica', min: -3, max: 3, paso: 0.1, valor: 2, dec: 1 },
+               formula: k => Viz.num(k, 1) + ' · z' },
+  sumar:     { nombre: 'sumar', f: (x, k) => x + k,
+               perilla: { etiqueta: 'cuánto suma', min: -10, max: 10, paso: 0.5, valor: 10, dec: 1 },
+               formula: k => 'z ' + (k < 0 ? '− ' : '+ ') + Viz.num(Math.abs(k), 1) },
+  cuadrado:  { nombre: 'elevar al cuadrado', f: (x, k) => k * x * x,
+               perilla: { etiqueta: 'por cuánto multiplica después', min: 0, max: 1, paso: 0.05, valor: 0.5, dec: 2 },
+               formula: k => Viz.num(k, 2) + ' · z²' },
+  rampa:     { nombre: 'rampa (ReLU)', f: (x, k) => Math.max(0, x - k),
+               perilla: { etiqueta: 'dónde está el codo', min: -10, max: 10, paso: 0.5, valor: 0, dec: 1 },
+               formula: k => 'max(0, z ' + (k < 0 ? '+ ' : '− ') + Viz.num(Math.abs(k), 1) + ')' },
+  sigmoide:  { nombre: 'sigmoide (achata entre 0 y 1)', f: (x, k) => 1 / (1 + Math.exp(-k * x)),
+               perilla: { etiqueta: 'qué tan brusco es el cambio', min: 0.1, max: 3, paso: 0.1, valor: 1, dec: 1 },
+               formula: k => '1 / (1 + e^(−' + Viz.num(k, 1) + '·z))' }
+};
+const ORDEN = ['nada', 'duplicar', 'sumar', 'cuadrado', 'rampa', 'sigmoide'];
+
+/* ================================================================== estado */
+// Arranca igual que el notebook: duplicar y después sumar 10.
+let bloques = [
+  { pieza: 'duplicar', k: 2 },
+  { pieza: 'sumar', k: 10 },
+  { pieza: 'nada', k: 0 }
+];
+let entrada = 3;
+let fantasma = null;      // la curva final ANTES del último intercambio
+const XMIN = -6, XMAX = 6;
+
+function aplicar(b, x) {
+  const P = PIEZAS[b.pieza];
+  return P.perilla ? P.f(x, b.k) : P.f(x);
+}
+// el valor después de las primeras (n) cajas
+function hasta(n, x) { let z = x; for (let i = 0; i < n; i++) z = aplicar(bloques[i], z); return z; }
+
+/* ================================================================== la cinta */
+const cinta = document.getElementById('cinta');
+function pintarCinta() {
+  cinta.innerHTML = '';
+  const paso = (valor, que, color) => {
+    const d = Viz.el('div', { class: 'paso' }, cinta);
+    const n = Viz.el('div', { class: 'num', texto: Viz.num(valor, 2) }, d);
+    n.style.color = color;
+    Viz.el('div', { class: 'que', texto: que }, d);
+  };
+  paso(entrada, 'lo que entra', Viz.color('acento'));
+  for (let i = 0; i < 3; i++) {
+    Viz.el('div', { class: 'flecha', texto: '→' }, cinta);
+    paso(hasta(i + 1, entrada), 'sale de la caja ' + (i + 1),
+         i === 2 ? Viz.color('modelo') : Viz.color('tinta2'));
+  }
+}
+
+/* ================================================================ los bloques */
+const cajaBloques = document.getElementById('bloques');
+const lienzos = [];
+
+function dibujarBloque(i) {
+  const cv = lienzos[i];
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 240, h = 132;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = Viz.color('fondo'); c.fillRect(0, 0, w, h);
+
+  const f = x => hasta(i + 1, x);
+  let lo = Infinity, hi = -Infinity;
+  const ys = [];
+  for (let k = 0; k <= 240; k++) {
+    const x = XMIN + (XMAX - XMIN) * k / 240;
+    const v = f(x); ys.push(v);
+    if (isFinite(v)) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  }
+  if (!isFinite(lo)) { lo = -1; hi = 1; }
+  const m = Math.max((hi - lo) * 0.14, 0.4);
+  lo -= m; hi += m;
+  const px = x => 6 + (x - XMIN) / (XMAX - XMIN) * (w - 12);
+  const py = v => h - 8 - (v - lo) / (hi - lo) * (h - 16);
+
+  // ejes cero
+  c.strokeStyle = Viz.alfa('borde', 1); c.lineWidth = 1;
+  c.beginPath();
+  if (lo < 0 && hi > 0) { const Y = Math.round(py(0)) + .5; c.moveTo(0, Y); c.lineTo(w, Y); }
+  const X0 = Math.round(px(0)) + .5; c.moveTo(X0, 0); c.lineTo(X0, h);
+  c.stroke();
+
+  // el fantasma de la configuración anterior (sólo en la caja 3)
+  if (i === 2 && fantasma) {
+    c.strokeStyle = Viz.alfa('verdad', .95); c.lineWidth = 2; c.setLineDash([5, 4]);
+    c.beginPath();
+    for (let k = 0; k < fantasma.length; k++) {
+      const x = XMIN + (XMAX - XMIN) * k / (fantasma.length - 1);
+      const X = px(x), Y = py(fantasma[k]);
+      k === 0 ? c.moveTo(X, Y) : c.lineTo(X, Y);
+    }
+    c.stroke(); c.setLineDash([]);
+  }
+
+  // la curva acumulada hasta acá
+  c.strokeStyle = Viz.color(i === 2 ? 'modelo' : 'parametro');
+  c.lineWidth = i === 2 ? 3 : 2.2; c.lineJoin = 'round';
+  c.beginPath();
+  for (let k = 0; k <= 240; k++) {
+    const x = XMIN + (XMAX - XMIN) * k / 240;
+    const X = px(x), Y = py(ys[k]);
+    k === 0 ? c.moveTo(X, Y) : c.lineTo(X, Y);
+  }
+  c.stroke();
+
+  // LA BOLITA: dónde está el número que viaja, en esta etapa
+  const v = f(entrada);
+  c.strokeStyle = Viz.alfa('acento', .55); c.lineWidth = 1.5; c.setLineDash([3, 3]);
+  c.beginPath(); c.moveTo(px(entrada), h); c.lineTo(px(entrada), py(v)); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = Viz.color('acento');
+  c.beginPath(); c.arc(px(entrada), py(v), 5.5, 0, 6.2832); c.fill();
+  c.strokeStyle = Viz.color('fondo'); c.lineWidth = 2; c.stroke();
+}
+
+function construir() {
+  cajaBloques.innerHTML = '';
+  lienzos.length = 0;
+  for (let i = 0; i < 3; i++) {
+    const b = bloques[i];
+    const card = Viz.el('div', { class: 'bloque' }, cajaBloques);
+    Viz.el('p', { class: 'titulo-bloque', texto: 'caja ' + (i + 1) }, card);
+
+    const cSel = Viz.el('div', { class: 'ctrl' }, card);
+    const sel = Viz.el('select', {}, cSel);
+    for (const clave of ORDEN) {
+      const o = Viz.el('option', { value: clave, texto: PIEZAS[clave].nombre }, sel);
+      if (clave === b.pieza) o.selected = true;
+    }
+    sel.addEventListener('change', () => {
+      b.pieza = sel.value;
+      const P = PIEZAS[b.pieza];
+      b.k = P.perilla ? P.perilla.valor : 0;
+      fantasma = null;
+      construir(); actualizar();
+    });
+
+    const cv = Viz.el('canvas', {}, card);
+    lienzos.push(cv);
+
+    const P = PIEZAS[b.pieza];
+    if (P.perilla) {
+      const w = Viz.el('div', { class: 'ctrl tipo-slider' }, card);
+      const fila = Viz.el('div', { class: 'ctrl-fila' }, w);
+      Viz.el('span', { class: 'ctrl-etiqueta', texto: P.perilla.etiqueta }, fila);
+      const val = Viz.el('span', { class: 'ctrl-valor', texto: Viz.num(b.k, P.perilla.dec) }, fila);
+      const inp = Viz.el('input', { type: 'range' }, w);
+      inp.min = P.perilla.min; inp.max = P.perilla.max; inp.step = P.perilla.paso; inp.value = b.k;
+      inp.style.setProperty('accent-color', Viz.color('parametro'));
+      inp.addEventListener('input', () => {
+        b.k = +inp.value; val.textContent = Viz.num(b.k, P.perilla.dec);
+        actualizar();
+      });
+    } else {
+      Viz.el('div', { class: 'ctrl-etiqueta', texto: 'esta caja no toca nada' }, card);
+    }
+
+    Viz.el('p', { class: 'formula', html: 'sale &nbsp;<b>' + P.formula(b.k) + '</b>' }, card);
+  }
+}
+
+/* ==================================================================== panel */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La cadena' },
+  { tipo: 'slider', id: 'x', etiqueta: 'el número que entra', sub: 'seguilo por la cinta de arriba',
+    min: -6, max: 6, paso: 0.5, valor: entrada, decimales: 1, color: 'acento' },
+  { tipo: 'boton', texto: 'Intercambiar el bloque 1 y el 2', principal: true, alClic: () => intercambiar() },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => reiniciar() },
+  { tipo: 'texto', id: 'lectura', html: '' },
+  { tipo: 'texto', id: 'orden', html: '' }
+], () => { entrada = ctl.valores.x; actualizar(); });
+
+function muestrear() {
+  const out = [];
+  for (let k = 0; k <= 240; k++) out.push(hasta(3, XMIN + (XMAX - XMIN) * k / 240));
+  return out;
+}
+
+let antes = null;   // { valor, texto } de la configuración previa al intercambio
+function intercambiar() {
+  fantasma = muestrear();
+  antes = { valor: hasta(3, entrada), orden: bloques.map(b => PIEZAS[b.pieza].nombre) };
+  const t = bloques[0]; bloques[0] = bloques[1]; bloques[1] = t;
+  construir(); actualizar();
+}
+function reiniciar() {
+  bloques = [{ pieza: 'duplicar', k: 2 }, { pieza: 'sumar', k: 10 }, { pieza: 'nada', k: 0 }];
+  fantasma = null; antes = null;
+  ctl.set('x', 3, true); entrada = 3;
+  construir(); actualizar();
+}
+
+/* =============================================================== actualizar */
+function actualizar() {
+  pintarCinta();
+  for (let i = 0; i < 3; i++) dibujarBloque(i);
+
+  const y = hasta(3, entrada);
+  let h = 'Entra <b>' + Viz.num(entrada, 2) + '</b>, sale <b>' + Viz.num(y, 2) + '</b>.';
+  if (antes) {
+    const dif = Math.abs(y - antes.valor) > 1e-9;
+    h += '<br>Con el orden anterior salía <b>' + Viz.num(antes.valor, 2) + '</b>. ' +
+      (dif ? '<span class="c-error">Mismas cajas, mismas perillas, otro resultado.</span>'
+           : '<span class="c-ok">Acá dio lo mismo: probá con otras cajas.</span>');
+  }
+  ctl.texto('lectura', h);
+
+  ctl.texto('orden',
+    'Se lee <b>de adentro hacia afuera</b>, como los paréntesis:<br>' +
+    '<span style="font-family:var(--f-mono);font-size:.8rem">caja3( caja2( caja1( x ) ) )</span><br>' +
+    'que es lo más incómodo de la notación matemática, y lo lamento.');
+}
+
+construir();
+actualizar();
+Viz.botonTema();
+window.addEventListener('resize', () => { for (let i = 0; i < 3; i++) dibujarBloque(i); });
+</script>
+</body>
+</html>

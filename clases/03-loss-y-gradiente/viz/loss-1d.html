@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La pendiente, con una resta — Clase 3</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "ah, la derivada es literalmente 'cuánto cambia la loss si me
+     muevo un toque'. Eso lo puedo calcular con una resta."
+
+     Esta viz existe para que NADIE tenga que haber estudiado cálculo. Va antes
+     que la flecha en 2D. Si el aula viene lenta, esta es más importante que el
+     valle: se le da más tiempo.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .dos-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .2rem 0 .1rem; }
+  .dos-numeros > div {
+    background: var(--papel); border: 1px solid var(--borde);
+    border-radius: var(--r-medio); padding: .45em .55em; text-align: center;
+  }
+  .dos-numeros .cab { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--tinta-3); font-weight: 700; display: block; margin-bottom: .15em; }
+  .dos-numeros .n { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 700;
+    font-variant-numeric: tabular-nums; }
+  .dos-numeros .q { display: block; font-size: .7rem; color: var(--tinta-2); margin-top: .15em; }
+  .frase-resta { font-family: var(--f-mono); font-size: .78rem; color: var(--tinta-2);
+    background: var(--papel); border: 1px solid var(--borde); border-radius: var(--r-medio);
+    padding: .4em .5em; margin-top: .4rem; line-height: 1.5; }
+
+  /* Adentro de la slide el marco mide 610 px y el panel no entra entero:
+     lo hacemos scrolleable para que no quede ninguna perilla fuera de alcance.
+     Abierta suelta, la página se ve completa y esta regla no hace nada. */
+  body.embebido .panel { box-sizing: border-box; max-height: calc(100vh - 1.2rem); overflow-y: auto; }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>La pendiente, con una resta</h1>
+    <p>La curva roja es el <strong>desajuste</strong> de nuestra recta cuando movemos
+       <em>una sola</em> perilla: qué tan empinada la dibujamos. Vos parate en un punto
+       y probá moverte un poquito para cada lado. Mirá los dos números de la derecha:
+       eso es todo lo que hace falta para saber para dónde bajar.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:10px">
+      <div id="lienzo"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Poné el pasito de prueba en <b>0.30</b> y fijate que la
+      línea turquesa (el atajo entre los dos puntos) está claramente torcida respecto de
+      la curva. Ahora achicá el pasito hasta <b>0.005</b>: la línea turquesa se pega a la
+      curva y el número deja de moverse. Ese número al que se pega tiene un nombre elegante
+      —<em>derivada</em>— y lo acabás de calcular con una resta y una división.
+    </div>
+    <p class="viz-pie">
+      Datos: menciones a «seguridad» en los discursos presidenciales de apertura de
+      sesiones, Argentina 1984-2019 (% de palabras del discurso). Datos reales; ver
+      <code>datos/README.md</code>. Acá está fija la altura de la recta (en su mejor
+      valor) y se mueve sólo la inclinación, para poder dibujar el desajuste en una
+      curva de dos dimensiones.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   1. LOS DATOS (los mismos de la clase 1, año por año)
+   --------------------------------------------------------------------------- */
+const ANIOS = [1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,
+               1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,
+               2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019];
+const Y = [0.0782,0.1166,0.0382,0.0082,0.0660,0.0324,0.0522,0.0516,0.2441,0.0765,
+           0.0578,0.1120,0.1044,0.2250,0.4357,0.1468,0.4138,0.3873,0.0000,0.0246,
+           0.1958,0.1645,0.1645,0.1006,0.3806,0.0000,0.0928,0.2338,0.0750,0.1626,
+           0.0535,0.0488,0.4267,0.2496,0.3112,0.2453];
+// el año, centrado y en décadas: así los números de la perilla son legibles
+const X = ANIOS.map(function (t) { return (t - 2001.5) / 10; });
+const B_FIJA = 0.154908;          // la altura, clavada en su mejor valor
+
+/* la loss: el promedio de los palitos rojos al cuadrado (MSE) */
+function loss(a) {
+  let s = 0;
+  for (let i = 0; i < X.length; i++) { const e = Y[i] - (a * X[i] + B_FIJA); s += e * e; }
+  return s / X.length;
+}
+
+// constantes medidas una sola vez sobre estos datos (no inventadas):
+// A_OPT es la inclinación que minimiza el desajuste; VARX es la curvatura del valle.
+const A_OPT = 0.042427;
+let VARX = 0; for (const v of X) VARX += v * v; VARX /= X.length;   // = 1.079167
+
+const estado = { a: -0.28, h: 0.25, tangente: false };
+
+/* ---------------------------------------------------------------------------
+   2. EL DIBUJO
+   --------------------------------------------------------------------------- */
+const p = Viz.plano('#lienzo', {
+  xmin: -0.56, xmax: 0.60, ymin: 0, ymax: 0.42,
+  ejeX: 'qué tan empinada dibujamos la recta (puntos por década)',
+  ejeY: 'desajuste (loss)',
+  titulo: 'el desajuste, en función de UNA perilla',
+  alto: 380
+});
+
+const puntoA = { x: estado.a, y: 0 };
+
+p.alDibujar(function () {
+  const a = estado.a, h = estado.h;
+  const La = loss(a), Lmas = loss(a + h), Lmenos = loss(a - h);
+
+  p.fondo();
+  p.grilla();
+  p.ejes({ formatoX: function (v) { return Viz.num(v, 2); } });
+
+  // la curva del desajuste
+  p.curva(loss, { color: 'error', grosor: 3.5 });
+
+  // el atajo hacia adelante (secante): de donde estoy al punto de prueba
+  const pend = (Lmas - La) / h;
+  p.linea([[a - 0.9, La - 0.9 * pend], [a + 0.9, La + 0.9 * pend]],
+          { color: 'acento', grosor: 2.4 });
+
+  // la tangente exacta, sólo si la piden
+  if (estado.tangente) {
+    const exacta = 2 * VARX * (a - A_OPT);
+    p.linea([[a - 0.9, La - 0.9 * exacta], [a + 0.9, La + 0.9 * exacta]],
+            { color: 'ok', grosor: 2, punteada: true });
+  }
+
+  // los dos puntos de prueba, uno a cada lado
+  p.segmento(a + h, 0, a + h, Lmas, { color: 'val', grosor: 1.2, punteada: true, opacidad: .7 });
+  p.segmento(a - h, 0, a - h, Lmenos, { color: 'val', grosor: 1.2, punteada: true, opacidad: .7 });
+  p.puntos([{ x: a + h, y: Lmas }, { x: a - h, y: Lmenos }], { color: 'val', r: 5 });
+  // con el pasito muy chico los dos rótulos se pisan: se sacan y quedan los puntitos
+  if (h > 0.06) {
+    p.texto(a + h, Lmas, 'un pasito →', { color: 'val', tam: 11, peso: '700', dx: 8, dy: -14, caja: true });
+    p.texto(a - h, Lmenos, '← un pasito', { color: 'val', tam: 11, peso: '700', dx: 8, dy: -15,
+                                            alinear: 'left', caja: true });
+  }
+
+  // dónde estoy parado
+  p.punto(a, La, { color: 'parametro', r: 8, halo: true });
+  p.texto(a, La, 'estoy acá', { color: 'parametro', tam: 12, peso: '700', dx: 0, dy: 22,
+                                alinear: 'center', caja: true });
+
+  // el fondo del valle, para que se vea que existe
+  p.segmento(A_OPT, 0, A_OPT, loss(A_OPT), { color: 'ok', grosor: 1.2, punteada: [3, 4], opacidad: .8 });
+  p.texto(A_OPT, 0, 'el fondo del valle', { color: 'ok', tam: 11, peso: '700', dy: -11, dx: 8,
+                                  alinear: 'left', caja: true });
+
+  p.leyenda([
+    { color: 'error', texto: 'el desajuste de cada recta posible', forma: 'linea' },
+    { color: 'parametro', texto: 'dónde estoy parado' },
+    { color: 'val', texto: 'los dos pasitos de prueba' },
+    { color: 'acento', texto: 'el atajo entre los dos puntos', forma: 'linea' }
+  ], { pos: 'ad' });
+});
+
+p.arrastrables([puntoA], {
+  radio: 20, fijarY: true, acotarX: [-0.55, 0.59],
+  alArrastrar: function (q) { ctl.set('a', q.x, true); actualizar(); }
+});
+p.tooltip(function (w) {
+  return 'inclinación ' + Viz.num(w.x, 3) + '\ndesajuste ' + Viz.num(loss(w.x), 5);
+});
+
+/* ---------------------------------------------------------------------------
+   3. LAS PERILLAS
+   --------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'Dónde estoy y qué pruebo' },
+  { tipo: 'slider', id: 'a', etiqueta: 'dónde estoy parado',
+    sub: 'la inclinación que estoy probando',
+    min: -0.55, max: 0.59, paso: 0.005, valor: estado.a, decimales: 3, color: 'parametro' },
+  { tipo: 'slider', id: 'h', etiqueta: 'tamaño del pasito de prueba',
+    sub: 'cuánto me corro para tantear',
+    min: 0.001, max: 0.30, escala: 'log', valor: estado.h, color: 'val',
+    formato: function (v) { return Viz.num(v, 3); } },
+  { tipo: 'checkbox', id: 'tangente', etiqueta: 'mostrar la respuesta exacta (la tangente)', valor: false },
+  { tipo: 'texto', id: 'numeros', html: '' },
+  { tipo: 'texto', id: 'cuenta', html: '' },
+  { tipo: 'boton', texto: 'Dar un paso cuesta abajo', principal: true, alClic: function () {
+      // el paso del descenso: me muevo AL REVÉS de la pendiente
+      const pend = (loss(estado.a + estado.h) - loss(estado.a - estado.h)) / (2 * estado.h);
+      const nuevo = Viz.acotar(estado.a - 0.35 * pend, -0.55, 0.59);
+      ctl.set('a', nuevo, true); actualizar();
+    } },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: function () {
+      ctl.set('a', -0.28, true); ctl.set('h', 0.25, true); actualizar();
+    } },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], function () { actualizar(); });
+
+function actualizar() {
+  estado.a = ctl.valores.a;
+  estado.h = ctl.valores.h;
+  estado.tangente = ctl.valores.tangente;
+  puntoA.x = estado.a;
+  puntoA.y = loss(estado.a);
+
+  const a = estado.a, h = estado.h;
+  const La = loss(a), Lmas = loss(a + h), Lmenos = loss(a - h);
+  const dMas = Lmas - La, dMenos = Lmenos - La;
+  const pend = (Lmas - La) / h;
+  const exacta = 2 * VARX * (a - A_OPT);
+
+  function pinta(d) {
+    if (d < 0) return '<span class="c-ok">' + Viz.num(d, 5) + '</span>';
+    return '<span class="c-error">+' + Viz.num(d, 5) + '</span>';
+  }
+  ctl.texto('numeros',
+    '<div class="dos-numeros">' +
+      '<div><span class="cab">si me muevo −' + Viz.num(h, 3) + '</span>' +
+        '<span class="n">' + pinta(dMenos) + '</span>' +
+        '<span class="q">' + (dMenos < 0 ? 'la loss BAJA' : 'la loss SUBE') + '</span></div>' +
+      '<div><span class="cab">si me muevo +' + Viz.num(h, 3) + '</span>' +
+        '<span class="n">' + pinta(dMas) + '</span>' +
+        '<span class="q">' + (dMas < 0 ? 'la loss BAJA' : 'la loss SUBE') + '</span></div>' +
+    '</div>');
+
+  ctl.texto('cuenta',
+    '<div class="frase-resta">' +
+      'pendiente = (' + Viz.num(Lmas, 5) + ' − ' + Viz.num(La, 5) + ') / ' + Viz.num(h, 3) +
+      ' = <b>' + Viz.num(pend, 4) + '</b><br>' +
+      'la respuesta exacta es <b>' + Viz.num(exacta, 4) + '</b>' +
+    '</div>');
+
+  const lado = dMas < dMenos ? 'a la <b>derecha</b>' : 'a la <b>izquierda</b>';
+  const err = Math.abs(pend - exacta);
+  ctl.texto('lectura',
+    'Para bajar tenés que ir ' + lado + '. ' +
+    (err < 0.005
+      ? 'Con un pasito así de chico, la resta ya te da <b>prácticamente la respuesta exacta</b>.'
+      : 'Con un pasito de ' + Viz.num(h, 3) + ' la resta se equivoca por ' + Viz.num(err, 3) +
+        '. Achicalo y mirá qué pasa.'));
+
+  p.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

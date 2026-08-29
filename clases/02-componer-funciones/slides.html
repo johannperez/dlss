@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase 2 — Componer funciones: dibujar lo imposible | Deep Learning para Cientistas Sociales</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+<style>
+  /* --- la cinta de cajas de la slide "seguí el número" --- */
+  .cadena-cajas {
+    display: flex; align-items: center; justify-content: center;
+    gap: .5rem; flex-wrap: wrap; margin: .8em 0;
+  }
+  .cadena-cajas .caja {
+    background: var(--papel-2); border: 2px solid var(--c-parametro);
+    border-radius: var(--r-medio); padding: .5em .9em; text-align: center; min-width: 120px;
+  }
+  .cadena-cajas .caja b { display: block; font-size: .78em; color: var(--c-parametro);
+    letter-spacing: .08em; text-transform: uppercase; }
+  .cadena-cajas .caja span { font-family: var(--f-mono); font-size: .95em; }
+  .cadena-cajas .valor {
+    font-family: var(--f-mono); font-weight: 700; font-size: 1.6em; color: var(--c-acento);
+  }
+  .cadena-cajas .fl { color: var(--c-acento); font-size: 1.5em; font-weight: 700; }
+
+  .enorme { font-size: 1.7em; line-height: 1.15; font-weight: 700; text-align: center;
+    margin: .5em 0; }
+  .enorme small { display: block; font-size: .38em; font-weight: 400; color: var(--tinta-2);
+    margin-top: .6em; letter-spacing: .02em; }
+
+  .escalones { display: flex; gap: .5rem; margin: .45em 0 0; }
+  .escalones > div {
+    flex: 1 1 0; display: flex; align-items: baseline; gap: .4em; justify-content: center;
+    background: var(--papel-2); border: 1px solid var(--borde); border-radius: var(--r-medio);
+    padding: .25em .5em;
+  }
+  .escalones .n { font-size: 1.15em; font-weight: 700; color: var(--c-acento); font-family: var(--f-mono); }
+  .escalones .d { font-size: .68em; color: var(--tinta-2); font-family: var(--f-mono); }
+  .escalones .q { font-size: .68em; color: var(--tinta-3); }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================ 1. PORTADA ============================ -->
+<section class="portada">
+  <p class="num-clase">Clase 2</p>
+  <h1>Componer funciones:<br>dibujar lo imposible</h1>
+  <div class="franja"></div>
+  <p class="gancho">Al final de hoy vas a saber exactamente qué es una red neuronal.
+     Sin metáforas de cerebros, sin misterio y sin una sola fórmula que no hayas visto moverse.</p>
+  <aside class="notes">
+    <b>0-1 min.</b> No leas el temario. Decí una sola cosa: "al final de hoy van a saber
+    exactamente qué es una red neuronal. Sin metáforas de cerebros." Y pasá.
+    El gancho de verdad empieza en la slide 3, con la curva proyectada y el aula tirando números.
+  </aside>
+</section>
+
+<!-- ============================ 2. DÓNDE QUEDAMOS ============================ -->
+<section>
+  <span class="marca">callback</span>
+  <h2>Dónde quedamos</h2>
+  <p class="bajada">La clase pasada, en cuatro viñetas.</p>
+  <ul>
+    <li>Una función es una <strong>caja con perillas</strong>: le metés algo, sale algo.</li>
+    <li>La <strong>variable</strong> te mueve <em>a lo largo</em> de la figura.
+        El <strong>parámetro</strong> <em>deforma</em> la figura.</li>
+    <li>Un modelo es la figura. <strong>Entrenar es girar las perillas.</strong></li>
+    <li>Vimos un zoo de figuras: recta, parábola, sigmoide, exponencial, seno, escalón.</li>
+  </ul>
+  <div class="intuicion compacta">
+    En la clase 1 teníamos <strong>un pincel</strong>. Hoy tenemos una caja de pinceles
+    y la posibilidad de pasarlos uno encima del otro.
+  </div>
+  <aside class="notes">
+    <b>1-3 min.</b> Preguntá al aula: "¿cuál es la diferencia entre una variable y un parámetro?"
+    Esperá una respuesta real, no sigas de largo. Si nadie contesta, dalo vos con el ecualizador:
+    la música es la variable, las perillas son los parámetros.<br>
+    Segunda pregunta, para engancharlos: "¿alguien se acuerda del número de desajuste más bajo
+    que sacó a ojo?". Ese número vuelve hoy.
+  </aside>
+</section>
+
+<!-- ============================ 3. EL DESAFÍO ============================ -->
+<section>
+  <h2>El desafío de hoy</h2>
+  <p class="bajada">Cuánto se habló de <strong>inflación</strong> en cada discurso presidencial
+     de apertura de sesiones. Datos reales, 1984-2019.</p>
+  <div class="viz-frame" style="padding:8px" id="caja-serie"></div>
+  <p class="viz-pie"><b>La consigna:</b> ajustale una recta. Dale, la mejor recta posible.
+     Gritame valores y yo los pongo.</p>
+  <aside class="notes">
+    <b>3-6 min.</b> Proyectá y callate cinco segundos. Después: "¿qué forma tiene esto?".
+    Van a decir "sube y baja", "hay tres momentos", "el final se dispara".
+    Todas esas respuestas sirven, anotalas: son los codos que vamos a poner después.<br>
+    Y ahora el desafío: <b>"ajustale una recta"</b>. Pedí valores a mano alzada.
+    Pasá a la slide siguiente y ponelos <i>en vivo</i>. Que fracasen ellos, no vos.
+  </aside>
+</section>
+
+<!-- ============================ 4. INTENTO 1 (VIZ) ============================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Intento 1: la mejor recta posible</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/la-recta-imposible.html" title="ajustar una recta a la curva de inflación" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el desajuste no baja de <b>0.00150</b>.
+     Y una raya horizontal en el promedio da <b>0.00152</b>.</p>
+  <aside class="notes">
+    <b>6-9 min.</b> Poné dos o tres valores que grite el aula. Que se vea que baja un poco y se traba.
+    Después apretá <b>«Poner la mejor recta posible»</b> y dejá el número en pantalla.<br>
+    La frase, textual: <b>"no es que lo hagamos mal. No se puede."</b><br>
+    Rematá con el dato duro: la mejor recta posible explica el <b>1,3 %</b> de la variación.
+    Dibujar una raya horizontal en el promedio da casi lo mismo.
+  </aside>
+</section>
+
+<!-- ============================ 5. MÁS PERILLAS ============================ -->
+<section>
+  <h2>«¿Y si le agrego perillas?»</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Lo que uno piensa</h4>
+      <p>Si con dos perillas no alcanza, le pongo cinco:</p>
+      <p style="font-family:var(--f-mono);font-size:.85em">y = a·x + b + c·1 + d·2 + e·x</p>
+      <p>Cinco números para mover. Tiene que ser más flexible.</p>
+    </div>
+    <div>
+      <h4>Lo que pasa</h4>
+      <p>Agrupás lo que multiplica a <code>x</code> y lo que no, y te quedan
+         <strong>dos</strong> números:</p>
+      <p style="font-family:var(--f-mono);font-size:.85em">y = (a+e)·x + (b+c+2d)</p>
+      <p><strong>La misma recta.</strong> Idéntica. Punto por punto.</p>
+    </div>
+  </div>
+  <div class="ojo compacta">
+    <strong>Más parámetros no es más flexibilidad.</strong> Acordate de esto la próxima vez
+    que alguien te venda un modelo por su tamaño.
+  </div>
+  <aside class="notes">
+    <b>9-12 min.</b> Volvé a la viz anterior y apretá los botones <b>3</b> y <b>5 perillas</b>.
+    Movelas todas delante de ellos. El desajuste no se mueve.<br>
+    Pregunta al aula: "¿por qué no cambia nada?". Si alguien dice "porque son todas lo mismo",
+    ganaste: esa persona acaba de descubrir sola por qué apilar cosas lineales no sirve, y lo
+    vamos a formalizar en veinte minutos.
+  </aside>
+</section>
+
+<!-- ============================ 6. EL PROBLEMA REAL ============================ -->
+<section>
+  <h2>El límite no es de precisión</h2>
+  <div class="intuicion">
+    Es de <strong>vocabulario</strong>. La recta no tiene cómo decir
+    «subió, después bajó, y después volvió a subir». No es que lo diga mal:
+    <em>no tiene la palabra</em>.
+  </div>
+  <p>La forma de la función que elegís <strong>limita lo que podés afirmar</strong> con ella.
+     Si tu modelo sólo sabe decir «sube» o «baja», tu conclusión va a ser «subió» o «bajó»,
+     aunque el mundo haya hecho otra cosa.</p>
+  <div class="ss compacta">
+    Esto es exactamente el problema de la <strong>especificación del modelo</strong> que ya
+    conocés de la regresión: si ponés el término lineal y no el cuadrático, no es que
+    «no encontraste» la U invertida. Es que la prohibiste antes de mirar.
+  </div>
+  <aside class="notes">
+    <b>12-14 min.</b> Ésta es la slide que conecta con lo que ya saben de metodología.
+    Pregunta: "¿a alguien le pasó de correr una regresión lineal y que le diera cero,
+    y después mirar el scatter y ver una U?". Casi siempre hay una mano.
+    Si nadie levanta la mano, contala vos como anécdota.
+  </aside>
+</section>
+
+<!-- ============================ 7. IDEA DE ALBAÑIL ============================ -->
+<section>
+  <h2>Una idea de albañil</h2>
+  <p class="bajada">Si una máquina no alcanza… poné dos.</p>
+  <div class="cadena-cajas">
+    <div class="caja"><b>caja 1</b><span>duplicar</span></div>
+    <span class="fl">→</span>
+    <div class="caja"><b>caja 2</b><span>sumar 10</span></div>
+  </div>
+  <p>La salida de la primera <strong>entra</strong> a la segunda. Eso es todo lo que
+     quiere decir <span class="glosario"><span class="en">composition</span><span class="es">composición</span></span>.
+     No hay nada más.</p>
+  <div class="ojo compacta">
+    <strong>Componer no es sumar.</strong> Es un error que aparece todos los años:
+    <code>g(f(x))</code> se lee como <code>g(x) + f(x)</code>. No. La salida de una
+    <em>es</em> la entrada de la otra.
+  </div>
+  <aside class="notes">
+    <b>14-16 min.</b> Dibujalo en el pizarrón mientras lo decís, aunque esté en la slide.
+    Dos cajas y una flecha. La lentitud acá se paga sola.
+  </aside>
+</section>
+
+<!-- ============================ 8. SEGUÍ EL NÚMERO ============================ -->
+<section>
+  <h2>Seguí el número</h2>
+  <div class="cadena-cajas">
+    <span class="valor">3</span>
+    <span class="fl">→</span>
+    <div class="caja"><b>duplicar</b><span>2 · z</span></div>
+    <span class="fl">→</span>
+    <span class="valor fragment">6</span>
+    <span class="fl fragment">→</span>
+    <div class="caja fragment"><b>sumar 10</b><span>z + 10</span></div>
+    <span class="fl fragment">→</span>
+    <span class="valor fragment">16</span>
+  </div>
+  <p class="fragment">Y ahora al revés, con <strong>las mismas dos cajas</strong>:</p>
+  <div class="cadena-cajas fragment">
+    <span class="valor">3</span>
+    <span class="fl">→</span>
+    <div class="caja"><b>sumar 10</b><span>z + 10</span></div>
+    <span class="fl">→</span>
+    <span class="valor">13</span>
+    <span class="fl">→</span>
+    <div class="caja"><b>duplicar</b><span>2 · z</span></div>
+    <span class="fl">→</span>
+    <span class="valor">26</span>
+  </div>
+  <p class="fragment"><strong>16 y 26.</strong> Mismas cajas, mismas perillas.
+     <strong>El orden importa.</strong></p>
+  <aside class="notes">
+    <b>16-18 min.</b> Recorrelo en voz alta, número por número, señalando la pantalla.
+    Antes de mostrar el 26, <b>preguntá</b>: "si invierto el orden, ¿da lo mismo?".
+    Van a dudar. Ahí revelás.<br>
+    Éste es el momento de desarmar "componer es sumar": si fuera una suma, el orden no importaría.
+  </aside>
+</section>
+
+<!-- ============================ 9. SE ESCRIBE ASÍ ============================ -->
+<section>
+  <h3>Se escribe así (y se lee al revés)</h3>
+  <div class="comparacion">
+    <div>
+      <h4>La notación</h4>
+      <p style="font-family:var(--f-mono);font-size:1.15em">g( f( x ) )</p>
+      <p style="font-family:var(--f-mono);font-size:1.15em">h( g( f( x ) ) )</p>
+      <p>Se lee <strong>de adentro hacia afuera</strong>, como los paréntesis de la calculadora.</p>
+    </div>
+    <div>
+      <h4>En Python, igual</h4>
+      <pre><code class="language-python" data-trim>
+def doble(x):
+    return 2 * x
+
+def mas_diez(x):
+    return x + 10
+
+doble(mas_diez(3))   # 26
+mas_diez(doble(3))   # 16
+</code></pre>
+    </div>
+  </div>
+  <p style="font-size:.85em">Que se lea de adentro para afuera es lo más incómodo de la notación
+     matemática, y lo lamento. No es culpa tuya.</p>
+  <aside class="notes">
+    <b>18-19 min.</b> Este código es <i>exactamente</i> el que van a correr en el notebook,
+    celda por celda. No es pseudocódigo.<br>
+    Si alguien pregunta por qué se escribe al revés: porque se escribe en el orden en que se
+    <i>aplica</i> la última función. Es una convención de hace 300 años y no la vamos a arreglar hoy.
+  </aside>
+</section>
+
+<!-- ============================ 10. USTEDES YA COMPONEN ============================ -->
+<section>
+  <span class="marca">en tu oficio</span>
+  <h2>Ustedes ya componen funciones</h2>
+  <div class="cadena-cajas" style="font-size:.8em">
+    <div class="caja"><b>1</b><span>respuestas crudas</span></div>
+    <span class="fl">→</span>
+    <div class="caja"><b>2</b><span>recodificación</span></div>
+    <span class="fl">→</span>
+    <div class="caja"><b>3</b><span>índice sumado</span></div>
+    <span class="fl">→</span>
+    <div class="caja"><b>4</b><span>estandarización</span></div>
+    <span class="fl">→</span>
+    <div class="caja"><b>5</b><span>tipología</span></div>
+  </div>
+  <p>Cinco funciones compuestas. Tu <em>pipeline</em> de construcción de un índice
+     <strong>es</strong> una composición de funciones. Ya sabés hacer esto, en papel,
+     hace años.</p>
+  <div class="ss compacta">
+    Y hay algo que también sabés: <strong>si una etapa distorsiona, todo lo que viene
+    después hereda la distorsión</strong>. En una red pasa exactamente lo mismo, y por eso
+    importa tanto qué le metés en la primera capa.
+  </div>
+  <aside class="notes">
+    <b>19-21 min.</b> Ésta es la slide que hace que la clase deje de ser "informática".
+    Preguntá: "¿alguien quiere contar su cadena?". Que alguien describa su pipeline de índice
+    en voz alta. Anotá las etapas en el pizarrón: son funciones compuestas y acaban de
+    escribirlas ellos.
+  </aside>
+</section>
+
+<!-- ============================ 11. VIZ LEGO ============================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Jugá con la cadena</h3>
+  <div class="viz-frame" style="height:430px">
+    <iframe src="viz/lego-de-funciones.html" title="cadena de tres funciones" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> el gráfico de cada caja muestra la curva
+     <em>acumulada</em> hasta ahí. Y el botón <b>«intercambiar el bloque 1 y el 2»</b>:
+     mismas cajas, mismas perillas, otro resultado.</p>
+  <aside class="notes">
+    <b>21-25 min.</b> Movelo vos primero, despacio. Cambiá el número que entra y mostrá la bolita
+    viajando por la cinta de arriba.<br>
+    Después, <b>el botón del intercambio</b>. Antes de apretarlo preguntá: "¿va a dar lo mismo?".
+    Y recién ahí apretá. El fantasma gris muestra la curva anterior.<br>
+    Si sobra tiempo: poné <code>rampa (ReLU)</code> en la caja 2 sin explicar qué es todavía.
+    Que la vean antes de que tenga nombre.
+  </aside>
+</section>
+
+<!-- ============================ 12. APUESTA ============================ -->
+<section class="pregunta">
+  <h2>Si encadeno <strong>dos rectas</strong>, ¿qué sale?</h2>
+  <div class="opciones">
+    <div><b>A</b> una curva</div>
+    <div><b>B</b> una recta</div>
+    <div><b>C</b> un escalón</div>
+  </div>
+  <p style="margin-top:1em;font-size:.85em">Votá a mano alzada. No pienses mucho.</p>
+  <aside class="notes">
+    <b>25-27 min.</b> <b>Se vota. En serio, se vota.</b> Sin la predicción fallida, la viz
+    que viene es un dibujito lindo.<br>
+    La mayoría dice <b>A</b> (una curva). Contá las manos en voz alta y anotá el número
+    en el pizarrón: "veintiuno dicen curva, cuatro dicen recta, dos dicen escalón".
+    Ese número anotado es lo que hace que el baldazo se sienta.
+  </aside>
+</section>
+
+<!-- ============================ 13. EL BALDAZO ============================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>El baldazo</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/sin-no-linealidad.html" title="apilar rectas sin no linealidad" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> no las curvas — el <b>contador</b>.
+     Randomizá quince veces y salen quince rectas.</p>
+  <aside class="notes">
+    <b>27-31 min.</b> Apretá <b>«randomizar»</b> muchas veces. En serio: quince, veinte veces,
+    hasta que se rían. La evidencia acá se construye por repetición, no por argumento.<br>
+    Frase textual: <b>"recta. Sale una recta. Y con diez rectas encadenadas también.
+    Puedo poner mil capas y sigue siendo una recta."</b><br>
+    Después bajá al panel y mostrá la cuenta: las cinco cajas se colapsan a
+    <code>y = a·x + b</code>, y la desviación es exactamente 0. Cinco cajas, dos números.
+    Es la misma lección de la slide 5, ahora con más fuerza.
+  </aside>
+</section>
+
+<!-- ============================ 14. POR QUÉ ============================ -->
+<section>
+  <h2>Por qué pasa eso</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Una goma que se estira</h4>
+      <p>Estirá una banda elástica al doble. Ahora estirá el resultado al triple.</p>
+      <p>Estiraste al <strong>séxtuplo</strong>. Sigue siendo <em>un</em> estiramiento.</p>
+      <p>No hay forma de que aparezca un <strong>codo</strong> estirando.</p>
+    </div>
+    <div>
+      <h4>Y en números</h4>
+      <p style="font-family:var(--f-mono);font-size:.9em">
+        f(x) = 2x + 1<br>
+        g(z) = 3z − 4<br><br>
+        g(f(x)) = 3(2x+1) − 4<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = <strong>6x − 1</strong>
+      </p>
+      <p style="font-size:.85em">Una recta. Otra vez.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>31-33 min.</b> Hacé la cuenta en el pizarrón con los números de la derecha, despacio,
+    distribuyendo el 3. Es la única cuenta algebraica de la clase y dura noventa segundos.<br>
+    Si el aula tiene alergia al álgebra, quedate con la goma y no hagas la cuenta:
+    la viz anterior ya lo demostró por repetición.
+  </aside>
+</section>
+
+<!-- ============================ 15. FALTA UN DOBLEZ ============================ -->
+<section>
+  <h2>Falta un doblez</h2>
+  <div class="intuicion">
+    Una hoja de papel plana es plana por más que la estires. Pero
+    <strong>doblala una vez</strong> y ya tenés una forma que antes era imposible.
+    Doblala ocho veces y tenés un origami.
+  </div>
+  <p>Necesitamos algo que <strong>doble</strong>, y que se pueda meter entre caja y caja.
+     Va a ser ridículamente simple. Tanto que da un poco de vergüenza.</p>
+  <aside class="notes">
+    <b>33-34 min.</b> Si tenés una hoja a mano, doblala. En serio: el gesto físico se recuerda.
+    "Estirar no alcanza. Hay que doblar."<br>
+    Y anunciá el anticlímax a propósito: "lo que viene es tan simple que van a pensar que
+    les estoy tomando el pelo".
+  </aside>
+</section>
+
+<!-- ============================ 16. RELU ============================ -->
+<section>
+  <h2>ReLU: la rampa</h2>
+  <div class="viz-con-panel angosto">
+    <div class="viz-frame" style="padding:8px" id="caja-relu"></div>
+    <div>
+      <p class="enorme" style="font-size:1.5em;margin-top:.2em">max(0, x)</p>
+      <p style="font-size:.9em">Si es <strong>negativo</strong>, poné cero.<br>
+         Si es <strong>positivo</strong>, dejalo pasar.</p>
+      <p style="font-size:.85em">Eso es todo. No hay nada más adentro.
+         Se llama <span class="glosario"><span class="en">ReLU</span><span class="es">unidad lineal rectificada</span></span>
+         y es la función de activación más usada del planeta.</p>
+    </div>
+  </div>
+  <p class="viz-pie"><b>En Python es una línea:</b>
+     <code>def rampa(x): return np.maximum(0, x)</code></p>
+  <aside class="notes">
+    <b>34-36 min.</b> Dejala proyectada y decilo bien lento: "si es negativo, cero.
+    Si es positivo, lo dejo pasar."<br>
+    Va a venir la pregunta: <b>"¿pero por qué justo ésa?"</b>. La respuesta honesta, y hay que
+    darla: <i>"porque es la más barata de calcular y porque anda. Se probaron otras más elegantes
+    y andan parecido. Gran parte del deep learning es así, y está bien saberlo."</i>
+    La honestidad acá compra confianza para toda la clase.
+  </aside>
+</section>
+
+<!-- ============================ 17. UNA RAMPA CON PERILLAS ============================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Una rampa con perillas</h3>
+  <div class="viz-con-panel">
+    <div class="viz-frame" style="padding:8px" id="caja-rampa"></div>
+    <div class="panel" id="panel-rampa"></div>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> tres perillas y podés poner el codo donde quieras,
+     con la inclinación que quieras, para arriba o para abajo. Guardá esa idea: son
+     <b>tres números por rampa</b>.</p>
+  <aside class="notes">
+    <b>36-38 min.</b> Movelas vos, una por una, nombrándolas: "dónde está el codo",
+    "qué tan empinada", "para dónde va".<br>
+    Preguntá: "¿cuántos números hacen falta para describir una rampa cualquiera?". Respuesta: tres.
+    Ese número vuelve en la slide del final, cuando tengamos ocho rampas y veinticuatro perillas.
+  </aside>
+</section>
+
+<!-- ============================ 18. BLOQUE PRÁCTICO 1 ============================ -->
+<section>
+  <h2>A las manos · parte 1</h2>
+  <div class="manos">
+    Abrí <code>notebook.ipynb</code> y corré hasta el <strong>TODO 3</strong>.
+    <strong>Veinte minutos.</strong> Si algo no corre, levantá la mano.
+  </div>
+  <ul>
+    <li><strong>TODO 1</strong> — escribí una tercera función y componé las tres.
+        <em>Predecí el resultado y anotalo antes de correr la celda.</em></li>
+    <li><strong>TODO 2</strong> — sumá <strong>dos</strong> rampas para dibujar una
+        <strong>V invertida</strong> (sube y baja).</li>
+    <li><strong>TODO 3</strong> — ahora una <strong>meseta</strong>: sube, se queda plana, baja.
+        ¿Cuántas rampas hacen falta?</li>
+  </ul>
+  <div class="ojo compacta">
+    El notebook viene con la respuesta <strong>puesta mal a propósito</strong>. Las celdas de
+    verificación van a decir «todavía no» hasta que la arregles. Eso es lo esperado.
+  </div>
+  <aside class="notes">
+    <b>38-55 min.</b> Recorré el aula. Los tres atascos que vas a encontrar, en orden de frecuencia:<br>
+    1. <b>El TODO 2 no baja</b>: la segunda altura tiene que ser negativa <i>y</i> más grande en
+    valor absoluto que la primera. Preguntales "¿qué pendiente tiene la suma después del segundo
+    codo?" en vez de darles el número.<br>
+    2. <b>El acumulador del <code>for</code></b>: si alguien no entiende <code>total = total + rampa(...)</code>,
+    ejecutalo a mano en el pizarrón con tres iteraciones y valores concretos.<br>
+    3. <b>Confunden codo con altura</b>: el codo es <i>dónde</i>, la altura es <i>cuánto</i>.<br>
+    Últimos 2 minutos: preguntá quién resolvió el TODO 3 con tres rampas y quién con cuatro.
+    Las dos están bien y la discusión es buena.
+  </aside>
+</section>
+
+<!-- ============================ PAUSA ============================ -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Estirá las piernas. Si algo del bloque anterior no cerró, éste es el momento de
+    preguntarlo sin levantar la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    <b>55-65 min.</b> <b>La pausa no se recorta.</b> Lo que viene es el momento fuerte de la clase
+    y necesitan la cabeza fresca. Si vas atrasado, se recorta contenido, nunca la pausa.
+  </aside>
+</section>
+
+<!-- ============================ 19. VOLVIMOS ============================ -->
+<section>
+  <h2>Volvimos</h2>
+  <p class="bajada">Antes de seguir: ¿cómo les fue con la V invertida?</p>
+  <ul>
+    <li>¿Alguien la hizo <strong>distinto</strong> a lo que decía la pista?</li>
+    <li>La meseta: ¿tres rampas o cuatro? ¿Por qué?</li>
+    <li>¿A alguien le quedó una figura rara que no esperaba? Mostrémosla.</li>
+  </ul>
+  <aside class="notes">
+    <b>65-68 min.</b> Poné en pantalla la solución de alguien del aula, aunque sea fea.
+    Vale más una solución distinta de un estudiante que la tuya prolija.<br>
+    Si nadie quiere: contá vos que la meseta se puede hacer con 3 rampas (sube, frena, baja)
+    o con 4 si además querés que termine plana.
+  </aside>
+</section>
+
+<!-- ============================ 20. Y AHORA EL TRUCO ============================ -->
+<section>
+  <h2>Y ahora, el truco</h2>
+  <p class="enorme">¿Qué pasa si sumo <em>muchas</em> rampas,<br>cada una con el codo en un lugar distinto?
+    <small>Pensalo diez segundos antes de que lo muestre.</small></p>
+  <aside class="notes">
+    <b>68-70 min.</b> Dejá la pregunta en pantalla y <b>callate</b>. Diez segundos completos.
+    Contalos si hace falta.<br>
+    Preguntá: "¿cuántas rampas creen que hacen falta para tapar esa curva?".
+    Anotá los números que digan. Después los comparamos con la realidad.
+  </aside>
+</section>
+
+<!-- ============================ 21. LA VIZ CENTRAL ============================ -->
+<section>
+  <span class="marca">viz · la importante</span>
+  <h3>Una. Dos. Cuatro. Ocho.</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/rampas.html" title="sumar rampas hasta dibujar la curva" loading="lazy"></iframe>
+  </div>
+  <div class="escalones">
+    <div class="fragment"><span class="n">1</span><span class="d">0.00084</span><span class="q">mal, obviamente</span></div>
+    <div class="fragment"><span class="n">2</span><span class="d">0.00062</span><span class="q">un poquito mejor</span></div>
+    <div class="fragment"><span class="n">4</span><span class="d">0.00032</span><span class="q">uy</span></div>
+    <div class="fragment"><span class="n">8</span><span class="d">0.00014</span><span class="q">…</span></div>
+  </div>
+  <aside class="notes">
+    <b>70-78 min.</b> <b>Ésta es la visualización más importante del curso. Dejala proyectada.</b><br>
+    Guion, apretando los botones del atajo y revelando un escalón por vez:<br>
+    · <b>1 rampa</b> — "mal, obviamente". Movele el codo por todos lados para que se vea que
+    no hay manera.<br>
+    · <b>2 rampas</b> — "un poquito mejor". Señalá que cada una se hace cargo de un tramo.<br>
+    · <b>4 rampas</b> — "uy".<br>
+    · <b>8 rampas</b> — y acá <b>callate cinco segundos</b>. Contalos.<br>
+    Recién después: "esto es una red neuronal. Ya está. Eso es todo lo que hay."<br>
+    Recordá el desajuste de la recta: 0.00150. Con ocho rampas: 0.00014. Diez veces mejor.<br>
+    <b>No aprietes «32» todavía.</b> Eso va en la slide 30.
+  </aside>
+</section>
+
+<!-- ============================ 22. EL SILENCIO ============================ -->
+<section>
+  <p class="enorme" style="margin-top:1.2em">Esto es una red neuronal.
+    <small>Ya está. Eso es todo lo que hay: rampas sumadas,
+      con los codos y las alturas bien puestos.</small></p>
+  <aside class="notes">
+    <b>78-79 min.</b> Slide de un solo golpe. No la explices. Dejala tres segundos y pasá.<br>
+    Si alguien dice "¿pero eso es <i>todo</i>?", la respuesta es "sí" y no hay que suavizarla.
+    Lo que falta es cómo se encuentran esos números solos, y eso es la clase que viene.
+  </aside>
+</section>
+
+<!-- ============================ 23. EL TEOREMA ============================ -->
+<section>
+  <h2>Lo que acaban de ver tiene nombre</h2>
+  <div class="intuicion compacta">
+    <strong>Teorema de aproximación universal.</strong> Con suficientes rampas se puede
+    aproximar <em>cualquier</em> función continua, tan bien como quieras.
+    No lo vamos a demostrar, porque lo acaban de ver. (Cybenko 1989, Hornik 1991.)
+  </div>
+  <div class="ojo">
+    El teorema dice que la combinación <strong>existe</strong>.
+    <strong>No dice</strong> que la vayas a encontrar. No dice con cuántos datos.
+    Y no dice que le vaya a ir bien con datos que no vio.
+    Esa distinción va a importar muchísimo en la clase 4.
+  </div>
+  <div class="ss compacta">
+    Ya conocés este problema con otro nombre: <strong>una teoría que puede explicar
+    cualquier resultado no explica nada</strong>.
+  </div>
+  <aside class="notes">
+    <b>79-83 min.</b> La analogía con Popper es la más potente de la clase para esta audiencia.
+    Usala explícitamente y despacio.<br>
+    Preguntá: "¿qué le criticarías a una teoría que explica cualquier resultado?".
+    Van a contestar bien solos. Después: "bueno, acabamos de construir una función así".<br>
+    <b>Ésta es la confusión más peligrosa de la clase</b>: "entonces con suficientes rampas
+    puedo predecir cualquier cosa". No. Aproximar lo que ya viste no es predecir lo que no viste.
+  </aside>
+</section>
+
+<!-- ============================ 24. DIBUJADO COMO RED ============================ -->
+<section>
+  <h2>Lo mismo, dibujado como red</h2>
+  <p class="bajada">El diagrama de circulitos y flechas que viste mil veces en notas de divulgación.</p>
+  <div class="comparacion">
+    <div>
+      <h4>Lo que parece</h4>
+      <p>Un cerebro. Neuronas. Sinapsis. Algo que piensa.</p>
+      <p>Un ícono místico que no se puede leer.</p>
+    </div>
+    <div>
+      <h4>Lo que es</h4>
+      <p>Cada <strong>bolita del medio</strong> es una rampa.</p>
+      <p>Cada <strong>flecha</strong> es una perilla.</p>
+      <p>La <strong>bolita de la derecha</strong> las suma.</p>
+      <p>Es la misma suma de rampas, con otra notación.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <b>83-85 min.</b> Este diagrama es el ícono que les generó respeto reverencial durante años.
+    Desactivarlo es media clase.<br>
+    Frase: "el diagrama no tiene nada de místico: es un plano de cableado".
+  </aside>
+</section>
+
+<!-- ============================ 25. VIZ RED COMO DIBUJANTE ============================ -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Tocá una perilla, mirá la curva</h3>
+  <div class="viz-frame" style="height:510px">
+    <iframe src="viz/red-como-dibujante.html" title="el diagrama de red, por dentro" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Qué mirar:</b> pasá el mouse por una bolita y se enciende <em>su</em>
+     rampa. Hacé clic en una flecha y movela: se mueve <b>esa</b> parte de la curva
+     y el resto ni se entera.</p>
+  <aside class="notes">
+    <b>85-88 min.</b> Hacé clic en la flecha de salida de la bolita 5 (la del codo en 2014)
+    y movela hasta el tope. Se dispara el final de la curva y el resto queda igual.<br>
+    Frase: <b>"toqué esta flecha de acá y se movió esa parte de la curva de allá.
+    Cada perilla tiene su territorio."</b><br>
+    Después apretá <b>«randomizar toda la red»</b> dos veces: sale cualquier cosa.
+    Eso también hay que mostrarlo. Y volvé a la configuración buena.
+  </aside>
+</section>
+
+<!-- ============================ 26. VOCABULARIO ============================ -->
+<section>
+  <h2>El vocabulario mínimo</h2>
+  <table>
+    <tr><th>palabra</th><th>qué es, en castellano llano</th></tr>
+    <tr><td><b>peso</b> · <i>weight</i></td><td>la perilla que <strong>multiplica</strong></td></tr>
+    <tr><td><b>sesgo</b> · <i>bias</i></td><td>la perilla que <strong>desplaza</strong>. Nada que ver con sesgo social</td></tr>
+    <tr><td><b>neurona</b> · <i>neuron</i></td><td>una rampa</td></tr>
+    <tr><td><b>capa</b> · <i>layer</i></td><td>un grupo de rampas en paralelo</td></tr>
+    <tr><td><b>capa oculta</b> · <i>hidden layer</i></td><td>las del medio, las que no ves entrar ni salir</td></tr>
+    <tr><td><b>activación</b> · <i>activation</i></td><td>el doblez que va entre capa y capa</td></tr>
+    <tr><td><b>profunda</b> · <i>deep</i></td><td>muchas capas, una atrás de la otra</td></tr>
+  </table>
+  <div class="ojo compacta">
+    <strong>«Bias» acá no quiere decir sesgo social.</strong> Es un número que sube o baja la recta.
+    Cuando en la clase 10 hablemos de sesgo <em>de verdad</em>, va a ser otra cosa completamente
+    distinta y con el mismo nombre en inglés. Es la trampa de vocabulario número uno del campo.
+  </div>
+  <aside class="notes">
+    <b>88-91 min.</b> "Siete palabras. Con estas siete entendés el 90 % del vocabulario de
+    cualquier paper."<br>
+    Deteneté en <b>bias</b>. Es un falso amigo que va a causar malentendidos toda la cursada
+    y conviene clavarlo ahora.
+  </aside>
+</section>
+
+<!-- ============================ 27. ANCHO VS PROFUNDO ============================ -->
+<section>
+  <h2>¿Y por qué «profundo»?</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Ancho</h4>
+      <p>Muchas rampas <strong>en paralelo</strong>, todas mirando la entrada cruda.</p>
+      <p><em>Como cien codificadores que leen todos lo mismo.</em> Cubrís mucho, pero cada uno
+         arranca de cero.</p>
+    </div>
+    <div>
+      <h4>Profundo</h4>
+      <p>Varias capas, cada una mirando <strong>lo que armó la anterior</strong>.</p>
+      <p><em>Como cinco analistas donde cada uno trabaja sobre la síntesis del anterior.</em>
+         Construís <strong>partes hechas de partes</strong>.</p>
+    </div>
+  </div>
+  <p>Lo segundo suele ser más eficiente, y de ahí sale la palabra <em>deep</em>.
+     Se va a ver muy claro con imágenes en la clase 5.</p>
+  <aside class="notes">
+    <b>91-93 min.</b> Si vas atrasado, ésta es la primera slide que se recorta. Se puede decir
+    en una frase: "profundo quiere decir que hay varias capas, una atrás de la otra, y cada una
+    trabaja sobre lo que armó la anterior. Lo vemos en la clase 5."<br>
+    La analogía de los codificadores es la que funciona con esta audiencia.
+  </aside>
+</section>
+
+<!-- ============================ 28. BLOQUE PRÁCTICO 2 ============================ -->
+<section>
+  <h2>A las manos · parte 2</h2>
+  <div class="manos">
+    De a dos. Del <strong>TODO 4</strong> hasta el final del notebook.
+    <strong>Veinte minutos.</strong>
+  </div>
+  <ul>
+    <li><strong>TODO 4</strong> — bajá el desajuste de <code>0.00056</code> agregando y
+        moviendo rampas. Anotá cuántas necesitaste.</li>
+    <li>Después, la sección 5: <strong>la misma red escrita con matrices</strong>,
+        y un <code>assert</code> que comprueba que da lo mismo.</li>
+    <li><strong>TODO 5</strong> <em>(opcional)</em> — cambiá la rampa por la sigmoide de la
+        clase 1. ¿La curva queda más angulosa o más redondeada?</li>
+  </ul>
+  <div class="intuicion compacta">
+    Van a escribir una red neuronal entera en <strong>seis líneas</strong>, sin PyTorch,
+    sin importar nada raro. Es la misma cuenta que hace una librería de verdad.
+  </div>
+  <aside class="notes">
+    <b>93-105 min.</b> De a dos, en serio: que discutan dónde poner el próximo codo.<br>
+    Recorré preguntando <b>"¿por qué pusiste el codo ahí?"</b>. La respuesta que buscás es
+    "porque ahí la curva cambia de dirección" o "porque ahí el palito rojo era el más largo".<br>
+    Si alguien llega abajo de 0.00040, que lo cuente al aula: hay que reconocer lo difícil que es
+    a mano, porque eso es lo que hace deseable la clase 3.
+  </aside>
+</section>
+
+<!-- ============================ 29. LO QUE NO ES ============================ -->
+<section>
+  <h2>Lo que <em>no</em> es</h2>
+  <ul>
+    <li><strong>No es un cerebro.</strong> El nombre «neurona» es de 1943 (McCulloch y Pitts)
+        y es marketing histórico.</li>
+    <li><strong>No piensa.</strong> No hay nada adentro que delibere.</li>
+    <li><strong>No entiende.</strong> Suma rampas.</li>
+    <li>Es <strong>una suma de rampas con las perillas bien puestas</strong>. Eso, y es muchísimo.</li>
+  </ul>
+  <div class="ojo">
+    Y esto no lo digo por humildad. Lo digo porque <strong>si creés que piensa, vas a
+    interpretar mal sus errores</strong>: los vas a leer como distracciones o como mentiras,
+    cuando son otra cosa. Lo vamos a ver en la clase 8.
+  </div>
+  <aside class="notes">
+    <b>105-108 min.</b> Acá aparece siempre la pregunta de si las neuronas artificiales imitan
+    a las reales. La respuesta: <i>"una neurona artificial es una rampa. Una neurona real es una
+    célula viva de una complejidad brutal. La analogía te va a hacer sobreestimar el modelo."</i><br>
+    No lo digas con desprecio: el entusiasmo es bueno, lo que no sirve es la magia.
+  </aside>
+</section>
+
+<!-- ============================ 30. EL PROBLEMA QUE QUEDA ============================ -->
+<section>
+  <span class="marca">viz · volvé a rampas.html</span>
+  <h2>Un momento. Apretá «32».</h2>
+  <div class="comparacion">
+    <div>
+      <h4>Con 8 rampas</h4>
+      <p>La curva azul sigue la <strong>forma</strong> de la negra. Desajuste <code>0.00014</code>.</p>
+      <p>24 perillas y una base.</p>
+    </div>
+    <div>
+      <h4>Con 32 rampas</h4>
+      <p>La curva azul pasa por <strong>todos</strong> los puntos. Incluidos los que son
+         claramente ruido del instrumento. Desajuste <code>0.00001</code>.</p>
+      <p>96 perillas. Y sólo hay <strong>36 datos</strong>.</p>
+    </div>
+  </div>
+  <div class="aha">
+    Guardá esta imagen. Hoy no la vamos a explicar. En la clase 4 va a tener nombre,
+    y va a ser el error más común de los papers que te toque revisar.
+  </div>
+  <aside class="notes">
+    <b>108-111 min.</b> Volvé a <code>viz/rampas.html</code> y apretá <b>«32»</b>.
+    Dejala en pantalla.<br>
+    <b>No expliques el sobreajuste hoy.</b> La tentación es enorme y hay que resistirla:
+    la siembra funciona porque queda incómoda. Decí sólo: "guarden esta imagen".<br>
+    Y mostrá el panel: 96 perillas, y no te muestro los sliders porque son demasiados.
+    Ése es el pie para la slide siguiente.
+  </aside>
+</section>
+
+<!-- ============================ 31. EL LUNES ============================ -->
+<section>
+  <span class="marca">el lunes</span>
+  <h2>Qué te llevás para el lunes</h2>
+  <p>Cuando leas <em>«usamos una red neuronal»</em>, traducí mentalmente:
+     <strong>«usamos una función muy flexible con muchísimas perillas»</strong>.</p>
+  <p>Y hacé las dos preguntas de revisor:</p>
+  <ol>
+    <li><strong>¿Cuántas perillas?</strong> (parámetros del modelo)</li>
+    <li><strong>¿Cuántos datos?</strong> (casos con los que se entrenó)</li>
+  </ol>
+  <div class="ss">
+    Si un paper modela la trayectoria de 80 municipios con 2 millones de parámetros
+    y dice que «ajusta perfecto», <strong>ajustar perfecto es la señal de alarma, no el
+    resultado</strong>. Con esas dos preguntas ya podés escribir media revisión.
+  </div>
+  <aside class="notes">
+    <b>111-114 min.</b> Éste es el entregable concreto de la clase. Que lo anoten.<br>
+    Preguntá: "¿alguien está revisando algo ahora mismo donde podría preguntar esto?".
+    Si hay una mano, dejalo contar el caso: vale más que cualquier ejemplo tuyo.
+  </aside>
+</section>
+
+<!-- ============================ 32. QUÉ TE LLEVÁS ============================ -->
+<section>
+  <h2>Las tres cosas de hoy</h2>
+  <ol style="font-size:1.05em">
+    <li><strong>Componer es encadenar</strong>: la salida de una entra a la siguiente.
+        Y el orden importa, porque componer no es sumar.</li>
+    <li><strong>Apilar cosas lineales no sirve de nada.</strong> Hace falta un doblez en el medio,
+        y el doblez es <code>max(0, x)</code>. No hay nada que entender ahí adentro.</li>
+    <li><strong>Una red neuronal es una suma de rampas.</strong> Con suficientes dibujás cualquier
+        figura — pero <em>poder dibujarla</em> no es lo mismo que <em>predecir bien</em>.</li>
+  </ol>
+  <aside class="notes">
+    <b>114-115 min.</b> Tres, no cuatro. Si te piden una cuarta, la cuarta es la tercera dicha
+    de nuevo: aproximar no es predecir.
+  </aside>
+</section>
+
+<!-- ============================ 33. GLOSARIO ============================ -->
+<section>
+  <h2>Glosario de hoy</h2>
+  <ul class="glosario-lista" style="font-size:.86em">
+    <li><b>composition</b><span>composición — la salida de una función es la entrada de la otra</span></li>
+    <li><b>non-linearity</b><span>no linealidad — cualquier cosa que doble la línea recta</span></li>
+    <li><b>ReLU</b><span>la rampa: <code>max(0, x)</code>. Si es negativo, cero</span></li>
+    <li><b>activation function</b><span>función de activación — el doblez que va entre capa y capa</span></li>
+    <li><b>weight</b><span>peso — la perilla que multiplica</span></li>
+    <li><b>bias</b><span>sesgo — la perilla que desplaza. <b>No</b> es el sesgo social</span></li>
+    <li><b>neuron</b><span>neurona — una rampa. Ni una célula, ni algo que piense</span></li>
+    <li><b>hidden layer</b><span>capa oculta — el grupo de rampas del medio</span></li>
+    <li><b>deep</b><span>profundo — muchas capas, una atrás de la otra</span></li>
+    <li><b>universal approximation</b><span>aproximación universal — con suficientes rampas, cualquier figura</span></li>
+  </ul>
+  <aside class="notes">
+    <b>115-117 min.</b> Diez términos. Están todos en <code>recursos/glosario.md</code> con la clase
+    donde aparecieron. No los leas uno por uno: señalá los dos que más se confunden
+    (<i>bias</i> y <i>neuron</i>) y pasá.
+  </aside>
+</section>
+
+<!-- ============================ 34. EL PUENTE ============================ -->
+<section class="portada">
+  <p class="num-clase">La que viene</p>
+  <h1>Clase 3: estar equivocado es un número,<br>y ese número tiene pendiente</h1>
+  <div class="franja"></div>
+  <p class="gancho">Sabemos dibujar cualquier cosa. Pero pusimos los pesos a mano, y con ocho
+     perillas ya es un suplicio. Un modelo de verdad tiene millones.
+     <strong>¿Cómo los encuentra solo?</strong></p>
+  <aside class="notes">
+    <b>117-120 min.</b> Cerrá con la promesa concreta: "hacen falta dos cosas.
+    Un número que mida qué tan mal está —y ése ya lo vieron: es el desajuste que estuvieron
+    bajando a mano— y una brújula que diga para dónde ir."<br>
+    Última frase: "las dos las vieron hoy sin saberlo".<br>
+    Y avisá: la clase 3 arranca con dos rectas sobre una nube y una pregunta que divide al aula.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<!-- ====================== SCRIPTS (todos locales) ====================== -->
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+  /* =====================================================================
+     LAS VIZ INLINE DE LAS SLIDES
+     Los datos son los mismos que usan las viz de viz/: la serie real de
+     menciones a «inflación» (media móvil de 3 años), 1984-2019.
+     ===================================================================== */
+  const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+                 0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
+                 0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
+                 0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
+                 0.1440, 0.1837, 0.1321, 0.1268];
+  const serie = SERIE.map((v, i) => ({ x: 1984 + i, y: v }));
+  const planos = [];
+
+  // --- slide 3: la serie sola, sin modelo -------------------------------
+  (function () {
+    const p = Viz.plano('#caja-serie', {
+      xmin: 1983, xmax: 2020, ymin: 0, ymax: 0.21, alto: 420,
+      ejeX: 'año', ejeY: '% de palabras del discurso',
+      titulo: 'menciones a «inflación» en la apertura de sesiones'
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla();
+      p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
+      p.linea(serie, { color: 'datos', grosor: 3 });
+      p.puntos(serie, { color: 'datos', r: 4 });
+    });
+    p.tooltip(w => {
+      const a = Math.round(w.x);
+      if (a < 1984 || a > 2019) return null;
+      return 'año ' + a + '\n' + Viz.num(SERIE[a - 1984], 3) + ' % de las palabras';
+    });
+    planos.push(p);
+  })();
+
+  // --- slide 16: la ReLU, grande ----------------------------------------
+  (function () {
+    const p = Viz.plano('#caja-relu', {
+      xmin: -4, xmax: 4, ymin: -1, ymax: 4, alto: 300,
+      ejeX: 'x', ejeY: 'max(0, x)', titulo: 'la función más tonta del mundo'
+    });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla(); p.ejes();
+      p.curva(x => Math.max(0, x), { color: 'modelo', grosor: 5 });
+      p.texto(-2.4, 0.35, 'acá: cero', { color: 'tinta2', tam: 14, peso: '700' });
+      p.texto(1.4, 2.6, 'acá: lo dejo pasar', { color: 'tinta2', tam: 14, peso: '700' });
+      p.punto(0, 0, { color: 'acento', r: 6 });
+      p.texto(0, 0, 'el codo', { color: 'acento', tam: 13, peso: '700', dx: 8, dy: 18 });
+    });
+    planos.push(p);
+  })();
+
+  // --- slide 17: una rampa con sus tres perillas ------------------------
+  (function () {
+    const estado = { codo: 0, empinada: 1, signo: 1 };
+    const p = Viz.plano('#caja-rampa', {
+      xmin: -5, xmax: 5, ymin: -5, ymax: 5, alto: 330,
+      ejeX: 'x', ejeY: 'rampa(x)', titulo: 'tres perillas y ninguna más'
+    });
+    function rampa(x) {
+      return estado.signo * estado.empinada * Math.max(0, x - estado.codo);
+    }
+    p.alDibujar(() => {
+      p.fondo(); p.grilla(); p.ejes();
+      p.curva(rampa, { color: 'modelo', grosor: 4 });
+      p.punto(estado.codo, 0, { color: 'parametro', r: 7, halo: true });
+      p.texto(estado.codo, 0, 'el codo',
+        { color: 'parametro', tam: 12, peso: '700', dx: 10, dy: 20, caja: true });
+    });
+    const ctl = Viz.controles('#panel-rampa', [
+      { tipo: 'titulo', texto: 'Las perillas de la rampa' },
+      { tipo: 'slider', id: 'codo', etiqueta: 'dónde está el codo',
+        min: -4, max: 4, paso: 0.1, valor: 0, decimales: 1, color: 'parametro' },
+      { tipo: 'slider', id: 'empinada', etiqueta: 'qué tan empinada',
+        min: 0, max: 3, paso: 0.05, valor: 1, decimales: 2, color: 'parametro' },
+      { tipo: 'botones', id: 'signo', etiqueta: 'para dónde va', valor: '1',
+        opciones: [{ valor: '1', texto: 'sube' }, { valor: '-1', texto: 'baja' }] },
+      { tipo: 'texto', id: 'lectura', html: '' }
+    ], (v) => {
+      estado.codo = v.codo; estado.empinada = v.empinada; estado.signo = +v.signo;
+      ctl.texto('lectura', 'Antes de <b>' + Viz.num(estado.codo, 1) +
+        '</b> vale cero. Después ' + (estado.signo > 0 ? 'sube' : 'baja') +
+        ' <b>' + Viz.num(estado.empinada, 2) + '</b> por cada unidad de x.');
+      p.redibujar();
+    });
+    ctl.disparar();
+    planos.push(p);
+  })();
+
+  // Reveal esconde las slides: cuando aparece una, el canvas ya tiene el ancho
+  // bueno y hay que redibujar. Si no, en el proyector aparece cortado.
+  Reveal.on('slidechanged', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+  Reveal.on('ready', () => {
+    for (const p of planos) { p.redimensionar(); p.redibujar(); }
+  });
+</script>
+</body>
+</html>
