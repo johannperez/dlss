@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El filtro que se desliza — Clase 5</title>
+
+<!-- ==========================================================================
+     MOMENTO AHA: "elegí nueve números y, sin escribir una sola regla sobre
+     bordes, me quedó un detector de bordes verticales. El filtro es un pincel:
+     nueve números deciden qué se enciende."
+
+     SEGUNDO MOMENTO: apretá «filtro al azar» diez veces. Casi siempre sale
+     porquería. Por eso los pinceles se APRENDEN y no se eligen a mano.
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../../_shared/css/curso.css">
+<style>
+  .tres { display:grid; grid-template-columns: 1fr 190px 1fr; gap:14px; align-items:start; }
+  .tres figure { margin:0; }
+  .tres figcaption {
+    font-size:.74rem; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--tinta-3); margin:0 0 .35rem; font-weight:600; min-height:2.1em;
+  }
+  .rejilla3 { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+  .rejilla3 input {
+    width:100%; box-sizing:border-box; text-align:center; font:600 15px var(--f-mono);
+    padding:.5em .1em; border-radius:var(--r-chico); border:1px solid var(--borde);
+    color:var(--tinta); background:var(--papel);
+  }
+  .rejilla3 input:focus { outline:2px solid var(--c-acento); outline-offset:1px; }
+  .pie3 { font-size:.72rem; color:var(--tinta-3); margin:.45rem 0 0; text-align:center; }
+  .cuenta {
+    margin-top:12px; padding:10px 12px; border-radius:var(--r-medio);
+    background:var(--papel-2); border:1px dashed var(--borde-fuerte);
+  }
+  .cuenta-titulo { font-size:.74rem; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--tinta-3); margin:0 0 .5rem; font-weight:600; }
+  .cuenta-fila { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .mini { display:grid; grid-template-columns:repeat(3,34px); gap:2px; }
+  .mini span {
+    display:flex; align-items:center; justify-content:center; height:26px;
+    font:600 11px var(--f-mono); border-radius:3px; border:1px solid var(--borde);
+    color:var(--tinta);
+  }
+  .op { font:700 20px var(--f-mono); color:var(--tinta-3); }
+  .res {
+    font:700 26px var(--f-mono); color:var(--c-acento);
+    background:var(--papel); border:1px solid var(--borde);
+    border-radius:var(--r-chico); padding:.1em .45em;
+  }
+  .res-etq { font-size:.75rem; color:var(--tinta-3); display:block; }
+  @media (max-width: 820px) { .tres { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>El filtro que se desliza</h1>
+    <p>Una ventanita de 3×3 recorre la imagen. En cada posición multiplica lo que ve
+       por <em>nueve números</em> y suma. Ese resultado es un píxel del dibujo nuevo.
+       Cambiá los nueve números y mirá qué se enciende.</p>
+  </header>
+
+  <div>
+    <div class="viz-frame" style="padding:12px">
+      <div class="tres">
+        <figure>
+          <figcaption>1 · la imagen · la ventana está acá</figcaption>
+          <div id="entrada"></div>
+        </figure>
+        <figure>
+          <figcaption>2 · el filtro (editable)</figcaption>
+          <div id="filtro-grid" class="rejilla3"></div>
+          <p class="pie3">azul − &nbsp;·&nbsp; blanco 0 &nbsp;·&nbsp; rojo +</p>
+        </figure>
+        <figure>
+          <figcaption>3 · el mapa de activación</figcaption>
+          <div id="salida"></div>
+        </figure>
+      </div>
+
+      <div class="cuenta">
+        <p class="cuenta-titulo">La cuenta del píxel que está parpadeando</p>
+        <div class="cuenta-fila">
+          <div><span class="res-etq">lo que ve la ventana</span><div class="mini" id="c-parche"></div></div>
+          <span class="op">×</span>
+          <div><span class="res-etq">el filtro</span><div class="mini" id="c-filtro"></div></div>
+          <span class="op">=</span>
+          <div><span class="res-etq">los nueve productos</span><div class="mini" id="c-prod"></div></div>
+          <span class="op">→</span>
+          <div><span class="res-etq">su suma</span><span class="res" id="c-res">0,00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Poné el preset <b>borde vertical</b> y mirá el panel 3:
+      se encienden <em>sólo</em> los contornos verticales, y el resto queda apagado.
+      No escribimos ninguna regla sobre bordes: elegimos nueve números. Ahora apretá
+      <b>filtro al azar</b> diez veces seguidas y contá cuántas veces sale algo útil.
+      Casi ninguna. Por eso los pinceles no se eligen a mano: <b>se aprenden</b>.
+    </div>
+    <p class="viz-pie">
+      Las prendas salen de <b>FashionMNIST</b> (Zalando Research, MIT) — un sandbox
+      técnico, no un dato de ciencias sociales. El afiche, el diario, la multitud y la
+      reja son esquemas dibujados con numpy <span class="chip sintetico">sintético</span>
+      para que se vea el efecto del filtro sobre estructuras que sí aparecen en material
+      de archivo. Todo se genera con <code>medir-experimentos.py</code>, semilla 1983.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../datos-experimentos.js"></script>
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   1. Las imágenes disponibles (vienen de datos-experimentos.js, medidas de verdad)
+   --------------------------------------------------------------------------- */
+const IMAGENES = [];
+(DATOS_EXP.muestras || []).slice(0, 4).forEach(m => IMAGENES.push({ nombre: m.nombre, px: m.px }));
+const nombresEsquema = { afiche: 'afiche de campaña', diario: 'página de diario',
+                         multitud: 'multitud', reja: 'reja / ventana' };
+for (const k of ['afiche', 'diario', 'multitud', 'reja']) {
+  if (DATOS_EXP.esquemas && DATOS_EXP.esquemas[k]) {
+    IMAGENES.push({ nombre: nombresEsquema[k], px: DATOS_EXP.esquemas[k] });
+  }
+}
+
+const N = IMAGENES[0].px.length;      // 28
+const M = N - 2;                      // 26: el mapa de salida es dos más chico
+
+/* ---------------------------------------------------------------------------
+   2. Los presets: cada uno es una elección de nueve números
+   --------------------------------------------------------------------------- */
+const PRESETS = {
+  vertical:   [[ 1, 0, -1], [ 2, 0, -2], [ 1, 0, -1]],
+  horizontal: [[ 1, 2,  1], [ 0, 0,  0], [-1, -2, -1]],
+  desenfoque: [[.11, .11, .11], [.11, .11, .11], [.11, .11, .11]],
+  realce:     [[ 0, -1,  0], [-1,  5, -1], [ 0, -1,  0]],
+  diagonal:   [[ 2,  1,  0], [ 1,  0, -1], [ 0, -1, -2]],
+  identidad:  [[ 0,  0,  0], [ 0,  1,  0], [ 0,  0,  0]],
+  cero:       [[ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0]]
+};
+
+const estado = {
+  imagen: 0,
+  filtro: PRESETS.vertical.map(f => f.slice()),
+  hecho: 0,                    // cuántos píxeles del mapa ya se calcularon
+  cursor: 0,                   // dónde está parada la ventana (la cuenta de abajo)
+  azares: 0                    // cuántas veces apretaron "filtro al azar"
+};
+
+let img = normalizar(IMAGENES[0].px);
+let mapa = ceros(M, M);
+let listo = ceros(M, M);       // 1 si ese píxel ya se calculó
+
+function normalizar(px) { return px.map(f => f.map(v => v / 255)); }
+function ceros(f, c) { const a = []; for (let j = 0; j < f; j++) a.push(new Array(c).fill(0)); return a; }
+
+/* ---------------------------------------------------------------------------
+   3. La convolución. Es esto y nada más: multiplicar de a nueve y sumar.
+      Es la MISMA cuenta que hace el doble `for` del notebook.
+   --------------------------------------------------------------------------- */
+function convolucionEn(j, i) {
+  let s = 0;
+  for (let dj = 0; dj < 3; dj++) {
+    for (let di = 0; di < 3; di++) s += img[j + dj][i + di] * estado.filtro[dj][di];
+  }
+  return s;
+}
+
+function recalcularTodo() {
+  for (let j = 0; j < M; j++) for (let i = 0; i < M; i++) mapa[j][i] = convolucionEn(j, i);
+}
+
+function reiniciarBarrido() {
+  mapa = ceros(M, M); listo = ceros(M, M); estado.hecho = 0;
+  dibujar();
+}
+
+/** El píxel donde el filtro más se enciende. Es el que conviene mirar primero. */
+function cursorInteresante() {
+  let mejor = 0, valor = -1;
+  for (let j = 0; j < M; j++) for (let i = 0; i < M; i++) {
+    const v = Math.abs(convolucionEn(j, i));
+    if (v > valor) { valor = v; mejor = j * M + i; }
+  }
+  return mejor;
+}
+
+function avanzar(k) {
+  for (let t = 0; t < k && estado.hecho < M * M; t++) {
+    const j = Math.floor(estado.hecho / M), i = estado.hecho % M;
+    mapa[j][i] = convolucionEn(j, i); listo[j][i] = 1;
+    estado.hecho++;
+    estado.cursor = estado.hecho - 1;
+  }
+  dibujar();
+  return estado.hecho < M * M;
+}
+
+function posicionActual() {
+  const k = Viz.acotar(estado.cursor, 0, M * M - 1);
+  return { j: Math.floor(k / M), i: k % M };
+}
+
+/* ---------------------------------------------------------------------------
+   4. Los dos planos: la imagen y el mapa
+   --------------------------------------------------------------------------- */
+const pEntrada = Viz.plano('#entrada', {
+  xmin: 0, xmax: N, ymin: 0, ymax: N, cuadrado: true,
+  margen: { i: 4, d: 4, a: 4, b: 4 }
+});
+const pSalida = Viz.plano('#salida', {
+  xmin: 0, xmax: M, ymin: 0, ymax: M, cuadrado: true,
+  margen: { i: 4, d: 4, a: 4, b: 4 }
+});
+
+pEntrada.alDibujar(() => {
+  pEntrada.fondo({ marco: false });
+  pEntrada.celdas(img, { paleta: 'grises', min: 0, max: 1, borde: false });
+  const { j, i } = posicionActual();
+  // la ventana de 3x3, en el color de las perillas: es donde está mirando el filtro
+  const x = i, y = N - j - 3;
+  pEntrada.poligono([[x, y], [x + 3, y], [x + 3, y + 3], [x, y + 3]],
+    { relleno: false, borde: Viz.color('parametro'), grosor: 2.5 });
+});
+
+pSalida.alDibujar(() => {
+  pSalida.fondo({ marco: false });
+  let lim = 0;
+  for (let j = 0; j < M; j++) for (let i = 0; i < M; i++)
+    if (listo[j][i]) lim = Math.max(lim, Math.abs(mapa[j][i]));
+  lim = lim || 1;
+  const visible = mapa.map((f, j) => f.map((v, i) => listo[j][i] ? v : 0));
+  pSalida.celdas(visible, { paleta: 'divergente', min: -lim, max: lim, borde: false });
+  // el píxel que se está calculando, parpadeando
+  const { j, i } = posicionActual();
+  const x = i, y = M - j - 1;
+  const pulso = .5 + .5 * Math.abs(Math.sin(Date.now() / 300));
+  pSalida.poligono([[x - .6, y - .6], [x + 1.6, y - .6], [x + 1.6, y + 1.6], [x - .6, y + 1.6]],
+    { relleno: false, borde: Viz.alfa('acento', pulso), grosor: 2.5 });
+});
+
+// se puede mover la ventana con el dedo: clic en cualquiera de los dos paneles
+pEntrada.alClic(w => {
+  const i = Viz.acotar(Math.floor(w.x), 0, M - 1);
+  const j = Viz.acotar(M - 1 - Math.floor(w.y - 2), 0, M - 1);
+  estado.cursor = j * M + i; dibujar(); leer();
+});
+pSalida.alClic(w => {
+  const i = Viz.acotar(Math.floor(w.x), 0, M - 1);
+  const j = Viz.acotar(M - 1 - Math.floor(w.y), 0, M - 1);
+  estado.cursor = j * M + i; dibujar(); leer();
+});
+pEntrada.tooltip(() => 'clic para mover la ventana acá');
+pSalida.tooltip(() => 'clic para ver la cuenta de este píxel');
+
+/* ---------------------------------------------------------------------------
+   5. El filtro editable, con su color
+   --------------------------------------------------------------------------- */
+const cajas = [];
+const rej = document.getElementById('filtro-grid');
+for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) {
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.inputMode = 'decimal';
+  inp.setAttribute('aria-label', `peso fila ${j + 1} columna ${i + 1}`);
+  inp.addEventListener('input', () => {
+    const v = parseFloat(inp.value.replace(',', '.'));
+    estado.filtro[j][i] = isFinite(v) ? v : 0;
+    ctl.set('preset', 'a-mano', true);
+    pintarFiltro(); reiniciarBarrido(); avanzar(M * M); leer();
+  });
+  rej.appendChild(inp); cajas.push(inp);
+}
+
+function pintarFiltro() {
+  let lim = 0;
+  for (const f of estado.filtro) for (const v of f) lim = Math.max(lim, Math.abs(v));
+  lim = lim || 1;
+  const pal = Viz.paleta('divergente');
+  for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) {
+    const k = j * 3 + i, v = estado.filtro[j][i];
+    if (document.activeElement !== cajas[k]) cajas[k].value = Viz.num(v, 2);
+    cajas[k].style.background = pal((v / lim + 1) / 2);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   6. La cuenta de abajo
+   --------------------------------------------------------------------------- */
+function miniGrilla(id, valores, colorear) {
+  const cont = document.getElementById(id);
+  cont.innerHTML = '';
+  let lim = 0;
+  for (const v of valores) lim = Math.max(lim, Math.abs(v));
+  lim = lim || 1;
+  const pal = Viz.paleta('divergente');
+  const gris = Viz.paleta('grises');
+  valores.forEach(v => {
+    const s = document.createElement('span');
+    s.textContent = Viz.num(v, 2);
+    s.style.background = colorear === 'gris' ? gris(Viz.acotar(v, 0, 1))
+                                             : pal((v / lim + 1) / 2);
+    cont.appendChild(s);
+  });
+}
+
+function leer() {
+  const { j, i } = posicionActual();
+  const parche = [], prod = [], filtroPlano = [];
+  let suma = 0;
+  for (let dj = 0; dj < 3; dj++) for (let di = 0; di < 3; di++) {
+    const a = img[j + dj][i + di], b = estado.filtro[dj][di];
+    parche.push(a); filtroPlano.push(b); prod.push(a * b); suma += a * b;
+  }
+  miniGrilla('c-parche', parche, 'gris');
+  miniGrilla('c-filtro', filtroPlano);
+  miniGrilla('c-prod', prod);
+  document.getElementById('c-res').textContent = Viz.num(suma, 2);
+
+  const nombre = { vertical: 'un detector de bordes verticales',
+                   horizontal: 'un detector de bordes horizontales',
+                   desenfoque: 'un promediador: borronea',
+                   realce: 'un realzador: exagera las diferencias',
+                   diagonal: 'un detector de diagonales',
+                   identidad: 'la identidad: devuelve la imagen igual',
+                   cero: 'nada: todo por cero es cero',
+                   'a-mano': 'tuyo, hecho a mano',
+                   azar: 'nueve números al azar' }[ctl.valores.preset] || '';
+  let extra = '';
+  if (ctl.valores.preset === 'azar') {
+    extra = ` Van <b>${estado.azares}</b> filtros al azar. ¿Cuántos sirvieron?`;
+  }
+  ctl.texto('lectura',
+    `El filtro de ahora es <b>${nombre}</b>. Va por el píxel <b>${estado.hecho}</b> de ` +
+    `<b>${M * M}</b> del mapa.${extra}`);
+}
+
+function dibujar() { pEntrada.redibujar(); pSalida.redibujar(); }
+
+/* ---------------------------------------------------------------------------
+   7. La animación: deslizar la ventana por toda la imagen
+   --------------------------------------------------------------------------- */
+const anim = Viz.animacion({
+  cadaMs: 0,
+  paso: () => avanzar(ctl.valores.velocidad),
+  reset: () => { reiniciarBarrido(); leer(); }
+});
+
+/* ---------------------------------------------------------------------------
+   8. El panel
+   --------------------------------------------------------------------------- */
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'El pincel' },
+  { tipo: 'botones', id: 'preset', etiqueta: 'nueve números ya elegidos', valor: 'vertical',
+    opciones: [
+      { valor: 'vertical', texto: 'borde vertical' },
+      { valor: 'horizontal', texto: 'borde horizontal' },
+      { valor: 'diagonal', texto: 'diagonal' },
+      { valor: 'desenfoque', texto: 'desenfoque' },
+      { valor: 'realce', texto: 'realce' },
+      { valor: 'identidad', texto: 'identidad' },
+      { valor: 'cero', texto: 'todo cero' }
+    ] },
+  { tipo: 'boton', texto: 'Filtro al azar', alClic: () => {
+      const r = Viz.gauss(Date.now() % 100000);
+      estado.filtro = [0, 1, 2].map(() => [0, 1, 2].map(() => Math.round(r() * 100) / 100));
+      estado.azares++;
+      ctl.set('preset', 'azar', true);
+      pintarFiltro(); reiniciarBarrido(); avanzar(M * M); leer();
+    } },
+  { tipo: 'titulo', texto: 'Sobre qué imagen' },
+  { tipo: 'select', id: 'imagen', etiqueta: 'la imagen de entrada',
+    opciones: IMAGENES.map((im, k) => ({ valor: String(k), texto: im.nombre })), valor: '0' },
+  { tipo: 'titulo', texto: 'Deslizar' },
+  { tipo: 'slider', id: 'velocidad', etiqueta: 'qué tan rápido se desliza',
+    sub: 'píxeles del mapa por cuadro', min: 1, max: 30, paso: 1, valor: 8, decimales: 0 },
+  { tipo: 'boton', texto: 'Deslizar todo', principal: true, alClic: () => {
+      if (estado.hecho >= M * M) reiniciarBarrido();
+      anim.play();
+    } },
+  { tipo: 'boton', texto: 'Un paso', alClic: () => { anim.pausa(); avanzar(1); leer(); } },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => { anim.pausa(); reiniciarBarrido(); leer(); } },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], (v, id) => {
+  if (id === 'preset' && PRESETS[v.preset]) {
+    estado.filtro = PRESETS[v.preset].map(f => f.slice());
+    pintarFiltro(); reiniciarBarrido(); avanzar(M * M);
+  }
+  if (id === 'imagen') {
+    estado.imagen = +v.imagen;
+    img = normalizar(IMAGENES[estado.imagen].px);
+    reiniciarBarrido(); avanzar(M * M); estado.cursor = cursorInteresante(); dibujar();
+  }
+  leer();
+});
+
+// el parpadeo del píxel actual: un latido suave, sin cronómetro propio
+setInterval(() => pSalida.redibujar(), 260);
+
+pintarFiltro();
+recalcularTodo();
+avanzar(M * M);                       // arranca con el mapa completo: primero el resultado
+estado.cursor = cursorInteresante();  // y la ventana parada donde más se enciende
+dibujar();
+leer();
+Viz.botonTema();
+</script>
+</body>
+</html>

@@ -20,3 +20,6 @@ runs/
 # Sistema
 .DS_Store
 node_modules/
+
+# Caches reproducibles de las clases (se regeneran con los scripts medir-*.py)
+clases/**/cache-*.npz
