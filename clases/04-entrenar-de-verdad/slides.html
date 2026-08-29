@@ -61,12 +61,6 @@
     text-transform: uppercase; color: var(--tinta-3); line-height: 1.25; min-height: 2.4em; }
   .cifras-fila .nu { font-family: var(--f-mono); font-size: 1.25em; font-weight: 700; }
 
-  /* OJO: curso.css estiliza `.reveal pre code` pero no le pone `display:block`,
-     y reveal.js tampoco. Un <code> inline con padding vertical pinta su fondo
-     encima de las líneas de al lado y el código se ve cortado por la mitad.
-     Una línea lo arregla. (Vale para las diez clases: conviene subirlo a
-     _shared/css/curso.css.) */
-  .reveal pre code { display: block; overflow-x: auto; }
   /* el glosario de hoy tiene once términos: en una sola columna no entran */
   .reveal .glosario-lista.dos { display: grid; grid-template-columns: 1fr 1fr;
     column-gap: 1.6rem; }

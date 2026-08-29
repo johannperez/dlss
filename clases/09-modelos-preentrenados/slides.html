@@ -24,13 +24,6 @@
   .reveal .mono { font-family: var(--f-mono); }
   /* el rótulo .marca flota arriba a la derecha: que el título no se le meta abajo */
   .reveal .marca + h2, .reveal .marca + h3 { padding-right: 10.5rem; }
-  /* Los pasos de `data-line-numbers="1-2|3-4"` los arma el plugin clonando el <code>
-     y poniéndolo en position:absolute. Sin un ancestro posicionado, ese clon se ancla
-     a la <section> y se come el título. El <pre> tiene que ser el ancestro. */
-  .reveal pre { position: relative; }
-  .reveal pre > code.fragment { top: 0; left: 0; width: 100%; box-sizing: border-box; }
-  /* mientras se ve un paso, el bloque de base no tiene que asomar por detrás */
-  .reveal pre:has(> code.fragment.visible) > code:first-child { visibility: hidden; }
 </style>
 </head>
 <body>
@@ -63,7 +56,7 @@
       <li>Clase 4: entrenar de verdad, y la diferencia entre <strong>dibujar</strong> y <strong>calcar</strong>.</li>
       <li>Clase 5-7: la arquitectura son supuestos. Convoluciones, embeddings, attention.</li>
       <li>Clase 8: entrenamos un mini-GPT de <strong>~1,5 millones</strong> de perillas.
-          Tardó diez minutos y escribe castellano reconocible.</li>
+          Tardó entre cuatro y siete minutos y escribe castellano reconocible.</li>
       <li class="fragment"><strong>Y ahí terminó lo que podemos entrenar nosotros.</strong></li>
     </ul>
     <aside class="notes">
@@ -80,8 +73,8 @@
       <div>
         <h4>Tu mini-GPT</h4>
         <p><span class="numero-vivo">~1,5 M</span> de parámetros<br>
-           <strong>10 minutos</strong> en una CPU<br>
-           <strong>1 MB</strong> de texto<br>
+           <strong>4 a 7 minutos</strong> en una CPU<br>
+           <strong>1,1 MB</strong> de texto<br>
            costo: el café que te tomaste mientras entrenaba</p>
       </div>
       <div>
@@ -255,7 +248,14 @@ clasificador(titulares[:20])
 
   <!-- =========================== 10 · LA METÁFORA =========================== -->
   <section>
+    <span class="marca">callback dibujo</span>
     <h2>El informante clave</h2>
+    <div class="aha compacta">
+      Nueve clases dibujando. Hoy <strong>no dibujamos desde cero</strong>: agarramos a
+      alguien que ya sabe dibujar —le enseñaron castellano durante meses y con millones de
+      dólares— y le corregimos el estilo con cuatro trazos. Las perillas de abajo quedan
+      como estaban; las de arriba, esas pocas, son las tuyas.
+    </div>
     <div class="ss">
       Un modelo pre-entrenado es como un <strong>informante clave</strong>: conoce el
       terreno, habla el idioma, te ahorra meses de trabajo de campo.
@@ -267,7 +267,9 @@ clasificador(titulares[:20])
     <p class="fragment">Nadie publicaría una etnografía diciendo "me lo contó un tipo".
        <strong>Tampoco publiques "usamos BERT".</strong></p>
     <aside class="notes">
-      2 min. Esta metáfora es la que se llevan. Usala cada vez que aparezca un modelo
+      2 min. La caja de arriba es el <b>[CALLBACK DIBUJO]</b> de la clase: decila en voz
+      alta, es lo que engancha el módulo 3 con las nueve clases anteriores.
+      La metáfora del informante es la que se llevan. Usala cada vez que aparezca un modelo
       nuevo en el resto del curso.
       La segunda frase entra fuerte: dejá el fragment para el final y hacé silencio.
     </aside>

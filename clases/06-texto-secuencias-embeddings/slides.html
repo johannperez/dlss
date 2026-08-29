@@ -32,10 +32,6 @@
     background:var(--papel-3); font:700 .5em/1.6em var(--f-mono); text-align:center;
     color:var(--tinta-3); font-style:normal; }
   .reveal .onehot-tira i.uno { background:var(--c-acento); color:var(--papel); }
-  /* OJO: `curso.css` estiliza `.reveal pre code` pero no le pone `display:block`,
-     y el `reveal.css` vendorizado tampoco lo trae. Sin esto el bloque de código
-     se desborda de su caja y queda ilegible. Mismo parche que las clases 1 y 4. */
-  .reveal pre code { display:block; overflow-x:auto; }
   /* el glosario del final: diez filas tienen que entrar en una pantalla */
   .reveal .glosario-lista.apretada { font-size:.72em; }
   .reveal .glosario-lista.apretada li { padding:.18em 0; }

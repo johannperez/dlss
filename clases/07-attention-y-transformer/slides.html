@@ -247,7 +247,7 @@
 
 <!-- ===================== 9. VIZ: attention como mesa ===================== -->
 <section>
-  <span class="marca">viz</span>
+  <span class="marca">viz · callback dibujo</span>
   <h3>Hacé clic en una palabra</h3>
   <div class="viz-frame" data-alto="medio" style="height:530px">
     <iframe src="viz/attention-como-mesa.html" title="cada palabra arma su propio resumen" loading="lazy"></iframe>
@@ -255,7 +255,15 @@
   <p class="viz-pie"><b>Qué mirar:</b> hacé clic en «lo» y después en «si». Son mapas
     completamente distintos. <b>Cada palabra tiene el suyo.</b> Y los pesos no son
     inventados: salen de un transformer entrenado sobre discursos de apertura reales.</p>
+  <div class="aha compacta">Seguimos dibujando. En la clase 1 la máquina dibujaba una
+    curva sobre unos puntos; en la 6, el mapa donde viven las palabras; hoy
+    <b>cada palabra dibuja su propio mapa de a quién mira</b>. Y ese mapa tiene perillas
+    —Q, K y V— que se ajustan con el mismo descenso de la clase 3. Nada nuevo bajo el sol,
+    sólo mejor organizado.</div>
   <aside class="notes">
+    <b>Éste es el [CALLBACK DIBUJO] de la clase: decilo con todas las letras</b>, señalando
+    la pantalla mientras un mapa está abierto. Es la frase que cose la clase 7 al resto del
+    curso.<br>
     Movelo vos primero, despacio, dos o tres palabras. Después dejá que lo toquen 2
     minutos. Pregunta al aula: «¿alguien encontró una palabra que mire a algo raro?».
     Siempre aparece una, y es oro: sirve para la slide 34. (6 min con la exploración)
@@ -858,7 +866,8 @@ self.mlp = nn.Sequential(
     </svg>
   </div>
   <div class="tarjetas">
-    <div><h4>el de hoy</h4>2 bloques, 4 cabezas, ~0,5 M de perillas</div>
+    <div><h4>el de hoy</h4>6 bloques, 4 cabezas, ~1,25 M de perillas. Armado y apagado:
+      lo entrenamos la clase que viene.</div>
     <div><h4>GPT-2 chico</h4>12 bloques, 12 cabezas, 124 M</div>
     <div><h4>los grandes</h4>más de 100 bloques. Misma idea, más plata.</div>
   </div>

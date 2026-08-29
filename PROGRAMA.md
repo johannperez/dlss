@@ -423,7 +423,7 @@ construido hoy se entrena mañana.
 **Gancho (10 min).**
 Se lee en voz alta un párrafo de un debate parlamentario. Tiene la cadencia, las fórmulas de
 cortesía, los giros. Se vota si es real o generado. Es generado — por un modelo de un millón y medio de
-parámetros que entrenamos en diez minutos, en esta misma clase, y que vas a poder mirar por dentro
+parámetros que entrenamos en menos de siete minutos, en esta misma clase, y que vas a poder mirar por dentro
 línea por línea. **Todo lo que hace ChatGPT que te resulta mágico o irritante lo vas a poder
 explicar antes de que termine la clase.**
 

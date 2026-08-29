@@ -33,11 +33,6 @@
   .tabla-bruta { font-size: .82em !important; }
   .tabla-bruta td.muerte { color: var(--c-error); font-weight: 700; }
 
-  /* OJO: el reset.css de reveal aplana `sup` y `sub` (les pone
-     `vertical-align: baseline; font-size: 100%`), así que "10^16" escrito con
-     <sup> se leía "1016". Sin esto, la tabla de la fuerza bruta miente. */
-  .reveal sup { vertical-align: super; font-size: .68em; line-height: 0; }
-  .reveal sub { vertical-align: sub;   font-size: .68em; line-height: 0; }
 
   .dos-canvas { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
   .tres-canvas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; }

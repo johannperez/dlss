@@ -34,11 +34,6 @@
   .reveal .abrir-suelta { font-size: .62em; color: var(--tinta-3); margin: .15em 0 0; }
   .reveal table.dos-tipos td, .reveal table.dos-tipos th { font-size: 1.02em; }
   .reveal table.dos-tipos td { height: 2.4em; }
-  /* OJO: `curso.css` estiliza `.reveal pre code` pero no le pone `display:block`,
-     y reveal.css tampoco. Sin esto el <code> queda inline, el <pre> mide una sola
-     linea de alto y el bloque de codigo aparece CORTADO en el proyector.
-     Lo mismo hizo el equipo de la clase 4; convendria arreglarlo en curso.css. */
-  .reveal pre code { display: block; overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -419,12 +414,21 @@ def recta(x, a, b):
     <div><h4>Escalón</h4><div id="mini-escalon"></div></div>
   </div>
   <p class="viz-pie">Seis formas básicas. Como los ladrillos de un Lego:
-    lo interesante no es cada una, es lo que se puede armar con ellas.</p>
+    lo interesante no es cada una, es lo que se puede armar con ellas.
+    Cinco tienen slide propia acá abajo. El <b>escalón</b> no la necesita:
+    afirma <b>«antes de este umbral, una cosa; después, otra»</b> —mayoría de edad,
+    línea de pobreza, el 3&nbsp;% del piso electoral— y es la única del zoo que no
+    tiene pendiente en ningún lado. Es también la sigmoide llevada al extremo, y
+    por eso las dos aparecen juntas cada vez que hay un sí/no de por medio.</p>
   <aside class="notes">
     <b>72:00 — 2 min.</b> «No hay nada que memorizar acá. No quiero que se aprendan las
     fórmulas: quiero que reconozcan la <b>forma</b>. Si ven una S en un gráfico, quiero que
     piensen “ah, una sigmoide”, y la fórmula la buscan en Google.»<br>
-    Esa frase desarma a los que ya empezaron a copiar fórmulas en el cuaderno.
+    Esa frase desarma a los que ya empezaron a copiar fórmulas en el cuaderno.<br>
+    El escalón se despacha con la línea del pie y no lleva slide propia: alcanza con que
+    lo reconozcan. Si alguien pregunta por qué no lo usamos como pieza, la respuesta corta
+    es «porque no tiene pendiente, y en la clase 3 vas a ver que sin pendiente no se puede
+    aprender». No abras ese tema ahora.
   </aside>
 </section>
 
@@ -525,12 +529,17 @@ def recta(x, a, b):
     <iframe src="viz/zoo-de-funciones.html" title="el zoo de funciones" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> apostá primero cuántas formas van a poder tapar la
-    curva gris. Después probá. Ojo con el desafío 3.</p>
+    curva gris. Después probá. Ojo con el desafío 3.<br>
+    <b>Y fijate que acá hay una que no estaba en la lista de recién: la rampa.</b>
+    Ocupa el lugar del escalón, no la voy a explicar hoy, y es la protagonista de la
+    clase que viene. Acordate de ella.</p>
   <p class="abrir-suelta">Para proyectar más grande:
     <a href="viz/zoo-de-funciones.html" target="_blank">abrir la visualización sola</a>.</p>
   <aside class="notes">
     <b>82:00 — 3 min. Esta conviene abrirla suelta, a pantalla completa.</b><br>
     <b>Antes</b> de apretar cada desafío, pedí la apuesta: «¿cuántas de las seis van a poder?».
+    (Las seis de la viz: la rampa reemplaza al escalón. Es a propósito: es la siembra de la
+    clase 2 y no se explica hoy.)
     Anotá el número que diga el aula.<br>
     Desafío 1: la sacan tres (recta, rampa y una sigmoide muy estirada). Punto:
     <i>varias familias pueden contener la misma figura</i>.<br>
