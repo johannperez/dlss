@@ -32,50 +32,61 @@ problema de modelo: tenés un problema de concepto.*
 
 ## 2. Plan de tiempos real
 
-| Min | Bloque | Slides | Qué hacés |
-|---|---|---|---|
-| **0-2** | Portada | 1 | El gancho. No leas el temario. |
-| **2-4** | Dónde quedamos | 2 | Puente desde la clase 8. |
-| **4-7** | El presupuesto | 3 | Tu mini-GPT contra un modelo grande. |
-| **7-11** | Las tres líneas | 4 | **Corrélo en vivo si tenés red.** |
-| **11-15** | Los resultados y la pregunta | 5-6 | La tabla de titulares reales + votación. |
-| **15-17** | Por qué funciona | 7 | Transfer learning, con la analogía. |
-| **17-19** | Callback clase 5 | 8 | La jerarquía de capas. |
-| **19-22** | Qué se congela | 9 | Menos perillas = menos datos. Clase 4. |
-| **22-24** | El informante clave | 10 | La metáfora que se llevan. |
-| **24-28** | Las tres estrategias | 11 | **La tabla de decisión. Foto.** |
-| **28-31** | Estrategia A | 12 | El código que está en el notebook. |
-| **31-34** | Estrategia B (zero-shot) | 13 | Reconocimiento: ya hicieron esto con diccionarios. |
-| **34-37** | Estrategia C (fine-tuning) | 14 | Las cinco estaciones adentro del `Trainer`. |
-| **37-38** | **Apuesta** | 15 | Votación a mano alzada. **No la saltees.** |
-| **38-43** | Viz de la curva | 16 | Movela vos, despacio. |
-| **43-46** | Modelos en castellano | 17 | 70, no 95. |
-| **46-66** | **Manos 1** | 18 | Notebook, secciones 1-4. 20 min. |
-| **66-71** | Viz de búsqueda semántica | 19 | Puesta en común + el contrapunto de falsos positivos. |
-| **71-81** | **PAUSA** | 20 | **En serio. No se toca.** |
-| **81-82** | Segunda parte | 21 | Cambio de tono. |
-| **82-85** | Etiquetá a mano | 22 | Va a haber resistencia. |
-| **85-88** | La matriz con palabras | 23 | Pizarrón, con un ejemplo del aula. |
-| **88-89** | **Apuesta del umbral** | 24 | Votación. |
-| **89-97** | **Viz de la matriz** | 25 | **La viz central. No la apures.** |
-| **97-100** | Precisión y recall | 26 | Que digan las frases en voz alta. |
-| **100-103** | ¿Cuál te importa? | 27 | Que escriban su caso. |
-| **103-106** | El baseline tonto | 28 | Números reales del notebook. |
-| **106-110** | El techo humano | 29 | Acá ellos saben más que el ingeniero. |
-| **110-135** | **Manos 2** | 30 | De a dos. 25 min. |
-| **135-139** | Resultados del aula | 31 | Que hablen ellos. |
-| **139-144** | **La trampa del corpus** | 32 | Lo más importante de la segunda mitad. |
-| **144-147** | Mirá los errores | 33 | |
-| **147-150** | Qué reportar | 34 | Foto. |
-| **150-153** | `[EL LUNES]` | 35 | |
-| **153-155** | Cuándo NO | 36 | |
-| **155-157** | Qué te llevás | 37 | Tres, no más. |
-| **157-158** | Glosario | 38 | |
-| **158-160** | Lo que falta + puente | 39-40 | |
+**Son 120 minutos y este plan suma 120 exactos**, con las mismas seis casillas del
+presupuesto de `PROGRAMA.md`. Las casillas grandes son las que mandan: si un bloque se te
+va, lo recortás adentro de su casilla, **no le comés minutos a la siguiente**.
 
-> **Este plan suma más de 120.** Es a propósito: está calculado con holgura para que veas
-> cuánto sobra. La casilla oficial es 120 con dos bloques prácticos de 20 y 25 minutos,
-> más los 10 de pausa. Usá la sección 6 para decidir qué se recorta.
+| Min | Casilla | Slides | Qué hacés |
+|---|---|---|---|
+| **0-10** | **Gancho** | 1-6 | |
+| 0-1 | Portada | 1 | El título y nada más. No leas el temario. |
+| 1-3 | Dónde quedamos | 2 | Puente desde la clase 8. Que digan ellos qué hicieron. |
+| 3-4 | El presupuesto | 3 | Tu mini-GPT contra un modelo grande. Un minuto, no más. |
+| 4-7 | **Las tres líneas** | 4 | **Corrélo en vivo si tenés red.** Si no, mostrá la salida guardada. |
+| 7-9 | Los resultados | 5 | La tabla de titulares reales. "¿Estos dos están bien?" |
+| 9-10 | **La pregunta** | 6 | Votación a mano alzada. No la contestes vos. |
+| **10-25** | **Transfer learning** | 7-17 | **La casilla más apretada de la clase. Cronometrala.** |
+| 10-12 | Por qué funciona | 7 | El diagrama, con la analogía. |
+| 12-13 | Callback clase 5 | 8 | Una frase mientras avanzás. Ya lo vieron. |
+| 13-15 | Qué se congela | 9 | Menos perillas = menos datos. Cobra la clase 4. |
+| 15-16 | El informante clave | 10 | La metáfora que se llevan. |
+| 16-19 | **Las tres estrategias** | 11 | **La tabla de decisión. Pedí que le saquen foto.** |
+| 19-21 | A, B y C | 12-14 | Cuarenta segundos cada una. El detalle está en el notebook. |
+| 21-22 | **Apuesta** | 15 | Votación. **No la saltees: sin esto la viz que sigue es decoración.** |
+| 22-24 | Viz de la curva | 16 | Movela vos, despacio, y leé el cartel de recomendación. |
+| 24-25 | Modelos en castellano | 17 | 70, no 95. Una frase. |
+| **25-45** | **Manos 1** | 18-19 | |
+| 25-26 | Las consignas | 18 | Leelas en voz alta y arrancan. |
+| 26-42 | Notebook, secciones 1 a 4 | — | Caminá por el aula. No resuelvas: preguntá. |
+| 42-45 | Puesta en común + viz | 19 | La búsqueda semántica **y el botón de falsos positivos**. |
+| **45-55** | **PAUSA** | 20 | **En serio. No se toca. Nunca.** |
+| **55-75** | **Evaluar de verdad** | 21-29 | |
+| 55-56 | Segunda parte | 21 | Cambio de tono. Decí que esta mitad es la que importa. |
+| 56-58 | Etiquetá a mano | 22 | Va a haber resistencia. Bancala. |
+| 58-61 | La matriz con palabras | 23 | Pizarrón, con un corpus del aula. |
+| 61-62 | **Apuesta del umbral** | 24 | Votación. |
+| 62-69 | **Viz de la matriz** | 25 | **La viz central de la clase. Siete minutos y no la apures.** |
+| 69-71 | Precisión y recall | 26 | Que digan las frases en voz alta, ellos. |
+| 71-72 | ¿Cuál te importa? | 27 | Treinta segundos para que escriban su caso. |
+| 72-73 | El modelo bobo | 28 | Números reales del notebook. |
+| 73-75 | El techo humano | 29 | Acá ellos saben más que el ingeniero. Aprovechalo. |
+| **75-100** | **Manos 2 — el proyecto chico** | 30 | |
+| 75-77 | Las consignas | 30 | De a dos. Repartí quién hace qué. |
+| 77-100 | Notebook, secciones 5 a 12 | — | El grueso: comparación honesta y los 30 errores. |
+| **100-120** | **Cierre** | 31-40 | |
+| 100-104 | Resultados del aula | 31 | Que hablen ellos. Manos arriba. |
+| 104-109 | **La trampa del corpus** | 32 | **Lo más importante de la segunda mitad.** |
+| 109-111 | Mirá los errores | 33 | |
+| 111-113 | Qué reportar | 34 | Foto. |
+| 113-115 | `[EL LUNES]` | 35 | Foto también. Es lo único que se llevan escrito. |
+| 115-116 | Cuándo NO | 36 | El mejor consejo de la clase, en una frase. |
+| 116-118 | Qué te llevás | 37 | Tres ideas. Tres, no más. |
+| 118-119 | Glosario | 38 | Pasala. Está en `recursos/glosario.md`. |
+| 119-120 | Lo que falta + puente | 39-40 | Dejalo incómodo. No lo resuelvas. |
+
+> **Los dos bloques prácticos suman 45 minutos y la exposición 65.** Es la proporción que
+> pide la clase: la parte de hacerlo andar es corta, la de saber si anda es larga. Si al
+> minuto 25 seguís hablando de Hugging Face, ya te comiste el bloque práctico.
 
 ---
 
@@ -296,7 +307,9 @@ el de la sátira. La prueba barata: partí por grupo y mirá si se cae.
 - **Hugging Face no se pudo probar** en el contenedor donde se construyó este material
   (`huggingface.co` da 403; ver `datos/README.md` §2). En consecuencia:
   - El **camino B** (embeddings PPMI+SVD propios + scikit-learn) está corrido y verificado
-    entero: el notebook completo tarda **~45 segundos** en CPU sin red.
+    entero: el notebook completo corre de punta a punta en **1 min 49 s** en CPU y sin red
+    (medido con `nbconvert --execute` en el contenedor de construcción; el grueso es
+    levantar el kernel e importar torch, el cómputo propio son ~25 s).
   - El **camino A** está escrito con cuidado y **no ejecutado**. Las celdas están marcadas
     `# ── CAMINO A ──`.
   - El identificador `pysentimiento/robertuito-sentiment-analysis` está **verificado

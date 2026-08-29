@@ -99,7 +99,7 @@
   <!-- =========================== 4 · LAS TRES LÍNEAS =========================== -->
   <section>
     <h3>Tres líneas</h3>
-    <pre><code class="language-python" data-trim data-line-numbers>
+    <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 from transformers import pipeline
 clasificador = pipeline("sentiment-analysis",
                         model="pysentimiento/robertuito-sentiment-analysis")
@@ -299,10 +299,10 @@ clasificador(titulares[:20])
     <pre><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
 X = vectorizar(titulares)          # texto -> un punto en 100 dimensiones
                                    # (clase 6: el mapa donde viven las palabras)
-modelo = LogisticRegression(max_iter=2000, class_weight="balanced")
-modelo.fit(X[i_train], y[i_train])
-pred  = modelo.predict(X[i_test])
-proba = modelo.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
+modelo_a = LogisticRegression(max_iter=2000, class_weight="balanced")
+modelo_a.fit(X[i_train], y[i_train])
+pred_a  = modelo_a.predict(X[i_test])
+proba_a = modelo_a.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el sí/no
 </code></pre>
     <div class="intuicion compacta">
       El clasificador es <strong>una regresión logística</strong>. La misma que ya sabés
@@ -696,6 +696,10 @@ for epoca in range(3):
       Si dos codificadores entrenados coinciden en el <strong>73 %</strong> de los casos
       (kappa 0,46), ese es tu <strong>techo realista</strong>. No hay modelo que pueda
       hacer mejor una distinción que dos personas no saben hacer igual.
+      <br><span class="chip sintetico">codificadores simulados</span>
+      <span style="font-size:.8em; color:var(--tinta-2)">esos dos números salen del archivo
+      del curso, donde las dos codificaciones se generaron con una semilla. Sirven para
+      practicar la cuenta; reportarlos como acuerdo humano real sería fraude.</span>
     </div>
     <div class="ojo">
       Y si tu modelo saca <strong>0,95</strong> donde dos humanos coinciden en 0,73:
