@@ -50,12 +50,29 @@
 | **55** | 19 | **PAUSA** | **No se toca.** |
 | **65** | 20-21 | Volvimos + la pregunta | Se muestra la solución de alguien. Diez segundos de silencio. |
 | **70** | 22-24 | **El momento fuerte** | `viz/rampas.html`: 1 → 2 → 4 → 8. Silencio. El teorema. |
-| **83** | 25-27 | El nombre y el vocabulario | El diagrama, `viz/red-como-dibujante.html`, las siete palabras. |
-| **93** | 28 | **Manos 2** | De a dos. TODO 4 y la versión matricial. |
-| **105** | 29-31 | Lo que no es + la siembra | El desinflado. El botón «32». `[EL LUNES]`. |
-| **114** | 32-35 | Cierre | Las tres cosas, el glosario, el puente a la clase 3. |
+| **82** | 25-28 | El nombre y el vocabulario | El diagrama, `viz/red-como-dibujante.html`, las siete palabras, ancho vs profundo. |
+| **90** | 29 | **Manos 2** | De a dos, 17 minutos. TODO 4 y la versión matricial. |
+| **107** | 30-32 | Lo que no es + la siembra | El desinflado. El botón «32». `[EL LUNES]`. |
+| **115** | 33-35 | Cierre | Las tres cosas, el glosario, el puente a la clase 3. |
 
 Suma exacta: **120 minutos**. La pausa está a los 55 y dura 10.
+
+**Los números de slide de esta tabla son los que muestra reveal abajo a la
+derecha** (`n / 35`), o sea contando la pausa como la 19. Todas las referencias
+a slides de este archivo y de las notas del docente usan esa misma numeración.
+
+Los dos bloques prácticos duran **17 minutos** cada uno, no 20: son los que
+quedan después de descontar lo que efectivamente ocupa la exposición, y es lo
+que dice la slide. Si querés los 20, lo que se recorta está en la sección 6.
+
+> **Diferencia con `PROGRAMA.md`.** El plan del curso pone «Manos 2» en 85-105 y
+> el cierre en 105-120. Medido slide por slide, el tramo del nombre y el
+> vocabulario (25-28) no entra en 20 minutos: son cinco slides y una viz. Así que
+> acá el práctico 2 va **90-107** y el cierre **107-120**. Suma lo mismo, la pausa
+> no se movió, y ningún bloque quedó por debajo de lo que necesita. Si preferís
+> respetar el reloj del programa al pie de la letra, recortá la slide 28 (ancho vs
+> profundo) y acortá la 26 (`red-como-dibujante`) a dos minutos: con eso arrancás
+> el práctico a los 87.
 
 ---
 
@@ -70,9 +87,9 @@ Suma exacta: **120 minutos**. La pausa está a los 55 y dura 10.
 | Slide 8 | «Si invierto el orden, ¿da lo mismo?» | Desarma "componer es sumar" antes de que se instale. |
 | **Slide 12** | **«Si encadeno dos rectas, ¿qué sale?» — se vota** | Sin esta apuesta, la viz siguiente es decoración. |
 | Slide 16 | (la que van a hacer ellos) «¿Por qué justo esa función?» | Preparate la respuesta honesta. Está abajo. |
-| Slide 20 | «¿Cuántas rampas creen que hacen falta?» | Anotá los números. Después se comparan. |
-| Slide 23 | «¿Qué le criticarías a una teoría que explica cualquier resultado?» | Puente a Popper. Contestan bien solos. |
-| Slide 28 | «¿Por qué pusiste el codo ahí?» (recorriendo) | Buscás: «porque ahí cambia de dirección» o «ahí el palito era más largo». |
+| Slide 21 | «¿Cuántas rampas creen que hacen falta?» | Anotá los números. Después se comparan. |
+| Slide 24 | «¿Qué le criticarías a una teoría que explica cualquier resultado?» | Puente a Popper. Contestan bien solos. |
+| Slide 29 | «¿Por qué pusiste el codo ahí?» (recorriendo) | Buscás: «porque ahí cambia de dirección» o «ahí el palito era más largo». |
 
 ---
 
@@ -127,11 +144,11 @@ Tres minutos, y no vuelve a pasar en toda la cursada.
 es *dónde*, la altura es *cuánto*.**
 
 **«Con suficientes rampas puedo predecir cualquier cosa»** — la más peligrosa.
-Aproximar lo que ya viste no es predecir lo que no viste. Se dice en la slide 23
+Aproximar lo que ya viste no es predecir lo que no viste. Se dice en la slide 24
 y se cobra en la clase 4. Si aparece antes, no la resuelvas del todo: decí
 «guardá esa pregunta, es la clase 4 entera» y anotala en el pizarrón.
 
-**«Bias = sesgo social»** — falso amigo. Clavarlo en la slide 26 ahorra
+**«Bias = sesgo social»** — falso amigo. Clavarlo en la slide 27 ahorra
 malentendidos durante ocho clases.
 
 ---
@@ -140,7 +157,7 @@ malentendidos durante ocho clases.
 
 ### Qué se recorta, en este orden
 
-1. **Slide 27 (ancho vs profundo).** Se reemplaza por una frase: «profundo quiere
+1. **Slide 28 (ancho vs profundo).** Se reemplaza por una frase: «profundo quiere
    decir varias capas, cada una trabajando sobre lo que armó la anterior; lo
    vemos en la clase 5».
 2. **Slide 9 (la notación `g(f(x))`).** Se puede dejar para el notebook, que la
@@ -151,8 +168,8 @@ malentendidos durante ocho clases.
 4. **Slide 10 (la cadena de mediciones).** Duele recortarla porque es la que
    conecta con su oficio, pero se puede decir en una frase mientras mostrás la
    viz del lego.
-5. **Bloque práctico 2**, achicándolo a 12 minutos y dejando la sección 5 del
-   notebook (matrices) como tarea.
+5. **Bloque práctico 2**, achicándolo de 17 a 12 minutos y dejando la sección 5
+   del notebook (matrices) como tarea.
 
 ### Qué NUNCA se recorta
 
@@ -162,9 +179,9 @@ malentendidos durante ocho clases.
   dibujito lindo.
 - **El silencio de cinco segundos en las 8 rampas.** Es tentador seguir hablando.
   No lo hagas.
-- **La advertencia del teorema (slide 23).** Sin ella, la clase enseña
+- **La advertencia del teorema (slide 24).** Sin ella, la clase enseña
   entusiasmo mágico, que es exactamente lo contrario de lo que este curso quiere.
-- **El botón «32» de la slide 30.** Es la siembra del sobreajuste, y el equipo de
+- **El botón «32» de la slide 31.** Es la siembra del sobreajuste, y el equipo de
   la clase 4 cuenta con que esté puesta.
 
 ### Si vas adelantado
@@ -195,7 +212,7 @@ malentendidos durante ocho clases.
   circuito sería una sola operación trivial. Este chiste funciona *siempre*.
 - **El ecualizador con 24 perillas.** Callback a la clase 1: nadie ecualiza 24
   bandas a mano, por eso existen los presets. El descenso por gradiente es la
-  máquina que fabrica presets. Guardalo para la slide 30.
+  máquina que fabrica presets. Guardalo para la slide 31.
 - **La goma que se estira dos veces.** Para el "por qué apilar lineales no sirve".
   Si tenés una banda elástica en el bolsillo, mejor.
 - **La hoja de papel.** Doblala en vivo. El gesto físico se recuerda más que la
@@ -204,7 +221,7 @@ malentendidos durante ocho clases.
   ser antipático con quien la trajo.
 - **Popper.** «Una teoría que puede explicar cualquier resultado no explica nada.»
   Es la analogía más potente de la clase con esta audiencia y hay que decirla
-  con todas las letras en la slide 23.
+  con todas las letras en la slide 24.
 
 ---
 

@@ -132,8 +132,9 @@
     </div>
     <p class="viz-pie">
       <b>Y una cosa más:</b> apretá <b>32 rampas</b>. La curva azul pasa por
-      <em>todos</em> los puntos, incluidos los que son claramente ruido de
-      medición. Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
+      <em>todos</em> los puntos, incluidos los que casi seguro son ruido de
+      medición —el léxico que produce esta serie lo escribimos nosotros—.
+      Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
       tener nombre.
     </p>
     <p class="viz-pie">
@@ -622,8 +623,14 @@ function actualizar() {
 function redibujarTodo() { construirTaller(); actualizar(); }
 
 // primer dibujo
-redibujarTodo();
+// OJO (bug de la espina compartida, parcheado acá): `Viz.botonTema()` aplica el
+// tema que quedó guardado en localStorage, pero NO recarga la paleta ni redibuja.
+// Si abrís esta página con el tema oscuro ya guardado de otra viz, el canvas sale
+// con los colores CLAROS sobre el fondo oscuro. Estas dos líneas lo arreglan.
+// Corresponde arreglarlo en `_shared/js/viz.js` (ver VERIFICACION.md).
 Viz.botonTema();
+Viz.recargarColores();
+redibujarTodo();
 
 // que los mini-gráficos se reacomoden si cambia el ancho o el tema
 window.addEventListener('resize', () => { construirTaller(); });

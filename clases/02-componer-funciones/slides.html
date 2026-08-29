@@ -91,14 +91,17 @@
 <section>
   <h2>El desafío de hoy</h2>
   <p class="bajada">Cuánto se habló de <strong>inflación</strong> en cada discurso presidencial
-     de apertura de sesiones. Datos reales, 1984-2019, <strong>suavizados</strong> con una media
-     móvil de 3 años: la pregunta que contestan es «en qué parte del período el tema estuvo en
-     agenda», no «cuánto habló ese año».</p>
+     de apertura de sesiones. Datos reales, 1984-2019, suavizados con una
+     <strong>media móvil de 3 años</strong>.</p>
   <div class="viz-frame" style="padding:8px" id="caja-serie"></div>
   <p class="viz-pie"><b>La consigna:</b> ajustale una recta. Dale, la mejor recta posible.
      Gritame valores y yo los pongo.</p>
   <aside class="notes">
     <b>3-6 min.</b> Proyectá y callate cinco segundos. Después: "¿qué forma tiene esto?".
+    Si alguien pregunta por el suavizado, la respuesta corta: <i>"es un promedio de tres años,
+    así que la serie contesta «en qué parte del período el tema estuvo en agenda» y no «cuánto
+    habló ese año». Las dos preguntas son legítimas; usar una y reportar la otra, no."</i>
+    (Está en <code>datos/README.md</code> §1.2 y en el notebook.)<br>
     Van a decir "sube y baja", "hay tres momentos", "el final se dispara".
     Todas esas respuestas sirven, anotalas: son los codos que vamos a poner después.<br>
     Y ahora el desafío: <b>"ajustale una recta"</b>. Pedí valores a mano alzada.
@@ -148,7 +151,10 @@
   </div>
   <aside class="notes">
     <b>9-12 min.</b> Volvé a la viz anterior y apretá los botones <b>3</b> y <b>5 perillas</b>.
-    Movelas todas delante de ellos. El desajuste no se mueve.<br>
+    Movelas todas delante de ellos. Ojo con cómo lo decís: <b>la recta sí se mueve</b> (si dijeras
+    que no, lo desmiente la pantalla). Lo que no se mueve es el <b>piso</b>: el desajuste rebota
+    para arriba y para abajo pero nunca baja de 0.00150, y el renglón del panel muestra por qué —
+    las cinco se vuelven a colapsar a dos números.<br>
     Pregunta al aula: "¿por qué no cambia nada?". Si alguien dice "porque son todas lo mismo",
     ganaste: esa persona acaba de descubrir sola por qué apilar cosas lineales no sirve, y lo
     vamos a formalizar en veinte minutos.
@@ -444,7 +450,8 @@ mas_diez(doble(3))   # 16
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> tres perillas y podés poner el codo donde quieras,
      con la inclinación que quieras, para arriba o para abajo. Guardá esa idea: son
-     <b>tres números por rampa</b>.</p>
+     <b>tres números por rampa</b>. En el notebook la vas a escribir así, tal cual:<br>
+     <code>def rampa(x, codo=0.0, altura=1.0): return altura * np.maximum(0, x - codo)</code></p>
   <aside class="notes">
     <b>36-38 min.</b> Movelas vos, una por una, nombrándolas: "dónde está el codo",
     "qué tan empinada", "para dónde va".<br>

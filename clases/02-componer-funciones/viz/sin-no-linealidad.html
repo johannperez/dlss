@@ -304,8 +304,14 @@ function actualizar() {
   pIzq.redibujar(); pDer.redibujar();
 }
 
-actualizar();
+// OJO (bug de la espina compartida, parcheado acá): `Viz.botonTema()` aplica el
+// tema que quedó guardado en localStorage, pero NO recarga la paleta ni redibuja.
+// Si abrís esta página con el tema oscuro ya guardado de otra viz, el canvas sale
+// con los colores CLAROS sobre el fondo oscuro. Estas dos líneas lo arreglan.
+// Corresponde arreglarlo en `_shared/js/viz.js` (ver VERIFICACION.md).
 Viz.botonTema();
+Viz.recargarColores();
+actualizar();
 </script>
 </body>
 </html>

@@ -320,6 +320,7 @@ const ctl = Viz.controles('#panel', [
 const cajaPerilla = ctl.nodos['perilla'];
 
 let semillaRnd = 3;
+let alAzar = false;
 function randomizar() {
   semillaRnd++;
   const r = Viz.azar(semillaRnd * 7919);
@@ -348,12 +349,12 @@ function randomizar() {
   for (let j = 0; j < H; j++) red.w2[j] = +(red.w2[j] * k).toFixed(3);
   red.b2 = +(k * (b2Viejo - lo) + 0.02).toFixed(3);
 
-  seleccion = null; clavePerilla = null;
+  seleccion = null; clavePerilla = null; alAzar = true;
   refrescar();
 }
 function volver() {
   red = JSON.parse(JSON.stringify(BUENA));
-  seleccion = null; clavePerilla = null;
+  seleccion = null; clavePerilla = null; alAzar = false;
   refrescar();
 }
 
@@ -421,7 +422,14 @@ function refrescar() {
   } else {
     msg = 'La red tiene <b>' + (3 * H + 1) + ' perillas</b>: ' + H + ' pesos de entrada, ' +
       H + ' sesgos, ' + H + ' pesos de salida y 1 sesgo de salida. ' +
-      'Con esas 19 dibuja todo lo que ves.';
+      'Con esas ' + (3 * H + 1) + ' dibuja todo lo que ves.';
+    if (alAzar) {
+      msg = '<b class="c-error">Perillas al azar.</b> Esto es lo que dibuja una red sin ' +
+        'entrenar, y es lo que hay que encontrar a mano. ' +
+        '<span class="chico">(Las alturas se reescalaron para que la curva entre en el ' +
+        'cuadro: si no, se va tan arriba que no verías nada. La <em>forma</em> es la que ' +
+        'salió al azar, no se tocó.)</span><br>' + msg;
+    }
   }
   ctl.texto('lectura', msg);
   ctl.texto('cuenta',
@@ -433,8 +441,14 @@ function refrescar() {
 }
 
 construirDiagrama();
-refrescar();
+// OJO (bug de la espina compartida, parcheado acá): `Viz.botonTema()` aplica el
+// tema que quedó guardado en localStorage, pero NO recarga la paleta ni redibuja.
+// Si abrís esta página con el tema oscuro ya guardado de otra viz, el canvas sale
+// con los colores CLAROS sobre el fondo oscuro. Estas dos líneas lo arreglan.
+// Corresponde arreglarlo en `_shared/js/viz.js` (ver VERIFICACION.md).
 Viz.botonTema();
+Viz.recargarColores();
+refrescar();
 </script>
 </body>
 </html>
