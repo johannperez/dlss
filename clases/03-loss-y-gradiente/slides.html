@@ -50,7 +50,11 @@
   /* Las cuatro viz de esta clase traen panel con botones de animación y
      lecturas en vivo: a los 610 px del `grande` estándar el panel se cortaba
      abajo y el botón «Soltar la pelota» quedaba fuera de la pantalla. */
-  .viz-frame[data-alto="viz3"] { height: 660px; }
+  .viz-frame[data-alto="viz3"] { height: 614px; }
+  /* y le apretamos un poco el título y el pie a esas slides, que es de donde
+     sale el alto extra sin que nada se salga de la pantalla */
+  section:has(> .viz-frame[data-alto="viz3"]) h3 { margin-bottom: .16em; }
+  section:has(> .viz-frame[data-alto="viz3"]) .viz-pie { margin-top: .18em; font-size: .74em; }
 
   /* doce términos: entran justo si se los compacta un poco */
   .glosario-dos li { font-size: .78em; padding: .18em 0;
@@ -578,7 +582,7 @@
   <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/tasa-de-aprendizaje.html" title="tres learning rates en paralelo" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>. El quiz de firmas se scrollea en el panel.</p>
   <aside class="notes">
     <b>79-85 min.</b> «Izquierda: paso microscópico, no llega nunca. Centro: bien.
     Derecha: se va del mapa.»<br>
@@ -1181,7 +1185,7 @@
   /* --- slide 20: el mapa con la flecha del gradiente --------------------- */
   (function () {
     const p = nuevoPlano('#caja-gradiente', {
-      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 355,
+      xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 340,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'la flecha, en el mismo mapa de antes'
     });

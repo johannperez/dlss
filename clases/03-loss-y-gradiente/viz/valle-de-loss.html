@@ -41,7 +41,10 @@
      entero sin scrollear adentro del marco de la slide. */
   body.embebido .viz-pagina { grid-template-columns: minmax(0, 1fr) 330px; }
   body.embebido .panel { font-size: .86em; padding: .5rem .55rem .55rem; }
-  body.embebido .ctrl { margin-bottom: .40rem; }
+  body.embebido .ctrl { margin-bottom: .38rem; }
+  body.embebido .par-perillas > div { padding: .22em .4em; }
+  body.embebido .par-perillas { margin: 0 0 .2rem; }
+  body.embebido .lectura-grande { font-size: 1.12rem; }
 </style>
 </head>
 <body class="curso">
@@ -162,7 +165,7 @@ function grad(a, b) {
 // Adentro de la slide el marco es más alto que la página suelta: aprovechamos
 // ese alto para que los dos dibujos se vean de lejos en un proyector.
 const EMBEBIDO = Viz.detectarEmbebido();
-const ALTO_PANEL = EMBEBIDO ? 380 : 300;
+const ALTO_PANEL = EMBEBIDO ? 390 : 300;
 
 const mapa = Viz.plano('#caja-mapa', {
   xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445,

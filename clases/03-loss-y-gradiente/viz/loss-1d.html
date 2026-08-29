@@ -244,14 +244,23 @@ function actualizar() {
       'la respuesta exacta es <b>' + Viz.num(exacta, 4) + '</b>' +
     '</div>');
 
-  const lado = dMas < dMenos ? 'a la <b>derecha</b>' : 'a la <b>izquierda</b>';
   const err = Math.abs(pend - exacta);
-  ctl.texto('lectura',
-    'Para bajar tenés que ir ' + lado + '. ' +
-    (err < 0.005
-      ? 'Con un pasito así de chico, la resta ya te da <b>prácticamente la respuesta exacta</b>.'
-      : 'Con un pasito de ' + Viz.num(h, 3) + ' la resta se equivoca por ' + Viz.num(err, 3) +
-        '. Achicalo y mirá qué pasa.'));
+  const precision = (err < 0.005
+    ? 'Con un pasito así de chico, la resta ya te da <b>prácticamente la respuesta exacta</b>.'
+    : 'Con un pasito de ' + Viz.num(h, 3) + ' la resta se equivoca por ' + Viz.num(err, 3) +
+      '. Achicalo y mirá qué pasa.');
+
+  if (dMas > 0 && dMenos > 0) {
+    // las dos direcciones suben: estamos en el fondo. Decirlo, en vez de mandar
+    // a alguien «a la derecha» por un redondeo.
+    ctl.texto('lectura',
+      '<b>Llegaste al fondo.</b> Te muevas para donde te muevas, la loss sube: por eso los ' +
+      'dos números de arriba están en rojo y la pendiente es prácticamente cero. Acá el ' +
+      'descenso se frena solo.');
+  } else {
+    const lado = dMas < dMenos ? 'a la <b>derecha</b>' : 'a la <b>izquierda</b>';
+    ctl.texto('lectura', 'Para bajar tenés que ir ' + lado + '. ' + precision);
+  }
 
   p.redibujar();
 }
