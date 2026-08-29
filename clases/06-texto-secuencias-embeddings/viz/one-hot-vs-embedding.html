@@ -173,8 +173,9 @@ function pintar() {
   document.getElementById('cuenta-oh').innerHTML =
     '<b>' + NVOC.toLocaleString('es-AR') + '</b> números para escribir una palabra, ' +
     'y <b>' + (NVOC - 1).toLocaleString('es-AR') + '</b> de ellos son cero. ' +
-    'El único 1 está en la posición <b>' + id + '</b>, que es el orden alfabético ' +
-    'de nada: es simplemente el lugar donde quedó esta palabra en la lista.';
+    'El único 1 está en la posición <b>' + id + '</b>, y ese número no significa ' +
+    'nada: no es un orden alfabético ni una medida de nada. Es simplemente el ' +
+    'lugar donde quedó esta palabra en la lista.';
 
   // --- embedding ---
   const M = Math.max.apply(null, v.map(Math.abs));

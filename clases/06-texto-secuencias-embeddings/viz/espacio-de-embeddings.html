@@ -59,6 +59,7 @@
   .lista li.se-fue .w { color: var(--c-error); text-decoration: line-through; }
   .nota { font-size: .84rem; color: var(--tinta-2); margin: .45rem 0 0; }
   .veredicto { font-weight: 700; }
+  .lista p.fino { font-size: .82em; color: var(--tinta-3); }
   .veredicto.ok  { color: var(--c-ok); }
   .veredicto.mal { color: var(--c-error); }
   .aviso { font-size: .82rem; color: var(--c-error); margin: .3rem 0 0; }
@@ -190,7 +191,7 @@ const estado = {
 // Adentro de una slide hay menos alto disponible: el mapa se achica para que
 // las listas de vecinas entren igual. Un archivo, dos presentaciones.
 const EMBEBIDO = Viz.detectarEmbebido();
-const ALTO_MAPA = EMBEBIDO ? 300 : 430;
+const ALTO_MAPA = EMBEBIDO ? 250 : 430;
 
 const p = Viz.plano('#lienzo', {
   xmin: -1.05, xmax: 1.05, ymin: -1.05, ymax: 1.05,
@@ -505,8 +506,13 @@ function pintarAritmetica() {
         ? '<p>Antes de mirar, una persona esperaría <b>«' + guardado.esperado + '»</b>' +
           (guardado.esperado_en_vocab ? '' :
             ' <span class="aviso">(y esa palabra ni siquiera está en el corpus)</span>') +
-          '.</p><p class="veredicto ' + (guardado.acierta ? 'ok">acertó' : 'mal">no acertó') +
-          '</p><p>' + guardado.nota + '.</p>'
+          '.</p><p class="veredicto ' + (guardado.acierta
+            ? 'ok">acertó — está entre las cinco'
+            : 'mal">no acertó — no está entre las cinco') +
+          '</p><p>' + guardado.nota + '.</p>' +
+          '<p class="fino">Contamos acierto con manga ancha: alcanza con que la ' +
+          'palabra esperada aparezca entre las cinco que devuelve el modelo. Con ' +
+          'el criterio estricto —que salga primera— de las diez acierta una.</p>'
         : '<p>Esta combinación la armaste vos. Preguntate <b>antes</b> de mirar ' +
           'qué esperabas, y después fijate si está en la lista.</p>') +
     '</div>';

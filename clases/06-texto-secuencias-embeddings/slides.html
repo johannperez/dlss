@@ -32,6 +32,13 @@
     background:var(--papel-3); font:700 .5em/1.6em var(--f-mono); text-align:center;
     color:var(--tinta-3); font-style:normal; }
   .reveal .onehot-tira i.uno { background:var(--c-acento); color:var(--papel); }
+  /* OJO: `curso.css` estiliza `.reveal pre code` pero no le pone `display:block`,
+     y el `reveal.css` vendorizado tampoco lo trae. Sin esto el bloque de código
+     se desborda de su caja y queda ilegible. Mismo parche que las clases 1 y 4. */
+  .reveal pre code { display:block; overflow-x:auto; }
+  /* el glosario del final: diez filas tienen que entrar en una pantalla */
+  .reveal .glosario-lista.apretada { font-size:.72em; }
+  .reveal .glosario-lista.apretada li { padding:.18em 0; }
 </style>
 </head>
 <body>
@@ -91,24 +98,38 @@
   <h2>Las mismas, contadas</h2>
   <div class="comparacion">
     <div>
-      <h4>«El gobierno criticó al congreso»</h4>
-      <div class="bolsa"><span>al 1</span><span>congreso 1</span><span>criticó 1</span>
-        <span>el 1</span><span>gobierno 1</span></div>
+      <h4>«La comisión rechazó al ministro»</h4>
+      <div class="bolsa"><span>al 1</span><span>comisión 1</span><span>la 1</span>
+        <span>ministro 1</span><span>rechazó 1</span></div>
     </div>
     <div>
-      <h4>«El congreso criticó al gobierno»</h4>
-      <div class="bolsa"><span>al 1</span><span>congreso 1</span><span>criticó 1</span>
-        <span>el 1</span><span>gobierno 1</span></div>
+      <h4>«El ministro rechazó a la comisión»</h4>
+      <div class="bolsa"><span>a 1</span><span>comisión 1</span><span>el 1</span>
+        <span>la 1</span><span>ministro 1</span><span>rechazó 1</span></div>
     </div>
+  </div>
+  <p style="font-size:.78em;margin:.3em 0">Lo único que cambia son los artículos
+     (<code>al</code> de un lado, <code>a</code> + <code>el</code> del otro).
+     <strong>Ninguna palabra con contenido se movió.</strong> Y todo pipeline de
+     análisis de texto tira las palabras vacías antes de contar. Sacalas:</p>
+  <div class="comparacion">
+    <div><h4>bolsa A, sin palabras vacías</h4>
+      <div class="bolsa"><span>comisión 1</span><span>ministro 1</span><span>rechazó 1</span></div></div>
+    <div><h4>bolsa B, sin palabras vacías</h4>
+      <div class="bolsa"><span>comisión 1</span><span>ministro 1</span><span>rechazó 1</span></div></div>
   </div>
   <div class="ojo compacta">Idénticas. No parecidas: <strong>idénticas</strong>.
     Este es el método más usado en análisis cuantitativo de texto en ciencias
-    sociales durante treinta años, y no puede distinguir quién criticó a quién.</div>
+    sociales durante treinta años, y no puede distinguir quién rechazó a quién.</div>
   <aside class="notes">
-    Callate cinco segundos después de mostrar las dos tablas. Es el golpe seco de
-    la clase. Después: «esto se llama bag-of-words, bolsa de palabras, y es la base
-    de los diccionarios, del análisis de contenido cuantitativo y de LDA».
-    3 minutos.
+    Callate cinco segundos después de mostrar las dos tablas de abajo. Es el golpe
+    seco de la clase. Después: «esto se llama bag-of-words, bolsa de palabras, y es
+    la base de los diccionarios, del análisis de contenido cuantitativo y de LDA».
+    <b>Si alguien te dice «pero arriba no son idénticas»:</b> tiene razón, y es el
+    mejor comentario posible. Los artículos son la única diferencia, y sacarlos es
+    lo primero que hace cualquiera. Si querés el caso sin asterisco, en el notebook
+    y en la viz está «el gobierno criticó al congreso» / «el congreso criticó al
+    gobierno»: ahí las bolsas salen idénticas sin tocar nada. 3 minutos.
   </aside>
 </section>
 
@@ -448,11 +469,16 @@
   <h2>Los vecinos cuentan una historia</h2>
   <table class="vecinos">
     <tr><th>palabra</th><th>sus vecinas más cercanas, en este corpus</th></tr>
-    <tr><td>pobreza</td><td>indigencia 0,72 · desocupación 0,69 · inflación 0,63 · hambre 0,62 · desempleo 0,60 · exclusión 0,57</td></tr>
+    <tr><td>pobreza</td><td>indigencia 0,72 · desocupación 0,69 · inflación 0,63 · hambre 0,62 · desempleo 0,60 · lucha 0,57</td></tr>
     <tr><td>provincias</td><td>formosa 0,69 · chaco 0,67 · salta 0,67 · misiones 0,66 · catamarca 0,66</td></tr>
     <tr><td>docentes</td><td>investigadores 0,62 · mínimo 0,61 · salario 0,60 · piso 0,59 · trabajadores 0,57</td></tr>
     <tr><td>mujeres</td><td>hombres 0,79 · jóvenes 0,68 · niños 0,65 · edad 0,61 · embarazadas 0,60</td></tr>
   </table>
+  <p style="font-size:.68em;color:var(--tinta-3);margin:.1em 0 .5em">De la lista cruda
+     sacamos las palabras de función (<code>de</code>, <code>entre</code>) y la misma
+     palabra en singular (<code>provincia</code>, <code>docente</code>). <b>Esa poda
+     también es una decisión nuestra</b>, y por eso está escrita acá. La lista sin
+     podar sale en el notebook.</p>
   <div class="ss compacta">Leelas como cientista social. <code>pobreza</code> vive
     en un vocabulario <em>económico</em>, no asistencial. <code>docentes</code> vive
     pegada a <em>salario</em> y <em>piso</em>: en estos discursos, a los docentes se
@@ -479,7 +505,11 @@
   </table>
   <div class="ojo compacta">Con 347.714 palabras de corpus, la aritmética casi no
     funciona. Es una propiedad que aparece con <em>muchísimo</em> más texto. Decilo
-    antes de que lo descubran solos y se frustren.</div>
+    antes de que lo descubran solos y se frustren.<br>
+    <span style="font-size:.8em;color:var(--tinta-3)">Y somos generosos contando:
+    damos por acertada la analogía si la palabra esperada aparece entre las
+    <b>cinco</b> primeras. Con el criterio estricto —que salga primera— acierta
+    <b>una</b> de diez.</span></div>
   <aside class="notes">
     Que «niñas» no exista en 35 discursos presidenciales es, por sí solo, un dato.
     Dejá que caiga. 3 minutos. Si vas apretado, esta slide se recorta a la mitad.
@@ -555,9 +585,10 @@
   <span class="marca">el código</span>
   <h3>Todo lo de hoy, en tres líneas</h3>
   <pre><code class="language-python" data-trim>
-corpus = datos.corpus_mini_gpt()            # 35 discursos, 2,2 MB de texto real
-V, palabras = datos.embeddings_ppmi_svd(corpus, dim=100, top=2000,
-                                        ventana=5, minimo=8)   # unos 4 segundos en CPU
+corpus = datos.corpus_mini_gpt()          # 35 discursos, 2,2 MB de texto real
+
+V, palabras = datos.embeddings_ppmi_svd(  # unos 4 segundos en CPU
+    corpus, dim=100, top=2000, ventana=5, minimo=8)
 
 datos.vecinos("pobreza", V, palabras, k=6)
 # [('indigencia', 0.72), ('desocupación', 0.69), ('inflación', 0.63),
@@ -719,13 +750,18 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <iframe src="viz/memoria-que-se-olvida.html" title="la memoria que se olvida" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> para decidir si va «lo» o «la» hace falta la
-    palabra <b>2</b>, y en la palabra <b>32</b> de esa palabra 2 no queda casi nada.
-    Agrandá la mochila al máximo: el olvido se hace más lento y <em>igual llega abajo</em>.</p>
+    palabra <b>2</b>, y con la mochila chica (8 dimensiones) en la palabra <b>32</b>
+    queda <span class="cifra">0 %</span>: el modelo tira una moneda. Subila al
+    máximo (512) y recién ahí queda <span class="cifra">40 %</span>.
+    <em>Sesenta y cuatro veces más memoria para llegar con menos de la mitad.</em></p>
   <aside class="notes">
     Apretá «Leer» con la mochila en el mínimo y no hables mientras corre. Cuando el
     cursor llega a «lo», mostrá las dos barras 50/50 y decí: «el modelo está tirando
-    una moneda». Después subí la mochila y volvé a leer. La frase que cierra:
-    «agrandar la memoria posterga el problema, no lo resuelve». 4 minutos.
+    una moneda». Después subí la mochila al máximo y volvé a leer: ahora acierta,
+    pero de la primera palabra perdió el 60 % igual. La frase que cierra:
+    «agrandar la memoria <b>posterga</b> el problema; con una oración el doble de
+    larga volvés al mismo lugar, y la mochila grande se paga en perillas y en
+    tiempo». 4 minutos.
   </aside>
 </section>
 
@@ -801,7 +837,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
 <!-- ===== 37 · GLOSARIO ========================================== -->
 <section>
   <h2>Glosario de hoy</h2>
-  <ul class="glosario-lista">
+  <ul class="glosario-lista apretada">
     <li><b>token</b><span>ficha — un pedacito de texto; casi siempre una palabra, a veces un pedazo</span></li>
     <li><b>tokenization</b><span>tokenización — partir el texto en esos pedacitos</span></li>
     <li><b>vocabulary</b><span>vocabulario — la lista de todas las fichas que el modelo conoce</span></li>

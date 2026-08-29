@@ -252,7 +252,7 @@ mundo, exactamente igual.
 - [ ] `slides.html` abre con doble clic, sin internet, y las cuatro viz cargan adentro.
 - [ ] Probaste las viz **sueltas** en pantalla completa: son las que vas a proyectar.
 - [ ] Corriste el notebook entero una vez esta semana (**tarda unos 2 minutos** en CPU:
-      medido acá, 116 s con la máquina tranquila; en Colab, más).
+      medido acá, entre 81 y 116 s según la carga; en Colab, 3-4 min).
 - [ ] Tenés la alarma de la pausa puesta.
 - [ ] Sabés de memoria los cuatro números de la slide 28: **85,8 / 85,6 / 87,8 / 83,2**,
       y el par de la foto corrida: **32,3** contra **74,1**.

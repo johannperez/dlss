@@ -44,7 +44,7 @@ usan parecido, no que signifiquen lo mismo.*
 | **0-1** | 1 | Portada | Una frase y pasás. |
 | **1-3** | 2 | Dónde quedamos | Dos minutos. Preguntá qué supone una CNN sobre el mundo. |
 | **3-5** | 3 | **Las dos frases** | Leelas en voz alta con énfasis distinto. Preguntá y esperá. |
-| **5-8** | 4 | La misma bolsa | **Callate cinco segundos** después de mostrar las dos tablas. |
+| **5-8** | 4 | La misma bolsa | **Callate cinco segundos** después de mostrar las dos tablas de abajo (las podadas). Si alguien objeta que arriba no son idénticas, tiene razón: ver §4. |
 | **8-10** | 5-6 | No despreciar / el problema | La 5 se dice en serio, no como concesión. |
 | **10-13** | 7 | Tokenizar | «¿qué se perdió acá?». Salen mayúsculas y puntuación. |
 | **13-16** | 8 | Tres estrategias | Preguntá cuál usarían. Casi todos dicen «por palabras». |
@@ -67,9 +67,11 @@ usan parecido, no que signifiquen lo mismo.*
 | **112-117** | 33-35 | RNN y su falla | **La 35 es lo primero que se recorta.** |
 | **117-120** | 36-40 | Cierre | La pregunta, tres ideas, glosario, puente. |
 
-> Los bloques prácticos tienen 20 y 17 minutos en este plan (el presupuesto del
-> programa dice 20 y 25). La diferencia se mueve al bloque «el orden importa», que
-> es contenido nuevo y va **después** del segundo práctico. El notebook está armado
+> Los dos bloques prácticos duran 20 y 17 minutos, que es exactamente lo que dice
+> el presupuesto de `PROGRAMA.md`. Lo único que se movió es **dónde** cae el
+> segundo: el programa lo pone en 78-95 y acá arranca en 88, porque entre medio
+> entran la apuesta, la viz del eje y la advertencia de validez, que no se recortan.
+> El total sigue siendo 120 minutos exactos. El notebook está armado
 > para que la segunda mitad se pueda terminar en casa sin perderse nada.
 
 ---
@@ -99,6 +101,17 @@ usan parecido, no que signifiquen lo mismo.*
 **Slide 3, «¿significan lo mismo?»**
 Dicen «no, cambia quién rechaza». Perfecto: escribí **QUIÉN** en el pizarrón y dejalo
 ahí toda la clase. En la slide 31, cuando el promedio dé 1,000 exacto, señalalo.
+
+**Slide 4, «pero arriba las dos bolsas no son idénticas»**
+Si sale, es el mejor comentario de los primeros diez minutos, y hay que agradecerlo.
+En castellano, «al» es «a» + «el», así que el par del gancho difiere en dos artículos.
+Ninguna palabra con contenido cambia, y sacar las palabras vacías es lo primero que
+hace cualquier pipeline: por eso la slide muestra las dos bolsas podadas, y ahí sí
+son idénticas. Si querés el caso sin ningún asterisco, en el notebook (celda de la
+sección 3) y en la viz `bolsa-vs-orden` está *«el gobierno criticó al congreso»* /
+*«el congreso criticó al gobierno»*: dos sustantivos masculinos, y las bolsas salen
+iguales tal cual. **La moraleja es mejor que el ejemplo limpio**: qué tan idénticos
+son dos textos depende de las decisiones de preprocesamiento que tomaste vos.
 
 **Slide 15, «¿el significado es el uso?»**
 Va a salir alguien que dice que sí (Wittgenstein), alguien que dice que no (hay
@@ -271,6 +284,8 @@ exactamente la lección de capacidad contra datos de la clase 4.
       tira ninguna: `reforma`, `pobreza`, `derechos`.
 - [ ] Corré la primera celda del notebook en la máquina del aula **antes** de empezar.
 - [ ] Acordate de la siembra: en la viz del tokenizador se plantea *«¿cuántas erres
-      tiene?»* y **no se responde**. La clase 8 la cobra.
+      tiene?»* y **no se responde**. La clase 8 la cobra. El botón
+      *«irreprochable (contá las erres)»* es el que mejor la planta: tiene tres
+      erres y sale en cinco fichas, ninguna de las cuales es una letra suelta.
 - [ ] Y de la que ya se cobró: `viz/supuestos-de-arquitectura.html` de la clase 5
       tiene una fila para texto. Si la mostraste allá, referila hoy.

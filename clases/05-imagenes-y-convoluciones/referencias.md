@@ -23,7 +23,7 @@ En el orden en que conviene leerlas.
 **1. Jean, N., Burke, M., Xie, M., Davis, W. M., Lobell, D. B. & Ermon, S. (2016).
 *Combining satellite imagery and machine learning to predict poverty*. Science, 353(6301),
 790-794.** `[VERIFICAR URL]` · DOI: 10.1126/science.aaf7894
-> **La lectura obligatoria de esta clase.** Es el caso de las slides 28-30, y es el mejor ejemplo
+> **La lectura obligatoria de esta clase.** Es el caso de las slides 29-31, y es el mejor ejemplo
 > disponible de una CNN haciendo algo que a las ciencias sociales le importa de verdad: producir
 > estimaciones de bienestar en regiones donde no hay encuestas. Leelo con las tres preguntas al
 > lado y prestá especial atención a **cómo describen la validación**: qué partición usaron y hasta
@@ -113,7 +113,7 @@ Hsiang, S. (2021). *A generalizable and accessible approach to machine learning 
 satellite imagery*. Nature Communications, 12, 4392.** `[VERIFICAR URL]` · DOI `[VERIFICAR]`
 > **La continuación crítica del punto 1.** Proponen un método mucho más simple y barato para
 > predecir variables socioeconómicas desde satélites, y —lo que a nosotros nos importa— discuten
-> explícitamente **la generalización entre regiones**, que es la pregunta 3 de la slide 29.
+> explícitamente **la generalización entre regiones**, que es la pregunta 3 de la slide 30.
 > Leelo después de Jean et al. y la conversación se te arma sola.
 > Dos horas.
 
@@ -129,7 +129,7 @@ satellite imagery*. Nature Communications, 12, 4392.** `[VERIFICAR URL]` · DOI 
 > ninguna conclusión sustantiva sale de ahí.
 > Diez minutos.
 
-**12. El corpus visual de la sección 6 del notebook.** *No hay enlace: se genera en el notebook.*
+**12. El corpus visual de la sección 5 del notebook.** *No hay enlace: se genera en el notebook.*
 > Es **sintético**, hecho con numpy, y está a la vista en la función `archivo_visual`. País
 > ficticio, proceso generador conocido, cero fotos de personas reales. Se usa precisamente porque
 > **sabemos la verdad**: por eso podemos mostrar que los errores del modelo se concentran en las

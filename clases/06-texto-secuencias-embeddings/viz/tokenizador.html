@@ -178,7 +178,8 @@ const EJEMPLOS = [
            'de las cuentas públicas y del rumbo del Gobierno.', boton: 'un párrafo de discurso' },
   { texto: 'En 2019 el índice subió 53,8 % 😐 y nadie festejó.', boton: 'números y emoji' },
   { texto: 'ñandutí kerandy: palabras en guaraní que el corpus nunca vio',
-    boton: 'palabras que no vio nunca' }
+    boton: 'palabras que no vio nunca' },
+  { texto: 'irreprochable', boton: 'irreprochable (contá las erres)' }
 ];
 
 /* --- 4. dibujar ------------------------------------------------------------ */
@@ -212,16 +213,22 @@ function pintar() {
 
   const nPal = (texto.match(/[\p{L}\p{M}]+/gu) || []).length;
   const desc = fichas.filter(f => f.desc).length;
+  const plural = (n, sing, plu) => '<b>' + n + '</b> ' + (n === 1 ? sing : plu);
   cajaConteo.innerHTML =
-    '<b>' + texto.length + '</b> caracteres · <b>' + nPal + '</b> palabras · ' +
-    '<b>' + fichas.length + '</b> fichas (' + est.nombre + ') · ' +
+    plural(texto.length, 'caracter', 'caracteres') + ' · ' +
+    plural(nPal, 'palabra', 'palabras') + ' · ' +
+    plural(fichas.length, 'ficha', 'fichas') + ' (' + est.nombre + ') · ' +
     'vocabulario de <b>' + est.voc.toLocaleString('es-AR') + '</b> fichas' +
-    (nPal ? ' · <b>' + (fichas.length / nPal).toFixed(2) + '</b> fichas por palabra' : '') +
+    (nPal ? ' · <b>' + (fichas.length / nPal).toFixed(2).replace('.', ',') +
+            '</b> fichas por palabra' : '') +
     (desc ? ' · <b style="color:' + Viz.color('error') + '">' + desc +
             '</b> desconocidas' : '');
 
   // la promesa de la clase 8
-  const primera = (texto.toLowerCase().match(/[\p{L}\p{M}]{4,}/u) || ['inconstitucionalidad'])[0];
+  // Para la siembra de la clase 8 conviene una palabra que efectivamente tenga
+  // erres: si hay alguna, se usa ésa; si no, la primera palabra larga.
+  const largas = texto.toLowerCase().match(/[\p{L}\p{M}]{4,}/gu) || ['irreprochable'];
+  const primera = largas.find(w => w.includes('r')) || largas[0];
   const trozosP = ESTRATEGIAS[ctl.valores.estrategia].fn(primera);
   cajaPromesa.innerHTML = '¿Cuántas veces aparece la letra <b>R</b> en <b>«' + primera +
     '»</b>? El modelo ve esto: <code>[' + trozosP.map(f => f.id).join(', ') + ']</code>.';

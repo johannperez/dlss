@@ -109,14 +109,14 @@ te acordás de la analogía, te acordás del concepto.
 | Término | En castellano | La analogía de clase |
 |---|---|---|
 | **token** | ficha, pedacito | La unidad mínima en que se parte el texto. No siempre es una palabra. |
-| **tokenización** | tokenización | Partir el texto en fichas. "Inconstitucionalidad" puede salir en cuatro pedazos. |
+| **tokenización** | tokenización | Partir el texto en fichas. Con el BPE de la clase 6, "inconstitucionalidad" sale en **cinco** pedazos y ninguno es "constitución". |
 | **vocabulario** | vocabulario | La lista de todas las fichas que el modelo conoce. |
-| **OOV** (*out of vocabulary*) | fuera de vocabulario | Una palabra que el modelo nunca vio. Suele terminar en un cajón llamado `<unk>`. |
+| **OOV** (*out of vocabulary*) | fuera de vocabulario | Una palabra que el modelo nunca vio. Termina en un cajón llamado `<unk>` (en las viz del curso, `<desc>`) y desaparece sin avisar. |
 | **one-hot** | uno-caliente | Un vector larguísimo de ceros con un solo uno. Todas las palabras quedan igual de lejos entre sí, que es justo lo que no queremos. |
 | **embedding** | representación vectorial | Darle a cada palabra un lugar en un espacio, de manera que las que se usan parecido queden cerca. |
 | **dimensión** | dimensión | Cuántos números tiene el vector de cada palabra. No corresponden a conceptos interpretables, por más que dé ganas. |
 | **similitud coseno** | similitud coseno | Qué tan alineadas apuntan dos flechas. 1 = misma dirección, 0 = perpendiculares. |
-| **hipótesis distribucional** | hipótesis distribucional | "Sabrás una palabra por la compañía que tiene." Es el supuesto sustantivo detrás de todos los embeddings. |
+| **hipótesis distribucional** | hipótesis distribucional | "Conocerás una palabra por la compañía que mantiene" (Firth, 1957). Es el supuesto sustantivo detrás de todos los embeddings. |
 | **bag-of-words** | bolsa de palabras | Contar palabras y tirar el orden. Funciona sorprendentemente bien, y por eso hay que saber qué se pierde. |
 | **RNN** (*recurrent neural network*) | red recurrente | Leer palabra por palabra arrastrando una mochila de memoria. |
 | **LSTM** | LSTM | Una RNN con una mochila más grande y con candados. Mejora la memoria; no la arregla. |

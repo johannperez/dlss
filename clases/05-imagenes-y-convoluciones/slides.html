@@ -154,7 +154,9 @@
   <h3>Cómo se la dábamos al modelo de la clase 4</h3>
   <div class="viz-frame" style="padding:10px"><div id="desenrollada"></div></div>
   <p class="viz-pie"><b>Aplanar</b> (<code>nn.Flatten</code>): agarrás la grilla de 28×28 y la
-    estirás en una fila de <b>784 números</b>. Es exactamente lo que hicimos la clase pasada.</p>
+    estirás en una fila de <b>784 números</b>. Y ahí adentro le metemos <b>la misma máquina de
+    la clase 4</b>: dos capas densas con un doblez en el medio. Lo único que cambia es que
+    ahora entran 784 números en vez de uno.</p>
   <div class="ojo compacta">Al estirarla, la fila 1 y la fila 2 quedan a 28 lugares de
     distancia. Dos píxeles que en la foto están pegados, para el modelo son las variables
     número 30 y 58. <strong>Y ahí se perdió algo enorme.</strong></div>
@@ -346,7 +348,7 @@
     <div>
       <h4>Cuántas perillas</h4>
       <div class="cuenta-params">
-        <span>capa densa de 784 → 64 (la de la clase 4)</span>
+        <span>capa densa de 784 → 64 (como las de la clase 4)</span>
         <b class="c-datos">50.176 pesos</b>
         <div class="riel" style="grid-column:1/-1"><i style="width:100%;background:var(--c-datos)"></i></div>
         <span>capa convolucional, 32 filtros de 3×3</span>
