@@ -42,11 +42,19 @@
      que achicarlo de ancho es lo que más alto libera; sin esto, las barras de los
      porcentajes —que son justo lo que hay que mirar al mover la perilla— quedaban
      cortadas abajo del borde del iframe. Suelta se ve grande. */
-  body.embebido #lienzo { max-width: 330px; }
+  #lienzo { max-width: 400px; margin: 0 auto; }
+  body.embebido #lienzo { max-width: 340px; }
   body.embebido .peso-fila { font-size: .76rem; margin: 2px 0;
                              grid-template-columns: 84px 1fr 42px; }
   body.embebido .peso-fila .barra { height: 13px; }
   body.embebido .leyenda { font-size: .76rem; }
+  /* el que manda el alto es el PANEL, no el dibujo: dos sliders con subtítulo,
+     un select, un checkbox, un botón y la caja de lectura. Se aprieta lo justo
+     para que la lectura («se lleva el 40%») entre entera. */
+  body.embebido .ctrl { margin-bottom: .55rem; }
+  body.embebido .ctrl-etiqueta { font-size: .8rem; }
+  body.embebido .ctrl-etiqueta .sub { font-size: .7rem; }
+  body.embebido .lectura { font-size: .78rem; line-height: 1.38; padding: .45rem .6rem; }
 </style>
 </head>
 <body class="curso">
@@ -66,7 +74,7 @@
     <!-- el plano tiene que ser CUADRADO: acá el contenido es un ángulo, y un
          ángulo dibujado en un plano achatado miente. Por eso se le pone tope de
          ancho y se usa `cuadrado` SIN `alto`. -->
-    <div id="lienzo" style="max-width:400px;margin:0 auto"></div>
+    <div id="lienzo"></div>
     <ul class="leyenda" style="margin:.4rem 0 0">
       <li><i style="background:var(--c-val)"></i>query: lo que busca</li>
       <li><i style="background:var(--c-modelo)"></i>key: el aviso que publica</li>

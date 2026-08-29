@@ -48,6 +48,11 @@
     border-radius: var(--r-medio); padding: .4rem .6rem; color: var(--tinta-2);
   }
   .lectura-cabezas b { color: var(--tinta); }
+  body.embebido .caja-cabeza { padding:.25rem .4rem .2rem; }
+  body.embebido .caja-cabeza h4 { font-size:.7rem; margin-bottom:.15rem; }
+  body.embebido .caja-cabeza .detalle { font-size:.64rem; margin-top:.15rem; }
+  body.embebido .grilla-cabezas { gap:.4rem; }
+  body.embebido .lectura-cabezas { font-size:.76rem; padding:.35rem .55rem; margin-top:.3rem; }
   @media (max-width: 720px) { .grilla-cabezas { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -130,7 +135,10 @@ function dibujar() {
   grilla.innerHTML = '';
   const fs = fichas();
   const mapas = oracion().atencion[estado.capa];
-  const celda = fs.length > 11 ? 12 : 14;
+  // Embebida en la slide hay 610 px y hay que meter CUATRO mapas: la celda se
+  // achica un par de píxeles. Suelta (que es como se explora) se ve grande.
+  const emb = document.body.classList.contains('embebido');
+  const celda = emb ? (fs.length > 11 ? 9 : 10) : (fs.length > 11 ? 12 : 14);
 
   if (estado.superponer) {
     grilla.style.gridTemplateColumns = '1fr';
@@ -191,7 +199,7 @@ function dibujar() {
     // Cuatro matrices tienen que entrar en la altura de una slide: achicamos la
     // letra de los rótulos y el aire de las celdas. Los mapas siguen siendo los
     // mismos; lo único que cambia es cuánto lugar ocupan.
-    tabla.style.fontSize = '9.5px';
+    tabla.style.fontSize = emb ? '8.6px' : '9.5px';
     tabla.querySelectorAll('th').forEach(th => { th.style.padding = '1px 3px'; });
   });
 }
@@ -216,12 +224,31 @@ function actualizar() {
   const raras = D.cabezas[estado.capa]
     .filter(h => /difusa|no se deja resumir|sin un patrón/.test(h.titulo + h.detalle)).length;
   const titulos = D.cabezas[estado.capa].map(h => h.titulo);
-  const todasIguales = titulos.every(t => t === titulos[0]);
+  const mismoRotulo = titulos.every(t => t === titulos[0]);
+  // OJO: que a las cuatro les toque el mismo RÓTULO no quiere decir que hagan lo
+  // mismo. El rótulo es un resumen grueso; los mapas pueden ser bien distintos.
+  // Se mide de verdad: diferencia media entre cada par de mapas de esta oración.
+  const M = oracion().atencion[estado.capa];
+  let dif = 0;
+  for (let a = 0; a < M.length; a++) {
+    for (let b = a + 1; b < M.length; b++) {
+      let acum = 0, n = 0;
+      for (let i = 0; i < M[a].length; i++)
+        for (let j = 0; j < M[a][i].length; j++) { acum += Math.abs(M[a][i][j] - M[b][i][j]); n++; }
+      dif = Math.max(dif, acum / n);
+    }
+  }
+  const mismosMapas = dif < 0.02;
   ctl.texto('nota',
     'En el <b>bloque ' + (estado.capa + 1) + '</b>, ' +
-    (todasIguales ? 'las cuatro cabezas hacen <b>lo mismo</b>: «' + titulos[0] + '». ' +
-                    'Cuatro juegos de perillas distintos que terminaron en el mismo lugar. ' +
-                    'Pasa, y es un dato honesto sobre modelos chicos.'
+    (mismoRotulo && mismosMapas
+      ? 'las cuatro cabezas hacen <b>lo mismo</b>: «' + titulos[0] + '». ' +
+        'Cuatro juegos de perillas distintos que terminaron en el mismo lugar. ' +
+        'Pasa, y es un dato honesto sobre modelos chicos.'
+     : mismoRotulo
+      ? 'a las cuatro les queda el <b>mismo rótulo</b> («' + titulos[0] + '») y sin ' +
+        'embargo <b>los cuatro mapas son distintos</b>: mirá dónde cae la casilla más ' +
+        'oscura en cada uno. El rótulo es un resumen grueso, no una explicación.'
      : raras === 0 ? 'las cuatro cabezas se dejan describir con una regla simple. ' +
                    'Es más de lo que suele pasar.'
      : raras === 4 ? '<b>ninguna</b> de las cuatro se deja describir con una regla simple. ' +
