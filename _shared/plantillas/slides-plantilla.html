@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clase NN — Título de la clase | Deep Learning para Cientistas Sociales</title>
+
+<!-- ==========================================================================
+     PLANTILLA DE SLIDES — copiala a clases/NN-slug/slides.html
+     Las rutas ya están escritas para vivir en clases/NN-slug/ (dos niveles de
+     profundidad). Si la movés de lugar, ajustá los ../../
+     CERO CDNs: todo sale de _shared/vendor por ruta relativa y abre con file://
+     ========================================================================== -->
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
+<!-- KaTeX local (sin red). El plugin de math de reveal apunta a un CDN, así que
+     lo cargamos a mano y lo enganchamos como plugin nuestro más abajo. -->
+<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
+<!-- el tema del curso va ÚLTIMO: pisa a reveal -->
+<link rel="stylesheet" href="../../_shared/css/curso.css">
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+  <!-- ================= PORTADA ================= -->
+  <section class="portada">
+    <p class="num-clase">Clase NN</p>
+    <h1>El título que dice de qué se trata</h1>
+    <div class="franja"></div>
+    <p class="gancho">La frase gancho: una oración que da ganas de quedarse, escrita
+      como se la dirías a alguien en un pasillo.</p>
+    <aside class="notes">
+      Arrancá con la pregunta, no con el temario. Los primeros 3 minutos deciden la clase.
+    </aside>
+  </section>
+
+  <!-- ================= DE DÓNDE VENIMOS ================= -->
+  <section>
+    <span class="marca">callback</span>
+    <h2>Dónde quedamos</h2>
+    <p class="bajada">Una viñeta por clase anterior, en castellano, sin jerga.</p>
+    <ul>
+      <li>La clase pasada aprendimos a <strong>girar dos perillas a ojo</strong>.</li>
+      <li>Nos quedó una bronca: mover perillas a mano no escala.</li>
+      <li class="fragment">Hoy la máquina las gira sola.</li>
+    </ul>
+    <aside class="notes">Preguntá quién se acuerda del número más bajo que sacó. Sirve de puente.</aside>
+  </section>
+
+  <!-- ================= .intuicion ================= -->
+  <section>
+    <h2>La idea, antes que la fórmula</h2>
+    <div class="intuicion">
+      Si podés ponerle un número a <em>qué tan mal la estoy dibujando</em>, ese número
+      dibuja un paisaje sobre el espacio de las perillas. Aprender es soltar una pelota
+      en ese paisaje y dejarla rodar.
+    </div>
+    <p>Fijate que todavía no escribimos ni una ecuación. La ecuación viene después,
+       y sólo si se la gana.</p>
+  </section>
+
+  <!-- ================= .ojo y .manos ================= -->
+  <section>
+    <h2>Dos cajas que vas a usar todo el tiempo</h2>
+    <div class="ojo">
+      <strong>backward no mueve nada.</strong> Sólo anota para dónde <em>habría</em> que
+      moverse. Recién <code>step</code> mueve. Esta confusión aparece todos los años.
+    </div>
+    <div class="manos">
+      Abrí <code>notebook.ipynb</code> en Colab y corré las celdas 1 a 6.
+      Cuarenta minutos. Si algo no corre, levantá la mano.
+    </div>
+  </section>
+
+  <!-- ================= .aha y .ss ================= -->
+  <section>
+    <h2>Y las otras dos</h2>
+    <div class="aha">
+      Moví <strong>un</strong> punto y la recta azul giró; la naranja ni se enteró.
+      La diferencia no es técnica: es <em>qué caso decidís que importa</em>.
+    </div>
+    <div class="ss">
+      Esto que acabás de hacer con dos palabras es, tal cual, la metodología de
+      Kozlowski, Taddy &amp; Evans (2019) en la <em>American Sociological Review</em>.
+    </div>
+  </section>
+
+  <!-- ================= APUESTA (votar antes de ver) ================= -->
+  <section class="pregunta">
+    <h2>Si muevo <code>x</code>, ¿se mueve la curva o se mueve un punto sobre la curva?</h2>
+    <div class="opciones">
+      <div><b>A</b> se mueve la curva entera</div>
+      <div><b>B</b> se mueve un punto sobre la curva</div>
+      <div><b>C</b> las dos cosas</div>
+    </div>
+    <aside class="notes">
+      Voten a mano alzada. En serio. Sin la predicción fallida, mover un slider es un dibujito lindo.
+    </aside>
+  </section>
+
+  <!-- ===================================================================
+       SLIDE DE PAUSA — obligatoria. Va donde lo dice el presupuesto de
+       tiempo de la especificación de tu clase. No la borres: si no está,
+       la pausa se la come el entusiasmo y la segunda mitad se atropella.
+       =================================================================== -->
+  <section class="pausa">
+    <h2>Pausa</h2>
+    <p class="minutos">10 minutos</p>
+    <p class="letra-chica">
+      Estirá las piernas. Si algo del bloque anterior no cerró, este es el
+      momento de preguntarlo sin levantar la mano delante de treinta personas.
+    </p>
+  </section>
+
+  <!-- ================= VIZ EMBEBIDA (iframe) ================= -->
+  <section>
+    <span class="marca">viz</span>
+    <h3>La respuesta se mira, no se explica</h3>
+    <div class="viz-frame" data-alto="grande">
+      <iframe src="viz/ejemplo.html" title="visualización interactiva" loading="lazy"></iframe>
+    </div>
+    <p class="viz-pie"><b>Qué mirar:</b> el rastro fantasma son todas las funciones posibles.
+      Elegir el parámetro es elegir una de esa familia.</p>
+    <aside class="notes">Movelo vos primero, despacio, y recién después dejá que lo toquen.</aside>
+  </section>
+
+  <!-- ================= VIZ INLINE con viz.js ================= -->
+  <section>
+    <h3>Una viz chiquita, hecha acá mismo</h3>
+    <div class="viz-con-panel">
+      <div class="viz-frame" style="padding:8px" id="caja-demo"></div>
+      <div class="panel" id="panel-demo"></div>
+    </div>
+    <p class="viz-pie">Cuando la viz es simple, va inline con <code>viz.js</code>.
+      Cuando tiene estado propio, va en <code>viz/*.html</code> y entra por iframe.</p>
+  </section>
+
+  <!-- ================= COMPARACIÓN ================= -->
+  <section>
+    <h2>Dibujar no es calcar</h2>
+    <div class="comparacion">
+      <div>
+        <h4>Dibujar</h4>
+        <p>Capturás la <strong>forma</strong>. Te salteás las manchitas del papel
+           porque sabés que son suciedad.</p>
+      </div>
+      <div>
+        <h4>Calcar</h4>
+        <p>Copiás <strong>cada manchita</strong>, incluidas las que son ruido.
+           Queda igualito al original y no sirve para nada más.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TARJETAS ================= -->
+  <section>
+    <h2>El zoo</h2>
+    <div class="tarjetas">
+      <div><h4>Recta</h4>Cambio constante por unidad.</div>
+      <div><h4>Parábola</h4>Sube y después baja. La U invertida de siempre.</div>
+      <div><h4>Sigmoide</h4>Empieza lento, se acelera, se satura.</div>
+      <div><h4>Exponencial</h4>Nuestro cerebro es malísimo para esto.</div>
+      <div><h4>Seno</h4>Todo lo que se repite.</div>
+      <div><h4>Escalón</h4>Antes y después. El corte.</div>
+    </div>
+  </section>
+
+  <!-- ================= CÓDIGO ================= -->
+  <section>
+    <h3>El loop, entero, en ocho líneas</h3>
+    <pre><code class="language-python" data-trim data-line-numbers="1-3|4-8">
+for epoca in range(200):
+    pred = modelo(x)
+    perdida = ((pred - y) ** 2).mean()   # qué tan mal la estoy dibujando
+    opt.zero_grad()                      # borrar lo anotado la vuelta pasada
+    perdida.backward()                   # anotar para dónde habría que moverse
+    opt.step()                           # recién acá se mueven las perillas
+</code></pre>
+    <div class="ojo compacta">Si te olvidás <code>zero_grad()</code>, los gradientes se
+      acumulan y la curva de loss hace cosas raras. Pasa siempre. Es un rito de iniciación.</div>
+  </section>
+
+  <!-- ================= FÓRMULA (con figura al lado, siempre) ================= -->
+  <section>
+    <h3>Recién ahora la fórmula</h3>
+    <div class="comparacion">
+      <div>
+        <h4>El resumen taquigráfico</h4>
+        <p>$$\mathcal{L}(a,b)=\frac{1}{n}\sum_{i=1}^{n}\bigl(y_i-(a\,x_i+b)\bigr)^2$$</p>
+        <p style="font-size:.8em">Se lee: "el promedio de los palitos rojos, al cuadrado".</p>
+      </div>
+      <div>
+        <h4>Lo que ya entendiste</h4>
+        <p>Cada palito rojo es un error. Los elevás al cuadrado para que los grandes
+           pesen más y para que no se cancelen. Los promediás. Listo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GLOSARIO ================= -->
+  <section>
+    <h2>Glosario de hoy</h2>
+    <ul class="glosario-lista">
+      <li><b>loss</b><span>pérdida — el número que dice qué tan mal la estás dibujando</span></li>
+      <li><b>gradient descent</b><span>descenso por gradiente — bajar el valle a pasitos</span></li>
+      <li><b>learning rate</b><span>tasa de aprendizaje — de qué tamaño es el pasito</span></li>
+      <li><b>overfitting</b><span>sobreajuste — calcar la muestra en vez de dibujar la forma</span></li>
+    </ul>
+    <p>En el texto quedan así:
+      <span class="glosario"><span class="en">loss</span><span class="es">pérdida</span></span>
+      y van a <code>recursos/glosario.md</code> con la clase donde aparecieron.</p>
+  </section>
+
+  <!-- ================= EL LUNES ================= -->
+  <section>
+    <span class="marca">el lunes</span>
+    <h2>Qué te llevás para el lunes</h2>
+    <ol>
+      <li>Tomá una serie de tu investigación.</li>
+      <li>Graficala.</li>
+      <li>Ajustale una recta y decí <strong>en castellano sustantivo</strong> qué significa
+          cada parámetro.</li>
+    </ol>
+    <div class="ss compacta">Si tu pendiente da 0.4, no digas "la pendiente es 0.4".
+      Decí "cada año sube 0.4 puntos". Esa traducción es tu trabajo, no el del modelo.</div>
+  </section>
+
+  <!-- ================= PUENTE ================= -->
+  <section class="portada">
+    <p class="num-clase">La que viene</p>
+    <h1>Clase NN+1: el título de la próxima</h1>
+    <div class="franja"></div>
+    <p class="gancho">Una promesa concreta, que se pueda cobrar.</p>
+  </section>
+
+</div>
+</div>
+
+<!-- ====================== SCRIPTS (todos locales) ====================== -->
+<script src="../../_shared/vendor/reveal/dist/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
+<script src="../../_shared/vendor/katex/katex.min.js"></script>
+<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
+<script src="../../_shared/js/viz.js"></script>
+<script>
+  // --- plugin de matemática: KaTeX local, sin red ---------------------------
+  const MateLocal = () => ({
+    id: 'mate-local',
+    init: (deck) => {
+      const pintar = () => {
+        if (window.renderMathInElement) {
+          renderMathInElement(deck.getSlidesElement(), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$',  right: '$',  display: false },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false
+          });
+          deck.layout();
+        }
+      };
+      deck.isReady() ? pintar() : deck.on('ready', pintar);
+    }
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    center: false,          // el contenido arranca arriba: entra más y no baila
+    width: 1280,
+    height: 760,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'none',
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+  });
+
+  // --- la viz inline de ejemplo (borrala si tu slide no la usa) -------------
+  (function () {
+    const datos = [];
+    const rnd = Viz.gauss(11);
+    for (let i = 0; i < 30; i++) {
+      const x = 1983 + i * 40 / 29;
+      datos.push({ x: x, y: 2 + 0.13 * (x - 1983) + rnd() * 1.1 });
+    }
+    let a = 0.05, b = 4;
+
+    const p = Viz.plano('#caja-demo', {
+      xmin: 1981, xmax: 2025, ymin: 0, ymax: 10, alto: 300,
+      ejeX: 'año', ejeY: '% de palabras', titulo: 'menciones a "seguridad"'
+    });
+
+    function desajuste() {
+      let s = 0;
+      for (const d of datos) { const e = d.y - (a * (d.x - 1983) + b); s += e * e; }
+      return s / datos.length;
+    }
+
+    p.alDibujar(() => {
+      p.fondo(); p.grilla(); p.ejes({ formatoX: v => String(Math.round(v)) });
+      if (ctl.valores.errores) {
+        for (const d of datos) p.segmento(d.x, d.y, d.x, a * (d.x - 1983) + b,
+          { color: 'error', grosor: 1.6, opacidad: .8 });
+      }
+      p.puntos(datos, { color: 'datos', r: 4 });
+      p.curva(x => a * (x - 1983) + b, { color: 'modelo', grosor: 3 });
+      p.leyenda([
+        { color: 'datos', texto: 'lo observado' },
+        { color: 'modelo', texto: 'lo que dibuja el modelo', forma: 'linea' },
+        { color: 'error', texto: 'el desajuste', forma: 'linea' }
+      ], { pos: 'ai' });
+    });
+
+    const ctl = Viz.controles('#panel-demo', [
+      { tipo: 'titulo', texto: 'Las perillas' },
+      { tipo: 'slider', id: 'a', etiqueta: 'qué tan empinada', sub: 'puntos por año',
+        min: -0.3, max: 0.4, paso: 0.005, valor: a, decimales: 3 },
+      { tipo: 'slider', id: 'b', etiqueta: 'dónde arranca', sub: 'valor en 1983',
+        min: 0, max: 9, paso: 0.05, valor: b, decimales: 2 },
+      { tipo: 'checkbox', id: 'errores', etiqueta: 'mostrar los errores', valor: true },
+      { tipo: 'medidor', id: 'des', etiqueta: 'desajuste' }
+    ], (v) => {
+      a = v.a; b = v.b;
+      const d = desajuste();
+      ctl.medidor('des', Math.min(1, d / 12), Viz.num(d, 2));
+      p.redibujar();
+    });
+    ctl.disparar();
+  })();
+</script>
+</body>
+</html>

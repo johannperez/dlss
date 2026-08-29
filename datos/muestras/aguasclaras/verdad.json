@@ -1,0 +1,675 @@
+{
+ "_ADVERTENCIA": "PAIS Y PERSONAS FICTICIOS. Corpus sintetico del curso 'Deep Learning para Cientistas Sociales'. Ninguna de estas personas, partidos o leyes existe. No usar para investigacion sustantiva.",
+ "semilla": 1983,
+ "pais": "Republica de Aguasclaras",
+ "partidos": [
+  {
+   "sigla": "PUN",
+   "nombre": "Partido de la Union Nacional",
+   "eje": "centro-derecha",
+   "temas": [
+    "orden",
+    "inversion",
+    "exportaciones",
+    "seguridad"
+   ]
+  },
+  {
+   "sigla": "MPR",
+   "nombre": "Movimiento Popular Ribereño",
+   "eje": "centro-izquierda",
+   "temas": [
+    "trabajo",
+    "salud",
+    "vivienda",
+    "distribucion"
+   ]
+  },
+  {
+   "sigla": "FCA",
+   "nombre": "Frente Civico de Aguasclaras",
+   "eje": "centro",
+   "temas": [
+    "instituciones",
+    "transparencia",
+    "educacion",
+    "federalismo"
+   ]
+  },
+  {
+   "sigla": "UAP",
+   "nombre": "Union Agraria y Productiva",
+   "eje": "derecha",
+   "temas": [
+    "campo",
+    "impuestos",
+    "infraestructura",
+    "exportaciones"
+   ]
+  },
+  {
+   "sigla": "BST",
+   "nombre": "Bloque Socialista del Trabajo",
+   "eje": "izquierda",
+   "temas": [
+    "salarios",
+    "sindicatos",
+    "salud",
+    "vivienda"
+   ]
+  },
+  {
+   "sigla": "VVA",
+   "nombre": "Vecinos y Vecinas de Aguasclaras",
+   "eje": "local",
+   "temas": [
+    "ambiente",
+    "transporte",
+    "agua",
+    "municipios"
+   ]
+  }
+ ],
+ "provincias": [
+  "Ribera Alta",
+  "Ribera Baja",
+  "San Telmo del Sur",
+  "Cerro Verde",
+  "Puerto Nuevo",
+  "Valle Hondo",
+  "Los Juncales",
+  "Costa Azul",
+  "Sierra Mansa",
+  "Tres Lagunas"
+ ],
+ "diputados": [
+  {
+   "id": 1,
+   "nombre": "Aldo Ugarte",
+   "tratamiento": "diputado",
+   "partido": "PUN",
+   "provincia": "Ribera Alta",
+   "desde": 2017
+  },
+  {
+   "id": 2,
+   "nombre": "Nestor Molinari",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Valle Hondo",
+   "desde": 2023
+  },
+  {
+   "id": 3,
+   "nombre": "Roxana Tejerina",
+   "tratamiento": "diputada",
+   "partido": "FCA",
+   "provincia": "Valle Hondo",
+   "desde": 2021
+  },
+  {
+   "id": 4,
+   "nombre": "Ivana Delgado",
+   "tratamiento": "diputada",
+   "partido": "UAP",
+   "provincia": "Ribera Baja",
+   "desde": 2021
+  },
+  {
+   "id": 5,
+   "nombre": "Ariel Escalante",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Puerto Nuevo",
+   "desde": 2017
+  },
+  {
+   "id": 6,
+   "nombre": "Oscar Krause",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "San Telmo del Sur",
+   "desde": 2021
+  },
+  {
+   "id": 7,
+   "nombre": "Mabel Dominguez",
+   "tratamiento": "diputada",
+   "partido": "PUN",
+   "provincia": "San Telmo del Sur",
+   "desde": 2019
+  },
+  {
+   "id": 8,
+   "nombre": "Estela Olmedo",
+   "tratamiento": "diputada",
+   "partido": "MPR",
+   "provincia": "Puerto Nuevo",
+   "desde": 2015
+  },
+  {
+   "id": 9,
+   "nombre": "Analia Godoy",
+   "tratamiento": "diputada",
+   "partido": "FCA",
+   "provincia": "Sierra Mansa",
+   "desde": 2019
+  },
+  {
+   "id": 10,
+   "nombre": "Analia Galvan",
+   "tratamiento": "diputada",
+   "partido": "UAP",
+   "provincia": "Costa Azul",
+   "desde": 2015
+  },
+  {
+   "id": 11,
+   "nombre": "Horacio Suarez",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Sierra Mansa",
+   "desde": 2017
+  },
+  {
+   "id": 12,
+   "nombre": "Osvaldo Ybarra",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Tres Lagunas",
+   "desde": 2023
+  },
+  {
+   "id": 13,
+   "nombre": "Raul Falcon",
+   "tratamiento": "diputado",
+   "partido": "PUN",
+   "provincia": "Los Juncales",
+   "desde": 2019
+  },
+  {
+   "id": 14,
+   "nombre": "Carina Herrera",
+   "tratamiento": "diputada",
+   "partido": "MPR",
+   "provincia": "Ribera Alta",
+   "desde": 2019
+  },
+  {
+   "id": 15,
+   "nombre": "Jorge Espinoza",
+   "tratamiento": "diputado",
+   "partido": "FCA",
+   "provincia": "Sierra Mansa",
+   "desde": 2021
+  },
+  {
+   "id": 16,
+   "nombre": "Ernesto Pineda",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Valle Hondo",
+   "desde": 2017
+  },
+  {
+   "id": 17,
+   "nombre": "Hector Bordon",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Costa Azul",
+   "desde": 2017
+  },
+  {
+   "id": 18,
+   "nombre": "Ivana Duarte",
+   "tratamiento": "diputada",
+   "partido": "VVA",
+   "provincia": "Ribera Alta",
+   "desde": 2015
+  },
+  {
+   "id": 19,
+   "nombre": "Claudia Ibarra",
+   "tratamiento": "diputada",
+   "partido": "PUN",
+   "provincia": "Valle Hondo",
+   "desde": 2023
+  },
+  {
+   "id": 20,
+   "nombre": "Ruben Zabaleta",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Cerro Verde",
+   "desde": 2015
+  },
+  {
+   "id": 21,
+   "nombre": "Ruben Peralta",
+   "tratamiento": "diputado",
+   "partido": "FCA",
+   "provincia": "Cerro Verde",
+   "desde": 2015
+  },
+  {
+   "id": 22,
+   "nombre": "Griselda Maidana",
+   "tratamiento": "diputada",
+   "partido": "UAP",
+   "provincia": "Ribera Alta",
+   "desde": 2017
+  },
+  {
+   "id": 23,
+   "nombre": "Ivana Nuñez",
+   "tratamiento": "diputada",
+   "partido": "BST",
+   "provincia": "Ribera Baja",
+   "desde": 2021
+  },
+  {
+   "id": 24,
+   "nombre": "Hector Falcon",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Cerro Verde",
+   "desde": 2023
+  },
+  {
+   "id": 25,
+   "nombre": "Claudia Godoy",
+   "tratamiento": "diputada",
+   "partido": "PUN",
+   "provincia": "Cerro Verde",
+   "desde": 2015
+  },
+  {
+   "id": 26,
+   "nombre": "Carlos Correa",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Valle Hondo",
+   "desde": 2019
+  },
+  {
+   "id": 27,
+   "nombre": "Roxana Olmedo",
+   "tratamiento": "diputada",
+   "partido": "FCA",
+   "provincia": "Tres Lagunas",
+   "desde": 2017
+  },
+  {
+   "id": 28,
+   "nombre": "Horacio Herrera",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Los Juncales",
+   "desde": 2017
+  },
+  {
+   "id": 29,
+   "nombre": "Beatriz Jaramillo",
+   "tratamiento": "diputada",
+   "partido": "BST",
+   "provincia": "Valle Hondo",
+   "desde": 2021
+  },
+  {
+   "id": 30,
+   "nombre": "Alberto Larrosa",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Sierra Mansa",
+   "desde": 2021
+  },
+  {
+   "id": 31,
+   "nombre": "Jorge Duarte",
+   "tratamiento": "diputado",
+   "partido": "PUN",
+   "provincia": "Tres Lagunas",
+   "desde": 2023
+  },
+  {
+   "id": 32,
+   "nombre": "Osvaldo Ibarra",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Sierra Mansa",
+   "desde": 2021
+  },
+  {
+   "id": 33,
+   "nombre": "Oscar Nuñez",
+   "tratamiento": "diputado",
+   "partido": "FCA",
+   "provincia": "Tres Lagunas",
+   "desde": 2017
+  },
+  {
+   "id": 34,
+   "nombre": "Ernesto Insaurralde",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Ribera Baja",
+   "desde": 2017
+  },
+  {
+   "id": 35,
+   "nombre": "Fabian Heredia",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Costa Azul",
+   "desde": 2021
+  },
+  {
+   "id": 36,
+   "nombre": "Anibal Lezcano",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Ribera Baja",
+   "desde": 2015
+  },
+  {
+   "id": 37,
+   "nombre": "Roxana Quiroga",
+   "tratamiento": "diputada",
+   "partido": "PUN",
+   "provincia": "Tres Lagunas",
+   "desde": 2023
+  },
+  {
+   "id": 38,
+   "nombre": "Raul Ocampo",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Los Juncales",
+   "desde": 2017
+  },
+  {
+   "id": 39,
+   "nombre": "Estela Zabaleta",
+   "tratamiento": "diputada",
+   "partido": "FCA",
+   "provincia": "Ribera Alta",
+   "desde": 2021
+  },
+  {
+   "id": 40,
+   "nombre": "Ramon Galvan",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Los Juncales",
+   "desde": 2019
+  },
+  {
+   "id": 41,
+   "nombre": "Raul Navarro",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Sierra Mansa",
+   "desde": 2019
+  },
+  {
+   "id": 42,
+   "nombre": "Estela Tejerina",
+   "tratamiento": "diputada",
+   "partido": "VVA",
+   "provincia": "Tres Lagunas",
+   "desde": 2023
+  },
+  {
+   "id": 43,
+   "nombre": "Oscar Bordon",
+   "tratamiento": "diputado",
+   "partido": "PUN",
+   "provincia": "Ribera Baja",
+   "desde": 2017
+  },
+  {
+   "id": 44,
+   "nombre": "Anibal Ferreyra",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "San Telmo del Sur",
+   "desde": 2015
+  },
+  {
+   "id": 45,
+   "nombre": "Hector Cifuentes",
+   "tratamiento": "diputado",
+   "partido": "FCA",
+   "provincia": "Ribera Baja",
+   "desde": 2019
+  },
+  {
+   "id": 46,
+   "nombre": "Mabel Navarro",
+   "tratamiento": "diputada",
+   "partido": "UAP",
+   "provincia": "Ribera Baja",
+   "desde": 2015
+  },
+  {
+   "id": 47,
+   "nombre": "Horacio Peralta",
+   "tratamiento": "diputado",
+   "partido": "BST",
+   "provincia": "Puerto Nuevo",
+   "desde": 2019
+  },
+  {
+   "id": 48,
+   "nombre": "Fabiana Kaufman",
+   "tratamiento": "diputada",
+   "partido": "VVA",
+   "provincia": "San Telmo del Sur",
+   "desde": 2019
+  },
+  {
+   "id": 49,
+   "nombre": "Nestor Sosa",
+   "tratamiento": "diputado",
+   "partido": "PUN",
+   "provincia": "San Telmo del Sur",
+   "desde": 2023
+  },
+  {
+   "id": 50,
+   "nombre": "Rosana Bordon",
+   "tratamiento": "diputada",
+   "partido": "MPR",
+   "provincia": "Costa Azul",
+   "desde": 2017
+  },
+  {
+   "id": 51,
+   "nombre": "Beatriz Aguirre",
+   "tratamiento": "diputada",
+   "partido": "FCA",
+   "provincia": "Costa Azul",
+   "desde": 2017
+  },
+  {
+   "id": 52,
+   "nombre": "Oscar Barreto",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Cerro Verde",
+   "desde": 2015
+  },
+  {
+   "id": 53,
+   "nombre": "Adriana Olmedo",
+   "tratamiento": "diputada",
+   "partido": "BST",
+   "provincia": "Puerto Nuevo",
+   "desde": 2021
+  },
+  {
+   "id": 54,
+   "nombre": "Ruben Krause",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Costa Azul",
+   "desde": 2017
+  },
+  {
+   "id": 55,
+   "nombre": "Nelida Villalba",
+   "tratamiento": "diputada",
+   "partido": "PUN",
+   "provincia": "Cerro Verde",
+   "desde": 2015
+  },
+  {
+   "id": 56,
+   "nombre": "Marcelo Suarez",
+   "tratamiento": "diputado",
+   "partido": "MPR",
+   "provincia": "Tres Lagunas",
+   "desde": 2021
+  },
+  {
+   "id": 57,
+   "nombre": "Ariel Falcon",
+   "tratamiento": "diputado",
+   "partido": "FCA",
+   "provincia": "San Telmo del Sur",
+   "desde": 2017
+  },
+  {
+   "id": 58,
+   "nombre": "Oscar Falcon",
+   "tratamiento": "diputado",
+   "partido": "UAP",
+   "provincia": "Valle Hondo",
+   "desde": 2023
+  },
+  {
+   "id": 59,
+   "nombre": "Marcela Cifuentes",
+   "tratamiento": "diputada",
+   "partido": "BST",
+   "provincia": "San Telmo del Sur",
+   "desde": 2019
+  },
+  {
+   "id": 60,
+   "nombre": "Ramon Iriarte",
+   "tratamiento": "diputado",
+   "partido": "VVA",
+   "provincia": "Costa Azul",
+   "desde": 2021
+  }
+ ],
+ "leyes": [
+  {
+   "numero": "Ley 4412",
+   "titulo": "de Presupuesto General de la Administracion",
+   "tema": "presupuesto",
+   "anio": 1994
+  },
+  {
+   "numero": "Ley 4780",
+   "titulo": "de Emergencia Habitacional",
+   "tema": "vivienda",
+   "anio": 1996
+  },
+  {
+   "numero": "Ley 5103",
+   "titulo": "de Proteccion de la Cuenca del Rio Manso",
+   "tema": "ambiente",
+   "anio": 1999
+  },
+  {
+   "numero": "Ley 5266",
+   "titulo": "de Financiamiento Educativo",
+   "tema": "educacion",
+   "anio": 2001
+  },
+  {
+   "numero": "Ley 5540",
+   "titulo": "de Riesgos del Trabajo",
+   "tema": "trabajo",
+   "anio": 2004
+  },
+  {
+   "numero": "Ley 5771",
+   "titulo": "de Seguridad Interior y Prevencion del Delito",
+   "tema": "seguridad",
+   "anio": 2006
+  },
+  {
+   "numero": "Ley 6012",
+   "titulo": "de Acceso a la Informacion Publica",
+   "tema": "instituciones",
+   "anio": 2009
+  },
+  {
+   "numero": "Ley 6188",
+   "titulo": "de Movilidad y Transporte Interurbano",
+   "tema": "transporte",
+   "anio": 2011
+  },
+  {
+   "numero": "Ley 6340",
+   "titulo": "de Cobertura Universal de Salud",
+   "tema": "salud",
+   "anio": 2013
+  },
+  {
+   "numero": "Ley 6502",
+   "titulo": "de Promocion de las Economias Regionales",
+   "tema": "campo",
+   "anio": 2015
+  },
+  {
+   "numero": "Ley 6699",
+   "titulo": "de Alquileres Urbanos",
+   "tema": "vivienda",
+   "anio": 2017
+  },
+  {
+   "numero": "Ley 6845",
+   "titulo": "de Gestion Integral de Residuos",
+   "tema": "ambiente",
+   "anio": 2019
+  },
+  {
+   "numero": "Ley 7001",
+   "titulo": "de Emergencia Sanitaria",
+   "tema": "salud",
+   "anio": 2020
+  },
+  {
+   "numero": "Ley 7150",
+   "titulo": "de Regimen Federal de Coparticipacion",
+   "tema": "instituciones",
+   "anio": 2022
+  }
+ ],
+ "diarios": [
+  {
+   "nombre": "El Litoral de Aguasclaras",
+   "linea": "centro-derecha"
+  },
+  {
+   "nombre": "La Voz del Puerto",
+   "linea": "popular"
+  },
+  {
+   "nombre": "Cronica Ribereña",
+   "linea": "centro"
+  },
+  {
+   "nombre": "El Debate Nacional",
+   "linea": "centro-izquierda"
+  },
+  {
+   "nombre": "Diario Sierra Mansa",
+   "linea": "regional"
+  }
+ ]
+}

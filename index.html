@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Learning para Cientistas Sociales</title>
+<link rel="stylesheet" href="_shared/css/curso.css">
+<style>
+  body.curso { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  .cabecera { border-bottom: 2px solid var(--borde); padding-bottom: 1.4rem; margin-bottom: 2rem; }
+  .cabecera .franja {
+    height: 6px; width: 12rem; margin: .9rem 0 1.1rem; border-radius: 999px;
+    background: linear-gradient(90deg,
+      var(--c-datos) 0 20%, var(--c-modelo) 20% 40%, var(--c-acento) 40% 60%,
+      var(--c-parametro) 60% 80%, var(--c-error) 80% 100%);
+  }
+  .cabecera p.bajada { font-size: 1.05rem; color: var(--tinta-2); max-width: 44rem; }
+  table.clases { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; }
+  table.clases th, table.clases td {
+    text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--borde);
+    vertical-align: top; font-size: .92rem;
+  }
+  table.clases th { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-3); }
+  table.clases td.n { font-family: var(--f-mono); color: var(--c-acento); font-weight: 700; width: 2.2rem; }
+  table.clases td.tit { font-weight: 600; }
+  table.clases td.tit small { display: block; font-weight: 400; color: var(--tinta-2); margin-top: .2rem; }
+  table.clases td.ent { font-family: var(--f-mono); font-size: .78rem; color: var(--tinta-3); white-space: nowrap; }
+  .modulo td { background: var(--papel-2); font-size: .74rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--tinta-2); font-weight: 700; }
+  .cajas { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin: 1rem 0 2rem; }
+  .caja { border: 1px solid var(--borde); border-radius: var(--r-medio, 8px);
+    padding: .9rem 1rem; background: var(--papel-2); }
+  .caja h3 { margin: 0 0 .35rem; font-size: .95rem; }
+  .caja p { margin: 0; font-size: .85rem; color: var(--tinta-2); }
+  .caja code { font-size: .8rem; }
+  .aviso { border-left: 4px solid var(--c-val); background: var(--papel-2);
+    padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-size: .9rem; margin: 1.4rem 0; }
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--borde);
+    font-size: .82rem; color: var(--tinta-3); }
+  a { color: var(--c-modelo); }
+</style>
+</head>
+<body class="curso">
+
+<header class="cabecera">
+  <p class="etiqueta-chica">10 clases de 2 horas · español rioplatense</p>
+  <h1>Deep Learning para Cientistas Sociales</h1>
+  <div class="franja"></div>
+  <p class="bajada">
+    Para gente de sociología, ciencia política, antropología, comunicación y economía
+    que quiere <b>sumar esta herramienta a su caja y usarla con criterio</b> — no
+    convertirse en data scientist. La intuición va primero, la fórmula después, y a
+    veces no va. Todo el material abre sin internet.
+  </p>
+</header>
+
+<div class="cajas">
+  <div class="caja">
+    <h3>Empezá por acá</h3>
+    <p><a href="PROGRAMA.md">PROGRAMA.md</a> — el programa entero: filosofía, plan
+    minuto a minuto de cada clase y el mapa de puentes.</p>
+  </div>
+  <div class="caja">
+    <h3>Antes de la clase 1</h3>
+    <p><a href="recursos/setup.md">recursos/setup.md</a> — cómo abrir los notebooks
+    en Colab y qué hacer si algo explota.</p>
+  </div>
+  <div class="caja">
+    <h3>Tenelo abierto siempre</h3>
+    <p><a href="recursos/glosario.md">recursos/glosario.md</a> — cada término en
+    inglés, qué quiere decir y la analogía con que lo contamos.</p>
+  </div>
+  <div class="caja">
+    <h3>Qué leer después</h3>
+    <p><a href="recursos/bibliografia.md">recursos/bibliografia.md</a> — todo lo que
+    se cita en las diez clases, con las fuentes de datos y sus licencias.</p>
+  </div>
+  <div class="caja">
+    <h3>Los datos</h3>
+    <p><a href="datos/README.md">datos/README.md</a> — de dónde salen, qué licencia
+    tienen y <b>qué trampa esconde cada uno</b>.</p>
+  </div>
+</div>
+
+<h2>Las diez clases</h2>
+
+<table class="clases">
+  <thead>
+    <tr><th>#</th><th>Clase</th><th>Entregables</th></tr>
+  </thead>
+  <tbody>
+    <tr class="modulo"><td colspan="3">Módulo 1 · qué es aprender (clases 1-4)</td></tr>
+    <tr>
+      <td class="n">01</td>
+      <td class="tit">Una función es una máquina con perillas
+        <small>Entradas que recorren la figura, parámetros que la deforman. Aprender es mover parámetros.</small></td>
+      <td class="ent"><a href="clases/01-funciones-y-parametros/slides.html">slides</a> ·
+        <a href="clases/01-funciones-y-parametros/notebook.ipynb">notebook</a> ·
+        <a href="clases/01-funciones-y-parametros/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">02</td>
+      <td class="tit">Componer funciones: dibujar lo imposible
+        <small>Apilando rampas se dibuja cualquier figura. Eso, y no otra cosa, es una red neuronal.</small></td>
+      <td class="ent"><a href="clases/02-componer-funciones/slides.html">slides</a> ·
+        <a href="clases/02-componer-funciones/notebook.ipynb">notebook</a> ·
+        <a href="clases/02-componer-funciones/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">03</td>
+      <td class="tit">Estar equivocado es un número, y ese número tiene pendiente
+        <small>Si podés medir cuán mal dibujás, podés bajar por esa medida hasta el fondo del valle.</small></td>
+      <td class="ent"><a href="clases/03-loss-y-gradiente/slides.html">slides</a> ·
+        <a href="clases/03-loss-y-gradiente/notebook.ipynb">notebook</a> ·
+        <a href="clases/03-loss-y-gradiente/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">04</td>
+      <td class="tit">El ciclo de entrenamiento, y la diferencia entre dibujar y calcar
+        <small>Un modelo con demasiada libertad memoriza tu muestra. Por eso existe la validación.</small></td>
+      <td class="ent"><a href="clases/04-entrenar-de-verdad/slides.html">slides</a> ·
+        <a href="clases/04-entrenar-de-verdad/notebook.ipynb">notebook</a> ·
+        <a href="clases/04-entrenar-de-verdad/viz/">viz</a></td>
+    </tr>
+
+    <tr class="modulo"><td colspan="3">Módulo 2 · la forma del dato manda (clases 5-8)</td></tr>
+    <tr>
+      <td class="n">05</td>
+      <td class="tit">La forma de los datos manda: imágenes
+        <small>La arquitectura es una teoría sobre cómo es el mundo. Una CNN supone que lo que importa es local.</small></td>
+      <td class="ent"><a href="clases/05-imagenes-y-convoluciones/slides.html">slides</a> ·
+        <a href="clases/05-imagenes-y-convoluciones/notebook.ipynb">notebook</a> ·
+        <a href="clases/05-imagenes-y-convoluciones/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">06</td>
+      <td class="tit">La forma de los datos manda: texto, secuencias y embeddings
+        <small>El orden es información, y cada palabra necesita un lugar en el espacio.</small></td>
+      <td class="ent"><a href="clases/06-texto-secuencias-embeddings/slides.html">slides</a> ·
+        <a href="clases/06-texto-secuencias-embeddings/notebook.ipynb">notebook</a> ·
+        <a href="clases/06-texto-secuencias-embeddings/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">07</td>
+      <td class="tit">Attention: cada palabra arma su propio resumen del contexto
+        <small>En vez de leer en orden y olvidarse, cada palabra mira a todas y decide a cuál prestarle atención.</small></td>
+      <td class="ent"><a href="clases/07-attention-y-transformer/slides.html">slides</a> ·
+        <a href="clases/07-attention-y-transformer/notebook.ipynb">notebook</a> ·
+        <a href="clases/07-attention-y-transformer/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">08</td>
+      <td class="tit">Un mini-GPT propio, y la traducción a ChatGPT
+        <small>Un LLM dibuja la distribución de la próxima palabra. Todo lo raro que hace ChatGPT sale de ahí.</small></td>
+      <td class="ent"><a href="clases/08-mini-gpt-y-los-llm/slides.html">slides</a> ·
+        <a href="clases/08-mini-gpt-y-los-llm/notebook.ipynb">notebook</a> ·
+        <a href="clases/08-mini-gpt-y-los-llm/viz/">viz</a></td>
+    </tr>
+
+    <tr class="modulo"><td colspan="3">Módulo 3 · usarlo con criterio (clases 9-10)</td></tr>
+    <tr>
+      <td class="n">09</td>
+      <td class="tit">Usar modelos que ya existen, sin creerles
+        <small>Un modelo pre-entrenado es un informante clave: sabe muchísimo y tiene sus sesgos.</small></td>
+      <td class="ent"><a href="clases/09-modelos-preentrenados/slides.html">slides</a> ·
+        <a href="clases/09-modelos-preentrenados/notebook.ipynb">notebook</a> ·
+        <a href="clases/09-modelos-preentrenados/viz/">viz</a></td>
+    </tr>
+    <tr>
+      <td class="n">10</td>
+      <td class="tit">Criterio: validez, sesgo, reproducibilidad y el revisor 2
+        <small>El modelo mide algo. Tu trabajo es demostrar que ese algo es lo que decís que es.</small></td>
+      <td class="ent"><a href="clases/10-criterio-validacion-y-etica/slides.html">slides</a> ·
+        <a href="clases/10-criterio-validacion-y-etica/notebook.ipynb">notebook</a> ·
+        <a href="clases/10-criterio-validacion-y-etica/viz/">viz</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="aviso">
+  <b>Los enlaces a las clases van a dar 404 hasta que esa clase esté construida.</b>
+  Esta página es el índice del repo, no una promesa de que todo esté hecho. El
+  estado real de la base compartida está en
+  <a href="_shared/especificaciones/00-ESTADO-ESPINA.md">_shared/especificaciones/00-ESTADO-ESPINA.md</a>.
+</div>
+
+<h2>Para quien construye una clase</h2>
+<div class="cajas">
+  <div class="caja">
+    <h3>Especificaciones</h3>
+    <p><code>_shared/especificaciones/clase-NN-*.md</code> — narrativa, presupuesto de
+    tiempo, guion de slides, spec de cada viz y del notebook.</p>
+  </div>
+  <div class="caja">
+    <h3>Plantillas y guía</h3>
+    <p><a href="_shared/plantillas/GUIA-CONSTRUCCION.md">GUIA-CONSTRUCCION.md</a>,
+    más <code>slides-plantilla.html</code>, <code>viz-plantilla.html</code> y
+    <code>notebook-plantilla.ipynb</code>.</p>
+  </div>
+  <div class="caja">
+    <h3>Banco de pruebas de viz.js</h3>
+    <p><a href="_shared/plantillas/demo.html">demo.html</a> — las ocho áreas de la
+    biblioteca, incluida una red entrenando en vivo en el navegador.</p>
+  </div>
+  <div class="caja">
+    <h3>El paquete de Python</h3>
+    <p><a href="_shared/ssdl/README.md">_shared/ssdl/README.md</a> — cargar datos,
+    dibujar con los colores del curso, el loop de entrenamiento.</p>
+  </div>
+</div>
+
+<footer>
+  Todo el material abre con <code>file://</code> y funciona sin internet:
+  reveal.js y KaTeX están vendoreados en <code>_shared/vendor/</code>, y los datos
+  de muestra viven versionados en <code>datos/muestras/</code>.
+  Los notebooks corren en Colab gratis, en CPU.
+</footer>
+
+<script src="_shared/js/viz.js"></script>
+<script>document.body.appendChild(Viz.botonTema());</script>
+</body>
+</html>
