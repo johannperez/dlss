@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Título de la viz — Clase NN</title>
+
+<!-- ==========================================================================
+     PLANTILLA DE VISUALIZACIÓN STANDALONE
+     Copiala a clases/NN-slug/viz/nombre-de-la-viz.html
+     Las rutas ya están escritas para vivir tres niveles adentro (clases/NN/viz/).
+     Un archivo, cero dependencias, cero CDN, abre con file:// y entra en un
+     <iframe> dentro de la slide sin tocar nada.
+
+     ANTES DE EMPEZAR, escribí acá abajo el MOMENTO AHA de esta viz.
+     Si no lo podés escribir, la viz todavía no está diseñada.
+
+       MOMENTO AHA: "con ocho rampas y ningún truco, la curva azul tapa a la gris"
+
+     ========================================================================== -->
+
+<!-- Las rutas apuntan a clases/NN-slug/viz/ (tres niveles adentro), que es el
+     destino real de este archivo. En ese destino cargan a la primera. El
+     `onerror` de abajo existe sólo para que la plantilla NO se vea en blanco
+     si la abrís acá, en _shared/plantillas/, para espiarla. Cuando copies el
+     archivo a su lugar podés borrarlo: no hace falta y no molesta. -->
+<link rel="stylesheet" href="../../../_shared/css/curso.css"
+      onerror="this.onerror=null;this.href='../../_shared/css/curso.css'">
+</head>
+<body class="curso">
+
+<div class="viz-pagina">
+
+  <header>
+    <h1>Título corto de la viz</h1>
+    <p>Una o dos oraciones que dicen qué es esto y qué hay que hacer.
+       En segunda persona y en voseo: <em>"movés el codo, movés la altura, y mirás
+       cuánto le falta a la curva azul para tapar a la gris"</em>.</p>
+  </header>
+
+  <!-- ---------- el dibujo ---------- -->
+  <div class="viz-frame" style="padding:10px">
+    <div id="lienzo"></div>
+  </div>
+
+  <!-- ---------- los controles ---------- -->
+  <div class="panel" id="panel"></div>
+
+  <!-- ---------- qué mirar ---------- -->
+  <footer>
+    <div class="aha">
+      <strong>Qué mirar.</strong> Poné una sola rampa y tratá de tapar la curva gris:
+      no se puede. Agregá la segunda y fijate que ahora <em>sí</em> aparece el codo.
+      Ninguna rampa entiende nada; juntas dibujan cualquier cosa.
+    </div>
+    <p class="viz-pie">
+      Datos: corpus <b>Aguasclaras</b> — país ficticio, corpus generado
+      programáticamente con semilla fija. <span class="chip sintetico">sintético</span>
+      No son discursos reales de nadie.
+    </p>
+  </footer>
+
+</div>
+
+<script src="../../../_shared/js/viz.js"></script>
+<script>
+// Red de contención para la previsualización desde _shared/plantillas/. En el
+// destino real (clases/NN-slug/viz/) el <script> de arriba ya cargó y esto no
+// hace nada. Podés borrarlo al copiar el archivo.
+if (typeof Viz === 'undefined') {
+  document.write('<script src="../../_shared/js/viz.js"><\/script>');
+}
+</script>
+<script>
+/* ===========================================================================
+   EJEMPLO FUNCIONAL — borralo y escribí el tuyo. Está acá para que veas el
+   esqueleto completo: datos, plano, función de dibujo, panel, interacción.
+   =========================================================================== */
+
+// --- 1. datos (siempre con semilla fija: reproducibilidad desde la clase 1) ---
+const rnd = Viz.gauss(2024);
+const objetivo = [];
+for (let i = 0; i <= 40; i++) {
+  const x = 1983 + i;
+  // OJO CON LA ESCALA: `serie_menciones` devuelve PORCENTAJE de palabras del
+  // discurso, y son números chicos (la serie real de "seguridad" va de 0 a
+  // 0,44 %). Si tu viz dibuja un 14 % de menciones a una sola palabra, el
+  // número es una fantasía y alguien del aula lo va a notar.
+  const y = 0.10 + 0.085 * Math.max(0, x - 1995) * 0.28
+            - 0.100 * Math.max(0, x - 2004) * 0.30
+            + 0.078 * Math.max(0, x - 2015) * 0.26
+            + rnd() * 0.012;
+  objetivo.push({ x: x, y: y });
+}
+
+// --- 2. estado: las perillas ------------------------------------------------
+const estado = { codo: 1996, altura: 0.018, signo: 1, mostrarPiezas: true };
+
+// una rampa (ReLU): plana hasta el codo, después sube (o baja) recto
+function rampa(x) { return estado.signo * estado.altura * Math.max(0, x - estado.codo); }
+function modelo(x) { return 0.10 + rampa(x); }
+
+// --- 3. el plano ------------------------------------------------------------
+const p = Viz.plano('#lienzo', {
+  xmin: 1982, xmax: 2024, ymin: 0, ymax: 0.5,
+  ejeX: 'año', ejeY: 'menciones (%)',
+  titulo: 'menciones a "inflación" en el discurso de apertura',
+  alto: 380
+});
+
+p.alDibujar(() => {
+  p.fondo();
+  p.grilla();
+  p.ejes({ formatoX: v => String(Math.round(v)) });
+
+  // la curva objetivo va SIEMPRE en gris: es lo observado, no es del modelo
+  p.linea(objetivo, { color: 'verdad', grosor: 3 });
+  p.puntos(objetivo, { color: 'verdad', r: 2.5, borde: false });
+
+  // la pieza suelta, tenue, para que se vea de dónde sale la suma
+  if (estado.mostrarPiezas) {
+    p.curva(rampa, { color: 'parametro', grosor: 2, punteada: true, opacidad: .9 });
+    p.texto(2022, rampa(2022), 'la pieza sola', { color: 'parametro', tam: 11,
+      alinear: 'right', dy: -12, caja: true });
+  }
+
+  // lo que dibuja el modelo
+  p.curva(modelo, { color: 'modelo', grosor: 3.5 });
+
+  // el codo, arrastrable
+  p.punto(estado.codo, modelo(estado.codo), { color: 'parametro', r: 8, halo: true });
+  p.texto(estado.codo, modelo(estado.codo), 'el codo',
+          { color: 'parametro', tam: 12, peso: '700', dx: 16, dy: -22, caja: true });
+
+  p.leyenda([
+    { color: 'verdad', texto: 'lo observado', forma: 'linea' },
+    { color: 'modelo', texto: 'lo que dibuja el modelo', forma: 'linea' },
+    { color: 'parametro', texto: 'la rampa suelta', forma: 'linea', punteada: true }
+  ], { pos: 'ai' });
+});
+
+// --- 4. interacción: arrastrar el codo con el dedo ---------------------------
+const puntoCodo = { x: estado.codo, y: 0 };
+p.arrastrables([puntoCodo], {
+  fijarY: true,
+  acotarX: [1984, 2022],
+  alArrastrar: (q) => { estado.codo = q.x; ctl.set('codo', q.x, true); actualizar(); }
+});
+
+// tooltip: qué año y cuánto vale
+p.tooltip(w => 'año ' + Math.round(w.x) + '\nmodelo ' + Viz.num(modelo(w.x), 3) + '%');
+
+// --- 5. el panel de control -------------------------------------------------
+const ctl = Viz.controles('#panel', [
+  { tipo: 'titulo', texto: 'La rampa' },
+  { tipo: 'slider', id: 'codo', etiqueta: 'dónde está el codo', sub: 'el año en que cambia',
+    min: 1984, max: 2022, paso: 1, valor: estado.codo, decimales: 0, color: 'parametro' },
+  { tipo: 'slider', id: 'altura', etiqueta: 'qué tan empinada', sub: 'cuánto sube por año',
+    min: 0, max: 0.04, paso: 0.001, valor: estado.altura, decimales: 3, color: 'parametro' },
+  { tipo: 'select', id: 'signo', etiqueta: 'para dónde va',
+    opciones: [{ valor: '1', texto: 'para arriba' }, { valor: '-1', texto: 'para abajo' }],
+    valor: '1' },
+  { tipo: 'checkbox', id: 'mostrarPiezas', etiqueta: 'mostrar la pieza suelta', valor: true },
+  { tipo: 'medidor', id: 'des', etiqueta: 'cuánto le falta' },
+  { tipo: 'boton', texto: 'Volver al principio', alClic: () => {
+      ctl.set('codo', 1996, true); ctl.set('altura', 0.018, true);
+      ctl.set('signo', '1', true); actualizar();
+    } },
+  { tipo: 'texto', id: 'lectura', html: '' }
+], () => actualizar());
+
+function actualizar() {
+  estado.codo = ctl.valores.codo;
+  estado.altura = ctl.valores.altura;
+  estado.signo = +ctl.valores.signo;
+  estado.mostrarPiezas = ctl.valores.mostrarPiezas;
+  puntoCodo.x = estado.codo;
+
+  let s = 0;
+  for (const d of objetivo) { const e = d.y - modelo(d.x); s += e * e; }
+  const des = s / objetivo.length;
+
+  ctl.medidor('des', Math.min(1, des / 0.02), Viz.num(des, 4));
+  // MEJOR es el piso medido de UNA rampa sobre estos datos. Si cambiás los
+  // datos del ejemplo, volvé a medirlo: un número inventado acá enseña mal.
+  const MEJOR = 0.00165;   // medido por barrido sobre estos datos, no estimado
+  ctl.texto('lectura',
+    'Con <b>una sola</b> rampa lo mejor que se consigue ronda <b>' +
+    Viz.num(MEJOR, 4) + '</b>. ' +
+    'Ahora estás en <b>' + Viz.num(des, 4) + '</b>. ' +
+    (des < MEJOR * 1.25 ? 'Ya llegaste al techo de una rampa: hace falta otra.' :
+                          'Todavía se puede bajar moviendo el codo.'));
+  p.redibujar();
+}
+
+actualizar();
+Viz.botonTema();
+</script>
+</body>
+</html>

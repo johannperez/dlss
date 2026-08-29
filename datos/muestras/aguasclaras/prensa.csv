@@ -1,0 +1,1401 @@
+id,anio,diario,linea_editorial,titular,tema,menciona_protesta
+AC00000,2018,La Voz del Puerto,popular,La comision de seguridad recibio a intendentes de Puerto Nuevo,seguridad,0
+AC00001,2022,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00002,2022,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6188,instituciones,0
+AC00003,2023,El Debate Nacional,centro-izquierda,Cayo la actividad en Costa Azul segun el ultimo informe oficial,presupuesto,0
+AC00004,2023,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 7150,seguridad,0
+AC00005,2023,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6012,educacion,0
+AC00006,2019,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00007,2016,Diario Sierra Mansa,regional,El bloque FCA anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00008,2024,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00009,2024,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00010,2020,El Debate Nacional,centro-izquierda,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,campo,1
+AC00011,2019,El Debate Nacional,centro-izquierda,Docentes de Ribera Baja anunciaron un paro de 48 horas,instituciones,1
+AC00012,2018,El Litoral de Aguasclaras,centro-derecha,El bloque VVA anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC00013,2023,El Debate Nacional,centro-izquierda,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,trabajo,0
+AC00014,2023,El Litoral de Aguasclaras,centro-derecha,Estela Olmedo pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC00015,2017,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Baja,transporte,1
+AC00016,2021,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de campo,campo,0
+AC00017,2017,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,trabajo,0
+AC00018,2015,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 7150,transporte,0
+AC00019,2016,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00020,2016,Cronica Ribereña,centro,Corte de ruta en Los Juncales por reclamos de salud,salud,1
+AC00021,2017,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6502,presupuesto,0
+AC00022,2023,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00023,2020,Cronica Ribereña,centro,Docentes de Costa Azul anunciaron un paro de 48 horas,vivienda,1
+AC00024,2015,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00025,2015,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6845,educacion,0
+AC00026,2022,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de vivienda,vivienda,1
+AC00027,2019,La Voz del Puerto,popular,Cayo la actividad en Los Juncales segun el ultimo informe oficial,transporte,0
+AC00028,2015,Cronica Ribereña,centro,Corte de ruta en Cerro Verde por reclamos de campo,campo,1
+AC00029,2023,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6845,transporte,0
+AC00030,2017,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,campo,0
+AC00031,2016,Cronica Ribereña,centro,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,trabajo,0
+AC00032,2019,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Puerto Nuevo,transporte,1
+AC00033,2024,La Voz del Puerto,popular,Rosana Bordon pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00034,2017,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00035,2022,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6845,vivienda,0
+AC00036,2016,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00037,2019,El Litoral de Aguasclaras,centro-derecha,La comision de educacion recibio a intendentes de Sierra Mansa,educacion,0
+AC00038,2015,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Cerro Verde,salud,1
+AC00039,2015,El Litoral de Aguasclaras,centro-derecha,El bloque VVA anticipo que no acompaña la reforma de transporte,transporte,0
+AC00040,2016,La Voz del Puerto,popular,Corte de ruta en Tres Lagunas por reclamos de instituciones,instituciones,1
+AC00041,2015,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6502,presupuesto,0
+AC00042,2015,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00043,2023,Diario Sierra Mansa,regional,Cayo la actividad en Costa Azul segun el ultimo informe oficial,salud,0
+AC00044,2020,El Litoral de Aguasclaras,centro-derecha,Carina Herrera pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00045,2019,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,salud,0
+AC00046,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Alta,educacion,1
+AC00047,2015,Cronica Ribereña,centro,Corte de ruta en Los Juncales por reclamos de instituciones,instituciones,1
+AC00048,2022,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00049,2018,Cronica Ribereña,centro,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,vivienda,0
+AC00050,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6845,salud,0
+AC00051,2021,La Voz del Puerto,popular,Corte de ruta en Los Juncales por reclamos de presupuesto,presupuesto,1
+AC00052,2016,El Litoral de Aguasclaras,centro-derecha,La comision de instituciones recibio a intendentes de Puerto Nuevo,instituciones,0
+AC00053,2016,Diario Sierra Mansa,regional,Docentes de Los Juncales anunciaron un paro de 48 horas,campo,1
+AC00054,2021,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de salud,salud,0
+AC00055,2020,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00056,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00057,2018,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00058,2023,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 7001,ambiente,0
+AC00059,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6012,campo,0
+AC00060,2023,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de trabajo,trabajo,0
+AC00061,2019,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de instituciones,instituciones,1
+AC00062,2016,La Voz del Puerto,popular,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00063,2020,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Tres Lagunas por reclamos de trabajo,trabajo,1
+AC00064,2022,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Puerto Nuevo por reclamos de instituciones,instituciones,1
+AC00065,2020,El Litoral de Aguasclaras,centro-derecha,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,presupuesto,1
+AC00066,2023,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00067,2022,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Sierra Mansa,transporte,1
+AC00068,2016,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00069,2023,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00070,2024,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5266,presupuesto,0
+AC00071,2017,El Litoral de Aguasclaras,centro-derecha,El bloque FCA anticipo que no acompaña la reforma de salud,salud,0
+AC00072,2022,La Voz del Puerto,popular,El bloque BST anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00073,2017,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 5103,educacion,0
+AC00074,2019,Cronica Ribereña,centro,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00075,2021,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Valle Hondo,seguridad,1
+AC00076,2021,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Valle Hondo por reclamos de trabajo,trabajo,1
+AC00077,2016,Cronica Ribereña,centro,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,trabajo,0
+AC00078,2020,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,transporte,0
+AC00079,2016,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00080,2023,El Litoral de Aguasclaras,centro-derecha,El bloque BST anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC00081,2020,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Puerto Nuevo por reclamos de transporte,transporte,1
+AC00082,2018,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5103,vivienda,0
+AC00083,2024,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00084,2015,Diario Sierra Mansa,regional,El bloque MPR anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00085,2021,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6845,transporte,0
+AC00086,2015,El Debate Nacional,centro-izquierda,Docentes de Cerro Verde anunciaron un paro de 48 horas,trabajo,1
+AC00087,2019,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 5103,transporte,0
+AC00088,2018,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00089,2020,El Debate Nacional,centro-izquierda,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00090,2017,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 4412,salud,0
+AC00091,2020,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00092,2023,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 5266,trabajo,0
+AC00093,2017,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Tres Lagunas,educacion,0
+AC00094,2019,Cronica Ribereña,centro,Oscar Krause pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00095,2024,Diario Sierra Mansa,regional,Corte de ruta en Valle Hondo por reclamos de ambiente,ambiente,1
+AC00096,2017,Cronica Ribereña,centro,Cayo la actividad en Costa Azul segun el ultimo informe oficial,trabajo,0
+AC00097,2017,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 4412,salud,0
+AC00098,2015,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 4412,vivienda,0
+AC00099,2017,Cronica Ribereña,centro,Cayo la actividad en Los Juncales segun el ultimo informe oficial,transporte,0
+AC00100,2015,El Litoral de Aguasclaras,centro-derecha,El bloque FCA anticipo que no acompaña la reforma de campo,campo,0
+AC00101,2019,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de campo,campo,1
+AC00102,2018,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00103,2017,El Debate Nacional,centro-izquierda,Corte de ruta en Costa Azul por reclamos de instituciones,instituciones,1
+AC00104,2024,El Debate Nacional,centro-izquierda,Ruben Krause pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC00105,2017,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Alta,presupuesto,1
+AC00106,2019,Cronica Ribereña,centro,Cayo la actividad en Los Juncales segun el ultimo informe oficial,campo,0
+AC00107,2015,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00108,2023,Cronica Ribereña,centro,Horacio Herrera pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00109,2023,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6340,vivienda,0
+AC00110,2024,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Costa Azul,seguridad,1
+AC00111,2015,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6502,salud,0
+AC00112,2021,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6012,transporte,0
+AC00113,2022,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,campo,0
+AC00114,2019,Cronica Ribereña,centro,Cayo la actividad en Los Juncales segun el ultimo informe oficial,presupuesto,0
+AC00115,2023,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Valle Hondo por reclamos de transporte,transporte,1
+AC00116,2021,Cronica Ribereña,centro,Estela Olmedo pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC00117,2017,El Debate Nacional,centro-izquierda,Ivana Duarte pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00118,2016,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6188,salud,0
+AC00119,2018,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,salud,0
+AC00120,2019,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Alta,educacion,1
+AC00121,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6502,salud,0
+AC00122,2018,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Ribera Alta,vivienda,1
+AC00123,2020,El Litoral de Aguasclaras,centro-derecha,Fabian Heredia pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00124,2019,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 7150,vivienda,0
+AC00125,2024,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de educacion,educacion,0
+AC00126,2016,El Debate Nacional,centro-izquierda,La comision de campo recibio a intendentes de Cerro Verde,campo,0
+AC00127,2020,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6845,seguridad,0
+AC00128,2023,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Tres Lagunas por reclamos de vivienda,vivienda,1
+AC00129,2019,Cronica Ribereña,centro,Docentes de Ribera Baja anunciaron un paro de 48 horas,trabajo,1
+AC00130,2020,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 5540,presupuesto,0
+AC00131,2024,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,seguridad,0
+AC00132,2024,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00133,2020,Cronica Ribereña,centro,Docentes de Tres Lagunas anunciaron un paro de 48 horas,transporte,1
+AC00134,2022,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00135,2019,Diario Sierra Mansa,regional,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,trabajo,1
+AC00136,2021,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,trabajo,0
+AC00137,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00138,2019,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Tres Lagunas,transporte,1
+AC00139,2023,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de trabajo,trabajo,1
+AC00140,2024,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Sierra Mansa por reclamos de campo,campo,1
+AC00141,2024,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Puerto Nuevo,transporte,1
+AC00142,2022,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5266,ambiente,0
+AC00143,2023,El Debate Nacional,centro-izquierda,El bloque VVA anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00144,2020,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,vivienda,0
+AC00145,2016,Diario Sierra Mansa,regional,La comision de presupuesto recibio a intendentes de Ribera Alta,presupuesto,0
+AC00146,2021,El Debate Nacional,centro-izquierda,Corte de ruta en Tres Lagunas por reclamos de seguridad,seguridad,1
+AC00147,2022,El Debate Nacional,centro-izquierda,Marcela Cifuentes pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00148,2016,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00149,2018,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Cerro Verde por reclamos de presupuesto,presupuesto,1
+AC00150,2015,La Voz del Puerto,popular,Nelida Villalba pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00151,2016,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de campo,campo,1
+AC00152,2020,El Debate Nacional,centro-izquierda,Docentes de Cerro Verde anunciaron un paro de 48 horas,vivienda,1
+AC00153,2022,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6502,ambiente,0
+AC00154,2023,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Cerro Verde,transporte,1
+AC00155,2020,Diario Sierra Mansa,regional,Corte de ruta en Puerto Nuevo por reclamos de educacion,educacion,1
+AC00156,2016,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5540,seguridad,0
+AC00157,2015,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00158,2022,El Litoral de Aguasclaras,centro-derecha,Roxana Tejerina pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00159,2016,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00160,2019,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00161,2022,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Puerto Nuevo,salud,1
+AC00162,2019,La Voz del Puerto,popular,La comision de educacion recibio a intendentes de San Telmo del Sur,educacion,0
+AC00163,2019,Diario Sierra Mansa,regional,Corte de ruta en Sierra Mansa por reclamos de educacion,educacion,1
+AC00164,2023,El Debate Nacional,centro-izquierda,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,seguridad,1
+AC00165,2018,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Los Juncales,educacion,1
+AC00166,2019,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,ambiente,0
+AC00167,2017,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00168,2015,Cronica Ribereña,centro,Ramon Galvan pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00169,2016,Diario Sierra Mansa,regional,Corte de ruta en Valle Hondo por reclamos de salud,salud,1
+AC00170,2019,El Debate Nacional,centro-izquierda,El bloque UAP anticipo que no acompaña la reforma de transporte,transporte,0
+AC00171,2019,Cronica Ribereña,centro,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,ambiente,1
+AC00172,2017,Diario Sierra Mansa,regional,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,campo,0
+AC00173,2016,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4780,salud,0
+AC00174,2018,El Debate Nacional,centro-izquierda,La comision de ambiente recibio a intendentes de Valle Hondo,ambiente,0
+AC00175,2020,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00176,2016,Cronica Ribereña,centro,Hector Bordon pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC00177,2017,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6845,educacion,0
+AC00178,2022,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5266,presupuesto,0
+AC00179,2021,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,seguridad,0
+AC00180,2023,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Costa Azul,presupuesto,1
+AC00181,2015,Diario Sierra Mansa,regional,Cayo la actividad en Costa Azul segun el ultimo informe oficial,presupuesto,0
+AC00182,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6845,seguridad,0
+AC00183,2022,El Debate Nacional,centro-izquierda,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,ambiente,1
+AC00184,2017,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00185,2024,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 4780,vivienda,0
+AC00186,2016,El Litoral de Aguasclaras,centro-derecha,Raul Ocampo pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00187,2021,El Debate Nacional,centro-izquierda,Corte de ruta en Tres Lagunas por reclamos de campo,campo,1
+AC00188,2019,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00189,2022,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de campo,campo,0
+AC00190,2023,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6340,instituciones,0
+AC00191,2019,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5103,seguridad,0
+AC00192,2020,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,ambiente,1
+AC00193,2019,Cronica Ribereña,centro,Docentes de Ribera Baja anunciaron un paro de 48 horas,ambiente,1
+AC00194,2020,El Debate Nacional,centro-izquierda,La comision de vivienda recibio a intendentes de Tres Lagunas,vivienda,0
+AC00195,2017,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de campo,campo,0
+AC00196,2023,Cronica Ribereña,centro,Docentes de Tres Lagunas anunciaron un paro de 48 horas,ambiente,1
+AC00197,2023,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00198,2023,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 7001,educacion,0
+AC00199,2017,Cronica Ribereña,centro,Corte de ruta en Tres Lagunas por reclamos de presupuesto,presupuesto,1
+AC00200,2021,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Los Juncales por reclamos de salud,salud,1
+AC00201,2015,El Debate Nacional,centro-izquierda,El bloque MPR anticipo que no acompaña la reforma de salud,salud,0
+AC00202,2020,Diario Sierra Mansa,regional,Jorge Espinoza pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC00203,2024,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de salud,salud,0
+AC00204,2018,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Cerro Verde,educacion,0
+AC00205,2024,Cronica Ribereña,centro,Mabel Navarro pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC00206,2021,El Debate Nacional,centro-izquierda,Docentes de Ribera Baja anunciaron un paro de 48 horas,vivienda,1
+AC00207,2021,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00208,2024,Cronica Ribereña,centro,Docentes de Tres Lagunas anunciaron un paro de 48 horas,vivienda,1
+AC00209,2021,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Sierra Mansa,presupuesto,1
+AC00210,2023,Diario Sierra Mansa,regional,Claudia Ibarra pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00211,2023,Cronica Ribereña,centro,Docentes de Ribera Baja anunciaron un paro de 48 horas,instituciones,1
+AC00212,2024,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de transporte,transporte,0
+AC00213,2024,El Litoral de Aguasclaras,centro-derecha,La comision de ambiente recibio a intendentes de Ribera Baja,ambiente,0
+AC00214,2020,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de presupuesto,presupuesto,1
+AC00215,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00216,2020,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5103,educacion,0
+AC00217,2022,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00218,2024,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 7001,vivienda,0
+AC00219,2022,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 4412,vivienda,0
+AC00220,2015,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00221,2022,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Los Juncales,trabajo,1
+AC00222,2015,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5266,campo,0
+AC00223,2022,Cronica Ribereña,centro,Claudia Ibarra pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00224,2016,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6340,seguridad,0
+AC00225,2018,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 7001,campo,0
+AC00226,2019,El Debate Nacional,centro-izquierda,La comision de campo recibio a intendentes de Los Juncales,campo,0
+AC00227,2015,El Litoral de Aguasclaras,centro-derecha,Docentes de Los Juncales anunciaron un paro de 48 horas,trabajo,1
+AC00228,2020,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00229,2015,La Voz del Puerto,popular,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,seguridad,1
+AC00230,2021,Diario Sierra Mansa,regional,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,ambiente,0
+AC00231,2015,El Debate Nacional,centro-izquierda,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,trabajo,1
+AC00232,2018,El Debate Nacional,centro-izquierda,Corte de ruta en Costa Azul por reclamos de seguridad,seguridad,1
+AC00233,2023,La Voz del Puerto,popular,La comision de instituciones recibio a intendentes de Puerto Nuevo,instituciones,0
+AC00234,2021,La Voz del Puerto,popular,La comision de ambiente recibio a intendentes de Puerto Nuevo,ambiente,0
+AC00235,2023,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00236,2018,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de campo,campo,0
+AC00237,2016,Diario Sierra Mansa,regional,Analia Godoy pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00238,2021,El Debate Nacional,centro-izquierda,Nestor Sosa pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00239,2017,Diario Sierra Mansa,regional,El bloque MPR anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00240,2023,El Litoral de Aguasclaras,centro-derecha,Docentes de Tres Lagunas anunciaron un paro de 48 horas,educacion,1
+AC00241,2017,El Debate Nacional,centro-izquierda,Claudia Godoy pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00242,2016,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7001,instituciones,0
+AC00243,2019,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6699,educacion,0
+AC00244,2023,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,campo,1
+AC00245,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00246,2021,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 7001,seguridad,0
+AC00247,2019,Cronica Ribereña,centro,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,campo,0
+AC00248,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6845,presupuesto,0
+AC00249,2024,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00250,2022,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00251,2022,Diario Sierra Mansa,regional,Raul Ocampo pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00252,2016,Diario Sierra Mansa,regional,Corte de ruta en Ribera Alta por reclamos de seguridad,seguridad,1
+AC00253,2023,La Voz del Puerto,popular,Corte de ruta en Ribera Baja por reclamos de transporte,transporte,1
+AC00254,2016,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6502,presupuesto,0
+AC00255,2024,El Litoral de Aguasclaras,centro-derecha,La comision de presupuesto recibio a intendentes de Puerto Nuevo,presupuesto,0
+AC00256,2023,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00257,2021,La Voz del Puerto,popular,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,vivienda,0
+AC00258,2017,El Debate Nacional,centro-izquierda,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,salud,0
+AC00259,2016,La Voz del Puerto,popular,Oscar Barreto pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00260,2015,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 5771,trabajo,0
+AC00261,2024,La Voz del Puerto,popular,El bloque VVA anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00262,2021,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Ribera Alta,educacion,0
+AC00263,2019,La Voz del Puerto,popular,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,transporte,1
+AC00264,2016,El Debate Nacional,centro-izquierda,Docentes de Valle Hondo anunciaron un paro de 48 horas,presupuesto,1
+AC00265,2017,La Voz del Puerto,popular,Corte de ruta en Sierra Mansa por reclamos de seguridad,seguridad,1
+AC00266,2022,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6502,presupuesto,0
+AC00267,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6340,vivienda,0
+AC00268,2016,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Valle Hondo,educacion,1
+AC00269,2024,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Sierra Mansa,presupuesto,1
+AC00270,2022,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Puerto Nuevo,vivienda,1
+AC00271,2018,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de salud,salud,0
+AC00272,2021,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00273,2017,El Debate Nacional,centro-izquierda,Nelida Villalba pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00274,2017,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,instituciones,0
+AC00275,2022,Cronica Ribereña,centro,Corte de ruta en Ribera Alta por reclamos de presupuesto,presupuesto,1
+AC00276,2024,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6699,trabajo,0
+AC00277,2017,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00278,2020,El Debate Nacional,centro-izquierda,La comision de salud recibio a intendentes de San Telmo del Sur,salud,0
+AC00279,2016,El Litoral de Aguasclaras,centro-derecha,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,transporte,1
+AC00280,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Los Juncales,presupuesto,1
+AC00281,2015,Diario Sierra Mansa,regional,El bloque MPR anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00282,2018,La Voz del Puerto,popular,Marcelo Suarez pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC00283,2024,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Costa Azul,vivienda,1
+AC00284,2020,El Litoral de Aguasclaras,centro-derecha,La comision de trabajo recibio a intendentes de Ribera Alta,trabajo,0
+AC00285,2019,Cronica Ribereña,centro,Docentes de Valle Hondo anunciaron un paro de 48 horas,campo,1
+AC00286,2016,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,trabajo,0
+AC00287,2020,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de transporte,transporte,1
+AC00288,2023,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Puerto Nuevo,campo,1
+AC00289,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00290,2016,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6012,vivienda,0
+AC00291,2020,El Litoral de Aguasclaras,centro-derecha,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,educacion,1
+AC00292,2020,El Debate Nacional,centro-izquierda,La comision de salud recibio a intendentes de San Telmo del Sur,salud,0
+AC00293,2016,Cronica Ribereña,centro,La comision de presupuesto recibio a intendentes de Valle Hondo,presupuesto,0
+AC00294,2023,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00295,2021,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00296,2022,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 5771,transporte,0
+AC00297,2021,La Voz del Puerto,popular,La comision de trabajo recibio a intendentes de Costa Azul,trabajo,0
+AC00298,2022,La Voz del Puerto,popular,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00299,2020,Cronica Ribereña,centro,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,ambiente,1
+AC00300,2022,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6340,salud,0
+AC00301,2022,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00302,2019,Cronica Ribereña,centro,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,transporte,1
+AC00303,2021,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Cerro Verde,vivienda,1
+AC00304,2022,La Voz del Puerto,popular,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,vivienda,1
+AC00305,2022,La Voz del Puerto,popular,El bloque VVA anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC00306,2018,El Debate Nacional,centro-izquierda,La comision de transporte recibio a intendentes de Sierra Mansa,transporte,0
+AC00307,2019,Diario Sierra Mansa,regional,La comision de vivienda recibio a intendentes de Costa Azul,vivienda,0
+AC00308,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6012,transporte,0
+AC00309,2019,La Voz del Puerto,popular,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00310,2018,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 7001,salud,0
+AC00311,2020,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00312,2021,La Voz del Puerto,popular,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,trabajo,1
+AC00313,2015,Cronica Ribereña,centro,La comision de campo recibio a intendentes de Cerro Verde,campo,0
+AC00314,2018,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Puerto Nuevo,campo,1
+AC00315,2023,Cronica Ribereña,centro,La comision de campo recibio a intendentes de Sierra Mansa,campo,0
+AC00316,2021,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Puerto Nuevo,trabajo,1
+AC00317,2017,Diario Sierra Mansa,regional,Ramon Iriarte pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00318,2016,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,trabajo,1
+AC00319,2024,El Debate Nacional,centro-izquierda,Docentes de Ribera Alta anunciaron un paro de 48 horas,transporte,1
+AC00320,2019,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00321,2018,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00322,2019,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,transporte,0
+AC00323,2022,Diario Sierra Mansa,regional,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,vivienda,1
+AC00324,2020,El Debate Nacional,centro-izquierda,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,vivienda,1
+AC00325,2020,La Voz del Puerto,popular,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,ambiente,1
+AC00326,2018,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de San Telmo del Sur,seguridad,1
+AC00327,2015,La Voz del Puerto,popular,La comision de ambiente recibio a intendentes de Valle Hondo,ambiente,0
+AC00328,2021,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Los Juncales,presupuesto,1
+AC00329,2024,El Litoral de Aguasclaras,centro-derecha,El bloque UAP anticipo que no acompaña la reforma de transporte,transporte,0
+AC00330,2017,La Voz del Puerto,popular,Fabian Heredia pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00331,2015,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,salud,0
+AC00332,2020,Cronica Ribereña,centro,Corte de ruta en Cerro Verde por reclamos de educacion,educacion,1
+AC00333,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00334,2019,La Voz del Puerto,popular,Corte de ruta en Sierra Mansa por reclamos de seguridad,seguridad,1
+AC00335,2020,El Debate Nacional,centro-izquierda,La comision de trabajo recibio a intendentes de Sierra Mansa,trabajo,0
+AC00336,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Alta,seguridad,1
+AC00337,2024,El Debate Nacional,centro-izquierda,La comision de trabajo recibio a intendentes de Los Juncales,trabajo,0
+AC00338,2024,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00339,2020,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00340,2018,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6188,transporte,0
+AC00341,2016,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00342,2017,Diario Sierra Mansa,regional,Docentes de Ribera Baja anunciaron un paro de 48 horas,instituciones,1
+AC00343,2016,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00344,2015,Cronica Ribereña,centro,Oscar Krause pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC00345,2021,El Litoral de Aguasclaras,centro-derecha,El bloque BST anticipo que no acompaña la reforma de educacion,educacion,0
+AC00346,2018,Diario Sierra Mansa,regional,Corte de ruta en Ribera Alta por reclamos de trabajo,trabajo,1
+AC00347,2023,El Litoral de Aguasclaras,centro-derecha,Docentes de Cerro Verde anunciaron un paro de 48 horas,educacion,1
+AC00348,2018,Diario Sierra Mansa,regional,El bloque PUN anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00349,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5771,transporte,0
+AC00350,2023,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Los Juncales por reclamos de ambiente,ambiente,1
+AC00351,2021,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Baja por reclamos de trabajo,trabajo,1
+AC00352,2017,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6188,presupuesto,0
+AC00353,2015,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00354,2018,Cronica Ribereña,centro,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,vivienda,0
+AC00355,2017,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de trabajo,trabajo,1
+AC00356,2023,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00357,2021,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6188,trabajo,0
+AC00358,2023,El Litoral de Aguasclaras,centro-derecha,La comision de presupuesto recibio a intendentes de Sierra Mansa,presupuesto,0
+AC00359,2020,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Puerto Nuevo,trabajo,1
+AC00360,2024,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00361,2023,El Debate Nacional,centro-izquierda,Corte de ruta en Ribera Alta por reclamos de instituciones,instituciones,1
+AC00362,2023,La Voz del Puerto,popular,Docentes de Ribera Alta anunciaron un paro de 48 horas,campo,1
+AC00363,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Los Juncales segun el ultimo informe oficial,presupuesto,0
+AC00364,2020,El Litoral de Aguasclaras,centro-derecha,Carina Herrera pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00365,2019,Cronica Ribereña,centro,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,trabajo,1
+AC00366,2017,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00367,2021,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00368,2016,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00369,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Los Juncales segun el ultimo informe oficial,presupuesto,0
+AC00370,2017,La Voz del Puerto,popular,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,seguridad,1
+AC00371,2022,Diario Sierra Mansa,regional,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,transporte,1
+AC00372,2016,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Baja por reclamos de trabajo,trabajo,1
+AC00373,2017,Diario Sierra Mansa,regional,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,trabajo,0
+AC00374,2015,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 5540,campo,0
+AC00375,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,ambiente,0
+AC00376,2024,El Litoral de Aguasclaras,centro-derecha,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00377,2019,Diario Sierra Mansa,regional,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,instituciones,1
+AC00378,2017,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 5771,transporte,0
+AC00379,2024,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Baja por reclamos de presupuesto,presupuesto,1
+AC00380,2015,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00381,2024,La Voz del Puerto,popular,La comision de presupuesto recibio a intendentes de Ribera Alta,presupuesto,0
+AC00382,2017,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Tres Lagunas,instituciones,1
+AC00383,2020,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 4412,educacion,0
+AC00384,2020,El Debate Nacional,centro-izquierda,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,salud,1
+AC00385,2021,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Cerro Verde,seguridad,1
+AC00386,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Valle Hondo,instituciones,1
+AC00387,2024,Cronica Ribereña,centro,La comision de salud recibio a intendentes de Los Juncales,salud,0
+AC00388,2017,El Debate Nacional,centro-izquierda,La comision de educacion recibio a intendentes de Tres Lagunas,educacion,0
+AC00389,2022,La Voz del Puerto,popular,La comision de trabajo recibio a intendentes de Costa Azul,trabajo,0
+AC00390,2024,El Debate Nacional,centro-izquierda,Docentes de Sierra Mansa anunciaron un paro de 48 horas,transporte,1
+AC00391,2022,La Voz del Puerto,popular,Docentes de Ribera Baja anunciaron un paro de 48 horas,seguridad,1
+AC00392,2020,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5771,vivienda,0
+AC00393,2019,Diario Sierra Mansa,regional,Marcela Cifuentes pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC00394,2016,Diario Sierra Mansa,regional,Marcelo Suarez pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00395,2021,El Litoral de Aguasclaras,centro-derecha,La comision de salud recibio a intendentes de Tres Lagunas,salud,0
+AC00396,2020,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Los Juncales,vivienda,1
+AC00397,2018,Diario Sierra Mansa,regional,Docentes de Cerro Verde anunciaron un paro de 48 horas,ambiente,1
+AC00398,2017,El Litoral de Aguasclaras,centro-derecha,El bloque BST anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00399,2024,El Debate Nacional,centro-izquierda,El bloque PUN anticipo que no acompaña la reforma de campo,campo,0
+AC00400,2015,Diario Sierra Mansa,regional,Corte de ruta en Puerto Nuevo por reclamos de seguridad,seguridad,1
+AC00401,2017,El Litoral de Aguasclaras,centro-derecha,La comision de vivienda recibio a intendentes de Tres Lagunas,vivienda,0
+AC00402,2019,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de salud,salud,0
+AC00403,2021,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,transporte,0
+AC00404,2020,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en San Telmo del Sur por reclamos de vivienda,vivienda,1
+AC00405,2019,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,campo,1
+AC00406,2018,Cronica Ribereña,centro,La comision de vivienda recibio a intendentes de Ribera Alta,vivienda,0
+AC00407,2015,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de educacion,educacion,0
+AC00408,2024,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de salud,salud,0
+AC00409,2018,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 5540,trabajo,0
+AC00410,2024,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6012,campo,0
+AC00411,2022,Cronica Ribereña,centro,Docentes de Cerro Verde anunciaron un paro de 48 horas,seguridad,1
+AC00412,2023,La Voz del Puerto,popular,Osvaldo Ibarra pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00413,2016,La Voz del Puerto,popular,Oscar Nuñez pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00414,2023,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Ribera Alta,educacion,1
+AC00415,2022,Cronica Ribereña,centro,Mabel Navarro pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00416,2021,La Voz del Puerto,popular,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,salud,1
+AC00417,2015,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de salud,salud,0
+AC00418,2021,El Debate Nacional,centro-izquierda,El bloque FCA anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00419,2015,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5771,educacion,0
+AC00420,2019,Cronica Ribereña,centro,Docentes de Los Juncales anunciaron un paro de 48 horas,seguridad,1
+AC00421,2024,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00422,2021,El Debate Nacional,centro-izquierda,El bloque FCA anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00423,2018,La Voz del Puerto,popular,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,transporte,0
+AC00424,2024,La Voz del Puerto,popular,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,instituciones,0
+AC00425,2018,Cronica Ribereña,centro,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC00426,2018,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6340,trabajo,0
+AC00427,2024,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00428,2022,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00429,2019,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC00430,2016,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00431,2023,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00432,2015,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00433,2016,El Litoral de Aguasclaras,centro-derecha,La comision de salud recibio a intendentes de San Telmo del Sur,salud,0
+AC00434,2015,La Voz del Puerto,popular,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,ambiente,1
+AC00435,2016,La Voz del Puerto,popular,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,trabajo,1
+AC00436,2020,Diario Sierra Mansa,regional,Docentes de Costa Azul anunciaron un paro de 48 horas,presupuesto,1
+AC00437,2018,El Debate Nacional,centro-izquierda,Docentes de Ribera Alta anunciaron un paro de 48 horas,trabajo,1
+AC00438,2024,Cronica Ribereña,centro,Beatriz Aguirre pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC00439,2022,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00440,2021,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00441,2017,El Debate Nacional,centro-izquierda,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,vivienda,1
+AC00442,2022,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6699,instituciones,0
+AC00443,2017,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00444,2019,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de transporte,transporte,1
+AC00445,2024,El Debate Nacional,centro-izquierda,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,campo,1
+AC00446,2023,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de salud,salud,0
+AC00447,2017,El Debate Nacional,centro-izquierda,El bloque BST anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00448,2016,Diario Sierra Mansa,regional,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,ambiente,1
+AC00449,2021,El Litoral de Aguasclaras,centro-derecha,Docentes de Ribera Alta anunciaron un paro de 48 horas,seguridad,1
+AC00450,2015,El Litoral de Aguasclaras,centro-derecha,Nelida Villalba pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00451,2015,Diario Sierra Mansa,regional,Hector Cifuentes pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00452,2016,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de campo,campo,0
+AC00453,2019,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,vivienda,1
+AC00454,2015,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6188,ambiente,0
+AC00455,2018,La Voz del Puerto,popular,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,instituciones,1
+AC00456,2021,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de San Telmo del Sur,salud,1
+AC00457,2015,Diario Sierra Mansa,regional,La comision de seguridad recibio a intendentes de Puerto Nuevo,seguridad,0
+AC00458,2021,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00459,2021,El Debate Nacional,centro-izquierda,Hector Bordon pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00460,2017,Diario Sierra Mansa,regional,La comision de instituciones recibio a intendentes de Valle Hondo,instituciones,0
+AC00461,2015,Diario Sierra Mansa,regional,La comision de ambiente recibio a intendentes de Valle Hondo,ambiente,0
+AC00462,2024,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00463,2024,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,ambiente,0
+AC00464,2019,El Debate Nacional,centro-izquierda,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,campo,0
+AC00465,2024,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Cerro Verde,ambiente,1
+AC00466,2020,La Voz del Puerto,popular,Docentes de Cerro Verde anunciaron un paro de 48 horas,presupuesto,1
+AC00467,2020,Cronica Ribereña,centro,Ruben Peralta pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC00468,2015,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Baja,campo,1
+AC00469,2018,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00470,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,presupuesto,0
+AC00471,2017,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de educacion,educacion,0
+AC00472,2023,Diario Sierra Mansa,regional,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,ambiente,1
+AC00473,2016,El Litoral de Aguasclaras,centro-derecha,Docentes de Valle Hondo anunciaron un paro de 48 horas,presupuesto,1
+AC00474,2019,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 4780,salud,0
+AC00475,2021,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00476,2018,La Voz del Puerto,popular,La comision de salud recibio a intendentes de Ribera Baja,salud,0
+AC00477,2017,Cronica Ribereña,centro,Docentes de Tres Lagunas anunciaron un paro de 48 horas,transporte,1
+AC00478,2015,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5103,vivienda,0
+AC00479,2018,El Debate Nacional,centro-izquierda,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,vivienda,1
+AC00480,2022,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00481,2024,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00482,2023,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Alta,vivienda,1
+AC00483,2016,El Debate Nacional,centro-izquierda,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00484,2023,Cronica Ribereña,centro,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,instituciones,1
+AC00485,2019,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,seguridad,1
+AC00486,2016,Diario Sierra Mansa,regional,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,campo,0
+AC00487,2015,Cronica Ribereña,centro,Corte de ruta en Sierra Mansa por reclamos de trabajo,trabajo,1
+AC00488,2019,El Debate Nacional,centro-izquierda,Docentes de Los Juncales anunciaron un paro de 48 horas,educacion,1
+AC00489,2015,El Litoral de Aguasclaras,centro-derecha,Docentes de Valle Hondo anunciaron un paro de 48 horas,presupuesto,1
+AC00490,2017,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de trabajo,trabajo,0
+AC00491,2024,Cronica Ribereña,centro,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,vivienda,1
+AC00492,2016,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Costa Azul,educacion,1
+AC00493,2024,Cronica Ribereña,centro,Docentes de Tres Lagunas anunciaron un paro de 48 horas,vivienda,1
+AC00494,2024,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6012,transporte,0
+AC00495,2016,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6340,ambiente,0
+AC00496,2016,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00497,2015,El Debate Nacional,centro-izquierda,Corte de ruta en Ribera Baja por reclamos de educacion,educacion,1
+AC00498,2019,El Debate Nacional,centro-izquierda,Corte de ruta en Cerro Verde por reclamos de trabajo,trabajo,1
+AC00499,2020,Diario Sierra Mansa,regional,El bloque VVA anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00500,2024,El Debate Nacional,centro-izquierda,Corte de ruta en Ribera Alta por reclamos de campo,campo,1
+AC00501,2024,El Debate Nacional,centro-izquierda,El bloque VVA anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC00502,2015,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6845,salud,0
+AC00503,2017,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,campo,1
+AC00504,2023,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6699,campo,0
+AC00505,2024,Diario Sierra Mansa,regional,Corte de ruta en San Telmo del Sur por reclamos de salud,salud,1
+AC00506,2024,La Voz del Puerto,popular,Raul Falcon pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00507,2024,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00508,2018,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Valle Hondo,trabajo,1
+AC00509,2023,La Voz del Puerto,popular,La comision de transporte recibio a intendentes de Cerro Verde,transporte,0
+AC00510,2019,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Ribera Baja,seguridad,1
+AC00511,2022,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,salud,0
+AC00512,2017,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00513,2019,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00514,2019,Diario Sierra Mansa,regional,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,instituciones,0
+AC00515,2022,Diario Sierra Mansa,regional,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,seguridad,0
+AC00516,2024,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00517,2024,La Voz del Puerto,popular,Corte de ruta en Tres Lagunas por reclamos de transporte,transporte,1
+AC00518,2022,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Cerro Verde,educacion,0
+AC00519,2020,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Valle Hondo por reclamos de transporte,transporte,1
+AC00520,2016,La Voz del Puerto,popular,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,vivienda,0
+AC00521,2015,El Debate Nacional,centro-izquierda,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,presupuesto,1
+AC00522,2019,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6845,salud,0
+AC00523,2017,El Debate Nacional,centro-izquierda,Corte de ruta en Costa Azul por reclamos de trabajo,trabajo,1
+AC00524,2018,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6012,trabajo,0
+AC00525,2023,Diario Sierra Mansa,regional,Alberto Larrosa pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00526,2021,Cronica Ribereña,centro,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,educacion,1
+AC00527,2017,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de salud,salud,0
+AC00528,2024,Diario Sierra Mansa,regional,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,salud,1
+AC00529,2021,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Puerto Nuevo,transporte,1
+AC00530,2022,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Tres Lagunas,educacion,1
+AC00531,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5266,trabajo,0
+AC00532,2017,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5540,salud,0
+AC00533,2020,Cronica Ribereña,centro,Cayo la actividad en Los Juncales segun el ultimo informe oficial,salud,0
+AC00534,2022,El Litoral de Aguasclaras,centro-derecha,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,vivienda,1
+AC00535,2022,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de campo,campo,0
+AC00536,2016,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00537,2020,El Debate Nacional,centro-izquierda,Corte de ruta en Puerto Nuevo por reclamos de campo,campo,1
+AC00538,2021,La Voz del Puerto,popular,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,transporte,0
+AC00539,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Costa Azul segun el ultimo informe oficial,vivienda,0
+AC00540,2016,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00541,2017,El Debate Nacional,centro-izquierda,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,salud,1
+AC00542,2024,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Baja,salud,1
+AC00543,2015,Diario Sierra Mansa,regional,Corte de ruta en Tres Lagunas por reclamos de vivienda,vivienda,1
+AC00544,2022,La Voz del Puerto,popular,La comision de instituciones recibio a intendentes de Ribera Alta,instituciones,0
+AC00545,2024,El Litoral de Aguasclaras,centro-derecha,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,educacion,1
+AC00546,2015,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de campo,campo,1
+AC00547,2015,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Valle Hondo,transporte,1
+AC00548,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6845,presupuesto,0
+AC00549,2022,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Los Juncales,salud,1
+AC00550,2018,El Debate Nacional,centro-izquierda,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,transporte,1
+AC00551,2022,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,transporte,0
+AC00552,2016,Cronica Ribereña,centro,Jorge Duarte pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00553,2015,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de salud,salud,0
+AC00554,2018,El Debate Nacional,centro-izquierda,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,instituciones,1
+AC00555,2021,Cronica Ribereña,centro,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,vivienda,0
+AC00556,2023,El Debate Nacional,centro-izquierda,El bloque BST anticipo que no acompaña la reforma de campo,campo,0
+AC00557,2016,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5771,presupuesto,0
+AC00558,2020,Cronica Ribereña,centro,El bloque MPR anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00559,2023,El Litoral de Aguasclaras,centro-derecha,Raul Navarro pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00560,2020,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4412,ambiente,0
+AC00561,2020,Cronica Ribereña,centro,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,ambiente,1
+AC00562,2024,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Cerro Verde,salud,1
+AC00563,2017,El Litoral de Aguasclaras,centro-derecha,Docentes de Tres Lagunas anunciaron un paro de 48 horas,salud,1
+AC00564,2022,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Ribera Baja,salud,1
+AC00565,2018,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de San Telmo del Sur,seguridad,1
+AC00566,2017,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 4412,educacion,0
+AC00567,2021,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Baja,campo,1
+AC00568,2017,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00569,2020,Cronica Ribereña,centro,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,salud,0
+AC00570,2017,Diario Sierra Mansa,regional,Docentes de Tres Lagunas anunciaron un paro de 48 horas,vivienda,1
+AC00571,2024,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5266,trabajo,0
+AC00572,2021,Diario Sierra Mansa,regional,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,seguridad,1
+AC00573,2019,El Litoral de Aguasclaras,centro-derecha,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,educacion,1
+AC00574,2020,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Ribera Baja,educacion,1
+AC00575,2020,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00576,2017,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Valle Hondo,vivienda,1
+AC00577,2021,Diario Sierra Mansa,regional,Horacio Herrera pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00578,2016,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6012,ambiente,0
+AC00579,2018,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6012,instituciones,0
+AC00580,2016,Diario Sierra Mansa,regional,El bloque FCA anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC00581,2023,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Ribera Baja,educacion,1
+AC00582,2020,La Voz del Puerto,popular,Corte de ruta en Costa Azul por reclamos de vivienda,vivienda,1
+AC00583,2022,La Voz del Puerto,popular,Cayo la actividad en Costa Azul segun el ultimo informe oficial,ambiente,0
+AC00584,2015,El Debate Nacional,centro-izquierda,La comision de transporte recibio a intendentes de Los Juncales,transporte,0
+AC00585,2024,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Costa Azul,trabajo,1
+AC00586,2019,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6699,educacion,0
+AC00587,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,salud,0
+AC00588,2015,Cronica Ribereña,centro,Ernesto Pineda pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00589,2022,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00590,2017,El Litoral de Aguasclaras,centro-derecha,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,instituciones,1
+AC00591,2015,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 4780,campo,0
+AC00592,2020,El Debate Nacional,centro-izquierda,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,trabajo,1
+AC00593,2017,Diario Sierra Mansa,regional,El bloque FCA anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00594,2020,El Litoral de Aguasclaras,centro-derecha,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,educacion,1
+AC00595,2023,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Sierra Mansa,ambiente,1
+AC00596,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 4780,trabajo,0
+AC00597,2024,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7150,trabajo,0
+AC00598,2018,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6012,salud,0
+AC00599,2021,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,campo,0
+AC00600,2024,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00601,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00602,2015,Diario Sierra Mansa,regional,Ariel Falcon pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00603,2022,El Litoral de Aguasclaras,centro-derecha,La comision de salud recibio a intendentes de Valle Hondo,salud,0
+AC00604,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00605,2019,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6340,trabajo,0
+AC00606,2022,Cronica Ribereña,centro,La comision de transporte recibio a intendentes de Ribera Baja,transporte,0
+AC00607,2023,Diario Sierra Mansa,regional,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,educacion,1
+AC00608,2016,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5771,campo,0
+AC00609,2021,La Voz del Puerto,popular,Corte de ruta en Ribera Baja por reclamos de salud,salud,1
+AC00610,2019,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6699,instituciones,0
+AC00611,2020,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6699,educacion,0
+AC00612,2022,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00613,2018,La Voz del Puerto,popular,Cayo la actividad en Los Juncales segun el ultimo informe oficial,vivienda,0
+AC00614,2015,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00615,2021,Cronica Ribereña,centro,Corte de ruta en Ribera Baja por reclamos de ambiente,ambiente,1
+AC00616,2017,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5103,campo,0
+AC00617,2021,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00618,2022,La Voz del Puerto,popular,La comision de ambiente recibio a intendentes de San Telmo del Sur,ambiente,0
+AC00619,2015,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 7001,ambiente,0
+AC00620,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 5103,presupuesto,0
+AC00621,2015,La Voz del Puerto,popular,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,vivienda,1
+AC00622,2016,Cronica Ribereña,centro,El bloque UAP anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00623,2020,El Litoral de Aguasclaras,centro-derecha,Docentes de Los Juncales anunciaron un paro de 48 horas,vivienda,1
+AC00624,2022,Diario Sierra Mansa,regional,Docentes de Los Juncales anunciaron un paro de 48 horas,trabajo,1
+AC00625,2015,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 7150,vivienda,0
+AC00626,2015,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00627,2016,La Voz del Puerto,popular,La comision de salud recibio a intendentes de Los Juncales,salud,0
+AC00628,2022,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Cerro Verde,vivienda,1
+AC00629,2015,Diario Sierra Mansa,regional,El bloque BST anticipo que no acompaña la reforma de educacion,educacion,0
+AC00630,2015,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00631,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5771,transporte,0
+AC00632,2023,La Voz del Puerto,popular,Docentes de Ribera Baja anunciaron un paro de 48 horas,trabajo,1
+AC00633,2024,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00634,2024,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,vivienda,0
+AC00635,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00636,2024,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00637,2024,El Debate Nacional,centro-izquierda,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,salud,1
+AC00638,2017,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00639,2023,Diario Sierra Mansa,regional,La comision de presupuesto recibio a intendentes de Valle Hondo,presupuesto,0
+AC00640,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00641,2016,Diario Sierra Mansa,regional,Claudia Godoy pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00642,2018,Diario Sierra Mansa,regional,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,presupuesto,0
+AC00643,2023,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Tres Lagunas,campo,1
+AC00644,2017,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6845,seguridad,0
+AC00645,2017,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Los Juncales,vivienda,1
+AC00646,2023,La Voz del Puerto,popular,Anibal Ferreyra pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00647,2019,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,campo,1
+AC00648,2024,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00649,2015,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6012,transporte,0
+AC00650,2020,Cronica Ribereña,centro,La comision de ambiente recibio a intendentes de Cerro Verde,ambiente,0
+AC00651,2024,El Litoral de Aguasclaras,centro-derecha,Ramon Galvan pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00652,2023,Diario Sierra Mansa,regional,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,ambiente,1
+AC00653,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,vivienda,0
+AC00654,2023,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00655,2020,Cronica Ribereña,centro,Ernesto Insaurralde pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00656,2020,El Debate Nacional,centro-izquierda,Docentes de Ribera Baja anunciaron un paro de 48 horas,trabajo,1
+AC00657,2019,La Voz del Puerto,popular,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,seguridad,0
+AC00658,2018,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00659,2016,El Debate Nacional,centro-izquierda,Raul Navarro pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC00660,2019,Diario Sierra Mansa,regional,Estela Tejerina pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC00661,2022,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00662,2017,El Litoral de Aguasclaras,centro-derecha,La comision de vivienda recibio a intendentes de Los Juncales,vivienda,0
+AC00663,2023,La Voz del Puerto,popular,La comision de seguridad recibio a intendentes de Los Juncales,seguridad,0
+AC00664,2023,El Debate Nacional,centro-izquierda,Corte de ruta en Cerro Verde por reclamos de transporte,transporte,1
+AC00665,2023,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,trabajo,1
+AC00666,2020,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Valle Hondo,campo,1
+AC00667,2022,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de salud,salud,0
+AC00668,2018,Diario Sierra Mansa,regional,Corte de ruta en Cerro Verde por reclamos de instituciones,instituciones,1
+AC00669,2021,El Litoral de Aguasclaras,centro-derecha,Docentes de Costa Azul anunciaron un paro de 48 horas,presupuesto,1
+AC00670,2016,Diario Sierra Mansa,regional,Docentes de Valle Hondo anunciaron un paro de 48 horas,educacion,1
+AC00671,2018,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de transporte,transporte,1
+AC00672,2021,El Litoral de Aguasclaras,centro-derecha,La comision de ambiente recibio a intendentes de Valle Hondo,ambiente,0
+AC00673,2016,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00674,2016,La Voz del Puerto,popular,Roxana Tejerina pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC00675,2020,El Debate Nacional,centro-izquierda,Docentes de Cerro Verde anunciaron un paro de 48 horas,presupuesto,1
+AC00676,2019,Cronica Ribereña,centro,Docentes de Los Juncales anunciaron un paro de 48 horas,instituciones,1
+AC00677,2024,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Puerto Nuevo,trabajo,1
+AC00678,2018,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00679,2017,El Debate Nacional,centro-izquierda,Docentes de Costa Azul anunciaron un paro de 48 horas,salud,1
+AC00680,2019,El Litoral de Aguasclaras,centro-derecha,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,educacion,1
+AC00681,2016,La Voz del Puerto,popular,La comision de seguridad recibio a intendentes de Puerto Nuevo,seguridad,0
+AC00682,2020,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00683,2018,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Valle Hondo,salud,1
+AC00684,2018,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00685,2015,La Voz del Puerto,popular,Cayo la actividad en Costa Azul segun el ultimo informe oficial,instituciones,0
+AC00686,2017,El Debate Nacional,centro-izquierda,Corte de ruta en Ribera Alta por reclamos de campo,campo,1
+AC00687,2016,El Debate Nacional,centro-izquierda,Corte de ruta en Sierra Mansa por reclamos de instituciones,instituciones,1
+AC00688,2024,Cronica Ribereña,centro,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,ambiente,1
+AC00689,2024,La Voz del Puerto,popular,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,salud,0
+AC00690,2019,Cronica Ribereña,centro,La comision de ambiente recibio a intendentes de Tres Lagunas,ambiente,0
+AC00691,2016,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00692,2018,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00693,2023,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6340,presupuesto,0
+AC00694,2018,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Tres Lagunas,transporte,1
+AC00695,2024,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Sierra Mansa,salud,1
+AC00696,2019,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00697,2015,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00698,2015,El Litoral de Aguasclaras,centro-derecha,La comision de educacion recibio a intendentes de Ribera Alta,educacion,0
+AC00699,2019,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC00700,2020,La Voz del Puerto,popular,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,ambiente,0
+AC00701,2020,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00702,2016,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Costa Azul,salud,1
+AC00703,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00704,2022,Diario Sierra Mansa,regional,Nelida Villalba pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00705,2023,El Debate Nacional,centro-izquierda,Corte de ruta en Tres Lagunas por reclamos de transporte,transporte,1
+AC00706,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6188,transporte,0
+AC00707,2024,Diario Sierra Mansa,regional,Docentes de Costa Azul anunciaron un paro de 48 horas,salud,1
+AC00708,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5103,seguridad,0
+AC00709,2016,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00710,2017,Diario Sierra Mansa,regional,Docentes de Cerro Verde anunciaron un paro de 48 horas,educacion,1
+AC00711,2024,Diario Sierra Mansa,regional,La comision de vivienda recibio a intendentes de Ribera Alta,vivienda,0
+AC00712,2021,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Alta,trabajo,1
+AC00713,2016,El Debate Nacional,centro-izquierda,La comision de vivienda recibio a intendentes de Cerro Verde,vivienda,0
+AC00714,2024,El Litoral de Aguasclaras,centro-derecha,La comision de presupuesto recibio a intendentes de Los Juncales,presupuesto,0
+AC00715,2019,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00716,2016,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Valle Hondo,instituciones,1
+AC00717,2017,El Litoral de Aguasclaras,centro-derecha,El bloque UAP anticipo que no acompaña la reforma de campo,campo,0
+AC00718,2020,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00719,2023,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,transporte,0
+AC00720,2017,La Voz del Puerto,popular,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,campo,1
+AC00721,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en San Telmo del Sur por reclamos de educacion,educacion,1
+AC00722,2016,Diario Sierra Mansa,regional,El bloque VVA anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00723,2018,El Litoral de Aguasclaras,centro-derecha,La comision de instituciones recibio a intendentes de Tres Lagunas,instituciones,0
+AC00724,2019,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 4780,educacion,0
+AC00725,2019,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,ambiente,0
+AC00726,2018,La Voz del Puerto,popular,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,seguridad,0
+AC00727,2017,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC00728,2023,Cronica Ribereña,centro,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,seguridad,1
+AC00729,2022,El Litoral de Aguasclaras,centro-derecha,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,ambiente,1
+AC00730,2018,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00731,2019,El Debate Nacional,centro-izquierda,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00732,2023,La Voz del Puerto,popular,Corte de ruta en Cerro Verde por reclamos de seguridad,seguridad,1
+AC00733,2023,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 4780,salud,0
+AC00734,2022,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00735,2015,Cronica Ribereña,centro,El bloque BST anticipo que no acompaña la reforma de educacion,educacion,0
+AC00736,2022,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Cerro Verde,transporte,1
+AC00737,2017,Cronica Ribereña,centro,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,salud,0
+AC00738,2016,Cronica Ribereña,centro,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,seguridad,0
+AC00739,2024,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 5266,campo,0
+AC00740,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6502,seguridad,0
+AC00741,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 7150,transporte,0
+AC00742,2017,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6012,campo,0
+AC00743,2021,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC00744,2018,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00745,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Los Juncales segun el ultimo informe oficial,vivienda,0
+AC00746,2016,La Voz del Puerto,popular,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,instituciones,0
+AC00747,2016,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC00748,2015,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00749,2015,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 5771,presupuesto,0
+AC00750,2023,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de salud,salud,0
+AC00751,2023,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Sierra Mansa,presupuesto,1
+AC00752,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00753,2024,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Costa Azul,instituciones,1
+AC00754,2017,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 4412,trabajo,0
+AC00755,2020,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 4780,ambiente,0
+AC00756,2015,El Debate Nacional,centro-izquierda,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,presupuesto,0
+AC00757,2018,Diario Sierra Mansa,regional,Docentes de Sierra Mansa anunciaron un paro de 48 horas,instituciones,1
+AC00758,2015,Diario Sierra Mansa,regional,Corte de ruta en Sierra Mansa por reclamos de presupuesto,presupuesto,1
+AC00759,2020,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00760,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00761,2017,La Voz del Puerto,popular,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,instituciones,1
+AC00762,2023,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Puerto Nuevo,vivienda,1
+AC00763,2017,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00764,2022,Cronica Ribereña,centro,La comision de presupuesto recibio a intendentes de Los Juncales,presupuesto,0
+AC00765,2020,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4780,vivienda,0
+AC00766,2023,El Debate Nacional,centro-izquierda,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,vivienda,1
+AC00767,2021,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,instituciones,0
+AC00768,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00769,2019,La Voz del Puerto,popular,Corte de ruta en Ribera Alta por reclamos de transporte,transporte,1
+AC00770,2020,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,salud,1
+AC00771,2023,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00772,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5540,trabajo,0
+AC00773,2021,El Litoral de Aguasclaras,centro-derecha,La comision de trabajo recibio a intendentes de Valle Hondo,trabajo,0
+AC00774,2018,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,instituciones,0
+AC00775,2016,Diario Sierra Mansa,regional,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,educacion,0
+AC00776,2019,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00777,2016,El Litoral de Aguasclaras,centro-derecha,El bloque UAP anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00778,2015,El Debate Nacional,centro-izquierda,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,educacion,0
+AC00779,2023,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6012,ambiente,0
+AC00780,2017,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Los Juncales,vivienda,1
+AC00781,2023,Diario Sierra Mansa,regional,La comision de instituciones recibio a intendentes de San Telmo del Sur,instituciones,0
+AC00782,2018,Diario Sierra Mansa,regional,La comision de trabajo recibio a intendentes de Tres Lagunas,trabajo,0
+AC00783,2015,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6340,seguridad,0
+AC00784,2019,El Litoral de Aguasclaras,centro-derecha,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,vivienda,1
+AC00785,2019,El Debate Nacional,centro-izquierda,Marcelo Suarez pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC00786,2019,La Voz del Puerto,popular,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,transporte,0
+AC00787,2024,Diario Sierra Mansa,regional,El bloque BST anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00788,2017,El Litoral de Aguasclaras,centro-derecha,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,vivienda,1
+AC00789,2020,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 4780,salud,0
+AC00790,2018,Cronica Ribereña,centro,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00791,2023,La Voz del Puerto,popular,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,salud,0
+AC00792,2017,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00793,2019,El Debate Nacional,centro-izquierda,La comision de transporte recibio a intendentes de Tres Lagunas,transporte,0
+AC00794,2018,La Voz del Puerto,popular,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,ambiente,1
+AC00795,2015,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC00796,2018,El Litoral de Aguasclaras,centro-derecha,La comision de educacion recibio a intendentes de Tres Lagunas,educacion,0
+AC00797,2017,La Voz del Puerto,popular,Cayo la actividad en Costa Azul segun el ultimo informe oficial,presupuesto,0
+AC00798,2019,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00799,2015,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Puerto Nuevo,transporte,1
+AC00800,2024,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Ribera Alta,instituciones,1
+AC00801,2018,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6340,salud,0
+AC00802,2023,El Debate Nacional,centro-izquierda,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,vivienda,0
+AC00803,2022,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 4412,ambiente,0
+AC00804,2019,Cronica Ribereña,centro,El bloque VVA anticipo que no acompaña la reforma de campo,campo,0
+AC00805,2023,Cronica Ribereña,centro,Jorge Duarte pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00806,2017,El Debate Nacional,centro-izquierda,Docentes de Los Juncales anunciaron un paro de 48 horas,campo,1
+AC00807,2022,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Sierra Mansa,educacion,0
+AC00808,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 4412,trabajo,0
+AC00809,2017,El Litoral de Aguasclaras,centro-derecha,Docentes de Sierra Mansa anunciaron un paro de 48 horas,seguridad,1
+AC00810,2022,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de campo,campo,0
+AC00811,2017,La Voz del Puerto,popular,Nestor Molinari pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC00812,2023,El Debate Nacional,centro-izquierda,Oscar Bordon pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC00813,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 5266,ambiente,0
+AC00814,2018,El Litoral de Aguasclaras,centro-derecha,La comision de campo recibio a intendentes de Cerro Verde,campo,0
+AC00815,2024,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00816,2019,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00817,2017,El Litoral de Aguasclaras,centro-derecha,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00818,2022,Diario Sierra Mansa,regional,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,educacion,1
+AC00819,2018,El Litoral de Aguasclaras,centro-derecha,Ernesto Insaurralde pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00820,2019,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6012,transporte,0
+AC00821,2019,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC00822,2017,Diario Sierra Mansa,regional,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,instituciones,1
+AC00823,2022,La Voz del Puerto,popular,La comision de presupuesto recibio a intendentes de Puerto Nuevo,presupuesto,0
+AC00824,2023,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7150,presupuesto,0
+AC00825,2022,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7001,vivienda,0
+AC00826,2015,Cronica Ribereña,centro,La comision de seguridad recibio a intendentes de San Telmo del Sur,seguridad,0
+AC00827,2024,Cronica Ribereña,centro,La comision de salud recibio a intendentes de Costa Azul,salud,0
+AC00828,2020,El Litoral de Aguasclaras,centro-derecha,Ivana Delgado pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00829,2017,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC00830,2023,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00831,2021,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Puerto Nuevo,transporte,1
+AC00832,2024,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de campo,campo,0
+AC00833,2022,El Debate Nacional,centro-izquierda,Docentes de Los Juncales anunciaron un paro de 48 horas,trabajo,1
+AC00834,2023,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de transporte,transporte,0
+AC00835,2016,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC00836,2017,El Litoral de Aguasclaras,centro-derecha,La comision de transporte recibio a intendentes de Los Juncales,transporte,0
+AC00837,2023,Diario Sierra Mansa,regional,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,seguridad,0
+AC00838,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Costa Azul,vivienda,1
+AC00839,2022,Cronica Ribereña,centro,El bloque MPR anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00840,2024,El Litoral de Aguasclaras,centro-derecha,Docentes de Tres Lagunas anunciaron un paro de 48 horas,vivienda,1
+AC00841,2019,La Voz del Puerto,popular,La comision de vivienda recibio a intendentes de San Telmo del Sur,vivienda,0
+AC00842,2016,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00843,2024,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6699,ambiente,0
+AC00844,2016,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC00845,2022,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,salud,1
+AC00846,2017,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,ambiente,0
+AC00847,2017,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00848,2015,El Litoral de Aguasclaras,centro-derecha,Docentes de Costa Azul anunciaron un paro de 48 horas,instituciones,1
+AC00849,2022,El Debate Nacional,centro-izquierda,Raul Falcon pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC00850,2018,El Debate Nacional,centro-izquierda,El bloque FCA anticipo que no acompaña la reforma de educacion,educacion,0
+AC00851,2020,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Valle Hondo,seguridad,1
+AC00852,2020,Diario Sierra Mansa,regional,Corte de ruta en San Telmo del Sur por reclamos de campo,campo,1
+AC00853,2016,Cronica Ribereña,centro,El bloque PUN anticipo que no acompaña la reforma de transporte,transporte,0
+AC00854,2016,La Voz del Puerto,popular,Corte de ruta en Ribera Alta por reclamos de trabajo,trabajo,1
+AC00855,2015,El Debate Nacional,centro-izquierda,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,ambiente,1
+AC00856,2016,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC00857,2015,El Litoral de Aguasclaras,centro-derecha,La comision de seguridad recibio a intendentes de Puerto Nuevo,seguridad,0
+AC00858,2024,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6188,campo,0
+AC00859,2017,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 5540,seguridad,0
+AC00860,2022,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00861,2016,El Litoral de Aguasclaras,centro-derecha,El bloque FCA anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC00862,2016,El Litoral de Aguasclaras,centro-derecha,Docentes de Los Juncales anunciaron un paro de 48 horas,educacion,1
+AC00863,2015,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 4780,seguridad,0
+AC00864,2023,Diario Sierra Mansa,regional,El bloque PUN anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC00865,2023,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Valle Hondo,transporte,1
+AC00866,2022,Cronica Ribereña,centro,Corte de ruta en Tres Lagunas por reclamos de trabajo,trabajo,1
+AC00867,2017,El Debate Nacional,centro-izquierda,Corte de ruta en Valle Hondo por reclamos de ambiente,ambiente,1
+AC00868,2016,La Voz del Puerto,popular,La comision de vivienda recibio a intendentes de Valle Hondo,vivienda,0
+AC00869,2016,El Litoral de Aguasclaras,centro-derecha,Docentes de Ribera Baja anunciaron un paro de 48 horas,vivienda,1
+AC00870,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Baja por reclamos de salud,salud,1
+AC00871,2019,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,presupuesto,0
+AC00872,2022,El Debate Nacional,centro-izquierda,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,seguridad,1
+AC00873,2020,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00874,2016,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC00875,2017,Cronica Ribereña,centro,Docentes de Valle Hondo anunciaron un paro de 48 horas,vivienda,1
+AC00876,2018,Cronica Ribereña,centro,Ariel Falcon pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00877,2021,El Debate Nacional,centro-izquierda,Hector Bordon pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC00878,2024,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de seguridad,seguridad,1
+AC00879,2020,Cronica Ribereña,centro,La comision de salud recibio a intendentes de Cerro Verde,salud,0
+AC00880,2023,El Litoral de Aguasclaras,centro-derecha,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,presupuesto,1
+AC00881,2015,Cronica Ribereña,centro,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,ambiente,1
+AC00882,2021,Diario Sierra Mansa,regional,La comision de campo recibio a intendentes de Tres Lagunas,campo,0
+AC00883,2024,El Debate Nacional,centro-izquierda,Docentes de Sierra Mansa anunciaron un paro de 48 horas,instituciones,1
+AC00884,2019,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00885,2018,Cronica Ribereña,centro,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,ambiente,0
+AC00886,2018,El Litoral de Aguasclaras,centro-derecha,La comision de campo recibio a intendentes de Los Juncales,campo,0
+AC00887,2016,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de campo,campo,1
+AC00888,2016,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 4412,presupuesto,0
+AC00889,2017,Cronica Ribereña,centro,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,trabajo,0
+AC00890,2019,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5103,vivienda,0
+AC00891,2022,El Debate Nacional,centro-izquierda,Docentes de Cerro Verde anunciaron un paro de 48 horas,trabajo,1
+AC00892,2024,El Litoral de Aguasclaras,centro-derecha,Raul Falcon pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC00893,2015,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,instituciones,1
+AC00894,2024,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Costa Azul,seguridad,1
+AC00895,2021,Diario Sierra Mansa,regional,El bloque MPR anticipo que no acompaña la reforma de campo,campo,0
+AC00896,2020,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 5771,presupuesto,0
+AC00897,2015,La Voz del Puerto,popular,La comision de instituciones recibio a intendentes de Tres Lagunas,instituciones,0
+AC00898,2016,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00899,2018,La Voz del Puerto,popular,Corte de ruta en Ribera Baja por reclamos de ambiente,ambiente,1
+AC00900,2021,El Debate Nacional,centro-izquierda,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,transporte,1
+AC00901,2016,La Voz del Puerto,popular,Corte de ruta en San Telmo del Sur por reclamos de presupuesto,presupuesto,1
+AC00902,2021,La Voz del Puerto,popular,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,trabajo,1
+AC00903,2017,Diario Sierra Mansa,regional,El bloque FCA anticipo que no acompaña la reforma de transporte,transporte,0
+AC00904,2023,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00905,2017,Diario Sierra Mansa,regional,Nestor Sosa pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00906,2018,El Debate Nacional,centro-izquierda,Corte de ruta en Puerto Nuevo por reclamos de campo,campo,1
+AC00907,2022,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC00908,2015,El Debate Nacional,centro-izquierda,Docentes de Valle Hondo anunciaron un paro de 48 horas,presupuesto,1
+AC00909,2023,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 5266,trabajo,0
+AC00910,2021,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC00911,2020,El Debate Nacional,centro-izquierda,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,presupuesto,1
+AC00912,2016,Diario Sierra Mansa,regional,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,trabajo,1
+AC00913,2020,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 4780,salud,0
+AC00914,2023,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00915,2018,El Litoral de Aguasclaras,centro-derecha,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,vivienda,1
+AC00916,2023,Cronica Ribereña,centro,Corte de ruta en Puerto Nuevo por reclamos de presupuesto,presupuesto,1
+AC00917,2016,Diario Sierra Mansa,regional,El bloque BST anticipo que no acompaña la reforma de transporte,transporte,0
+AC00918,2020,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de salud,salud,0
+AC00919,2016,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00920,2022,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6188,salud,0
+AC00921,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,campo,0
+AC00922,2024,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de ambiente,ambiente,1
+AC00923,2015,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6699,instituciones,0
+AC00924,2018,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en San Telmo del Sur por reclamos de transporte,transporte,1
+AC00925,2023,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6845,seguridad,0
+AC00926,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00927,2022,El Debate Nacional,centro-izquierda,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,trabajo,1
+AC00928,2022,La Voz del Puerto,popular,Roxana Tejerina pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00929,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC00930,2017,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,educacion,0
+AC00931,2018,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC00932,2018,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 7150,ambiente,0
+AC00933,2022,La Voz del Puerto,popular,Docentes de Tres Lagunas anunciaron un paro de 48 horas,vivienda,1
+AC00934,2016,Cronica Ribereña,centro,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,transporte,1
+AC00935,2023,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 7150,trabajo,0
+AC00936,2018,Cronica Ribereña,centro,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,presupuesto,0
+AC00937,2020,El Litoral de Aguasclaras,centro-derecha,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,seguridad,1
+AC00938,2018,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC00939,2017,Diario Sierra Mansa,regional,Beatriz Jaramillo pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00940,2018,El Debate Nacional,centro-izquierda,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,campo,1
+AC00941,2018,Diario Sierra Mansa,regional,El bloque BST anticipo que no acompaña la reforma de transporte,transporte,0
+AC00942,2024,Diario Sierra Mansa,regional,El bloque FCA anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00943,2023,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 7150,salud,0
+AC00944,2015,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de campo,campo,0
+AC00945,2019,La Voz del Puerto,popular,La comision de educacion recibio a intendentes de Costa Azul,educacion,0
+AC00946,2015,La Voz del Puerto,popular,El bloque BST anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC00947,2017,El Debate Nacional,centro-izquierda,Corte de ruta en Costa Azul por reclamos de ambiente,ambiente,1
+AC00948,2022,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Puerto Nuevo,salud,1
+AC00949,2023,El Litoral de Aguasclaras,centro-derecha,La comision de vivienda recibio a intendentes de Cerro Verde,vivienda,0
+AC00950,2015,El Debate Nacional,centro-izquierda,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,salud,0
+AC00951,2019,Diario Sierra Mansa,regional,El bloque MPR anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00952,2020,El Debate Nacional,centro-izquierda,Anibal Ferreyra pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00953,2019,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC00954,2015,Cronica Ribereña,centro,Docentes de Costa Azul anunciaron un paro de 48 horas,vivienda,1
+AC00955,2017,Cronica Ribereña,centro,El bloque VVA anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC00956,2021,Cronica Ribereña,centro,Docentes de Cerro Verde anunciaron un paro de 48 horas,instituciones,1
+AC00957,2015,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de trabajo,trabajo,0
+AC00958,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,transporte,0
+AC00959,2022,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,salud,0
+AC00960,2015,La Voz del Puerto,popular,Corte de ruta en Cerro Verde por reclamos de presupuesto,presupuesto,1
+AC00961,2020,La Voz del Puerto,popular,Docentes de Ribera Baja anunciaron un paro de 48 horas,salud,1
+AC00962,2020,La Voz del Puerto,popular,Corte de ruta en Valle Hondo por reclamos de ambiente,ambiente,1
+AC00963,2016,Cronica Ribereña,centro,La comision de ambiente recibio a intendentes de Valle Hondo,ambiente,0
+AC00964,2016,El Debate Nacional,centro-izquierda,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,educacion,1
+AC00965,2018,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en San Telmo del Sur por reclamos de presupuesto,presupuesto,1
+AC00966,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Alta por reclamos de trabajo,trabajo,1
+AC00967,2016,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 7001,ambiente,0
+AC00968,2017,El Litoral de Aguasclaras,centro-derecha,Marcela Cifuentes pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC00969,2019,La Voz del Puerto,popular,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,trabajo,1
+AC00970,2015,La Voz del Puerto,popular,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,educacion,0
+AC00971,2020,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6188,presupuesto,0
+AC00972,2015,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC00973,2015,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC00974,2016,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de presupuesto,presupuesto,1
+AC00975,2024,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6340,instituciones,0
+AC00976,2024,El Debate Nacional,centro-izquierda,La comision de presupuesto recibio a intendentes de Puerto Nuevo,presupuesto,0
+AC00977,2019,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,vivienda,0
+AC00978,2021,Diario Sierra Mansa,regional,Nelida Villalba pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC00979,2017,Cronica Ribereña,centro,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,educacion,1
+AC00980,2024,El Debate Nacional,centro-izquierda,Cayo la actividad en Los Juncales segun el ultimo informe oficial,campo,0
+AC00981,2015,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Ribera Baja,vivienda,1
+AC00982,2024,La Voz del Puerto,popular,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,vivienda,1
+AC00983,2015,Cronica Ribereña,centro,Aldo Ugarte pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC00984,2024,La Voz del Puerto,popular,El bloque FCA anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC00985,2022,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Cerro Verde,trabajo,1
+AC00986,2022,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,trabajo,0
+AC00987,2016,Diario Sierra Mansa,regional,Docentes de Ribera Baja anunciaron un paro de 48 horas,vivienda,1
+AC00988,2019,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC00989,2024,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,instituciones,0
+AC00990,2024,Cronica Ribereña,centro,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,educacion,1
+AC00991,2019,Diario Sierra Mansa,regional,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,salud,0
+AC00992,2020,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7150,educacion,0
+AC00993,2016,La Voz del Puerto,popular,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,salud,0
+AC00994,2023,La Voz del Puerto,popular,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,instituciones,0
+AC00995,2016,La Voz del Puerto,popular,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,presupuesto,1
+AC00996,2020,Diario Sierra Mansa,regional,Jorge Duarte pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC00997,2024,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Costa Azul segun el ultimo informe oficial,educacion,0
+AC00998,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Sierra Mansa por reclamos de salud,salud,1
+AC00999,2018,Cronica Ribereña,centro,Ariel Escalante pidio la insercion de su discurso en el Diario de Sesiones,ambiente,0
+AC01000,2017,Cronica Ribereña,centro,Docentes de Valle Hondo anunciaron un paro de 48 horas,seguridad,1
+AC01001,2020,Diario Sierra Mansa,regional,Ramon Galvan pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC01002,2021,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4412,presupuesto,0
+AC01003,2019,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,salud,0
+AC01004,2017,Diario Sierra Mansa,regional,El bloque PUN anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC01005,2019,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01006,2018,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6699,educacion,0
+AC01007,2015,El Debate Nacional,centro-izquierda,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,transporte,1
+AC01008,2016,Diario Sierra Mansa,regional,Docentes de Costa Azul anunciaron un paro de 48 horas,transporte,1
+AC01009,2018,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de ambiente,ambiente,1
+AC01010,2021,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de transporte,transporte,0
+AC01011,2024,El Debate Nacional,centro-izquierda,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,ambiente,1
+AC01012,2024,El Debate Nacional,centro-izquierda,Corte de ruta en Valle Hondo por reclamos de presupuesto,presupuesto,1
+AC01013,2021,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Alta,campo,1
+AC01014,2016,Diario Sierra Mansa,regional,La comision de trabajo recibio a intendentes de San Telmo del Sur,trabajo,0
+AC01015,2015,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Puerto Nuevo,seguridad,1
+AC01016,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,salud,0
+AC01017,2017,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01018,2024,El Litoral de Aguasclaras,centro-derecha,El bloque VVA anticipo que no acompaña la reforma de salud,salud,0
+AC01019,2017,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Alta segun el ultimo informe oficial,vivienda,0
+AC01020,2015,Diario Sierra Mansa,regional,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,campo,1
+AC01021,2017,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC01022,2019,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Ribera Alta,educacion,0
+AC01023,2020,La Voz del Puerto,popular,La comision de salud recibio a intendentes de Cerro Verde,salud,0
+AC01024,2015,El Litoral de Aguasclaras,centro-derecha,La comision de transporte recibio a intendentes de Los Juncales,transporte,0
+AC01025,2017,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC01026,2018,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Alta,vivienda,1
+AC01027,2023,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de campo,campo,0
+AC01028,2019,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC01029,2023,La Voz del Puerto,popular,Cayo la actividad en Los Juncales segun el ultimo informe oficial,vivienda,0
+AC01030,2015,Cronica Ribereña,centro,La comision de educacion recibio a intendentes de Sierra Mansa,educacion,0
+AC01031,2019,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 7001,trabajo,0
+AC01032,2015,El Litoral de Aguasclaras,centro-derecha,El bloque UAP anticipo que no acompaña la reforma de campo,campo,0
+AC01033,2022,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de transporte,transporte,1
+AC01034,2023,Diario Sierra Mansa,regional,Cayo la actividad en Costa Azul segun el ultimo informe oficial,trabajo,0
+AC01035,2021,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de campo,campo,0
+AC01036,2018,Cronica Ribereña,centro,Osvaldo Ybarra pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC01037,2024,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de trabajo,trabajo,0
+AC01038,2017,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC01039,2019,El Debate Nacional,centro-izquierda,La comision de salud recibio a intendentes de Ribera Baja,salud,0
+AC01040,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6340,educacion,0
+AC01041,2019,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,trabajo,1
+AC01042,2024,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Los Juncales,presupuesto,1
+AC01043,2020,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5103,instituciones,0
+AC01044,2017,Cronica Ribereña,centro,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,salud,0
+AC01045,2016,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6012,presupuesto,0
+AC01046,2017,El Debate Nacional,centro-izquierda,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,seguridad,0
+AC01047,2019,Cronica Ribereña,centro,Corte de ruta en Cerro Verde por reclamos de salud,salud,1
+AC01048,2024,La Voz del Puerto,popular,Corte de ruta en Ribera Baja por reclamos de instituciones,instituciones,1
+AC01049,2020,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,salud,1
+AC01050,2022,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de presupuesto,presupuesto,1
+AC01051,2019,La Voz del Puerto,popular,Docentes de Costa Azul anunciaron un paro de 48 horas,salud,1
+AC01052,2021,Cronica Ribereña,centro,Beatriz Jaramillo pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC01053,2021,El Litoral de Aguasclaras,centro-derecha,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,trabajo,1
+AC01054,2022,Cronica Ribereña,centro,El bloque PUN anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC01055,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC01056,2021,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,ambiente,0
+AC01057,2018,Cronica Ribereña,centro,La comision de trabajo recibio a intendentes de Ribera Baja,trabajo,0
+AC01058,2021,La Voz del Puerto,popular,Ruben Zabaleta pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC01059,2023,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01060,2023,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5771,vivienda,0
+AC01061,2019,El Litoral de Aguasclaras,centro-derecha,La comision de educacion recibio a intendentes de Los Juncales,educacion,0
+AC01062,2019,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6340,campo,0
+AC01063,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6340,educacion,0
+AC01064,2018,La Voz del Puerto,popular,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,trabajo,0
+AC01065,2024,La Voz del Puerto,popular,Corte de ruta en San Telmo del Sur por reclamos de presupuesto,presupuesto,1
+AC01066,2020,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01067,2017,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5103,trabajo,0
+AC01068,2019,El Debate Nacional,centro-izquierda,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,vivienda,0
+AC01069,2017,El Litoral de Aguasclaras,centro-derecha,Horacio Herrera pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC01070,2021,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC01071,2021,El Litoral de Aguasclaras,centro-derecha,Carlos Correa pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC01072,2019,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC01073,2016,La Voz del Puerto,popular,El bloque FCA anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC01074,2022,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de transporte,transporte,0
+AC01075,2016,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,trabajo,0
+AC01076,2017,Cronica Ribereña,centro,Mabel Dominguez pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC01077,2015,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 5771,trabajo,0
+AC01078,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6340,salud,0
+AC01079,2020,La Voz del Puerto,popular,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,presupuesto,1
+AC01080,2023,Cronica Ribereña,centro,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,transporte,1
+AC01081,2018,La Voz del Puerto,popular,Nestor Molinari pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC01082,2021,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01083,2024,Diario Sierra Mansa,regional,Griselda Maidana pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC01084,2018,Cronica Ribereña,centro,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,salud,1
+AC01085,2024,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Los Juncales por reclamos de transporte,transporte,1
+AC01086,2019,Diario Sierra Mansa,regional,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,ambiente,1
+AC01087,2020,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC01088,2022,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en San Telmo del Sur segun el ultimo informe oficial,trabajo,0
+AC01089,2023,Diario Sierra Mansa,regional,La comision de transporte recibio a intendentes de Valle Hondo,transporte,0
+AC01090,2016,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC01091,2020,Diario Sierra Mansa,regional,Corte de ruta en Valle Hondo por reclamos de vivienda,vivienda,1
+AC01092,2018,El Litoral de Aguasclaras,centro-derecha,Mabel Navarro pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC01093,2021,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,presupuesto,1
+AC01094,2019,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de campo,campo,0
+AC01095,2023,Diario Sierra Mansa,regional,Vecinos de Cerro Verde se movilizaron frente a la sede del ministerio,educacion,1
+AC01096,2024,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01097,2022,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de campo,campo,0
+AC01098,2019,Diario Sierra Mansa,regional,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,ambiente,1
+AC01099,2021,La Voz del Puerto,popular,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,seguridad,1
+AC01100,2024,El Debate Nacional,centro-izquierda,El bloque PUN anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01101,2016,El Debate Nacional,centro-izquierda,El bloque PUN anticipo que no acompaña la reforma de transporte,transporte,0
+AC01102,2020,Diario Sierra Mansa,regional,Vecinos de Costa Azul se movilizaron frente a la sede del ministerio,ambiente,1
+AC01103,2015,El Debate Nacional,centro-izquierda,Hector Bordon pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC01104,2021,El Debate Nacional,centro-izquierda,Ernesto Insaurralde pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC01105,2022,Cronica Ribereña,centro,El bloque UAP anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC01106,2020,Cronica Ribereña,centro,Ruben Krause pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC01107,2022,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 7001,transporte,0
+AC01108,2022,Cronica Ribereña,centro,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,trabajo,1
+AC01109,2016,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Puerto Nuevo por reclamos de ambiente,ambiente,1
+AC01110,2021,Diario Sierra Mansa,regional,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,trabajo,0
+AC01111,2021,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de educacion,educacion,0
+AC01112,2021,La Voz del Puerto,popular,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,instituciones,1
+AC01113,2018,El Litoral de Aguasclaras,centro-derecha,El bloque MPR anticipo que no acompaña la reforma de transporte,transporte,0
+AC01114,2015,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC01115,2022,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC01116,2022,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6699,presupuesto,0
+AC01117,2017,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6340,campo,0
+AC01118,2022,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC01119,2023,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de salud,salud,0
+AC01120,2018,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC01121,2021,Cronica Ribereña,centro,Docentes de Sierra Mansa anunciaron un paro de 48 horas,vivienda,1
+AC01122,2015,El Debate Nacional,centro-izquierda,La comision de presupuesto recibio a intendentes de Puerto Nuevo,presupuesto,0
+AC01123,2016,El Litoral de Aguasclaras,centro-derecha,La comision de vivienda recibio a intendentes de Cerro Verde,vivienda,0
+AC01124,2023,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 7150,seguridad,0
+AC01125,2017,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de campo,campo,0
+AC01126,2020,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC01127,2018,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 7150,trabajo,0
+AC01128,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6188,instituciones,0
+AC01129,2022,El Debate Nacional,centro-izquierda,La comision de instituciones recibio a intendentes de San Telmo del Sur,instituciones,0
+AC01130,2019,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,educacion,0
+AC01131,2020,El Litoral de Aguasclaras,centro-derecha,Docentes de Tres Lagunas anunciaron un paro de 48 horas,seguridad,1
+AC01132,2019,Diario Sierra Mansa,regional,Corte de ruta en Puerto Nuevo por reclamos de instituciones,instituciones,1
+AC01133,2016,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6502,presupuesto,0
+AC01134,2022,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Tres Lagunas,ambiente,1
+AC01135,2016,La Voz del Puerto,popular,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,vivienda,1
+AC01136,2024,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Valle Hondo,educacion,1
+AC01137,2016,La Voz del Puerto,popular,El bloque PUN anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01138,2016,Diario Sierra Mansa,regional,Docentes de Sierra Mansa anunciaron un paro de 48 horas,educacion,1
+AC01139,2022,La Voz del Puerto,popular,Cayo la actividad en Costa Azul segun el ultimo informe oficial,instituciones,0
+AC01140,2015,El Debate Nacional,centro-izquierda,El bloque PUN anticipo que no acompaña la reforma de educacion,educacion,0
+AC01141,2023,El Litoral de Aguasclaras,centro-derecha,Roxana Tejerina pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC01142,2021,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC01143,2016,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC01144,2017,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,transporte,1
+AC01145,2022,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC01146,2016,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,trabajo,1
+AC01147,2017,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01148,2022,Cronica Ribereña,centro,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,salud,1
+AC01149,2019,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC01150,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Baja,transporte,1
+AC01151,2021,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,campo,1
+AC01152,2020,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC01153,2024,El Debate Nacional,centro-izquierda,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,trabajo,1
+AC01154,2015,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6188,salud,0
+AC01155,2020,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de educacion,educacion,0
+AC01156,2021,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",educacion,0
+AC01157,2016,El Debate Nacional,centro-izquierda,Corte de ruta en Cerro Verde por reclamos de trabajo,trabajo,1
+AC01158,2017,La Voz del Puerto,popular,Nestor Sosa pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC01159,2022,El Debate Nacional,centro-izquierda,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,ambiente,0
+AC01160,2017,El Litoral de Aguasclaras,centro-derecha,Ruben Krause pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC01161,2022,Diario Sierra Mansa,regional,Corte de ruta en Tres Lagunas por reclamos de educacion,educacion,1
+AC01162,2017,El Debate Nacional,centro-izquierda,El bloque MPR anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC01163,2016,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01164,2016,Diario Sierra Mansa,regional,Alberto Larrosa pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC01165,2019,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC01166,2015,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 4412,transporte,0
+AC01167,2017,Diario Sierra Mansa,regional,Corte de ruta en Puerto Nuevo por reclamos de vivienda,vivienda,1
+AC01168,2024,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de salud,salud,0
+AC01169,2015,Diario Sierra Mansa,regional,Corte de ruta en Puerto Nuevo por reclamos de educacion,educacion,1
+AC01170,2020,La Voz del Puerto,popular,Docentes de Los Juncales anunciaron un paro de 48 horas,vivienda,1
+AC01171,2016,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Tres Lagunas,educacion,1
+AC01172,2021,Diario Sierra Mansa,regional,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,ambiente,1
+AC01173,2022,El Debate Nacional,centro-izquierda,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,educacion,1
+AC01174,2022,El Debate Nacional,centro-izquierda,Corte de ruta en Valle Hondo por reclamos de salud,salud,1
+AC01175,2016,La Voz del Puerto,popular,Corte de ruta en Ribera Alta por reclamos de trabajo,trabajo,1
+AC01176,2023,El Debate Nacional,centro-izquierda,El bloque VVA anticipo que no acompaña la reforma de educacion,educacion,0
+AC01177,2017,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6188,salud,0
+AC01178,2020,Cronica Ribereña,centro,La comision de campo recibio a intendentes de Cerro Verde,campo,0
+AC01179,2015,La Voz del Puerto,popular,Ruben Krause pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC01180,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Cerro Verde por reclamos de presupuesto,presupuesto,1
+AC01181,2024,La Voz del Puerto,popular,Docentes de Valle Hondo anunciaron un paro de 48 horas,ambiente,1
+AC01182,2018,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC01183,2020,Cronica Ribereña,centro,Cayo la actividad en Puerto Nuevo segun el ultimo informe oficial,transporte,0
+AC01184,2022,El Litoral de Aguasclaras,centro-derecha,Rosana Bordon pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC01185,2022,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de ambiente,ambiente,0
+AC01186,2015,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Ribera Baja,educacion,1
+AC01187,2024,La Voz del Puerto,popular,La comision de presupuesto recibio a intendentes de Sierra Mansa,presupuesto,0
+AC01188,2023,El Debate Nacional,centro-izquierda,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,vivienda,1
+AC01189,2019,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Baja por reclamos de presupuesto,presupuesto,1
+AC01190,2020,Cronica Ribereña,centro,Nestor Molinari pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC01191,2018,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Ribera Alta,presupuesto,1
+AC01192,2020,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de instituciones,instituciones,0
+AC01193,2018,Cronica Ribereña,centro,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,campo,1
+AC01194,2016,El Debate Nacional,centro-izquierda,La comision de vivienda recibio a intendentes de Valle Hondo,vivienda,0
+AC01195,2018,El Litoral de Aguasclaras,centro-derecha,Docentes de Tres Lagunas anunciaron un paro de 48 horas,trabajo,1
+AC01196,2024,Diario Sierra Mansa,regional,Docentes de Valle Hondo anunciaron un paro de 48 horas,campo,1
+AC01197,2017,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4412,trabajo,0
+AC01198,2018,La Voz del Puerto,popular,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,educacion,0
+AC01199,2017,Cronica Ribereña,centro,Oscar Krause pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC01200,2023,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 5540,salud,0
+AC01201,2020,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC01202,2018,Diario Sierra Mansa,regional,La comision de vivienda recibio a intendentes de San Telmo del Sur,vivienda,0
+AC01203,2021,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6502,educacion,0
+AC01204,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC01205,2023,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6340,seguridad,0
+AC01206,2017,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Sierra Mansa segun el ultimo informe oficial,vivienda,0
+AC01207,2022,El Debate Nacional,centro-izquierda,Docentes de Tres Lagunas anunciaron un paro de 48 horas,seguridad,1
+AC01208,2017,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 7150,ambiente,0
+AC01209,2017,El Debate Nacional,centro-izquierda,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,instituciones,1
+AC01210,2015,Diario Sierra Mansa,regional,Cayo la actividad en Los Juncales segun el ultimo informe oficial,ambiente,0
+AC01211,2023,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01212,2021,Cronica Ribereña,centro,Corte de ruta en Puerto Nuevo por reclamos de vivienda,vivienda,1
+AC01213,2022,El Debate Nacional,centro-izquierda,Corte de ruta en Ribera Baja por reclamos de campo,campo,1
+AC01214,2017,Cronica Ribereña,centro,Docentes de Ribera Baja anunciaron un paro de 48 horas,ambiente,1
+AC01215,2016,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,presupuesto,1
+AC01216,2018,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 6502,seguridad,0
+AC01217,2019,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 5771,trabajo,0
+AC01218,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,presupuesto,0
+AC01219,2018,Diario Sierra Mansa,regional,Denuncian demoras en la obra de agua potable de Tres Lagunas,trabajo,1
+AC01220,2019,El Litoral de Aguasclaras,centro-derecha,Docentes de Ribera Baja anunciaron un paro de 48 horas,educacion,1
+AC01221,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 4412,vivienda,0
+AC01222,2018,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01223,2020,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Valle Hondo,salud,1
+AC01224,2019,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC01225,2015,Diario Sierra Mansa,regional,Cayo la actividad en Costa Azul segun el ultimo informe oficial,educacion,0
+AC01226,2023,Cronica Ribereña,centro,Corte de ruta en Valle Hondo por reclamos de campo,campo,1
+AC01227,2015,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 4412,ambiente,0
+AC01228,2018,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6699,trabajo,0
+AC01229,2017,La Voz del Puerto,popular,Docentes de Ribera Alta anunciaron un paro de 48 horas,seguridad,1
+AC01230,2021,La Voz del Puerto,popular,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,campo,0
+AC01231,2017,El Litoral de Aguasclaras,centro-derecha,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,trabajo,1
+AC01232,2017,La Voz del Puerto,popular,El oficialismo reunio los votos para sancionar la Ley 6188,trabajo,0
+AC01233,2023,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01234,2020,Diario Sierra Mansa,regional,La comision de campo recibio a intendentes de Costa Azul,campo,0
+AC01235,2019,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 4780,trabajo,0
+AC01236,2015,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC01237,2021,El Debate Nacional,centro-izquierda,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,educacion,1
+AC01238,2022,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Los Juncales,vivienda,1
+AC01239,2023,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Ribera Baja,presupuesto,1
+AC01240,2018,El Debate Nacional,centro-izquierda,Cayo la actividad en Los Juncales segun el ultimo informe oficial,trabajo,0
+AC01241,2021,La Voz del Puerto,popular,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,trabajo,1
+AC01242,2021,La Voz del Puerto,popular,Griselda Maidana pidio la insercion de su discurso en el Diario de Sesiones,vivienda,0
+AC01243,2015,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Puerto Nuevo por reclamos de instituciones,instituciones,1
+AC01244,2017,El Litoral de Aguasclaras,centro-derecha,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,instituciones,1
+AC01245,2024,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de San Telmo del Sur,educacion,1
+AC01246,2023,El Litoral de Aguasclaras,centro-derecha,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,salud,1
+AC01247,2015,El Debate Nacional,centro-izquierda,Vecinos de Sierra Mansa se movilizaron frente a la sede del ministerio,vivienda,1
+AC01248,2017,La Voz del Puerto,popular,Carina Herrera pidio la insercion de su discurso en el Diario de Sesiones,presupuesto,0
+AC01249,2022,El Debate Nacional,centro-izquierda,Beatriz Jaramillo pidio la insercion de su discurso en el Diario de Sesiones,seguridad,0
+AC01250,2023,El Debate Nacional,centro-izquierda,Corte de ruta en Sierra Mansa por reclamos de ambiente,ambiente,1
+AC01251,2023,Cronica Ribereña,centro,Corte de ruta en Sierra Mansa por reclamos de trabajo,trabajo,1
+AC01252,2024,El Debate Nacional,centro-izquierda,Corte de ruta en Valle Hondo por reclamos de transporte,transporte,1
+AC01253,2016,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de campo,campo,0
+AC01254,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01255,2020,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 7001,seguridad,0
+AC01256,2022,La Voz del Puerto,popular,El bloque MPR anticipo que no acompaña la reforma de salud,salud,0
+AC01257,2023,Cronica Ribereña,centro,Corte de ruta en Costa Azul por reclamos de presupuesto,presupuesto,1
+AC01258,2022,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",trabajo,0
+AC01259,2020,El Debate Nacional,centro-izquierda,La comision de educacion recibio a intendentes de San Telmo del Sur,educacion,0
+AC01260,2023,Diario Sierra Mansa,regional,El bloque VVA anticipo que no acompaña la reforma de transporte,transporte,0
+AC01261,2020,El Litoral de Aguasclaras,centro-derecha,Docentes de Valle Hondo anunciaron un paro de 48 horas,transporte,1
+AC01262,2018,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 4780,seguridad,0
+AC01263,2017,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Valle Hondo por reclamos de presupuesto,presupuesto,1
+AC01264,2019,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Los Juncales,campo,1
+AC01265,2017,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC01266,2020,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",salud,0
+AC01267,2020,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01268,2023,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Puerto Nuevo,educacion,1
+AC01269,2021,El Litoral de Aguasclaras,centro-derecha,La comision de instituciones recibio a intendentes de Cerro Verde,instituciones,0
+AC01270,2023,El Debate Nacional,centro-izquierda,Nestor Molinari pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC01271,2019,La Voz del Puerto,popular,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,trabajo,1
+AC01272,2019,Diario Sierra Mansa,regional,La comision de salud recibio a intendentes de Puerto Nuevo,salud,0
+AC01273,2024,El Debate Nacional,centro-izquierda,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,trabajo,1
+AC01274,2021,La Voz del Puerto,popular,Cayo la actividad en Los Juncales segun el ultimo informe oficial,salud,0
+AC01275,2020,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 5266,transporte,0
+AC01276,2020,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01277,2024,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Ribera Alta,vivienda,1
+AC01278,2018,Cronica Ribereña,centro,Diputados aprobo en general el proyecto de seguridad,seguridad,0
+AC01279,2020,Diario Sierra Mansa,regional,Vecinos de Puerto Nuevo se movilizaron frente a la sede del ministerio,trabajo,1
+AC01280,2015,El Debate Nacional,centro-izquierda,Fabiana Kaufman pidio la insercion de su discurso en el Diario de Sesiones,educacion,0
+AC01281,2017,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de San Telmo del Sur,instituciones,1
+AC01282,2021,Diario Sierra Mansa,regional,Docentes de Los Juncales anunciaron un paro de 48 horas,trabajo,1
+AC01283,2022,La Voz del Puerto,popular,Roxana Olmedo pidio la insercion de su discurso en el Diario de Sesiones,campo,0
+AC01284,2021,La Voz del Puerto,popular,Docentes de San Telmo del Sur anunciaron un paro de 48 horas,salud,1
+AC01285,2017,El Litoral de Aguasclaras,centro-derecha,El oficialismo reunio los votos para sancionar la Ley 6845,instituciones,0
+AC01286,2020,El Litoral de Aguasclaras,centro-derecha,La comision de educacion recibio a intendentes de Sierra Mansa,educacion,0
+AC01287,2024,Diario Sierra Mansa,regional,Corte de ruta en Ribera Alta por reclamos de campo,campo,1
+AC01288,2016,Diario Sierra Mansa,regional,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,educacion,1
+AC01289,2019,El Debate Nacional,centro-izquierda,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC01290,2016,Diario Sierra Mansa,regional,Docentes de Sierra Mansa anunciaron un paro de 48 horas,vivienda,1
+AC01291,2020,Diario Sierra Mansa,regional,Diputados aprobo en general el proyecto de educacion,educacion,0
+AC01292,2017,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,salud,0
+AC01293,2022,Diario Sierra Mansa,regional,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,ambiente,1
+AC01294,2023,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6012,instituciones,0
+AC01295,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Cerro Verde segun el ultimo informe oficial,instituciones,0
+AC01296,2015,La Voz del Puerto,popular,La comision de instituciones recibio a intendentes de Ribera Baja,instituciones,0
+AC01297,2024,La Voz del Puerto,popular,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,vivienda,0
+AC01298,2021,La Voz del Puerto,popular,Corte de ruta en Sierra Mansa por reclamos de seguridad,seguridad,1
+AC01299,2015,Diario Sierra Mansa,regional,La comision de educacion recibio a intendentes de Puerto Nuevo,educacion,0
+AC01300,2023,La Voz del Puerto,popular,Corte de ruta en Puerto Nuevo por reclamos de salud,salud,1
+AC01301,2021,Diario Sierra Mansa,regional,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,campo,1
+AC01302,2024,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de San Telmo del Sur,trabajo,1
+AC01303,2023,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 5771,campo,0
+AC01304,2021,El Debate Nacional,centro-izquierda,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,presupuesto,1
+AC01305,2017,Diario Sierra Mansa,regional,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,educacion,1
+AC01306,2023,El Litoral de Aguasclaras,centro-derecha,El bloque BST anticipo que no acompaña la reforma de salud,salud,0
+AC01307,2015,Cronica Ribereña,centro,Corte de ruta en Tres Lagunas por reclamos de educacion,educacion,1
+AC01308,2022,Diario Sierra Mansa,regional,Cayo la actividad en Valle Hondo segun el ultimo informe oficial,trabajo,0
+AC01309,2020,El Litoral de Aguasclaras,centro-derecha,La comision de salud recibio a intendentes de Valle Hondo,salud,0
+AC01310,2015,Diario Sierra Mansa,regional,Vecinos de San Telmo del Sur se movilizaron frente a la sede del ministerio,campo,1
+AC01311,2018,El Litoral de Aguasclaras,centro-derecha,Diputados aprobo en general el proyecto de vivienda,vivienda,0
+AC01312,2021,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Cerro Verde por reclamos de seguridad,seguridad,1
+AC01313,2015,Diario Sierra Mansa,regional,Anibal Ferreyra pidio la insercion de su discurso en el Diario de Sesiones,instituciones,0
+AC01314,2018,El Debate Nacional,centro-izquierda,Ariel Escalante pidio la insercion de su discurso en el Diario de Sesiones,salud,0
+AC01315,2018,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC01316,2017,La Voz del Puerto,popular,Diputados aprobo en general el proyecto de transporte,transporte,0
+AC01317,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",seguridad,0
+AC01318,2019,Cronica Ribereña,centro,Horacio Herrera pidio la insercion de su discurso en el Diario de Sesiones,trabajo,0
+AC01319,2022,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6699,seguridad,0
+AC01320,2021,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 4412,campo,0
+AC01321,2024,La Voz del Puerto,popular,El bloque UAP anticipo que no acompaña la reforma de presupuesto,presupuesto,0
+AC01322,2021,Diario Sierra Mansa,regional,La comision de salud recibio a intendentes de Valle Hondo,salud,0
+AC01323,2019,El Litoral de Aguasclaras,centro-derecha,Docentes de Ribera Alta anunciaron un paro de 48 horas,transporte,1
+AC01324,2016,El Debate Nacional,centro-izquierda,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,ambiente,1
+AC01325,2019,El Debate Nacional,centro-izquierda,La comision de instituciones recibio a intendentes de Puerto Nuevo,instituciones,0
+AC01326,2018,Cronica Ribereña,centro,Vecinos de Ribera Baja se movilizaron frente a la sede del ministerio,instituciones,1
+AC01327,2017,Cronica Ribereña,centro,El bloque VVA anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC01328,2017,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Valle Hondo,educacion,1
+AC01329,2017,Cronica Ribereña,centro,El bloque FCA anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC01330,2019,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 6340,presupuesto,0
+AC01331,2018,El Debate Nacional,centro-izquierda,Vecinos de Los Juncales se movilizaron frente a la sede del ministerio,ambiente,1
+AC01332,2018,El Debate Nacional,centro-izquierda,El bloque UAP anticipo que no acompaña la reforma de salud,salud,0
+AC01333,2024,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en Ribera Alta por reclamos de seguridad,seguridad,1
+AC01334,2021,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6012,presupuesto,0
+AC01335,2015,Diario Sierra Mansa,regional,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",vivienda,0
+AC01336,2022,Diario Sierra Mansa,regional,El bloque UAP anticipo que no acompaña la reforma de campo,campo,0
+AC01337,2018,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5540,ambiente,0
+AC01338,2023,Diario Sierra Mansa,regional,Corte de ruta en Cerro Verde por reclamos de campo,campo,1
+AC01339,2015,El Debate Nacional,centro-izquierda,El bloque MPR anticipo que no acompaña la reforma de salud,salud,0
+AC01340,2021,La Voz del Puerto,popular,Docentes de Cerro Verde anunciaron un paro de 48 horas,vivienda,1
+AC01341,2021,El Debate Nacional,centro-izquierda,Docentes de Ribera Baja anunciaron un paro de 48 horas,seguridad,1
+AC01342,2019,Diario Sierra Mansa,regional,El bloque VVA anticipo que no acompaña la reforma de salud,salud,0
+AC01343,2021,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6699,transporte,0
+AC01344,2022,Cronica Ribereña,centro,Corte de ruta en Los Juncales por reclamos de presupuesto,presupuesto,1
+AC01345,2019,El Debate Nacional,centro-izquierda,Fuerte cruce en el recinto por la Ley 6340,salud,0
+AC01346,2015,La Voz del Puerto,popular,Fuerte cruce en el recinto por la Ley 6340,trabajo,0
+AC01347,2024,El Litoral de Aguasclaras,centro-derecha,El bloque FCA anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01348,2016,Diario Sierra Mansa,regional,El bloque VVA anticipo que no acompaña la reforma de instituciones,instituciones,0
+AC01349,2022,Diario Sierra Mansa,regional,Corte de ruta en Costa Azul por reclamos de salud,salud,1
+AC01350,2023,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de San Telmo del Sur,instituciones,1
+AC01351,2020,Cronica Ribereña,centro,Docentes de Costa Azul anunciaron un paro de 48 horas,trabajo,1
+AC01352,2022,El Litoral de Aguasclaras,centro-derecha,Docentes de Cerro Verde anunciaron un paro de 48 horas,seguridad,1
+AC01353,2022,Diario Sierra Mansa,regional,Docentes de Tres Lagunas anunciaron un paro de 48 horas,instituciones,1
+AC01354,2015,El Litoral de Aguasclaras,centro-derecha,Docentes de Los Juncales anunciaron un paro de 48 horas,vivienda,1
+AC01355,2016,Diario Sierra Mansa,regional,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,educacion,1
+AC01356,2021,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",presupuesto,0
+AC01357,2017,Cronica Ribereña,centro,Vecinos de Tres Lagunas se movilizaron frente a la sede del ministerio,transporte,1
+AC01358,2017,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",instituciones,0
+AC01359,2018,La Voz del Puerto,popular,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",campo,0
+AC01360,2022,La Voz del Puerto,popular,La comision de campo recibio a intendentes de Puerto Nuevo,campo,0
+AC01361,2016,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 4412,ambiente,0
+AC01362,2023,El Debate Nacional,centro-izquierda,El oficialismo reunio los votos para sancionar la Ley 6012,transporte,0
+AC01363,2022,Diario Sierra Mansa,regional,Fuerte cruce en el recinto por la Ley 5266,presupuesto,0
+AC01364,2021,La Voz del Puerto,popular,Vecinos de Ribera Alta se movilizaron frente a la sede del ministerio,ambiente,1
+AC01365,2022,Cronica Ribereña,centro,El bloque VVA anticipo que no acompaña la reforma de ambiente,ambiente,0
+AC01366,2015,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Valle Hondo,transporte,1
+AC01367,2018,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Puerto Nuevo,vivienda,1
+AC01368,2018,El Debate Nacional,centro-izquierda,El bloque BST anticipo que no acompaña la reforma de seguridad,seguridad,0
+AC01369,2016,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 5540,educacion,0
+AC01370,2018,El Debate Nacional,centro-izquierda,El bloque VVA anticipo que no acompaña la reforma de salud,salud,0
+AC01371,2017,La Voz del Puerto,popular,Docentes de Costa Azul anunciaron un paro de 48 horas,transporte,1
+AC01372,2022,El Litoral de Aguasclaras,centro-derecha,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",ambiente,0
+AC01373,2020,El Litoral de Aguasclaras,centro-derecha,Fuerte cruce en el recinto por la Ley 7150,presupuesto,0
+AC01374,2021,El Debate Nacional,centro-izquierda,Diputados aprobo en general el proyecto de presupuesto,presupuesto,0
+AC01375,2019,La Voz del Puerto,popular,La comision de educacion recibio a intendentes de Sierra Mansa,educacion,0
+AC01376,2023,Cronica Ribereña,centro,Denuncian demoras en la obra de agua potable de Ribera Alta,seguridad,1
+AC01377,2020,El Litoral de Aguasclaras,centro-derecha,Corte de ruta en San Telmo del Sur por reclamos de presupuesto,presupuesto,1
+AC01378,2018,Diario Sierra Mansa,regional,Docentes de Ribera Baja anunciaron un paro de 48 horas,vivienda,1
+AC01379,2020,El Debate Nacional,centro-izquierda,Cayo la actividad en Ribera Baja segun el ultimo informe oficial,vivienda,0
+AC01380,2017,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 5103,ambiente,0
+AC01381,2021,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Tres Lagunas segun el ultimo informe oficial,vivienda,0
+AC01382,2015,Cronica Ribereña,centro,El oficialismo reunio los votos para sancionar la Ley 6188,campo,0
+AC01383,2023,La Voz del Puerto,popular,Corte de ruta en Sierra Mansa por reclamos de vivienda,vivienda,1
+AC01384,2020,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Los Juncales,instituciones,1
+AC01385,2022,Cronica Ribereña,centro,La comision de ambiente recibio a intendentes de Puerto Nuevo,ambiente,0
+AC01386,2019,Cronica Ribereña,centro,Fuerte cruce en el recinto por la Ley 6699,salud,0
+AC01387,2021,El Litoral de Aguasclaras,centro-derecha,Denuncian demoras en la obra de agua potable de Ribera Alta,trabajo,1
+AC01388,2024,Cronica Ribereña,centro,Anibal Lezcano pidio la insercion de su discurso en el Diario de Sesiones,transporte,0
+AC01389,2020,Cronica Ribereña,centro,El bloque BST anticipo que no acompaña la reforma de vivienda,vivienda,0
+AC01390,2018,Cronica Ribereña,centro,Docentes de Costa Azul anunciaron un paro de 48 horas,seguridad,1
+AC01391,2015,El Litoral de Aguasclaras,centro-derecha,El bloque PUN anticipo que no acompaña la reforma de trabajo,trabajo,0
+AC01392,2022,Cronica Ribereña,centro,"Sin acuerdo por el presupuesto, la sesion pasa a cuarto intermedio",transporte,0
+AC01393,2022,La Voz del Puerto,popular,Denuncian demoras en la obra de agua potable de Puerto Nuevo,ambiente,1
+AC01394,2018,El Debate Nacional,centro-izquierda,Denuncian demoras en la obra de agua potable de Costa Azul,transporte,1
+AC01395,2016,El Litoral de Aguasclaras,centro-derecha,La comision de trabajo recibio a intendentes de Puerto Nuevo,trabajo,0
+AC01396,2015,La Voz del Puerto,popular,Docentes de Puerto Nuevo anunciaron un paro de 48 horas,transporte,1
+AC01397,2020,El Litoral de Aguasclaras,centro-derecha,Cayo la actividad en Costa Azul segun el ultimo informe oficial,educacion,0
+AC01398,2024,El Litoral de Aguasclaras,centro-derecha,Vecinos de Valle Hondo se movilizaron frente a la sede del ministerio,transporte,1
+AC01399,2020,Diario Sierra Mansa,regional,El oficialismo reunio los votos para sancionar la Ley 6340,vivienda,0
