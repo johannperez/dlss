@@ -158,7 +158,7 @@ sobre todo:
 # las curvas de las viz y los números de las slides
 PYTHONPATH=_shared python3 clases/09-modelos-preentrenados/medir-clase09.py
 
-# el notebook entero, sin red, en CPU (medido: 1 min 49 s de punta a punta)
+# el notebook entero, sin red, en CPU (medido: entre 1 y 2 min de punta a punta)
 python3 -m nbconvert --to notebook --execute \
         --output /tmp/nb-09.ipynb clases/09-modelos-preentrenados/notebook.ipynb
 ```

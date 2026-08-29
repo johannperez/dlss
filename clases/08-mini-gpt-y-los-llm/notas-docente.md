@@ -21,7 +21,7 @@
 ## 1. El arco narrativo, en diez líneas
 
 1. Se lee un párrafo de debate parlamentario. Suena real. Se vota. Lo escribió una máquina.
-2. Esa máquina tiene 1.541.056 perillas y se entrena en cuatro minutos y medio, acá.
+2. Esa máquina tiene 1.541.056 perillas y se entrena en cinco o seis minutos, acá.
 3. Su único objetivo es tontísimo: **poner una probabilidad a la próxima ficha**.
 4. Y sin embargo, con ese objetivo, el dataset se arma solo y aparece todo lo demás.
 5. Se arranca el entrenamiento en el minuto 20 y se lo deja corriendo como teatro.
@@ -322,7 +322,7 @@ en el contenedor de construcción. **Si citás un número en el aula, citá esto
 |---|---|
 | parámetros del modelo | **1.541.056** (4 bloques · 4 cabezas · dim 176 · ventana 128 fichas) |
 | corpus | Aguasclaras, 1.098.206 caracteres, vocabulario de **71** fichas |
-| entrenamiento | **1200 pasos en 243 s = 4,1 min**, CPU con **4 hilos** (0,20 s por paso). En una segunda corrida idéntica dio 267 s: la CPU del contenedor es compartida, así que **decí «cuatro minutos y medio» y no un número al segundo**. |
+| entrenamiento | **1200 pasos, entre 4 y 6 minutos y medio** en CPU con **4 hilos**. Se midió **cuatro veces la misma corrida**: `entrenar-mini-gpt.py` dio **243 s** y **267 s**; el notebook entero, con `nbconvert --execute`, dio **361 s** y **376 s** (0,30 s por paso). La CPU del contenedor es compartida y el número se mueve casi un 55%. **Decí «cinco o seis minutos» y planificá con seis**, nunca un número al segundo. |
 | loss de validación | **4,23 → 0,19** (el piso teórico de «no tengo idea» es log 71 = 4,26) |
 | loss del bigrama en validación | **2,24** (la línea de base tonta) |
 | tamaño del checkpoint | 6,2 MB para un corpus de 1,1 MB |
@@ -449,7 +449,7 @@ esquivarla.
 Lo que el experimento muestra: **una parte muy grande de la información de un texto
 institucional está en su forma**, y esa parte es aprendible con relativamente poco. Eso no
 es una novedad para nadie que haya trabajado con análisis del discurso — es la noción de
-género — pero acá está **cuantificada**: 1,5 millones de parámetros y cuatro minutos.
+género — pero acá está **cuantificada**: 1,5 millones de parámetros y cinco minutos.
 
 Lo que **no** muestra: que el contenido sea predecible. El modelo produce forma vacía. La
 disputa política —qué se dice, quién lo dice, qué consecuencias tiene— no está en lo que

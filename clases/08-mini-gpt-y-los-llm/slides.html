@@ -114,7 +114,7 @@
   <div class="tarjetas">
     <div><h4><span class="numerito">1.541.056</span></h4>perillas. Un millón y medio.
       GPT-4 tiene, según las estimaciones públicas, unas cien mil veces más.</div>
-    <div><h4><span class="numerito">4,1 min</span></h4>de entrenamiento.
+    <div><h4><span class="numerito">4 a 6 min</span></h4>de entrenamiento.
       En una CPU con cuatro hilos. Sin GPU, sin nube, sin plata.</div>
     <div><h4><span class="numerito">1,1 MB</span></h4>de corpus: debates parlamentarios
       de un país que no existe. <span class="chip sintetico">sintético</span></div>
@@ -356,9 +356,11 @@
     <b>3.</b> <b>No la mires.</b> Seguí leyendo la sección 6 mientras corre.
   </div>
   <div class="ojo compacta">
-    <b>Tarda 4 minutos y medio en CPU</b> (medido: 243 s, 1200 pasos, 4 hilos) y unos
-    pocos minutos en GPU con 3000 pasos. El notebook detecta cuál tenés y ajusta solo.
-    Si te dio CPU, está perfecto: la clase está calibrada para eso.
+    <b>Tarda entre 4 y 6 minutos y medio en CPU</b> — los 1200 pasos se midieron cuatro
+    veces en la misma máquina de 4 hilos y dieron <b>243 s, 267 s, 361 s y 376 s</b>:
+    la CPU se comparte, así que el número se mueve. <b>Contá con seis minutos.</b>
+    Con GPU el notebook sube a 3000 pasos solo. Si te dio CPU, está perfecto: la clase
+    está calibrada para eso.
   </div>
   <p style="font-size:.85em">Cada tanto imprime una muestra de lo que escribiría.
     <b>Volvé a mirarla tres o cuatro veces.</b> Es el momento más lindo del curso.</p>
@@ -469,7 +471,7 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
 
 <section>
   <span class="paso-etiq">paso 1200 · final</span>
-  <h3>Cuatro minutos de CPU</h3>
+  <h3>Cinco o seis minutos de CPU</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: "la transferencia de la competencia sin la transferencia de los recursos convierte una politica publica en un problema municipal". Y aca esta el punto: esa frase resume el</div>
   <p><b>Es el párrafo del principio de la clase.</b>
     <span class="numerito">loss 4,23 → 0,19</span></p>
@@ -1066,7 +1068,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     adaptarlo a tu problema. Y después, la pregunta que hace la diferencia entre tu paper
     y un blog post: <b>¿cómo sabés que está bien?</b></p>
   <aside class="notes">
-    Cerrá con el costo: nuestro modelo son 4 minutos de CPU; reproducir GPT-2 son horas
+    Cerrá con el costo: nuestro modelo son cinco minutos de CPU; reproducir GPT-2 son horas
     de GPU y decenas de miles de millones de fichas. Ése es el argumento del transfer
     learning, y es cuantitativo.
     <br><br>
@@ -1211,8 +1213,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     const p = Viz.plano('#caja-loss', {
       xmin: 0, xmax: D.meta.pasos, ymin: 0, ymax: 4.6,
       ejeX: 'pasos de descenso', ejeY: 'loss (cross-entropy)',
-      titulo: 'el entrenamiento real: ' + D.meta.pasos + ' pasos en ' +
-              Math.round(D.meta.segundos_cpu) + ' s de CPU',
+      titulo: 'el entrenamiento real: ' + D.meta.pasos + ' pasos, entre 4 y 6 min de CPU',
       alto: 320
     });
     p.alDibujar(() => {

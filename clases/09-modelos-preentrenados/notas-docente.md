@@ -307,9 +307,10 @@ el de la sátira. La prueba barata: partí por grupo y mirá si se cae.
 - **Hugging Face no se pudo probar** en el contenedor donde se construyó este material
   (`huggingface.co` da 403; ver `datos/README.md` §2). En consecuencia:
   - El **camino B** (embeddings PPMI+SVD propios + scikit-learn) está corrido y verificado
-    entero: el notebook completo corre de punta a punta en **1 min 49 s** en CPU y sin red
-    (medido con `nbconvert --execute` en el contenedor de construcción; el grueso es
-    levantar el kernel e importar torch, el cómputo propio son ~25 s).
+    entero: el notebook completo corre de punta a punta en **entre 1 y 2 minutos** en CPU y
+    sin red (dos corridas medidas con `nbconvert --execute` en el contenedor de
+    construcción: 58 s y 1 min 49 s; la diferencia es cuánta CPU había libre). El grueso
+    es levantar el kernel e importar torch; el cómputo propio son ~25 s.
   - El **camino A** está escrito con cuidado y **no ejecutado**. Las celdas están marcadas
     `# ── CAMINO A ──`.
   - El identificador `pysentimiento/robertuito-sentiment-analysis` está **verificado
