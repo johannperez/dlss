@@ -223,6 +223,11 @@ Lo que **NUNCA** se recorta, pase lo que pase:
 - **El barrido de MAE en vivo.** En `comparador-de-losses.html`, arrastrá el punto de 2002
   (el que vale cero) hasta arriba de todo, despacio, y narrá cómo la azul lo sigue y la
   naranja no. Cinco minutos y no cansa.
+  **Y de paso, un regalo:** ese cero de 2002 *no* quiere decir que en 2002 no se habló de
+  inseguridad. Quiere decir que en ese discurso, con nuestro léxico de 23 palabras, no
+  apareció ninguna (está en `datos/README.md`). Un cero exacto en una serie de proporciones
+  casi siempre es un problema de instrumento, no un hallazgo — y acá es, además, el caso
+  extremo que más le tironea la recta al MSE. Dos ideas de la clase 10 en treinta segundos.
 - **El quiz de firmas** de `tasa-de-aprendizaje.html`, de a dos, con las tres curvas sin
   etiquetar. Convierte la viz en evaluación formativa y sale muy bien.
 - **La última celda del notebook** (el año centrado contra el año crudo). Proyectala: la

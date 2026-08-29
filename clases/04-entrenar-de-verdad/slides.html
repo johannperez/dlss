@@ -70,8 +70,8 @@
   /* el glosario de hoy tiene once términos: en una sola columna no entran */
   .reveal .glosario-lista.dos { display: grid; grid-template-columns: 1fr 1fr;
     column-gap: 1.6rem; }
-  .reveal .glosario-lista.dos li { font-size: .8em; grid-template-columns: minmax(7.5em, 34%) 1fr;
-    gap: .5em; padding: .28em 0; }
+  .reveal .glosario-lista.dos li { font-size: .74em; grid-template-columns: minmax(9.4em, 41%) 1fr;
+    gap: .7em; padding: .24em 0; }
   .reveal pre { font-size: .62em; }
   /* curso.css pinta todos los <b> con el color de la tinta; acá queremos que
      los que llevan clase semántica conserven su color */
@@ -884,12 +884,13 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <div class="cifras-fila fragment">
     <div><span class="et">test con partición al azar (con fuga)</span><span class="nu c-error">0.0142</span></div>
     <div><span class="et">test con partición por tiempo (honesta)</span><span class="nu c-ok">0.0319</span></div>
-    <div><span class="et">el baseline tonto: predecir el promedio</span><span class="nu">0.0255</span></div>
+    <div><span class="et">el baseline tonto en la partición honesta</span><span class="nu">0.0255</span></div>
   </div>
   <div class="ojo compacta fragment">
-    La partición al azar da un número <strong>2,2 veces mejor</strong>. Y con la honesta,
-    la red <strong>no le gana al baseline</strong>. Con 36 casos, ese es el resultado.
-    Reportarlo así es mejor trabajo que publicar el 0.0142.
+    La partición al azar da un número <strong>2,2 veces mejor</strong>, y con la honesta la red
+    <strong>no le gana al baseline</strong> (0.0319 contra 0.0255): con 36 casos, ese es el
+    resultado. <span style="font-size:.9em">Lo seguro no es <em>cuánto</em> infla la fuga —los
+    dos test no son el mismo conjunto—, es <strong>que no hay manera de saberlo</strong>.</span>
   </div>
   <aside class="notes">
     <b>115-118 min.</b> Esta es la mejor escena de la clase. <b>No la apures.</b><br>
@@ -898,6 +899,12 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     El cierre, sin dramatismo: "no inventamos esto para la clase. Está en el corpus que usamos
     hace cuatro clases, lo encontramos con un <code>md5sum</code>, y se les habría colado en un
     paper igual que se nos coló a nosotros."<br>
+    <b>Si alguien pregunta por el 2,2 (y ojalá pregunte):</b> tiene razón en desconfiar. Los dos
+    test son años distintos, así que parte de la diferencia es que 2014-2019 es más difícil —
+    el baseline tonto también empeora ahí, de 0.0133 a 0.0255. Contra su propio baseline, la
+    red al azar queda en 1,07 y la honesta en 1,25. La fuga garantiza la <b>dirección</b>, no
+    el tamaño: el 0.0142 está inflado y <b>no hay manera de medir cuánto</b>. Esa
+    imposibilidad es el problema, no el número. (Está impreso en la sección 6 del notebook.)<br>
     Y el <b>baseline</b>: "de cada paper que lean, pregunten cuál era el modelo tonto. Si no
     está, no saben si el resultado es bueno."
   </aside>
@@ -1137,16 +1144,21 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
   });
   p.alDibujar(() => {
     p.fondo(); p.grilla(); p.ejes({ formatoX: v => String(Math.round(v)) });
+    // OJO con los colores: el gris punteado ('verdad') está reservado para la
+    // verdad subyacente y acá los datos son REALES, así que no existe. Y el
+    // violeta ('parametro') es el color de las perillas, no el de una recta.
+    // Las tres líneas son cosas que un modelo dibuja → familia 'modelo'; la de
+    // "a ojo" va en gris neutro porque la dibujó una persona con dos sliders.
     p.curva(a => D.ojo.a * (a - 2001) / 10 + D.ojo.b,
-            { color: 'verdad', grosor: 2.4, punteada: [7, 5] });
+            { color: 'tinta3', grosor: 2 });
     p.curva(a => D.recta.a * (a - 2001) / 10 + D.recta.b,
-            { color: 'parametro', grosor: 2.4 });
+            { color: 'modelo', grosor: 2.2, punteada: [7, 5], opacidad: .75 });
     p.linea(enGrilla(D.reencuentro.curva), { color: 'modelo', grosor: 3.6 });
     p.puntos(PUNTOS, { color: 'datos', r: 5 });
     p.leyenda([
       { color: 'datos', texto: 'los 36 discursos' },
-      { color: 'verdad', texto: 'un ajuste a ojo (clase 1)', forma: 'linea', punteada: true },
-      { color: 'parametro', texto: 'la mejor recta posible', forma: 'linea' },
+      { color: 'tinta3', texto: 'un ajuste a ojo (clase 1)', forma: 'linea' },
+      { color: 'modelo', texto: 'la mejor recta posible', forma: 'linea', punteada: true },
       { color: 'modelo', texto: '16 rampas entrenadas hoy', forma: 'linea' }
     ], { pos: 'ai' });
   });

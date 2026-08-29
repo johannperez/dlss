@@ -1196,10 +1196,12 @@
       p.contornos(lossDe, { niveles: 11, color: 'tinta3', opacidad: .35 });
       p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
       const gr = gradDe(pa, pb), k = 0.20;
-      p.flecha(pa, pb, pa + k * gr[0] * 0.4, pb + k * gr[1] * 0.4,
-               { color: 'error', grosor: 3, cabeza: 11 });
-      p.texto(-0.385, 0.415, 'el gradiente: para arriba',
-              { color: 'error', tam: 13, peso: '700', alinear: 'left', caja: true });
+      // la flecha roja va sobre fondo naranja: si es corta no se ve de lejos
+      p.flecha(pa, pb, pa + k * gr[0] * 0.62, pb + k * gr[1] * 0.62,
+               { color: 'error', grosor: 3.4, cabeza: 13 });
+      p.texto(pa + k * gr[0] * 0.62, pb + k * gr[1] * 0.62, 'el gradiente: para arriba',
+              { color: 'error', tam: 13, peso: '700', alinear: 'left', dx: 6, dy: -10,
+                caja: true });
       p.flecha(pa, pb, pa - k * gr[0], pb - k * gr[1],
                { color: 'tinta', grosor: 3.2, cabeza: 12 });
       p.texto(pa - k * gr[0], pb - k * gr[1], 'nosotros vamos para acá',

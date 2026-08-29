@@ -52,7 +52,7 @@ interna y validez externa.
 
 **c.** Que bajó la loss **de entrenamiento**, que es el único número que ese colega está
 mirando y el único que no sirve para decidir nada. Sobre datos nuevos el modelo pasó de
-~0.018 (época 42) a ~0.022: **empeoró**. Que la azul baje no es una noticia; la azul siempre
+**0.0133** (época 42) a **0.0225** (época 1500): **empeoró**, y casi el doble. Que la azul baje no es una noticia; la azul siempre
 baja.
 
 *Este ítem es el que mejor separa a quien entendió de quien memorizó.* Quien contesta "bajó

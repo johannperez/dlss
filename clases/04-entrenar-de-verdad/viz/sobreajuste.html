@@ -17,6 +17,14 @@
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
 <style>
+  /* DEFECTO DE BASE (parcheado acá, conviene subirlo a _shared/css/curso.css):
+     curso.css no declara `box-sizing: border-box` en ningún lado, así que
+     `.viz-frame { width: 100% }` + su padding + su borde se le van 26 px por
+     la derecha a la columna del grid. Suelta la página no se nota; embebida en
+     una slide (donde el panel mide 268 px) el dibujo se mete ENCIMA del panel
+     y le come la primera letra a cada rótulo. Una línea lo arregla. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
   .semaforo { display: inline-block; width: .72em; height: .72em; border-radius: 50%;
     margin-right: .35em; vertical-align: -1px; }
   .panel .lectura + .lectura { margin-top: .5rem; }
@@ -61,7 +69,7 @@
       se mueve. Esa es la diferencia entre aprender el fenómeno y aprenderse la muestra.
     </div>
     <p class="viz-pie">
-      Datos: menciones a «protesta» en la prensa de <b>Aguasclaras</b>, por trimestre.
+      Datos: menciones a «protesta» en la prensa de <b>Aguasclaras</b>, un caso por medición.
       <span class="chip sintetico">sintético</span> País ficticio, proceso generador conocido
       y escrito en este archivo: por eso —y sólo por eso— podemos dibujar la verdad en gris.
       Con datos reales esa línea no existe, y ahí está todo el problema.

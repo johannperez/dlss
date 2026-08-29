@@ -1,7 +1,9 @@
 """Genera los números REALES que se dibujan en las figuras de slides.html.
 
 Ninguna figura de esta clase está dibujada "a ojo": todas salen de correr acá el
-mismo código que corre el notebook, con la misma semilla. Este script escribe
+mismo código que corre el notebook, con la misma semilla. (La única excepción, y
+está declarada en `referencias.md`, son los dos parámetros de la recta «a ojo»
+de la slide 18: esos sí van a mano, porque representan un ajuste humano.) Este script escribe
 `datos-figuras.js`, que las slides cargan por ruta relativa (nada de fetch: el
 material tiene que abrir con file://).
 
@@ -55,7 +57,10 @@ A = np.vstack([(anios - 2001) / 10, np.ones(len(anios))]).T
 coef, *_ = np.linalg.lstsq(A, seg, rcond=None)
 out["recta"] = {"a": float(coef[0]), "b": float(coef[1]),
                 "mse": round(float(np.mean((A @ coef - seg) ** 2)), 5)}
-# una recta "a ojo" plausible, de las que salían en la clase 1
+# Una recta "a ojo" plausible, de las que salían en la clase 1. OJO: estos dos
+# números están ELEGIDOS A MANO, no medidos — es el único par de la clase que no
+# sale de una corrida. El MSE sí se mide sobre los datos reales. Está declarado
+# en referencias.md; si lo cambiás, cambiá también la nota de ahí.
 a_ojo, b_ojo = 0.02, 0.22
 out["ojo"] = {"a": a_ojo, "b": b_ojo,
               "mse": round(float(np.mean((a_ojo * (anios - 2001) / 10 + b_ojo - seg) ** 2)), 5)}

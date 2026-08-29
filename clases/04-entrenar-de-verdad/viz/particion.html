@@ -18,6 +18,14 @@
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
 <style>
+  /* DEFECTO DE BASE (parcheado acá, conviene subirlo a _shared/css/curso.css):
+     curso.css no declara `box-sizing: border-box` en ningún lado, así que
+     `.viz-frame { width: 100% }` + su padding + su borde se le van 26 px por
+     la derecha a la columna del grid. Suelta la página no se nota; embebida en
+     una slide (donde el panel mide 268 px) el dibujo se mete ENCIMA del panel
+     y le come la primera letra a cada rótulo. Una línea lo arregla. */
+  .viz-frame, .panel { box-sizing: border-box; }
+
   .grilla-casos { display: grid; gap: 4px; }
   .caso {
     position: relative; border-radius: var(--r-chico); border: 1px solid var(--borde);
@@ -280,11 +288,27 @@ function pintar() {
   const nTest = destino.filter(d => d === 'test').length;
   const nFuga = new Set(diag.fugaGrupo.concat(
     diag.fugaGemelo.filter(id => destino[id] === 'test'))).size;
+  // Tres estados, no dos. La distinción importa: un duplicado partido entre
+  // ENTRENAMIENTO y VALIDACIÓN no ensucia el test (el número que reportás sigue
+  // siendo honesto), ensucia la decisión que tomaste con la validación. Decir
+  // "tu test no es un test" en ese caso sería mentir, y encima contradice al
+  // notebook, donde partir por tiempo deja el test limpio.
+  const gemelosCruzados = diag.paresPartidos > 0;
+  const gemeloEnTest = diag.fugaGemelo.some(id => destino[id] === 'test');
   let v;
-  if (nFuga === 0 && diag.paresPartidos === 0) {
+  if (nFuga === 0 && !gemelosCruzados) {
     v = '<span class="grande" style="color:var(--c-ok)">✓ Sin fugas: tu test es un test de verdad.</span>' +
         'Ningún caso del test comparte ' + conj.nombreGrupo + ' con el entrenamiento, ' +
         'y no hay duplicados cruzando la partición. El número que salga de acá se puede reportar.';
+  } else if (nFuga === 0) {
+    v = '<span class="grande" style="color:var(--c-val)">⚠ El test está limpio. La que se ensució es la validación.</span>' +
+        'Ningún caso del test comparte ' + conj.nombreGrupo + ' con el entrenamiento: ' +
+        '<b>el número que reportes es honesto</b>. Pero hay ' + diag.paresPartidos +
+        ' par' + (diag.paresPartidos > 1 ? 'es' : '') + ' de casos <u>idénticos</u> ' +
+        'repartidos entre entrenamiento y validación (los marcados con <b>=</b>). ' +
+        'La validación es la que usás para <i>decidir</i> —cuántas perillas, cuándo parar—, ' +
+        'así que esa decisión la tomaste con un número un poquito inflado. Es un problema ' +
+        'mucho más chico que el otro, pero se menciona en la nota metodológica.';
   } else {
     v = '<span class="grande" style="color:var(--c-error)">⚠ Hay fuga. Tu test no es un test.</span>';
     if (diag.fugaGrupo.length) {
@@ -299,7 +323,10 @@ function pintar() {
       v += '<b style="color:var(--c-error)">Y hay ' + diag.paresPartidos +
            ' par' + (diag.paresPartidos > 1 ? 'es' : '') + ' de casos <u>idénticos</u> ' +
            'repartidos en montones distintos</b> (los marcados con <b>=</b>): el modelo ' +
-           'los estudia de un lado y los "predice" del otro. ';
+           'los estudia de un lado y los "predice" del otro' +
+           (gemeloEnTest ? ', y uno de esos montones es el test' :
+                           ' (esta vez cae entre entrenamiento y validación, así que ' +
+                           'ensucia la decisión, no el número final)') + '. ';
     }
     v += '<br>Tu modelo va a "acertar" esos casos porque los reconoce, no porque los prediga. ' +
          'El número que reportes va a estar inflado y no vas a poder saber cuánto.';
