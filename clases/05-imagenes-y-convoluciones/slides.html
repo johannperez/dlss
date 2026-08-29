@@ -138,7 +138,7 @@
     <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto"></div></div>
     <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-zoom"></div></div>
   </div>
-  <p class="viz-pie">Cada casilla es un número de <b>0 a 255</b>: cuánta materia hay ahí.
+  <p class="viz-pie">Cada casilla es un número de <b>0 a 255</b>: cuánta luz hay en ese punto.
     Acá lo dibujamos como <b>tinta sobre papel</b> —más número, más oscuro— para que se lea
     en el proyector; en el archivo original el 255 es blanco. <b>Esto es lo único que ve la
     computadora:</b> el dibujo no está "adentro", el dibujo <em>es</em> la tabla.</p>
@@ -564,7 +564,7 @@
           <text x="190" y="60">conv + pool</text><text x="190" y="76">16×14×14</text>
           <text x="338" y="60">conv + pool</text><text x="338" y="76">32×7×7</text>
           <text x="486" y="60">conv</text><text x="486" y="76">64×7×7</text>
-          <text x="649" y="60">¿apareció?</text><text x="649" y="76">máx de cada mapa → 64</text>
+          <text x="649" y="60">¿apareció?</text><text x="649" y="76">máx por mapa → 64</text>
           <text x="812" y="60">densa</text><text x="812" y="76">64 → 10</text>
         </g>
         <g stroke="var(--tinta-3)" stroke-width="1.5" fill="none">

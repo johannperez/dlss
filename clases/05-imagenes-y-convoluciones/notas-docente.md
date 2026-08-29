@@ -30,6 +30,11 @@ de datos y más fácil de engañar.*
 
 ## 2. Plan de tiempos real, bloque por bloque
 
+> **Los números de slide de este documento son los que muestra el contador de
+> `slides.html` abajo a la derecha (`n / 36`), con la pausa contada como la 18.**
+> Si venís de leer la especificación, ahí la pausa no está numerada y todo lo que
+> va después lleva un número menos.
+
 | Min | Slides | Bloque | Qué hacés |
 |---|---|---|---|
 | **0-2** | 1 | Portada | Una frase y pasás. No leas objetivos. |
@@ -47,18 +52,18 @@ de datos y más fácil de engañar.*
 | **40-43** | 16 | La cuenta que importa | Los dos números en el pizarrón. |
 | **43-45** | 17 | Consignas del práctico 1 | Leelas en voz alta. |
 | **45-60** | — | **Práctico 1** | Notebook, secciones 1-3. Pasás por las mesas. |
-| **60-70** | pausa | **PAUSA** | Diez minutos. **No se toca.** Poné alarma. |
-| **70-74** | 18 | Volvimos: ¿qué filtro inventaron? | Proyectás dos o tres del aula. |
-| **74-78** | 19 | Apilar filtros | La segunda capa no mira la imagen. |
-| **78-83** | 20 | **VIZ jerarquía** | «La rueda» y «la multitud». Aclarás que es un esquema. |
-| **83-85** | 21-22 | Por qué profundo + pooling | La promesa de la clase 2, cobrada. Pooling en 30 s de verdad. |
-| **85-88** | 23-24 | La CNN completa + **la arquitectura es una teoría** | La slide central. Leela despacio. |
-| **88-94** | 25 | **VIZ supuestos** | Satelital primero; después «tabla de encuesta» y te callás. |
-| **94-95** | 26 | Consignas del práctico 2 | |
+| **60-70** | **18** | **PAUSA** | Diez minutos. **No se toca.** Poné alarma. |
+| **70-74** | 19 | Volvimos: ¿qué filtro inventaron? | Proyectás dos o tres del aula. |
+| **74-78** | 20 | Apilar filtros | La segunda capa no mira la imagen. |
+| **78-83** | 21 | **VIZ jerarquía** | «La rueda» y «la multitud». Aclarás que es un esquema. |
+| **83-85** | 22-23 | Por qué profundo + pooling | La promesa de la clase 2, cobrada. Pooling en 30 s de verdad. |
+| **85-88** | 24-25 | La CNN completa + **la arquitectura es una teoría** | La slide central. Leela despacio. |
+| **88-94** | 26 | **VIZ supuestos** | Satelital primero; después «tabla de encuesta» y te callás. |
+| **94-95** | 27 | Consignas del práctico 2 | |
 | **95-108** | — | **Práctico 2** | De a dos. Secciones 4-5 del notebook. |
-| **108-110** | 27 | El resultado | Comparás con lo que les dio a ellos. |
-| **110-116** | 28-30 | El caso y las tres preguntas | El bloque de ciencias sociales. **Nunca se recorta.** |
-| **116-120** | 31-36 | Cierre | El lunes, otros usos, tres ideas, glosario, puente. |
+| **108-110** | 28 | El resultado | Comparás con lo que les dio a ellos. |
+| **110-116** | 29-31 | El caso y las tres preguntas | El bloque de ciencias sociales. **Nunca se recorta.** |
+| **116-120** | 32-36 | Cierre | El lunes, otros usos, tres ideas, glosario, puente. |
 
 > **Ojo con el reloj.** El presupuesto oficial le da 20 minutos al práctico 2 (85-105) y 15 al
 > cierre. El plan de arriba le saca cinco minutos al práctico y se los da al bloque del caso,
@@ -77,8 +82,8 @@ de datos y más fácil de engañar.*
 | Slide 8, después de barajar | "¿Quién había votado A?" | El error público sin costo. Es el motor de la clase. |
 | Slide 13 (viz) | "¿Cuántos filtros al azar sirvieron?" | Prepara la slide 15: por eso se **aprenden**. |
 | Slide 16 | "¿De dónde sale que 288 alcancen?" | Que aparezca «se reusan los mismos nueve números». |
-| Slide 24 | **"¿Alguien puede darme un supuesto de este tipo en su propio trabajo?"** | El momento en que la clase deja de ser sobre CNNs. |
-| Slide 25 (viz) | "Si reordenás las columnas de tu CSV, ¿cambió algo?" | Demuele el supuesto de vecindad para tablas, en una línea. |
+| Slide 25 | **"¿Alguien puede darme un supuesto de este tipo en su propio trabajo?"** | El momento en que la clase deja de ser sobre CNNs. |
+| Slide 26 (viz) | "Si reordenás las columnas de tu CSV, ¿cambió algo?" | Demuele el supuesto de vecindad para tablas, en una línea. |
 | Práctico 2 | "¿Qué tienen en común los errores?" | La pregunta profesional de toda la clase. |
 
 ---
@@ -138,7 +143,7 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
 | **«El modelo ve como nosotros»** | Antropomorfización. | El `TODO 5`: el modelo confunde copas de árboles con multitudes. Ningún humano hace eso. |
 | **Pánico con las dimensiones** | Se pierden con `(batch, canales, alto, ancho)` y se frustran con los errores de forma. | La mnemotecnia: *cuántas fotos, cuántas capas de color, cuán alta, cuán ancha*. Y **enseñales a leer el error**: «expected 4-dimensional input… got 2-dimensional» te está diciendo qué falta. Leer errores es contenido. |
 | **Querer entender pooling/stride/padding a fondo** | Se traban en detalles. | Decilo explícito: *"esto es plomería. El día que armes una red lo googleás. No son conceptos."* |
-| **«Entonces mido pobreza con satélites y listo»** | Entusiasmo acrítico con el caso. | Slides 29-30, y la pregunta que ordena todo: **¿qué está midiendo realmente?** |
+| **«Entonces mido pobreza con satélites y listo»** | Entusiasmo acrítico con el caso. | Slides 30-31, y la pregunta que ordena todo: **¿qué está midiendo realmente?** |
 | **«¿Por qué el mapa sale más chico?»** | Confusión con las formas de salida. | La ventana no se puede asomar afuera de la foto: pierde un píxel de cada lado. Nada más. |
 
 ---
@@ -147,9 +152,9 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
 
 **El orden en que se recorta:**
 
-1. **Slide 22 (pooling).** Es plomería declarada. Decí una frase y pasá.
-2. **Slide 32 (otros usos en ciencias sociales).** Mandalo por mail; está escrito.
-3. **Slide 21 (por qué profundo).** Duele, pero se puede resumir en la 20 mientras mostrás la viz.
+1. **Slide 23 (pooling).** Es plomería declarada. Decí una frase y pasá.
+2. **Slide 33 (otros usos en ciencias sociales).** Mandalo por mail; está escrito.
+3. **Slide 22 (por qué profundo).** Duele, pero se puede resumir en la 21 mientras mostrás la viz.
 4. **Cinco minutos del práctico 2.** El notebook se puede terminar en casa; lo que no se puede
    es hacer la lectura crítica sin docente.
 
@@ -158,12 +163,12 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
 - **La pausa** (minutos 60-70).
 - **La votación de la slide 7 y la viz del barajado.** Sin la apuesta previa la clase se
   desinfla entera.
-- **Las slides 24-25** (la arquitectura es una teoría + cuándo es falsa). Es el objetivo real de
+- **Las slides 25-26** (la arquitectura es una teoría + cuándo es falsa). Es el objetivo real de
   la clase; las CNN son el vehículo.
-- **Las slides 28-30** (el caso y las tres preguntas). Es lo que hace que esta sea una clase de
+- **Las slides 29-31** (el caso y las tres preguntas). Es lo que hace que esta sea una clase de
   ciencias sociales y no de visión por computadora.
 
-Si tenés que elegir entre terminar el práctico 2 y hacer el bloque 28-30, hacé el bloque 28-30.
+Si tenés que elegir entre terminar el práctico 2 y hacer el bloque 29-31, hacé el bloque 29-31.
 
 ---
 
@@ -246,9 +251,10 @@ mundo, exactamente igual.
 
 - [ ] `slides.html` abre con doble clic, sin internet, y las cuatro viz cargan adentro.
 - [ ] Probaste las viz **sueltas** en pantalla completa: son las que vas a proyectar.
-- [ ] Corriste el notebook entero una vez esta semana (tarda ~1 minuto en CPU).
+- [ ] Corriste el notebook entero una vez esta semana (**tarda unos 2 minutos** en CPU:
+      medido acá, 116 s con la máquina tranquila; en Colab, más).
 - [ ] Tenés la alarma de la pausa puesta.
-- [ ] Sabés de memoria los cuatro números de la slide 27: **85,8 / 85,6 / 87,8 / 83,2**,
+- [ ] Sabés de memoria los cuatro números de la slide 28: **85,8 / 85,6 / 87,8 / 83,2**,
       y el par de la foto corrida: **32,3** contra **74,1**.
 - [ ] Si conseguiste una foto real de una movilización con licencia libre, ponela en la slide 3
       en lugar del esquema sintético. El esquema funciona, pero una foto de verdad funciona mejor.
