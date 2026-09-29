@@ -89,7 +89,7 @@
     <li>Apilando funciones simples con un doblez en el medio se dibuja
         <strong>cualquier</strong> figura. Eso es una red neuronal, y nada más que eso.</li>
     <li>Y quedó una bronca: <strong>las perillas las pusimos a mano</strong>.
-        Con ocho ya era un infierno.</li>
+        Con ocho rampas ya eran 25 perillas: un infierno.</li>
   </ul>
   <div class="ojo compacta">
     <strong>El número gris.</strong> En las dos clases hubo un número que decía «qué tan mal
@@ -112,11 +112,12 @@
   <p class="bajada">Los mismos datos de la clase 1: menciones a «seguridad» en los discursos
      de apertura de sesiones, 1984-2019. Dos rectas. No hay más información que ésta.</p>
   <div class="viz-frame" style="padding:8px" id="caja-rectas"></div>
-  <p class="viz-pie"><b>Votá:</b> <span class="c-modelo">azul</span>,
-     <span class="c-val">naranja</span>, o «no se puede decidir». A mano alzada, ahora.</p>
+  <p class="viz-pie"><b>Votá:</b> <span class="c-modelo">A (azul, continua)</span>,
+     <span class="c-val">B (naranja, punteada)</span>, o «no se puede decidir». A mano alzada, ahora.</p>
   <aside class="notes">
     <b>3-7 min. LA slide del gancho.</b> Proyectá y callate. Después: «¿cuál es mejor? Voten,
-    a mano alzada. Azul, naranja, o no se puede decidir».<br>
+    a mano alzada. A (la azul), B (la naranja), o no se puede decidir». Las dos rectas se
+    distinguen también por la letra y por el trazo (continua y punteada), no sólo por el color.<br>
     <b>Contá los votos en voz alta y anotalos en el pizarrón.</b> El aula se divide siempre.
     Preguntá a alguien de cada bando <i>por qué</i>. Las respuestas típicas:
     «la azul pasa más por el medio», «la naranja sigue mejor la subida del final»,
@@ -166,7 +167,7 @@
   <div class="viz-frame" style="padding:8px" id="caja-palitos"></div>
   <p>Ese número —el que resume todos los palitos en uno solo— se llama:</p>
   <ul class="glosario-lista">
-    <li><b>loss</b><span>pérdida — el nombre que vas a leer en el 95 % de los papers</span></li>
+    <li><b>loss</b><span>pérdida — el nombre que más vas a leer en los papers</span></li>
     <li><b>loss function</b><span>función de pérdida — la receta para calcularlo</span></li>
     <li><b>cost function</b><span>función de costo — lo mismo, otro nombre</span></li>
   </ul>
@@ -234,14 +235,14 @@
   <div class="comparacion tres">
     <div>
       <h4>(a) Es un error de tipeo</h4>
-      <p>Alguien cargó 15 donde iba 1,5. No querés que el modelo se rompa por eso.</p>
+      <p>Alguien cargó 1,5 donde iba 0,15. No querés que el modelo se rompa por eso.</p>
       <p class="c-val"><b>→ MAE</b></p>
     </div>
     <div>
       <h4>(b) Es <em>el</em> caso que te interesa</h4>
       <p>Es el año excepcional que motivó tu investigación. Un modelo que lo ignora
          no te sirve para nada.</p>
-      <p class="c-modelo"><b>→ MSE</b></p>
+      <p class="c-modelo"><b>→ MSE, o mejor: modelalo aparte</b></p>
     </div>
     <div>
       <h4>(c) No sabés cuál de las dos</h4>
@@ -250,17 +251,21 @@
     </div>
   </div>
   <div class="ss compacta">
-    La tradición del <em>case study</em> del caso desviado —Lipset, Ragin— es literalmente
-    la decisión de darle peso al outlier. MSE es «el caso raro me importa mucho»; MAE es
-    «quiero la tendencia general». El curso no toma partido: exige que elijas a conciencia.
+    <b>MSE es la recta de las medias; MAE, la de las medianas.</b> Una recta por MSE no
+    <em>explica</em> el año raro: sólo inclina la tendencia hacia él. La tradición del caso
+    desviado —Lipset, Ragin— lo estudia <em>aparte</em>. El curso no toma partido: exige
+    que elijas a conciencia.
   </div>
   <aside class="notes">
     <b>22-25 min.</b> «El paquete estadístico tiene un default. <b>El default es una posición
     teórica que alguien tomó por vos</b>.»<br>
-    Dato histórico útil si tenés medio minuto: el MSE se popularizó en buena medida porque
-    tiene <i>solución cerrada</i> —se podía resolver con lápiz y papel en 1805— y no porque
-    represente mejor el error que a vos te importa. Es una decisión de comodidad de cálculo
-    que quedó como norma. (Legendre y Gauss; está en las referencias.)<br>
+    Dato histórico útil si tenés medio minuto: el MSE se impuso en buena medida por
+    comodidad de cálculo —tiene <i>solución cerrada</i>, se podía resolver con lápiz y papel
+    en 1805— y también porque tiene una justificación estadística si los errores son
+    normales (Gauss, 1809). Ninguna de las dos razones es «representa mejor el error que a
+    vos te importa». (Legendre y Gauss; está en las referencias.)<br>
+    Si alguien viene de estadística: la recta del MSE estima la <b>media</b> condicional y la
+    del MAE la <b>mediana</b> condicional. La robustez de la mediana ya la conocen.<br>
     Pregunta al aula: «¿alguien tiene en su base un caso que es <i>el</i> caso?». Suele haber.
   </aside>
 </section>
@@ -377,8 +382,8 @@
   <p class="bajada">La misma idea, pintada: a cada recta posible le ponemos su loss como altura.</p>
   <div class="viz-frame mapa-angosto" style="padding:8px" id="caja-mapa"></div>
   <p class="viz-pie"><b>Qué mirar:</b> es un mapa topográfico, como los de senderismo.
-     Lo <span class="c-ok">claro</span> es hondo, lo <span class="c-error">rojo</span> es alto.
-     Queremos el fondo.</p>
+     Lo <span class="c-ok">claro</span> es hondo, lo <span class="c-error">rojo</span> es alto,
+     y las curvas de nivel se van cerrando alrededor del fondo. Queremos el fondo.</p>
   <aside class="notes">
     <b>46-48 min.</b> «Como un mapa de senderismo, pero al revés: acá queremos <b>bajar</b>.»<br>
     Señalá las curvas de nivel: «cada anillo es un conjunto de rectas que ajustan
@@ -422,7 +427,8 @@
     Contá los votos.<br>
     La respuesta es <b>C</b>, y casi nadie la vota: un poquito a la derecha baja
     (estamos a la izquierda del fondo), pero si me paso de largo vuelve a subir.
-    Ésa es exactamente la razón por la que el tamaño del paso va a importar tanto.<br>
+    Ésa es exactamente la razón por la que el largo del paso (y el learning rate, que lo
+    decide) va a importar tanto.<br>
     Volvé a la viz y hacelo: movete un poco a la derecha (baja), seguí (baja), seguí más
     (empieza a subir). Sin esta apuesta, la próxima media hora es decoración.
   </aside>
@@ -438,7 +444,7 @@
      perfectamente razonable. En el notebook lo hacemos con 14.400 y tarda menos de un segundo.
      (Los puntitos del dibujo son 40&times;26: diez mil no se distinguirían.)</p>
   <aside class="notes">
-    <b>54-56 min.</b> «Esto no es una estrategia tonta. Con dos perillas es lo que haría
+    <b>54-55 min.</b> «Esto no es una estrategia tonta. Con dos perillas es lo que haría
     cualquiera y está bien.» Que se sientan cómodos antes de la slide siguiente.
   </aside>
 </section>
@@ -449,11 +455,11 @@
   <table class="tabla-bruta">
     <tr><th>modelo</th><th>perillas</th><th>rectas a probar</th><th>cuánto tarda</th></tr>
     <tr><td>nuestra recta</td><td>2</td><td>10<sup>4</sup></td><td>menos de un parpadeo</td></tr>
-    <tr><td>una regresión con 3 variables</td><td>4</td><td>10<sup>8</sup></td><td>una décima de segundo</td></tr>
-    <tr class="muerte"><td>la red de 8 rampas de la clase 2</td><td>8</td><td>10<sup>16</sup></td>
+    <tr><td>una regresión con 3 variables</td><td>4</td><td>10<sup>8</sup></td><td>0,1 segundos</td></tr>
+    <tr class="muerte"><td>una regresión con 7 variables</td><td>8</td><td>10<sup>16</sup></td>
         <td class="muerte">115 días</td></tr>
-    <tr><td>una red chiquita</td><td>100</td><td>10<sup>200</sup></td>
-        <td class="muerte">10<sup>173</sup> edades del universo</td></tr>
+    <tr><td>la red de 8 rampas de la clase 2</td><td>25</td><td>10<sup>50</sup></td>
+        <td class="muerte">10<sup>23</sup> edades del universo</td></tr>
     <tr><td>el mini-GPT de la clase 8</td><td>1.500.000</td><td>10<sup>3.000.000</sup></td>
         <td class="muerte">no hay palabras</td></tr>
   </table>
@@ -461,10 +467,12 @@
      en el universo observable. Con cien valores por perilla y ocho perillas ya nos pasamos
      de todo lo razonable.</p>
   <aside class="notes">
-    <b>56-58 min.</b> Leé la tercera fila en voz alta y hacé una pausa.
-    «<b>Ocho perillas.</b> La red que armamos la clase pasada con ocho rampas. Ciento quince
-    días de computadora para encontrarle las perillas por fuerza bruta.»<br>
-    Los números salen de la celda 3 del notebook: cien valores por perilla, mil millones de
+    <b>55-56 min.</b> Leé la tercera fila en voz alta y hacé una pausa.
+    «<b>Ocho perillas.</b> Una regresión con siete variables, nada exótico. Ciento quince
+    días de computadora para encontrarle las perillas por fuerza bruta.» Y enseguida la
+    cuarta: «la red de ocho rampas de la clase pasada tiene 25 perillas: tres por rampa,
+    más la altura final. Ésa ya no se termina ni con todas las computadoras del mundo».<br>
+    Los números salen de la sección 3 del notebook: cien valores por perilla, mil millones de
     pruebas por segundo. Están calculados, no inventados.<br>
     «Se acabó la fuerza bruta. Hace falta otra cosa, y esa otra cosa es toda la clase.»
   </aside>
@@ -480,7 +488,7 @@
     Y con el paso siguiente, para dar el otro.
   </div>
   <aside class="notes">
-    <b>58-60 min.</b> Contala como una escena, no como un método: «están en una colina, hay
+    <b>56-57 min.</b> Contala como una escena, no como un método: «están en una colina, hay
     niebla cerrada, no ven ni sus manos. ¿Cómo bajan?».<br>
     Alguien va a decir «tanteando con el pie». Perfecto: «eso es literalmente el algoritmo».<br>
     <b>[EN CIENCIAS SOCIALES]</b> si tenés medio minuto: esto es racionalidad limitada de
@@ -496,13 +504,17 @@
   <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/loss-1d.html" title="la derivada como una resta" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> con el pasito grande, la línea turquesa está torcida.
-     Achicalo hasta 0,005 y se pega a la curva. <b>Ese número tiene un nombre elegante:
-     derivada.</b> Y lo acabás de calcular con una resta y una división.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> con el pasito de prueba grande, la línea turquesa
+     (el atajo hasta el pasito de la derecha) está torcida. Achicalo hasta 0,005 y se pega a
+     la curva. <b>Ese número tiene un nombre elegante: derivada.</b> Y lo acabás de calcular
+     con una resta y una división.</p>
   <aside class="notes">
-    <b>60-64 min. La slide donde se dice «derivada» por primera vez, y recién ahora.</b><br>
-    Guion exacto: «me muevo un poquito a la derecha: ¿subió o bajó? Me muevo un poquito a la
-    izquierda: ¿subió o bajó? Comparo. <b>Esa comparación es la derivada. No hay más.</b>»<br>
+    <b>57-60 min. La slide donde se dice «derivada» por primera vez, y recién ahora.</b><br>
+    Guion exacto: «me muevo un poquito a la derecha: ¿subió o bajó? ¿Y cuánto subió o bajó,
+    por cada unidad que me moví? <b>Esa cuenta es la derivada. No hay más.</b>» Los dos
+    números del panel (un pasito para cada lado) sirven para <i>sentir</i> para dónde baja;
+    la cuenta de la pendiente usa sólo el de la derecha. En el notebook se prueba para los
+    dos lados y se promedia, que con el mismo pasito da más preciso.<br>
     Movés el pasito de 0,30 a 0,005 delante de ellos y mostrás cómo el número se estaciona.<br>
     <b>Si el aula viene lenta, ésta es la viz a la que hay que darle más tiempo</b>, más que
     al valle. Es la que hace que nadie necesite haber estudiado cálculo.
@@ -517,6 +529,9 @@
     Estirá las piernas. Si el mapa de la loss no te cerró, éste es el momento de
     preguntarlo sin levantar la mano delante de treinta personas.
   </p>
+  <aside class="notes">
+    <b>60-70 min.</b> La pausa no se toca, aunque vengas atrasado.
+  </aside>
 </section>
 
 <!-- ======================== 20. EL GRADIENTE ======================== -->
@@ -533,7 +548,8 @@
     <div>
       <h4>Qué hacemos con él</h4>
       <p class="enorme" style="font-size:1.3em;margin:.1em 0">Ir para el lado contrario.</p>
-      <p style="font-size:.85em">Por eso el signo menos: <code>a = a − paso × pendiente</code>.</p>
+      <p style="font-size:.85em">Por eso el signo menos: <code>a = a − lr × pendiente</code>.
+         El <b>lr</b> es un multiplicador: el paso de verdad es lr × pendiente.</p>
     </div>
   </div>
   <aside class="notes">
@@ -561,8 +577,9 @@
     <b>73-79 min.</b> Apretá <b>«soltar la pelota»</b> con el paso en 0,15 y no hables hasta
     que frene.<br>
     Después, la pregunta: <b>«¿por qué se van acortando los pasos, si nadie los acortó?»</b>.
-    Aguantá el silencio. La respuesta: porque el paso es proporcional a la pendiente, y cerca
-    del fondo el terreno se aplana. La pelota frena sola.<br>
+    Aguantá el silencio. La respuesta: porque el paso es lr × pendiente. El lr no cambia,
+    pero cerca del fondo el terreno se aplana, la pendiente se achica y el paso con ella.
+    La pelota frena sola.<br>
     Repetilo desde tres lugares distintos con «soltarla desde otro lugar»: siempre llega al
     mismo fondo. <b>Sembralo</b>: «acuérdense de esto para dentro de diez minutos».<br>
     Y ahora subí el paso a <b>1.5</b> y volvé a soltarla. Alguien va a decir algo en voz alta.
@@ -570,17 +587,20 @@
   </aside>
 </section>
 
-<!-- ======================== 22. VIZ: EL TAMAÑO DEL PASO ======================== -->
+<!-- ======================== 22. VIZ: EL LEARNING RATE ======================== -->
 <section>
   <span class="marca">viz</span>
-  <h3>El paso: <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span></h3>
+  <h3>El multiplicador del paso: <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span></h3>
   <div class="viz-frame" data-alto="viz3">
     <iframe src="viz/tasa-de-aprendizaje.html" title="tres learning rates en paralelo" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> no los mapas, <b>las tres curvas de abajo</b>. El quiz de firmas se scrollea en el panel.</p>
   <aside class="notes">
-    <b>79-85 min.</b> «Izquierda: paso microscópico, no llega nunca. Centro: bien.
-    Derecha: se va del mapa.»<br>
+    <b>79-85 min.</b> «Izquierda: lr microscópico; baja tan poco que en 60 pasos casi no se
+    movió, y le faltarían miles. Centro: bien. Derecha: se va del mapa.»<br>
+    Definilo bien una vez: <b>el learning rate no es el largo del paso, es el número que
+    multiplica a la pendiente</b>. Por eso, con el mismo lr, los pasos se achican solos cerca
+    del fondo.<br>
     <b>Insistí en que miren abajo, no arriba.</b> Repetilo: «nadie puede dibujar un valle de
     un millón y medio de dimensiones. El mapa es un lujo que tenemos hoy porque el modelo
     tiene dos perillas. Lo único que van a tener el resto del curso es la curva de loss».<br>
@@ -597,15 +617,17 @@
     <div class="viz-frame" style="padding:6px" id="caja-sintoma-3"></div>
   </div>
   <div class="aha">
-    <b>Casi plana y alta</b> → el paso es muy chico: subilo (×10).
+    <b>Casi plana y alta</b> → el lr es muy chico: subilo (×10).
     <b>Cae y se aplana abajo</b> → así tiene que verse.
-    <b>Sube</b> → el paso es muy grande: bajalo (÷10).
+    <b>La tendencia sube</b> → el lr es muy grande: bajalo (÷10).
   </div>
   <aside class="notes">
     <b>85-88 min.</b> Ésta es la slide que se van a acordar en la clase 4 y en la 8.
     Pediles que le saquen una foto: no es una broma, hacelo.<br>
     «Cuando entrenen y vean una de estas dos formas raras, ya saben qué perilla tocar. Y la
-    regla es una sola: <b>si sube, dividí el learning rate por diez</b>.»<br>
+    regla es una sola: <b>si la tendencia sube, dividí el learning rate por diez</b>.»
+    Decí lo de «tendencia» en voz alta: desde la clase 4 se entrena con mini-batches y la
+    curva siempre tiembla un poco. Un temblor no es una subida.<br>
     Los tres gráficos salen del notebook, sección 6: son corridas reales sobre estos datos.
   </aside>
 </section>
@@ -616,13 +638,13 @@
   <h2>Bloque práctico 2 — de a dos</h2>
   <div class="manos">
     Notebook, <strong>secciones 4 a 6</strong>. Veinte minutos. De a dos, y turnándose
-    el teclado cada diez.
+    el teclado cada diez. Cada <code>TODO</code> se contesta <em>en la celda</em>.
   </div>
   <ol>
     <li>Corré el descenso completo (sección 5). Mirá los <strong>tres gráficos</strong>.</li>
-    <li><code>TODO 3</code>: poné <code>lr = 1.5</code>. Rompelo. Mirá el signo de <code>a</code>
-        en los primeros cinco pasos.</li>
-    <li><code>TODO 4</code>: poné <code>lr = 0.000001</code>. ¿Llegó? ¿Cuántas iteraciones
+    <li><code>TODO 3</code>: con <code>lr = 1.5</code>, rompelo. ¿El signo de <code>a</code>
+        se queda igual o alterna en los primeros cinco pasos?</li>
+    <li><code>TODO 4</code>: con <code>lr = 0.000001</code>, ¿llegó? ¿Cuántas iteraciones
         harían falta?</li>
     <li><code>TODO 5</code>: arrancá desde <code>a=-5, b=50</code>. ¿Llega al mismo lugar?</li>
   </ol>
@@ -728,13 +750,18 @@
   <div class="ss">
     <strong>Mínimo local = equilibrio subóptimo estable.</strong> El sistema se acomoda en
     una configuración que nadie elegiría de cero, y salir cuesta. <em>Path dependence</em>,
-    <em>lock-in</em> institucional: la analogía es exacta, no decorativa.
+    <em>lock-in</em> institucional: como mecanismo, la analogía es exacta. Como frecuencia,
+    no: con millones de perillas los pozos malos casi nunca son el problema en la práctica.
+    Lo que más traba son las mesetas y las sillas de montar.
   </div>
   <p class="viz-pie">Probalo vos: en <code>viz/valle-de-loss.html</code>, elegí
      <b>«uno con dos pozos»</b> y soltá la pelota desde dos lugares distintos.</p>
   <aside class="notes">
     <b>114-116 min.</b> Abrí la viz y hacelo: dos pozos, dos puntos de partida, dos finales
-    distintos. Treinta segundos y cierra la pregunta que hicieron en la slide 25.<br>
+    distintos. Treinta segundos y cierra la pregunta que hicieron en la slide 26.<br>
+    Si alguien se entusiasma con el <i>lock-in</i>, agregá la salvedad de la caja: el
+    mecanismo es ése, pero en redes grandes quedarse en un pozo malo es raro. Lo que suele
+    frenar al descenso son las mesetas.<br>
     La frase para el final: «esto es un campo con muchísima más ingeniería que teoría, y eso
     hay que tenerlo en la cabeza cuando leen un paper que suena muy seguro de sí mismo».<br>
     <b>Decirlo genera confianza y vacuna contra la mistificación.</b> No lo saltees ni aunque
@@ -760,16 +787,17 @@
   <aside class="notes">
     <b>116-117 min.</b> Esta slide es de un minuto y no más.<br>
     «Van a ver <code>Adam</code> en todos lados. Traducción: <i>la pelota con inercia y con
-    paso que se autorregula</i>. Con eso alcanza para leer el 99 % de los papers.»<br>
+    paso que se autorregula</i>. Con eso alcanza para leer casi cualquier paper.»<br>
     Si alguien pregunta cuál usar: Adam con lr=0.001 como punto de partida, y si la curva
-    hace cosas raras, tocás el lr. Es literalmente lo que hace todo el mundo.
+    hace cosas raras, tocás el lr. Adam ajusta el paso de cada perilla, pero el lr lo sigue
+    eligiendo uno. Es literalmente lo que hace todo el mundo.
   </aside>
 </section>
 
-<!-- ======================== 30. EL LUNES ======================== -->
+<!-- ======================== 30. EN TU INVESTIGACIÓN ======================== -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué te llevás para el lunes</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué te llevás a tu investigación</h2>
   <div class="ss">
     Cuando leas <em>«el modelo fue optimizado»</em>, anotá al margen una pregunta:
     <strong>¿optimizado para minimizar qué?</strong>
@@ -784,7 +812,8 @@
     <small>y que casi siempre encuentra algo.</small></p>
   <aside class="notes">
     <b>117-118 min.</b> Dalo como una herramienta concreta, no como
-    una moraleja. «Esto lo pueden usar el lunes, en el paper que tengan arriba del escritorio.»<br>
+    una moraleja. «Esto lo pueden usar la próxima vez que abran un paper, empezando por el que
+    tengan arriba del escritorio.»<br>
     Si hay tiempo, pediles un ejemplo de su propia área. Sale siempre y suele ser bueno.
   </aside>
 </section>
@@ -822,15 +851,15 @@
         hacen caso a casos distintos. Elegir una es declarar qué error te duele más.</li>
     <li><strong>El gradiente es una resta.</strong> «Me muevo un poquito para allá: ¿sube o
         baja?». No hace falta cálculo para entenderlo ni para calcularlo.</li>
-    <li><strong>La curva de loss se lee.</strong> Plana y alta: paso chico. Cae y se aplana:
-        bien. Sube: paso grande, dividilo por diez.</li>
+    <li><strong>La curva de loss se lee.</strong> Plana y alta: lr chico. Cae y se aplana:
+        bien. La tendencia sube: lr grande, dividilo por diez.</li>
   </ol>
   <div class="aha compacta">
     Si te llevás sólo una: <b>«¿optimizado para minimizar qué?»</b>.
   </div>
   <aside class="notes">
     <b>119 min.</b> Tres, no cuatro. Decilas mirando al aula, no a la pantalla.
-    Si tuvieras que elegir una sola para que sobreviva a la semana, es la primera.
+    Si tuvieras que elegir una sola para que sobreviva hasta la próxima clase, es la primera.
   </aside>
 </section>
 
@@ -840,11 +869,11 @@
   <ul class="glosario-lista glosario-dos">
     <li><b>loss</b><span>pérdida — el número que dice qué tan mal la estás dibujando</span></li>
     <li><b>MSE</b><span>error cuadrático medio — el promedio de los errores al cuadrado</span></li>
-    <li><b>MAE</b><span>error absoluto medio — el promedio de los errores, sin signo</span></li>
+    <li><b>MAE</b><span>error absoluto medio — el promedio de los errores, sin signo; cada caso empuja con la misma fuerza</span></li>
     <li><b>optimization</b><span>optimización — buscar las perillas que minimizan un número</span></li>
     <li><b>gradient</b><span>gradiente — para dónde sube la loss si movés cada perilla</span></li>
     <li><b>gradient descent</b><span>descenso por gradiente — ir al revés del gradiente, a pasitos</span></li>
-    <li><b>learning rate</b><span>tasa de aprendizaje — de qué tamaño es cada pasito</span></li>
+    <li><b>learning rate</b><span>tasa de aprendizaje — el número que multiplica a la pendiente: paso = lr × pendiente</span></li>
     <li><b>batch / mini-batch</b><span>lote — cuántos datos mira cada paso: censo o muestra</span></li>
     <li><b>SGD</b><span>descenso estocástico — el descenso con muestras en vez de censo</span></li>
     <li><b>backpropagation</b><span>retropropagación — cómo se calculan todos los gradientes de una pasada</span></li>
@@ -853,7 +882,7 @@
   </ul>
   <aside class="notes">
     <b>119 min.</b> No la leas entera: se muestra y se pasa. Señalá tres: <i>loss</i>, <i>learning rate</i> y
-    <i>gradient descent</i>. «Si mañana leen estas tres en un paper, ya saben qué son.»
+    <i>gradient descent</i>. «La próxima vez que lean estas tres en un paper, ya saben qué son.»
     Todos están en <code>recursos/glosario.md</code>.
   </aside>
 </section>
@@ -882,7 +911,8 @@
      Y descubrimos que un modelo puede sacarse un 99 % y ser un desastre.</p>
   <aside class="notes">
     <b>119-120 min.</b> La promesa se tiene que poder cobrar: «las diez líneas que escribieron
-    hoy se van a convertir en tres palabras, y van a sentir que se ganaron la abstracción».<br>
+    hoy se van a convertir en cinco líneas de PyTorch, y las dos restas del gradiente en dos
+    palabras, <code>loss.backward()</code>. Van a sentir que se ganaron la abstracción».<br>
     Y la pregunta abierta con la que se van: «si el modelo puede bajar la loss todo lo que
     quiera… ¿qué le impide simplemente <i>memorizar</i> los 36 años?». No la contestes.
   </aside>
@@ -978,7 +1008,14 @@
   function recta(r) { return anio => r.a * ((anio - 2001.5) / 10) + r.b; }
 
   const planos = [];
-  function nuevoPlano(sel, op) { const p = Viz.plano(sel, op); planos.push(p); return p; }
+  // Cada canvas lleva un rótulo para lectores de pantalla (el dibujo solo no se lee).
+  function nuevoPlano(sel, op, rotulo) {
+    const p = Viz.plano(sel, op);
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', rotulo || op.titulo || 'gráfico');
+    planos.push(p);
+    return p;
+  }
 
   /* --- slide 3: el gancho, dos rectas sobre la misma nube ---------------- */
   (function () {
@@ -986,16 +1023,17 @@
       xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 400,
       ejeX: 'año', ejeY: '% de palabras del discurso',
       titulo: 'menciones a «seguridad» en la apertura de sesiones'
-    });
+    }, 'Menciones a seguridad por año, 1984-2019, con dos rectas: A, azul y continua, ' +
+       'que minimiza el MSE; B, naranja y punteada, que minimiza el MAE. B sube un poco más.');
     p.alDibujar(() => {
       p.fondo(); p.grilla();
       p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
       p.curva(recta(R_MSE), { color: 'modelo', grosor: 4.5 });
-      p.curva(recta(R_MAE), { color: 'val', grosor: 4.5 });
+      p.curva(recta(R_MAE), { color: 'val', grosor: 4.5, punteada: [12, 7] });
       p.puntos(NUBE, { color: 'datos', r: 5 });
-      p.texto(2020, recta(R_MSE)(2020), 'azul', { color: 'modelo', tam: 15, peso: '700',
+      p.texto(2020, recta(R_MSE)(2020), 'A · azul', { color: 'modelo', tam: 15, peso: '700',
               alinear: 'right', dy: 18, caja: true });
-      p.texto(2020, recta(R_MAE)(2020), 'naranja', { color: 'val', tam: 15, peso: '700',
+      p.texto(2020, recta(R_MAE)(2020), 'B · naranja', { color: 'val', tam: 15, peso: '700',
               alinear: 'right', dy: -18, caja: true });
     });
     p.tooltip(w => {
@@ -1011,7 +1049,8 @@
       xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 300,
       ejeX: 'año', ejeY: '% de palabras',
       titulo: 'cada palito rojo es el error de un año'
-    });
+    }, 'La serie de seguridad con la recta del MSE; un segmento vertical por año marca ' +
+       'el error de ese año. Loss = ' + Viz.num(LOSS_MIN, 4) + '.');
     const f = recta(R_MSE);
     p.alDibujar(() => {
       p.fondo(); p.grilla();
@@ -1031,7 +1070,7 @@
       xmin: -0.35, xmax: 0.35, ymin: 0, ymax: 0.12, alto: 250,
       ejeX: 'error de un caso', ejeY: 'cuánto lo castigo',
       titulo: 'MSE: la parábola'
-    });
+    }, 'El castigo del MSE: una parábola. Los errores de cada año, elevados al cuadrado.');
     c1.alDibujar(() => {
       c1.fondo(); c1.grilla();
       c1.ejes({ formatoX: v => Viz.num(v, 1), formatoY: v => Viz.num(v, 2) });
@@ -1042,7 +1081,7 @@
       xmin: -0.35, xmax: 0.35, ymin: 0, ymax: 0.35, alto: 250,
       ejeX: 'error de un caso', ejeY: 'cuánto lo castigo',
       titulo: 'MAE: la V'
-    });
+    }, 'El castigo del MAE: una V. Los errores de cada año, en valor absoluto.');
     c2.alDibujar(() => {
       c2.fondo(); c2.grilla();
       c2.ejes({ formatoX: v => Viz.num(v, 1), formatoY: v => Viz.num(v, 2) });
@@ -1057,7 +1096,7 @@
       xmin: 1982, xmax: 2021, ymin: -0.04, ymax: 0.50, alto: 350,
       ejeX: 'año', ejeY: '% de palabras',
       titulo: 'el mundo: acá hay años y porcentajes'
-    });
+    }, 'Los datos por año con la recta del MSE.');
     izq.alDibujar(() => {
       izq.fondo(); izq.grilla();
       izq.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
@@ -1070,7 +1109,8 @@
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 350,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'el mapa: acá hay rectas, y nada más que rectas'
-    });
+    }, 'El mapa de la loss: el eje horizontal es la inclinación, el vertical la altura. ' +
+       'El punto marcado es la recta de la izquierda.');
     der.alDibujar(() => {
       der.fondo();
       der.mapaDeCalor(lossDe, { n: 120, paleta: 'loss', log: true });
@@ -1086,9 +1126,10 @@
   (function () {
     const p = nuevoPlano('#caja-mapa', {
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 430,
-      ejeX: 'qué tan empinada (puntos por década)', ejeY: 'dónde arranca (valor en 2001)',
+      ejeX: 'qué tan empinada (puntos por década)', ejeY: 'dónde arranca (valor a mitad de 2001-2002)',
       titulo: 'el paisaje de la loss: cada punto es una recta entera'
-    });
+    }, 'Mapa topográfico de la loss: un pozo redondo con el fondo marcado; la loss sube ' +
+       'hacia los bordes.');
     p.alDibujar(() => {
       p.fondo();
       p.mapaDeCalor(lossDe, { n: 150, paleta: 'loss', log: true });
@@ -1108,9 +1149,10 @@
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 400,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'la grilla, probada punto por punto (acá se dibuja más rala para que se vea)'
-    });
+    }, 'El mapa de la loss cubierto por una grilla de puntos; la mejor recta de la grilla ' +
+       'está marcada.');
     // la grilla que se dibuja es de 40x26 para que se vea; la del notebook es
-    // de 120x120 y tarda dos segundos
+    // de 120x120 y tarda menos de un segundo
     const puntos = [];
     for (let i = 0; i < 40; i++) {
       for (let j = 0; j < 26; j++) {
@@ -1134,7 +1176,8 @@
       xmin: 0, xmax: 10, ymin: 0, ymax: 4.2, alto: 340,
       titulo: 'estás acá, y no ves más allá de tus pies',
       margen: { i: 20, d: 20, a: 30, b: 20 }
-    });
+    }, 'Dibujo: una persona en una colina con niebla a los dos lados. Sólo ve el suelo ' +
+       'justo alrededor de sus pies: a un lado más alto, al otro más bajo.');
     // una colina cualquiera, con dos pozos. Es un dibujo, no un dato.
     const colina = t => 2.6 - 1.15 * Math.exp(-Math.pow((t - 3.2) / 1.5, 2))
                             - 1.55 * Math.exp(-Math.pow((t - 7.4) / 1.6, 2))
@@ -1183,7 +1226,8 @@
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 340,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'la flecha, en el mismo mapa de antes'
-    });
+    }, 'El mapa de la loss con dos flechas desde un punto arriba a la izquierda: el ' +
+       'gradiente, que apunta cuesta arriba, y la contraria, hacia donde vamos.');
     const pa = -0.30, pb = 0.33;
     p.alDibujar(() => {
       p.fondo();
@@ -1220,11 +1264,11 @@
       return h;
     }
     const casos = [
-      { sel: '#caja-sintoma-1', t: 'paso muy chico (0,000001)', h: correr(0.000001, 200),
+      { sel: '#caja-sintoma-1', t: 'lr muy chico (0,000001)', h: correr(0.000001, 200),
         color: 'val', techo: 0.25, xmax: 200, pie: 'casi plana y ALTA' },
-      { sel: '#caja-sintoma-2', t: 'paso bien (0,05)', h: correr(0.05, 200),
+      { sel: '#caja-sintoma-2', t: 'lr bien (0,05)', h: correr(0.05, 200),
         color: 'ok', techo: 0.25, xmax: 200, pie: 'cae y se aplana ABAJO' },
-      { sel: '#caja-sintoma-3', t: 'paso muy grande (1,5)', h: correr(1.5, 40),
+      { sel: '#caja-sintoma-3', t: 'lr muy grande (1,5)', h: correr(1.5, 40),
         color: 'error', techo: 1.0, xmax: 20, pie: 'se va para ARRIBA' }
     ];
     for (const c of casos) {
@@ -1232,7 +1276,7 @@
         xmin: 0, xmax: c.xmax, ymin: 0, ymax: c.techo, alto: 250,
         ejeX: 'iteración', ejeY: 'loss', titulo: c.t,
         margen: { i: 64, d: 12, a: 28, b: 34 }
-      });
+      }, 'Curva de loss con ' + c.t + ': ' + c.pie + '.');
       p.alDibujar(() => {
         p.fondo(); p.grilla();
         p.ejes({ formatoY: v => Viz.num(v, 2) });
@@ -1260,7 +1304,8 @@
       xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445, alto: 250,
       ejeX: 'qué tan empinada', ejeY: 'dónde arranca',
       titulo: 'los dos rastros llegan al mismo lugar; uno tiembla'
-    });
+    }, 'Dos rastros sobre el mapa de la loss: el censo, continuo y parejo, y la muestra, ' +
+       'punteado y tembloroso. Los dos llegan al fondo.');
     // censo: el gradiente con los 36 años
     const censo = [];
     (function () {
@@ -1272,7 +1317,8 @@
         censo.push({ x: a, y: b });
       }
     })();
-    // muestra: 5 años al azar por paso, con semilla fija
+    // muestra: 5 años distintos al azar por paso (sin reposición, como en el
+    // notebook), con semilla fija
     const muestra = [];
     (function () {
       const rnd = Viz.azar(1983);
@@ -1280,8 +1326,12 @@
       muestra.push({ x: a, y: b });
       for (let i = 0; i < 60; i++) {
         let ga = 0, gb = 0;
-        for (let k = 0; k < 5; k++) {
+        const elegidos = [];
+        while (elegidos.length < 5) {
           const j = Math.floor(rnd() * XS.length);
+          if (elegidos.indexOf(j) < 0) elegidos.push(j);
+        }
+        for (const j of elegidos) {
           const e = YS[j] - (a * XS[j] + b);
           ga += -2 * XS[j] * e; gb += -2 * e;
         }
@@ -1293,12 +1343,12 @@
       p.fondo();
       p.mapaDeCalor(lossDe, { n: 130, paleta: 'loss', log: true });
       p.ejes({ formatoX: v => Viz.num(v, 2), formatoY: v => Viz.num(v, 2) });
-      p.linea(muestra, { color: 'val', grosor: 2.2 });
+      p.linea(muestra, { color: 'val', grosor: 2.2, punteada: [6, 4] });
       p.linea(censo, { color: 'modelo', grosor: 3 });
       p.punto(R_MSE.a, R_MSE.b, { color: 'ok', r: 6 });
       p.leyenda([
         { color: 'modelo', texto: 'censo: los 36 años en cada paso', forma: 'linea' },
-        { color: 'val', texto: 'muestra: 5 años al azar por paso', forma: 'linea' }
+        { color: 'val', texto: 'muestra: 5 años al azar por paso', forma: 'linea', punteada: true }
       ], { pos: 'bd' });
     });
   })();

@@ -51,7 +51,7 @@
     <p>Quince años de la serie de «seguridad». Dos rectas, calculadas en vivo sobre
        <em>los mismos</em> datos: la <span class="c-modelo"><b>azul</b></span> es la que
        minimiza el <b>MSE</b> (los errores al cuadrado) y la
-       <span class="c-val"><b>naranja</b></span> es la que minimiza el <b>MAE</b>
+       <span class="c-val"><b>naranja</b></span> (punteada) es la que minimiza el <b>MAE</b>
        (los errores en valor absoluto). Agarrá cualquier punto con el mouse y subilo
        o bajalo. Ninguna de las dos rectas es «la correcta»: son dos criterios distintos.</p>
   </header>
@@ -122,8 +122,10 @@ function mae(a, b) {
   return s / nube.length;
 }
 
-/* La recta que minimiza el MSE sale de una fórmula cerrada (por eso el MSE se
-   hizo popular en el siglo XIX: se podía resolver con lápiz). */
+/* La recta que minimiza el MSE sale de una fórmula cerrada. Ésa es una de las
+   razones por las que el MSE se impuso en el siglo XIX (se podía resolver con
+   lápiz); la otra es que tiene justificación estadística si los errores son
+   normales. Es la recta de las MEDIAS; la del MAE, la de las MEDIANAS. */
 function rectaMSE() {
   let sx = 0, sy = 0;
   for (const d of nube) { sx += aX(d.x); sy += d.y; }
@@ -171,6 +173,10 @@ const p = Viz.plano('#lienzo', {
   titulo: 'menciones a "seguridad" — dos criterios, dos rectas',
   alto: 300
 });
+p.canvas.setAttribute('role', 'img');
+p.canvas.setAttribute('aria-label', 'Quince años de la serie de seguridad, con dos rectas: ' +
+  'la azul y continua minimiza el MSE; la naranja y punteada minimiza el MAE. Los puntos ' +
+  'se pueden arrastrar; las pendientes de las dos rectas están en el panel.');
 
 p.alDibujar(function () {
   p.fondo(); p.grilla();
@@ -186,7 +192,8 @@ p.alDibujar(function () {
   }
 
   p.curva(function (x) { return RMSE.a * aX(x) + RMSE.b; }, { color: 'modelo', grosor: 3.5 });
-  p.curva(function (x) { return RMAE.a * aX(x) + RMAE.b; }, { color: 'val', grosor: 3.5 });
+  p.curva(function (x) { return RMAE.a * aX(x) + RMAE.b; },
+          { color: 'val', grosor: 3.5, punteada: [10, 6] });
 
   p.puntos(nube, { color: 'datos', r: 6 });
   if (resaltado !== null) {
@@ -199,7 +206,7 @@ p.alDibujar(function () {
   p.leyenda([
     { color: 'datos', texto: 'los años (arrastrables)' },
     { color: 'modelo', texto: 'la recta del MSE', forma: 'linea' },
-    { color: 'val', texto: 'la recta del MAE', forma: 'linea' },
+    { color: 'val', texto: 'la recta del MAE', forma: 'linea', punteada: true },
     { color: 'error', texto: 'el desajuste contra la azul', forma: 'linea' }
   ], { pos: 'ai' });
 });
@@ -229,6 +236,12 @@ const pc2 = Viz.plano('#castigo-mae', {
   ejeX: 'error de un caso', ejeY: 'castigo',
   titulo: 'MAE: el castigo es el error, y nada más', alto: 165
 });
+pc1.canvas.setAttribute('role', 'img');
+pc1.canvas.setAttribute('aria-label', 'El castigo del MSE: una parábola, con el error de ' +
+  'cada año elevado al cuadrado.');
+pc2.canvas.setAttribute('role', 'img');
+pc2.canvas.setAttribute('aria-label', 'El castigo del MAE: una V, con el error de cada año ' +
+  'en valor absoluto.');
 
 pc1.alDibujar(function () {
   pc1.fondo(); pc1.grilla();

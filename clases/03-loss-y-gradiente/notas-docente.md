@@ -47,7 +47,7 @@ el modelo; el pulso lo pone el gradiente.»*
 | 0:25 | 10 | **Manos 1a** | Notebook sección 1 + `TODO 1`. **15 minutos de trabajo.** |
 | 0:40 | 11-13 | Idea 2a | Reformular el problema · **el salto conceptual** · el mapa de altura. |
 | 0:48 | 14-15 | **Viz 2** + apuesta | `valle-de-loss.html` en modo arrastrar. Se vota antes de mover. |
-| 0:54 | 16-18 | Idea 2b | Fuerza bruta, la tabla que la mata, la niebla. |
+| 0:54 | 16-18 | Idea 2b | Fuerza bruta (0:54), la tabla que la mata (0:55), la niebla (0:56). |
 | 0:57 | 19 | **Viz 3** | `loss-1d.html`. **Acá se dice «derivada» por primera vez.** |
 | **1:00** | 20 | **PAUSA** | **10 minutos. No se toca.** |
 | 1:10 | 21 | El gradiente | La flecha y el signo menos, en el pizarrón, con un número. |
@@ -56,9 +56,14 @@ el modelo; el pulso lo pone el gradiente.»*
 | 1:28 | 25 | **Manos 2** | Notebook secciones 4 a 6, de a dos. **20 minutos.** |
 | 1:48 | 26 | Volvimos | Se proyecta una curva rota del aula. |
 | 1:50 | 27-30 | Cierre conceptual | Censo/muestra · backprop · la honestidad · optimizadores. |
-| 1:57 | 31-36 | Salida | `[EL LUNES]` · la escalera · qué te llevás · glosario · el puente. |
+| 1:57 | 31-36 | Salida | `[EN TU INVESTIGACIÓN]` · la escalera · qué te llevás · glosario · el puente. |
 
-Suma: 120 minutos exactos, con la pausa adentro.
+Suma: 120 minutos exactos, con la pausa adentro. Los minutos de las notas del orador de
+cada slide siguen esta misma tabla (la pausa va de 1:00 a 1:10).
+
+**Numeración.** Los números de slide de estas notas son los que muestra reveal en pantalla,
+que cuenta la pausa como la slide 20. Los comentarios del HTML de `slides.html` no la
+cuentan: del gradiente en adelante, van uno atrás.
 
 **Ojo con el minuto 57.** La viz `loss-1d` está *justo antes* de la pausa a propósito: es la
 que hace que nadie necesite haber estudiado cálculo, y conviene que la digieran con un café
@@ -111,13 +116,15 @@ A, B o C, a mano alzada, **antes** de tocar nada.
 
 La respuesta es **C: depende de cuánto me mueva**, y casi nadie la vota. Un poquito a la
 derecha baja; si me paso de largo, vuelve a subir. Y ésa es *exactamente* la razón por la
-que dentro de veinte minutos el tamaño del paso va a importar tanto. Sin esta apuesta, la
-viz del learning rate es un dibujito lindo.
+que dentro de veinte minutos el largo del paso (y el learning rate, que lo decide) va a
+importar tanto. Sin esta apuesta, la viz del learning rate es un dibujito lindo.
 
 ### Minuto 78 — «¿Por qué se acortan los pasos, si nadie los acortó?» (slide 22)
 
-Aguantá el silencio quince segundos. La respuesta: **el paso es proporcional a la pendiente,
-y cerca del fondo el terreno se aplana**. La pelota frena sola. Nadie la frenó.
+Aguantá el silencio quince segundos. La respuesta: **el paso es lr × pendiente; el lr no
+cambia, pero cerca del fondo el terreno se aplana y la pendiente se achica**. La pelota
+frena sola. Nadie la frenó. Es el momento de fijar la definición: el learning rate no es
+el largo del paso, es el número que multiplica a la pendiente.
 
 ### Minuto 108 — «¿Quién lo rompió mejor?» (slide 26)
 
@@ -156,9 +163,15 @@ el efecto.
 ### 4.5 «MSE es el correcto; MAE es una alternativa rara»
 Toman el default como verdad.
 *Cómo se desarma:* la viz 1 más los tres escenarios de la slide 8. Y el dato histórico:
-**el MSE se popularizó en buena medida porque tenía solución cerrada** —se podía resolver
-con lápiz y papel a principios del siglo XIX— y no porque represente mejor el error que a
-vos te importa. Es una decisión de comodidad de cálculo que quedó como norma.
+**el MSE se impuso en buena medida por comodidad de cálculo** —tiene solución cerrada, se
+podía resolver con lápiz y papel a principios del siglo XIX— y también porque tiene una
+justificación estadística si los errores son normales (Gauss). Ninguna de las dos razones
+es «representa mejor el error que a vos te importa».
+Para quien viene de estadística, la traducción más útil: **la recta del MSE es la de las
+medias condicionales; la del MAE, la de las medianas**. La robustez de la mediana ya la
+conocen. Y ojo con el escenario (b) de la slide 8: una recta por MSE no *explica* el caso
+excepcional, sólo inclina la tendencia de todos los demás hacia él. Si ese caso es el tema,
+muchas veces lo mejor es estudiarlo aparte.
 
 ### 4.6 Comparar el número del MSE con el del MAE
 **Aparece en el práctico 1a, sin falta.** «El MSE me dio 0,014 y el MAE 0,090, así que el MSE
@@ -169,8 +182,12 @@ las perillas.
 ### 4.7 Creer que el learning rate se calcula
 Piden la fórmula del lr óptimo. No hay.
 *Respuesta honesta:* **«se prueba, se mira la curva, se ajusta. Es artesanía y la hacemos
-todos.»** Dales el rango práctico (0,1 a 0,0001) y la heurística: si la loss sube, dividí
-por diez.
+todos.»** Dales el rango práctico (0,1 a 0,0001) y la heurística: si la **tendencia** de la
+loss sube, dividí por diez. Lo de «tendencia» importa: desde la clase 4 se entrena con
+mini-batches y la curva siempre tiembla un poco.
+Y de paso fijá la definición: **el learning rate es el número que multiplica a la
+pendiente** (paso = lr × pendiente), no el largo del paso. En este valle, cualquier lr
+mayor que 0,93 explota: sale de la curvatura de estos datos, no es una constante general.
 
 ### 4.8 Perderse en el signo menos
 `a = a - lr * pendiente`: no entienden por qué menos.
@@ -183,11 +200,19 @@ palabras, no.
 dónde y cuánto; backprop es sólo la manera eficiente de calcular el gradiente.** Slide 28.
 
 ### 4.10 (Bonus, del práctico) «Con lr=1.5 el número se congela»
-Van a ver que la loss explota y después se queda quieta en 2,67e+25 en vez de seguir
-creciendo. **No es un bug de ellos.** Es que la derivada-por-resta se rompe con números
+Van a ver que la loss explota y después se queda quieta en 2,67e+25 (desde el paso 37,
+dentro de los 40 que corre la celda) en vez de seguir creciendo. **No es un bug de ellos.** Es que la derivada-por-resta se rompe con números
 gigantescos: `loss(a+h)` y `loss(a-h)` dejan de distinguirse en punto flotante. Está
 explicado en el notebook, arriba del `TODO 4`, y es un puente perfecto a la slide de
 backpropagation: *«por eso las bibliotecas de verdad no usan restas».*
+
+### 4.11 (Del práctico) «Me sale ✱ aunque corrí la celda»
+En los `TODO 2` a `5` la celda de verificación no aprueba sola: pide que completen algo
+(los rangos del zoom y la forma del valle; si el signo de `a` alterna; si llegó y cuántas
+iteraciones harían falta; el punto de partida lejano). Mientras quede un `None` o un `""`,
+la celda dice ✱ y explica qué falta. **Es a propósito.** Si alguien se traba, la pista de
+cada consigna tiene el valor exacto para empezar. Las respuestas modelo están al final de
+`cuestionario-soluciones.md`.
 
 ---
 
@@ -203,7 +228,8 @@ Lo que se recorta, **en este orden**:
 3. **Slide 16 (la grilla de fuerza bruta).** Se salta y se va directo a la tabla de la 17,
    que es la que hace el trabajo.
 4. **La segunda mitad de la viz 4** (el quiz de aparear firmas): se manda como tarea.
-5. **Cinco minutos del práctico 2**: que hagan `TODO 3` y `TODO 5`, y `TODO 4` en casa.
+5. **Cinco minutos del práctico 2**: que hagan `TODO 3` y `TODO 5`, y el `TODO 4` antes
+   de la clase 4, junto con el cuestionario (entre los dos no pasan de una hora y media).
 
 Lo que **NUNCA** se recorta, pase lo que pase:
 
@@ -224,10 +250,11 @@ Lo que **NUNCA** se recorta, pase lo que pase:
   (el que vale cero) hasta arriba de todo, despacio, y narrá cómo la azul lo sigue y la
   naranja no. Cinco minutos y no cansa.
   **Y de paso, un regalo:** ese cero de 2002 *no* quiere decir que en 2002 no se habló de
-  inseguridad. Quiere decir que en ese discurso, con nuestro léxico de 23 palabras, no
+  inseguridad. Quiere decir que en ese discurso, con nuestro léxico de 24 palabras, no
   apareció ninguna (está en `datos/README.md`). Un cero exacto en una serie de proporciones
-  casi siempre es un problema de instrumento, no un hallazgo — y acá es, además, el caso
-  extremo que más le tironea la recta al MSE. Dos ideas de la clase 10 en treinta segundos.
+  casi siempre es un problema de instrumento, no un hallazgo — y acá es, además, uno de los
+  casos que más le tironean la recta al MSE (el que más pesa en el comparador es 1998, y la
+  viz lo marca). Dos ideas de la clase 10 en treinta segundos.
 - **El quiz de firmas** de `tasa-de-aprendizaje.html`, de a dos, con las tres curvas sin
   etiquetar. Convierte la viz en evaluación formativa y sale muy bien.
 - **La última celda del notebook** (el año centrado contra el año crudo). Proyectala: la
@@ -241,9 +268,11 @@ Lo que **NUNCA** se recorta, pase lo que pase:
 ## 7. Los chistes y las analogías que funcionan
 
 - **«Se acabó la fuerza bruta en la línea 3 de esta tabla.»** Pausa después de leer los 115
-  días. Funciona porque es un número real, no una exageración.
-- **El learning rate como velocidad de reforma.** Cambios muy chicos: no pasa nada en una
-  generación. Cambios enormes de golpe: el sistema se desestabiliza y termina peor que antes.
+  días de una regresión con ocho perillas. Funciona porque es un número real, no una
+  exageración. La línea 4 es la red de ocho rampas de la clase 2, con sus 25 perillas (tres
+  por rampa, más la altura final): 10²³ edades del universo.
+- **El learning rate como intensidad de reforma.** Cuánto reaccionás a cada señal de que
+  algo anda mal. Muy poca: no pasa nada en una generación. Cambios enormes de golpe: el sistema se desestabiliza y termina peor que antes.
   Se ríen, y después se acuerdan.
 - **Censo contra muestra.** *«Calcular el gradiente con todos los datos es un censo; con un
   mini-batch es una muestra. La muestra es ruidosa y muchísimo más barata, y con suficientes
@@ -251,7 +280,10 @@ Lo que **NUNCA** se recorta, pase lo que pase:
   de la clase para esta audiencia.** Señalá el temblor del rastro naranja y decí «eso es error
   de muestreo».
 - **Mínimo local = *lock-in* institucional.** Path dependence: el sistema se estabiliza en una
-  configuración que nadie elegiría de cero, y salir cuesta. La analogía es exacta, no decorativa.
+  configuración que nadie elegiría de cero, y salir cuesta. Como mecanismo, la analogía es
+  exacta. Como frecuencia, no: con millones de perillas, quedarse en un pozo malo casi nunca
+  es el problema en la práctica (traban más las mesetas y las sillas de montar). Decí las dos
+  cosas juntas, así nadie se va creyendo que el descenso vive atrapado.
 - **La niebla y el conocimiento situado.** No ves el paisaje completo; ves tu entorno inmediato
   y decidís con eso. Si el aula es de sociología o antropología, mencioná a Simon y el
   *satisficing*: el descenso por gradiente es un agente de racionalidad limitada que igual
@@ -318,3 +350,7 @@ loss son idénticos. Lo van a ver en la clase 4.
 - [ ] Pizarrón o papelógrafo a mano: el signo menos se hace ahí, no en la slide.
 - [ ] Los números de la votación de la clase 2 (si los tenés) anotados para la slide 2.
 - [ ] Cronómetro a la vista. La pausa a los 60 minutos, en serio.
+- [ ] Los números que vas a proyectar (4,0× y 1,4×, 0,0387 contra 0,0424, 2,67e+25) salen
+      de tu corrida. En la misma máquina y con las mismas versiones de las librerías el
+      notebook es determinista. Con otras versiones algún decimal puede cambiar: si pasa,
+      proyectá los tuyos.

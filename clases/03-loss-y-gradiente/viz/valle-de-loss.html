@@ -77,9 +77,10 @@
       <strong>Qué mirar.</strong> Primero arrastrá el punto violeta despacio por el mapa y
       mirá <em>la recta de la derecha</em>: no se mueve ningún dato, se mueve la recta. En
       el mapa no hay años ni porcentajes: hay <b>rectas</b>. Después soltá la pelota con el
-      paso en <b>0.15</b> y mirá el rastro: <em>los puntitos arrancan separados y terminan
-      pegados</em>, sin que nadie los frene. Se frenan solos porque el terreno se aplana.
-      Y ahora subí el paso a <b>1.5</b> y volvé a soltarla.
+      learning rate en <b>0.15</b> y mirá el rastro: <em>los puntitos arrancan separados y terminan
+      pegados</em>, sin que nadie los frene. Se frenan solos porque el terreno se aplana:
+      el paso es lr × pendiente, y la pendiente se achica.
+      Y ahora subí el learning rate a <b>1.5</b> y volvé a soltarla.
     </div>
     <p class="viz-pie">
       Datos: menciones a «seguridad» en los discursos presidenciales de apertura de
@@ -174,6 +175,11 @@ const mapa = Viz.plano('#caja-mapa', {
   titulo: 'el mapa: cada punto es una recta entera',
   alto: ALTO_PANEL
 });
+mapa.canvas.setAttribute('role', 'img');
+mapa.canvas.setAttribute('aria-label', 'Mapa de la loss: el eje horizontal es la ' +
+  'inclinación de la recta y el vertical su altura. Un punto violeta arrastrable marca la ' +
+  'recta elegida; una flecha gruesa apunta hacia donde baja la loss y una fina hacia donde ' +
+  'sube. Los valores están en el panel.');
 
 const puntoP = { x: estado.a, y: estado.b };
 
@@ -248,6 +254,9 @@ const datos = Viz.plano('#caja-datos', {
   titulo: 'la recta que corresponde a ese punto',
   alto: ALTO_PANEL
 });
+datos.canvas.setAttribute('role', 'img');
+datos.canvas.setAttribute('aria-label', 'La serie de seguridad por año con la recta que ' +
+  'corresponde al punto del mapa, y el desajuste de esa recta.');
 
 datos.alDibujar(function () {
   datos.fondo(); datos.grilla();
@@ -288,6 +297,9 @@ const curva = Viz.plano('#lienzo-curva', {
   titulo: 'la curva que vas a ver en TODOS los entrenamientos del resto del curso',
   alto: 150, margen: { i: 84, d: 14, a: 28, b: 40 }
 });
+curva.canvas.setAttribute('role', 'img');
+curva.canvas.setAttribute('aria-label', 'La curva de loss contra iteración de la pelota que ' +
+  'acabás de soltar.');
 
 curva.alDibujar(function () {
   curva.fondo(); curva.grilla();
@@ -357,8 +369,8 @@ anim.on(function (a) { if (a.corriendo()) pasosDados = 0; });
    el corazón de las slides 14 y 22— van arriba, y los textos largos, al final. */
 const ctlPaso = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'La pelota' },
-  { tipo: 'slider', id: 'lr', etiqueta: 'tamaño del paso',
-    sub: 'el learning rate: cuánto te movés cada vez',
+  { tipo: 'slider', id: 'lr', etiqueta: 'learning rate',
+    sub: 'multiplica a la pendiente: paso = lr × pendiente',
     min: 0.0001, max: 2.0, escala: 'log', valor: 0.15, color: 'acento',
     formato: function (v) { return Viz.num(v, 4); } }
 ], function (v) { estado.lr = v.lr; refrescar(); });
@@ -424,7 +436,7 @@ function refrescar() {
     ctl.texto('frase',
       '<div style="font-size:.82rem;line-height:1.5">Esta recta afirma: «las menciones a ' +
       'seguridad ' + (estado.a >= 0 ? 'suben' : 'bajan') + ' <b>' +
-      Viz.num(Math.abs(estado.a), 3) + '</b> puntos por década, y en 2001 valían <b>' +
+      Viz.num(Math.abs(estado.a), 3) + '</b> puntos por década, y a mitad de 2001-2002 valían <b>' +
       Viz.num(estado.b, 3) + '</b>».<br>Desajuste: <span class="lectura-grande">' +
       Viz.num(L, 4) + '</span></div>');
   } else {
@@ -435,9 +447,9 @@ function refrescar() {
 
   let msg;
   if (!isFinite(L) || L > 50) {
-    msg = '<b class="c-error">Se fue del mapa.</b> El paso era tan grande que en vez de bajar ' +
-          'saltó al otro lado del valle, más arriba de donde estaba, y así cada vez. ' +
-          'Bajá el paso y volvé a soltarla.';
+    msg = '<b class="c-error">Se fue del mapa.</b> El learning rate era tan grande que en vez ' +
+          'de bajar, cada paso saltó al otro lado del valle, más arriba de donde estaba, y así ' +
+          'cada vez. Bajá el learning rate y volvé a soltarla.';
   } else if (estado.paisaje !== 'datos') {
     msg = 'Acordate de dónde arrancaste. Ahora apretá «Soltarla desde otro lugar» y volvé a ' +
           'soltarla: <b>no siempre terminás en el mismo pozo</b>. El descenso no promete ' +
@@ -447,7 +459,7 @@ function refrescar() {
           'se frenó sola porque acá el terreno es plano y no hay para dónde bajar.';
   } else {
     msg = 'La flecha gruesa apunta <b>para donde hay que ir</b>, que es justo al revés de ' +
-          'la roja: la roja es la dirección en la que la loss <em>sube</em> más rápido. ' +
+          'la finita (la roja): la finita es la dirección en la que la loss <em>sube</em> más rápido. ' +
           'Todo el gradiente es eso.';
   }
   ctl.texto('lectura', msg);

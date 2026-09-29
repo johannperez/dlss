@@ -6,8 +6,8 @@ Doce preguntas. Las de opción múltiple tienen **una sola** respuesta correcta.
 Las abiertas se contestan en tres o cuatro oraciones: **no hace falta ninguna fórmula**
 y no se puntúa la prolijidad matemática, se puntúa el criterio.
 
-Tiempo estimado: 35-45 minutos. Se puede hacer con el notebook abierto al lado; de hecho,
-para dos preguntas conviene.
+Tiempo estimado: 35-45 minutos. Se hace **antes de la clase 4**. Se puede hacer con el
+notebook abierto al lado; de hecho, para dos preguntas conviene.
 
 ---
 
@@ -17,7 +17,7 @@ para dos preguntas conviene.
 - **b)** Un número que resume, en una sola cifra, qué tan mal está el modelo sobre todos
   los datos, según un criterio que elige quien modela.
 - **c)** La cantidad de información que se pierde al simplificar los datos.
-- **d)** El porcentaje de casos que el modelo clasifica mal.
+- **d)** El porcentaje de casos extremos que conviene sacar de la base antes de modelar.
 
 ---
 
@@ -110,7 +110,7 @@ izquierda, o hacia abajo a la derecha? ¿Por qué?
 ## 8. `[opción múltiple]` ¿Qué es el *learning rate*?
 
 - **a)** La velocidad con la que la computadora hace los cálculos.
-- **b)** Cuánto se mueven los parámetros en cada paso del descenso.
+- **b)** Cuánto se mueven los parámetros en cada paso, en proporción a la pendiente.
 - **c)** Cuántos datos mira el modelo antes de actualizar los parámetros.
 - **d)** Qué porcentaje de los datos se usa para entrenar.
 

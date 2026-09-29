@@ -25,7 +25,8 @@ académica.
 
 ## Si te quedaste con ganas
 
-*(Cosas cortas, para hacer esta semana. Están en el orden en que conviene hacerlas.)*
+*(Cosas cortas, para cuando tengas un rato; ninguna es tarea para la clase 4. Están en el
+orden en que conviene hacerlas.)*
 
 **1. 3Blue1Brown, *Gradient descent, how neural networks learn* (capítulo 2 de la serie
 *Neural Networks*).** `[VERIFICAR URL]`
@@ -56,7 +57,7 @@ valle depende de tus datos**, no del método.
 **4. Tu propia base, y una pregunta.** Sin URL, porque es tuya.
 **Por qué te conviene:** agarrá el último trabajo tuyo que tenga una regresión y buscá dos
 cosas: (a) qué caso tiene el residuo más grande, y (b) qué pasa con tu conclusión si lo
-sacás. Es media hora y es exactamente el `[EL LUNES]` de esta clase.
+sacás. Es media hora y es exactamente el `[EN TU INVESTIGACIÓN]` de esta clase.
 
 ---
 
@@ -99,10 +100,12 @@ picando.
 before 1900*. Harvard University Press.** Capítulo 1. `[VERIFICAR URL]`
 **Para qué:** la anécdota de la slide 8. El método de mínimos cuadrados se publica con
 Legendre en 1805 y Gauss lo reclama en 1809 `[VERIFICAR — fechas y detalles de la disputa
-de prioridad]`; **se impuso en buena medida porque tenía solución cerrada**, o sea porque se
-podía calcular con lápiz y papel. Que el MSE sea hoy el default no es un veredicto sobre qué
-error importa: es la huella de una restricción de cómputo de hace dos siglos. Dicho en
-clase, en treinta segundos, cambia cómo se lee un default.
+de prioridad]`. **Se impuso en buena medida por comodidad de cálculo** (tenía solución
+cerrada: se podía calcular con lápiz y papel) **y también porque Gauss y Laplace le dieron
+una justificación estadística** si los errores son normales; Stigler cuenta las dos cosas.
+Que el MSE sea hoy el default no es un veredicto sobre qué error te importa a vos: ninguna
+de las dos razones habla de eso. Dicho en clase, en treinta segundos, cambia cómo se lee
+un default.
 
 **9. Simon, H. A. (1955). *A Behavioral Model of Rational Choice*. *Quarterly Journal of
 Economics*, 69(1), 99-118.** `[VERIFICAR URL]` `[VERIFICAR — número de páginas]`
@@ -114,10 +117,13 @@ cambia el vínculo con el tema.
 
 **10. Ragin, C. C. & Becker, H. S. (eds.) (1992). *What Is a Case? Exploring the Foundations
 of Social Inquiry*. Cambridge University Press.** `[VERIFICAR URL]`
-**Para qué:** la slide 8. La tradición del estudio del caso desviado es, en el vocabulario de
-hoy, la decisión de **darle mucho peso al outlier**. MSE y MAE son dos maneras de saldar esa
-discusión metodológica, escritas en una línea de código. Sirve para mostrar que la elección
-de loss no es un tema nuevo: es un tema viejo con ropa nueva.
+**Para qué:** la slide 8. La tradición del estudio del caso desviado se toma en serio al
+outlier: lo estudia **aparte**, como caso, en vez de dejar que se diluya en la tendencia.
+La elección entre MSE y MAE es un pariente cercano de esa discusión, escrito en una línea
+de código: cuánto dejás que un caso raro mande sobre la tendencia de todos (la recta del MSE
+es la de las medias, la del MAE la de las medianas). La analogía no es exacta, porque una
+recta por MSE no *explica* el caso desviado, sólo se inclina hacia él. Sirve para mostrar
+que la elección de loss no es un tema nuevo: es un tema viejo con ropa nueva.
 
 **11. Los propios datos del curso.** `datos/README.md`, sección de trampas.
 `[VERIFICADA — está en este repositorio]`. La recopilación de los discursos es de Lucas Ariel:
@@ -131,7 +137,7 @@ estimados. Si alguien del aula los quiere reproducir, puede.
 
 ## Lo que deliberadamente NO está en esta lista
 
-- **Tutoriales de PyTorch.** Es la clase 4 y llegan la semana que viene. Si los mirás ahora
+- **Tutoriales de PyTorch.** Llegan en la clase 4, la que viene. Si los mirás ahora
   vas a ver `loss.backward()` sin entender qué anota, que es justamente lo que hoy
   entendiste a mano.
 - **Cualquier cosa que empiece con «la regla de la cadena».** No la necesitás. Backprop es

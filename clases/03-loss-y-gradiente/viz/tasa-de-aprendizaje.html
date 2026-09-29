@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>El tamaño del paso — Clase 3</title>
+<title>El learning rate — Clase 3</title>
 
 <!-- ==========================================================================
      MOMENTO AHA: "la curva de la derecha se va para arriba. Entonces, cuando en
-     la clase 4 vea una curva que sube, ya sé qué perilla tengo que tocar."
+     la clase 4 vea una curva cuya tendencia sube, ya sé qué perilla tengo que tocar."
 
      Lo importante NO es el mapa: es que los tres comportamientos tienen FIRMAS
      VISUALES DISTINTAS en la curva de loss, y que esa curva es lo único que vas
@@ -41,10 +41,11 @@
 <div class="viz-pagina">
 
   <header>
-    <h1>El tamaño del paso</h1>
+    <h1>El learning rate</h1>
     <p>Tres pelotas idénticas, soltadas <strong>desde el mismo lugar</strong>, en
        <strong>el mismo valle</strong>, con los mismos datos. Lo único que cambia es
-       cuánto se mueven en cada paso. Arriba, el rastro en el mapa; abajo, la curva
+       el <strong>learning rate</strong>: el número que multiplica a la pendiente para
+       decidir cuánto se mueve cada paso (paso = lr × pendiente). Arriba, el rastro en el mapa; abajo, la curva
        de loss que vas a ver en la consola cuando entrenes de verdad. Aprendé a leer
        las tres formas de abajo y te ahorrás tardes enteras.</p>
   </header>
@@ -70,8 +71,8 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> No mires los mapas: mirá <em>las tres curvas de abajo</em>.
-      La primera baja tan despacio que parece una raya: el paso es tan chiquito que la
-      pelota no llega nunca. La segunda cae rápido y se aplana: eso es lo que querés ver.
+      La primera casi no se mueve: baja, pero tan lento que en 60 pasos recorrió apenas
+      un octavo del camino, y le faltarían miles. La segunda cae rápido y se aplana: eso es lo que querés ver.
       La tercera se va <em>para arriba</em> y se sale del gráfico. Cuando entrenes de
       verdad no vas a tener el mapa —nadie puede dibujar un valle de 1,5 millones de
       dimensiones—, vas a tener sólo esa curva. Y con esa curva alcanza.
@@ -79,8 +80,8 @@
     <p class="viz-pie">
       Datos: menciones a «seguridad» en los discursos presidenciales de apertura de
       sesiones, Argentina 1984-2019 (% de palabras del discurso). <b>Datos reales</b>.
-      Con estos datos, el paso más grande que todavía converge es <b>0,93</b>: de ahí
-      para arriba, cada paso deja a la pelota más alto que donde estaba. Ese número no
+      Con estos datos, el learning rate más grande que todavía converge es <b>0,93</b>:
+      de ahí para arriba, cada paso deja a la pelota más alto que donde estaba. Ese número no
       es mágico ni general: sale de la curvatura de <em>este</em> valle.
     </p>
   </footer>
@@ -133,7 +134,7 @@ function correr(lr, pasos) {
   return { rastro: rastro, perdidas: perdidas, a: a, b: b };
 }
 
-const TITULOS = ['paso chiquito', 'paso justo', 'paso enorme'];
+const TITULOS = ['lr chiquito', 'lr justo', 'lr enorme'];
 const TECHO = 0.24;      // el alto del gráfico de loss: arriba de esto, se sale
 
 /** Dibuja una curva de loss y, si se escapa por arriba, lo dice con una flecha.
@@ -155,7 +156,9 @@ function dibujarCurvaLoss(pl, perdidas, hasta, color) {
   }
   return fuga;
 }
-const POR_DEFECTO = [0.005, 0.30, 1.30];
+// El chiquito es 0,0005: con 0,005 la curva ya bajaba el 72 % del camino en 60
+// pasos y se confundía con la buena. Con 0,0005 baja el 12 %: casi plana y ALTA.
+const POR_DEFECTO = [0.0005, 0.30, 1.30];
 const estado = { lr: POR_DEFECTO.slice(), pasos: 60, corridas: [null, null, null], hasta: 0 };
 
 /* ---------------------------------------------------------------------------
@@ -169,6 +172,9 @@ for (let k = 0; k < 3; k++) {
       titulo: TITULOS[k], alto: 185,
       margen: { i: 26, d: 8, a: 26, b: 22 }
     });
+    m.canvas.setAttribute('role', 'img');
+    m.canvas.setAttribute('aria-label', 'Mapa de la loss con el rastro de la pelota, ' +
+      TITULOS[k] + '. La lectura de cada corrida está en el panel.');
     m.alDibujar(function () {
       m.fondo();
       m.mapaDeCalor(loss, { n: 70, paleta: 'loss', log: true });
@@ -197,6 +203,9 @@ for (let k = 0; k < 3; k++) {
       titulo: 'curva de loss · ' + TITULOS[k], alto: 130,
       margen: { i: 60, d: 10, a: 26, b: 30 }
     });
+    q.canvas.setAttribute('role', 'img');
+    q.canvas.setAttribute('aria-label', 'Curva de loss contra iteración, ' + TITULOS[k] +
+      ['. Casi plana y alta.', '. Cae rápido y se aplana abajo.', '. Se va para arriba.'][k]);
     q.alDibujar(function () {
       q.fondo(); q.grilla();
       q.ejes({ formatoY: function (v) { return Viz.num(v, 2); } });
@@ -241,7 +250,7 @@ const anim = Viz.animacion({
 const QUIZ = [
   { letra: 'A', lr: 0.35,  color: 'modelo',    correcta: 'bien',   etiquetaEn: 14 },
   { letra: 'B', lr: 1.25,  color: 'error',     correcta: 'grande', etiquetaEn: 1 },
-  { letra: 'C', lr: 0.004, color: 'parametro', correcta: 'chico',  etiquetaEn: 36 }
+  { letra: 'C', lr: 0.0004, color: 'parametro', correcta: 'chico',  etiquetaEn: 36 }
 ];
 QUIZ.forEach(function (q) { q.corrida = correr(q.lr, 60); });
 
@@ -251,6 +260,9 @@ const quiz = Viz.plano('#lienzo-quiz', {
   titulo: '¿qué firma es cada una? (respondé en el panel)', alto: 150,
   margen: { i: 62, d: 14, a: 26, b: 32 }
 });
+quiz.canvas.setAttribute('role', 'img');
+quiz.canvas.setAttribute('aria-label', 'Quiz: tres curvas de loss rotuladas A, B y C. ' +
+  'A cae y se aplana abajo; B se va para arriba enseguida; C queda casi plana y alta.');
 quiz.alDibujar(function () {
   quiz.fondo(); quiz.grilla();
   quiz.ejes({ formatoY: function (v) { return Viz.num(v, 2); } });
@@ -270,20 +282,20 @@ quiz.alDibujar(function () {
    --------------------------------------------------------------------------- */
 const OPCIONES_QUIZ = [
   { valor: '', texto: '— elegí —' },
-  { valor: 'chico', texto: 'el paso es muy chico' },
-  { valor: 'bien', texto: 'el paso está bien' },
-  { valor: 'grande', texto: 'el paso es muy grande' }
+  { valor: 'chico', texto: 'el lr es muy chico' },
+  { valor: 'bien', texto: 'el lr está bien' },
+  { valor: 'grande', texto: 'el lr es muy grande' }
 ];
 
 const ctl = Viz.controles('#panel', [
-  { tipo: 'titulo', texto: 'Los tres pasos' },
-  { tipo: 'slider', id: 'lr0', etiqueta: 'paso de la izquierda', sub: 'la que no llega nunca',
+  { tipo: 'titulo', texto: 'Los tres learning rates' },
+  { tipo: 'slider', id: 'lr0', etiqueta: 'lr de la izquierda', sub: 'la que casi no se mueve',
     min: 0.0001, max: 2.0, escala: 'log', valor: POR_DEFECTO[0], color: 'parametro',
     formato: function (v) { return Viz.num(v, 4); } },
-  { tipo: 'slider', id: 'lr1', etiqueta: 'paso del medio', sub: 'la que sí llega',
+  { tipo: 'slider', id: 'lr1', etiqueta: 'lr del medio', sub: 'la que sí llega',
     min: 0.0001, max: 2.0, escala: 'log', valor: POR_DEFECTO[1], color: 'ok',
     formato: function (v) { return Viz.num(v, 4); } },
-  { tipo: 'slider', id: 'lr2', etiqueta: 'paso de la derecha', sub: 'la que se va del mapa',
+  { tipo: 'slider', id: 'lr2', etiqueta: 'lr de la derecha', sub: 'la que se va del mapa',
     min: 0.0001, max: 2.0, escala: 'log', valor: POR_DEFECTO[2], color: 'error',
     formato: function (v) { return Viz.num(v, 4); } },
   { tipo: 'slider', id: 'pasos', etiqueta: 'cuántos pasos', sub: 'cuánto la dejamos rodar',
@@ -301,7 +313,7 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'titulo', texto: '¿Qué firma es cada una?' },
   { tipo: 'texto', id: 'ayuda-quiz',
     html: '<div style="font-size:.8rem;line-height:1.45;color:var(--tinta-2)">' +
-          'Mirá el gráfico de abajo de todo. Tres curvas de loss, sin decirte el paso.</div>' },
+          'Mirá el gráfico de abajo de todo. Tres curvas de loss, sin decirte el lr.</div>' },
   { tipo: 'select', id: 'qA', etiqueta: 'la curva A', opciones: OPCIONES_QUIZ, valor: '' },
   { tipo: 'select', id: 'qB', etiqueta: 'la curva B', opciones: OPCIONES_QUIZ, valor: '' },
   { tipo: 'select', id: 'qC', etiqueta: 'la curva C', opciones: OPCIONES_QUIZ, valor: '' },
@@ -348,7 +360,7 @@ function leer() {
     else if (L < LOSS_MIN * 1.02) dic = '<span class="c-ok">llegó al fondo</span>';
     else if (L > 0.030) dic = '<span class="c-val">todavía lejísimos</span>';
     else dic = '<span class="c-val">cerca, pero no</span>';
-    partes.push('<b>' + TITULOS[k] + '</b> (paso ' + Viz.num(estado.lr[k], 4) + '): loss ' +
+    partes.push('<b>' + TITULOS[k] + '</b> (lr ' + Viz.num(estado.lr[k], 4) + '): loss ' +
                 (isFinite(L) && L < 1e6 ? Viz.num(L, 4) : L.toExponential(1)) + ' — ' + dic);
   }
   ctl.texto('resultado',
@@ -372,12 +384,12 @@ function corregir() {
     '</div>');
 }
 const PISTAS = {
-  chico: 'La del paso chico baja, pero baja tan poco que parece una raya casi horizontal ' +
+  chico: 'La del lr chico baja, pero tan poco que parece una raya casi horizontal ' +
          'y queda altísima: le faltarían miles de iteraciones.',
-  bien: 'La del paso bien cae rápido al principio y después se aplana <em>abajo</em>, ' +
+  bien: 'La del lr bien cae rápido al principio y después se aplana <em>abajo</em>, ' +
         'pegada a la línea verde del fondo.',
-  grande: 'La del paso grande sube. Si la loss sube, el paso es demasiado grande: ' +
-          'divididlo por diez y volvé a probar.'
+  grande: 'La del lr grande sube. Si la tendencia de la loss sube, el lr es demasiado ' +
+          'grande: dividilo por diez y volvé a probar.'
 };
 
 soltar();

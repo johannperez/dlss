@@ -64,8 +64,8 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Poné el pasito de prueba en <b>0.30</b> y fijate que la
-      línea turquesa (el atajo entre los dos puntos) está claramente torcida respecto de
-      la curva. Ahora achicá el pasito hasta <b>0.005</b>: la línea turquesa se pega a la
+      línea turquesa (el atajo desde donde estás hasta el pasito de la derecha) está
+      claramente torcida respecto de la curva. Ahora achicá el pasito hasta <b>0.005</b>: la línea turquesa se pega a la
       curva y el número deja de moverse. Ese número al que se pega tiene un nombre elegante
       —<em>derivada</em>— y lo acabás de calcular con una resta y una división.
     </div>
@@ -74,7 +74,9 @@
       sesiones, Argentina 1984-2019 (% de palabras del discurso). Datos reales; ver
       <code>datos/README.md</code>. Acá está fija la altura de la recta (en su mejor
       valor) y se mueve sólo la inclinación, para poder dibujar el desajuste en una
-      curva de dos dimensiones.
+      curva de dos dimensiones. La cuenta de la pendiente usa un solo pasito, el de la
+      derecha: es la resta más simple. En el notebook se prueba para los dos lados y se
+      promedia, que con el mismo pasito da más preciso.
     </p>
   </footer>
 
@@ -120,6 +122,11 @@ const p = Viz.plano('#lienzo', {
   titulo: 'el desajuste, en función de UNA perilla',
   alto: 380
 });
+p.canvas.setAttribute('role', 'img');
+p.canvas.setAttribute('aria-label', 'Curva en forma de U del desajuste según la inclinación ' +
+  'de la recta. Un punto marca dónde estás parado, dos puntos más marcan un pasito a cada ' +
+  'lado, y una recta turquesa une tu punto con el pasito de la derecha. Los números y la ' +
+  'lectura están en el panel.');
 
 const puntoA = { x: estado.a, y: 0 };
 
@@ -134,7 +141,8 @@ p.alDibujar(function () {
   // la curva del desajuste
   p.curva(loss, { color: 'error', grosor: 3.5 });
 
-  // el atajo hacia adelante (secante): de donde estoy al punto de prueba
+  // el atajo hacia adelante (secante): de donde estoy al pasito de la DERECHA.
+  // Es la resta «de un solo lado»; el notebook usa la de los dos lados.
   const pend = (Lmas - La) / h;
   p.linea([[a - 0.9, La - 0.9 * pend], [a + 0.9, La + 0.9 * pend]],
           { color: 'acento', grosor: 2.4 });
@@ -171,7 +179,7 @@ p.alDibujar(function () {
     { color: 'error', texto: 'el desajuste de cada recta posible', forma: 'linea' },
     { color: 'parametro', texto: 'dónde estoy parado' },
     { color: 'val', texto: 'los dos pasitos de prueba' },
-    { color: 'acento', texto: 'el atajo entre los dos puntos', forma: 'linea' }
+    { color: 'acento', texto: 'el atajo hasta el pasito de la derecha', forma: 'linea' }
   ], { pos: 'ad' });
 });
 
@@ -199,7 +207,9 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'texto', id: 'numeros', html: '' },
   { tipo: 'texto', id: 'cuenta', html: '' },
   { tipo: 'boton', texto: 'Dar un paso cuesta abajo', principal: true, alClic: function () {
-      // el paso del descenso: me muevo AL REVÉS de la pendiente
+      // el paso del descenso: me muevo AL REVÉS de la pendiente. Acá usamos la
+      // resta de los dos lados (la del notebook), que no se engaña con el pasito
+      // grande; el número que muestra el panel es la de un solo lado.
       const pend = (loss(estado.a + estado.h) - loss(estado.a - estado.h)) / (2 * estado.h);
       const nuevo = Viz.acotar(estado.a - 0.35 * pend, -0.55, 0.59);
       ctl.set('a', nuevo, true); actualizar();
@@ -245,7 +255,10 @@ function actualizar() {
     '</div>');
 
   const err = Math.abs(pend - exacta);
-  const precision = (err < 0.005
+  // Con la resta de un solo lado el error es ~1,08·h en esta curva: con h = 0,005
+  // (el valor que recomiendan el pie y la slide) queda en 0,0054. Por eso el umbral
+  // de «prácticamente exacta» es 0,01 y no 0,005.
+  const precision = (err < 0.01
     ? 'Con un pasito así de chico, la resta ya te da <b>prácticamente la respuesta exacta</b>.'
     : 'Con un pasito de ' + Viz.num(h, 3) + ' la resta se equivoca por ' + Viz.num(err, 3) +
       '. Achicalo y mirá qué pasa.');

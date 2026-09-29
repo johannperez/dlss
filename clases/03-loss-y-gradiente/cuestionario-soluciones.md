@@ -18,7 +18,14 @@ una persona**. Si en la respuesta falta la segunda mitad, la clase se entendió 
 |---|---|---|
 | **a)** el error de un caso | Confunde el error individual (un palito rojo) con el resumen de todos. Es la confusión más benigna y la más común. | «Eso es *un* error. La loss es lo que hacés con los treinta y seis palitos para que quede un solo número.» |
 | **c)** información que se pierde | Se enganchó con la palabra «pérdida» y la leyó en su sentido cotidiano. Pasa siempre con la traducción. | Es un buen momento para insistir en que *loss* acá no tiene nada que ver con perder información: es «qué tan mal». |
-| **d)** porcentaje mal clasificado | Está pensando en clasificación, no en regresión. **No es una confusión grave**: es una loss posible, sólo que otra. | «Eso es *una* loss, la de clasificación. Hoy trabajamos con otra. Que existan varias es justamente el punto.» |
+| **d)** los casos extremos que conviene sacar | Mezcla la loss con la limpieza de datos: piensa que «manejar los outliers» es algo que se hace *antes* y no *con* la loss. Es la confusión que la slide 8 quiere desarmar. | «Sacar casos también es una decisión, y ésa sí hay que justificarla. La loss es otra cosa: el criterio con el que el modelo resume *todos* los errores, incluidos los de los casos raros. Elegir MAE es una manera de que un caso extremo no mande, sin sacarlo.» |
+
+*Nota para quien corrige.* Una versión anterior de este cuestionario tenía como d) «el
+porcentaje de casos que el modelo clasifica mal». Se cambió porque era defendible como
+correcta. Si alguien lo pregunta, la respuesta es útil igual: ese porcentaje es una
+**métrica** para evaluar, no la loss que se optimiza en clasificación. No se puede bajar con
+gradiente (es plano casi en todas partes y salta de golpe), y por eso para clasificar se
+entrena con entropía cruzada y se *reporta* el porcentaje de aciertos. Vuelve en la clase 9.
 
 ---
 
@@ -40,11 +47,17 @@ una persona**. Si en la respuesta falta la segunda mitad, la clase se entendió 
 que ese único caso pasa a aportar una fracción gigantesca del total. El **MAE también sube**,
 pero de manera proporcional al error, no a su cuadrado: sube muchísimo menos.
 Números del notebook, con un solo caso extremo sobre 36: el MSE creció **4,0×** y el MAE
-**1,4×**, y ese año pasó a explicar el **75 %** de todo el MSE.
+**1,4×**, y ese año pasó a explicar el **75 %** de todo el MSE. Ojo: esos números son con
+una recta **fija** (la que se puso a ojo en la sección 1), sin reajustarla. En la viz
+`comparador-de-losses.html`, donde la recta del MSE **sí** se reajusta para ir a buscar al
+caso, la cuota de ese año queda en **47 %**: la recta reajustada le achica el error, y aun
+así ese año explica casi la mitad.
 
 **b)** Se mueve más **la recta que minimiza el MSE**, y bastante más. Al MSE le «conviene»
 girar la recta para acercarse a ese caso, porque bajar un error grande le baja mucho la
-cuenta; al MAE le da casi lo mismo.
+cuenta; al MAE le da casi lo mismo: para el MAE cada caso empuja con la misma fuerza, esté
+cerca o lejos. (Es la diferencia entre la recta de las medias y la de las medianas.) En la
+viz, plantando un caso extremo, la azul se mueve 0,092 puntos por década y la naranja 0,011.
 
 **c)** Se busca algo del estilo de: *«mientras estoy limpiando datos y todavía no sé si los
 casos raros son reales o son errores de carga, me conviene el MAE, porque un error de carga
@@ -69,9 +82,18 @@ rápido» es incompleta, no incorrecta.
 2. **Se rompe.** Si `0.1` se pasa del límite del valle, cada paso salta al otro lado, más
    arriba que antes. La loss **sube**, a veces oscilando, y termina en `inf` o `nan`.
 
-**Cómo distinguirlos mirando sólo la curva:** si baja y se aplana, anduvo; **si sube, aunque
-sea un poquito, el paso es demasiado grande**. No hace falta ver nada más. Regla práctica:
-si sube, dividí por diez.
+Hay un tercer resultado, intermedio, que vale como bonus: **oscila pero converge**. Cada
+paso salta al otro lado del valle, pero cada vez un poco más abajo. La curva baja con
+serrucho y termina aplanándose.
+
+**Cómo distinguirlos mirando sólo la curva:** si baja y se aplana, anduvo; **si la
+tendencia sube** (o la curva sube y explota), el learning rate es demasiado grande. Regla
+práctica: si la tendencia sube, dividí por diez.
+Hoy, que cada paso usa todos los datos, cualquier subida es una señal. Pero desde la clase 4
+se entrena con **mini-batches** y la curva siempre tiembla un poco por el ruido de la
+muestra (lo vieron en el bonus del notebook). **Un temblor no es una subida**: hay que mirar
+la tendencia. Si alguien escribe «si sube aunque sea un poquito, está mal», vale, pero
+agregale ese matiz.
 
 *Respuesta parcial frecuente:* «va a ir más rápido». Vale la mitad: hay que preguntar «¿y si
 no?». La otra parcial frecuente es «se va a romper», sin la posibilidad de que ande, y también
@@ -121,13 +143,15 @@ con el año sin centrar) apunta **a la pared de enfrente**, y el descenso zigzag
 ## 7. ¿Por qué no probar todas las combinaciones? — **b)**
 
 **Correcta:** la cantidad de combinaciones crece exponencialmente con la cantidad de
-parámetros. Con 100 valores por perilla: 2 perillas son 10⁴ pruebas (instantáneo);
-**8 perillas son 10¹⁶, que son 115 días de computadora**; y el mini-GPT de la clase 8 tiene
-1,5 millones de perillas.
+parámetros. Con 100 valores por perilla y mil millones de pruebas por segundo: 2 perillas
+son 10⁴ pruebas (instantáneo); **8 perillas (una regresión con siete variables) son 10¹⁶,
+que son 115 días de computadora**; la red de 8 rampas de la clase 2 tiene 25 perillas (3 por
+rampa, más la altura final), o sea 10⁵⁰ pruebas y unas 10²³ edades del universo; y el
+mini-GPT de la clase 8 tiene 1,5 millones de perillas.
 
 | Si eligió | Qué confusión revela | Qué decirle |
 |---|---|---|
-| **a)** sería menos preciso | Al revés: la fuerza bruta es **más** confiable, sólo que impagable. | «Probar todo funciona perfecto. El problema no es la calidad, es la factura.» |
+| **a)** sería menos preciso | Tiene algo de razón, pero no es el motivo. La grilla es tan precisa como fina la hagas: en el notebook, la de 120×120 da a = 0,0387 contra el 0,0424 exacto del descenso, porque sus puntos van de a 0,0076. Afinarla arregla la precisión y empeora la factura. | «La precisión se compra con una grilla más fina. Lo que no se puede comprar es el tiempo: el problema es la factura, no la calidad.» |
 | **c)** no se sabe qué valores toman | Confunde el problema del rango con el de la escala. Es una objeción razonable pero no es la razón. | «Podrías acotar el rango a ojo y probar igual. Ese no es el cuello de botella.» |
 | **d)** daría un mínimo local | **Al revés**, y esta confusión importa: la fuerza bruta es justamente el único método que **sí** encontraría el mínimo global. El que se queda en mínimos locales es el descenso. | «Se te dieron vuelta los dos. Probar todo encuentra el global; bajar tanteando es lo que se puede quedar en un pozo.» |
 
@@ -135,11 +159,16 @@ parámetros. Con 100 valores por perilla: 2 perillas son 10⁴ pruebas (instant�
 
 ## 8. ¿Qué es el learning rate? — **b)**
 
-**Correcta:** cuánto se mueven los parámetros en cada paso.
+**Correcta:** cuánto se mueven los parámetros en cada paso, en proporción a la pendiente.
+El learning rate **no** es el largo del paso: es el número que multiplica a la pendiente
+(paso = lr × pendiente). Por eso, con el mismo lr, los pasos se achican solos cerca del
+fondo. Si alguien contesta b) pero en la justificación dice «el largo fijo de cada paso»,
+vale, pero corregile la definición: es lo que hace que «la pelota frena sola» tenga
+sentido.
 
 | Si eligió | Qué confusión revela | Qué decirle |
 |---|---|---|
-| **a)** velocidad de la computadora | Leyó «rate» como velocidad de máquina. Es una confusión de traducción, no conceptual. | «Es la velocidad *del aprendizaje*, no la del procesador. El largo del paso.» |
+| **a)** velocidad de la computadora | Leyó «rate» como velocidad de máquina. Es una confusión de traducción, no conceptual. | «Es la velocidad *del aprendizaje*, no la del procesador: cuánto te movés por cada unidad de pendiente.» |
 | **c)** cuántos datos mira | Confundió learning rate con **batch size**. Es una confusión razonable: los dos son perillas que uno elige y los dos afectan el ruido de la curva. | Vale la pena separar los dos explícitamente antes de la clase 4, donde aparecen juntos: «uno dice *cuánto me muevo*, el otro *con cuánta información decido para dónde*». |
 | **d)** porcentaje de datos de entrenamiento | Se lo llevó a train/test. Es la clase 4. | Anotalo: significa que están anticipando el tema siguiente, lo cual no está mal. |
 
@@ -191,6 +220,11 @@ loss elegida, y que estén **las dos** justificaciones.
 > me quedo con un modelo que describe la rutina y me pierde justamente el fenómeno que quiero
 > estudiar. Quiero que esos tres meses pesen.»
 
+Aceptala, pero con una salvedad que conviene devolver por escrito: que los tres meses pesen
+no quiere decir que el modelo los *explique*. Una recta por MSE sólo inclina la tendencia de
+los otros ciento diecisiete meses hacia ellos. Por eso la respuesta de nota máxima (abajo)
+es la que propone modelarlos aparte.
+
 **Justificación válida para MAE** (el caso extremo distorsiona):
 > «Mi pregunta es cuál es el nivel habitual de conflictividad y cómo evoluciona. Los tres
 > estallidos son eventos de otra naturaleza; si los dejo pesar, la tendencia que reporte va a
@@ -227,6 +261,11 @@ producir.
 exactamente?»**, y si la respuesta es «exactitud», la repregunta: *«con qué prevalencia?»*.
 Si sólo el 5 % de los alumnos deserta, un modelo que dice «nadie deserta» tiene 95 % de
 exactitud y sirve para cero. Esa observación merece nota máxima: es la clase 9 anticipada.
+Un matiz que vale como bonus: la exactitud casi nunca es lo que se *optimiza* (no se puede
+bajar con gradiente: es plana casi en todas partes y salta de golpe). Se entrena con otra
+loss, como la entropía cruzada, y la exactitud se *reporta*. «Optimizado para maximizar la
+exactitud» suele querer decir «elegido entre varios modelos por su exactitud», y la
+pregunta sigue valiendo igual.
 
 **Cómo NO puntuar esta pregunta.** No hay una respuesta correcta entre «falso positivo» y
 «falso negativo», y **no se le baja la nota a nadie por la posición que tome**. Se le baja a
@@ -248,3 +287,18 @@ el arco del curso.
 | Muchos eligen **7d** | Se dieron vuelta la fuerza bruta y el descenso. | Una frase: «probar todo encuentra el global; tantear se puede quedar en un pozo». |
 | Muchos confunden **A** con **B** en la 5 | No están mirando la **altura** de la curva, sólo su forma. | En la clase 4, dibujá siempre la línea de referencia del mínimo alcanzable. |
 | Las respuestas 11 y 12 son técnicas y no sustantivas | El mensaje central de la clase —que la loss es una decisión— no llegó. | **Es lo más grave que puede pasar.** Vale volver dos slides al empezar la clase 4. |
+
+---
+
+## Anexo: respuestas modelo de los `TODO` del notebook
+
+Los números son los de una corrida del notebook: es determinista en la misma máquina y con
+las mismas versiones de las librerías; con otras versiones algún decimal puede cambiar.
+
+| TODO | Qué se completa | Respuesta modelo |
+|---|---|---|
+| **1** | Dos comentarios. | 1. «Creció más el MSE (4,0× contra 1,4×), porque eleva cada error al cuadrado: un error grande, al cuadrado, se come la loss entera (ese año solo aporta el 75 % del MSE).» 2. «Si es un error de carga, MAE (o corregir el dato). Si es el año que motiva la investigación, MSE deja que pese; pero una recta no lo explica, así que conviene estudiarlo aparte.» |
+| **2** | `zoom_a`, `zoom_b` y `forma_del_valle`. | `np.linspace(mejor_a - 0.06, mejor_a + 0.06, 120)` y lo mismo con `mejor_b`; `forma_del_valle = "redondo"`. Sale redondo porque el año está centrado (eso despega las dos perillas) y en décadas (eso las pone en la misma escala): casi estandarizado. |
+| **3** | Un comentario y `signo_de_a`. | `signo_de_a = "alterna"`. «Con lr = 1,5 cada paso salta al otro lado del valle y cae más arriba que antes: `a` rebota con el signo cambiado y cada vez unas 2,2 veces más lejos (+0,81, −1,67, +3,88, −8,54, +19,2), y la loss explota.» |
+| **4** | `llego` e `iteraciones_estimadas`. | `llego = False`. Por regla de tres, unas 240.000 iteraciones (se acepta cualquier estimación desde 10.000). La cuenta exacta da más, del orden de 1,5 millones para quedar a menos de 2 % del fondo, porque el paso es lr × pendiente y la pendiente se va achicando. |
+| **5** | `a0_lejos`, `b0_lejos`, `pasos_lejos`. | `-5.0`, `50.0`, `400`. Llega a a = 0,0424, b = 0,1549, el mismo fondo que desde (−0,3; 0,4) y que el descenso original. Pasa porque este paisaje tiene un solo pozo; en «uno con dos pozos» de `valle-de-loss.html`, no. |
