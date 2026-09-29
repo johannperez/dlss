@@ -58,9 +58,11 @@
    flores iris. Cuando necesitamos un sandbox técnico neutro (dígitos manuscritos, por ejemplo),
    se usa explícitamente rotulado como sandbox y se vuelve al dominio antes de terminar el bloque.
 
-6. **El lunes.**
-   Cada clase tiene un bloque marcado `[EL LUNES]`: un momento explícito donde el docente muestra
-   cómo lo de hoy se usa **el lunes que viene en la investigación de ellos**. No es una promesa
+6. **En tu investigación.**
+   Cada clase tiene un bloque marcado `[EN TU INVESTIGACIÓN]`: un momento explícito donde el
+   docente muestra cómo lo de hoy se usa **en la investigación de ellos, desde ya**. El bloque
+   describe un *uso*, no un plazo: si además hay tarea, el plazo se dice por número de clase
+   ("antes de la clase 5", "la clase que viene"), nunca por día de la semana. No es una promesa
    futura ("cuando terminemos el curso vas a poder..."): es una cosa concreta y chiquita que ya
    pueden hacer con lo que vieron hoy. En la clase 1 es "graficá tu variable y ajustale una recta
    con una perilla que vos entendés". En la clase 8 es "ahora sabés por qué tu prompt largo se
@@ -84,9 +86,19 @@ Ninguna exposición dura más de 20 minutos seguidos. El ritmo base es:
 | **Pausa** | 10 min | En serio, pausa. |
 | **Idea 2** | 20 min | La vuelta de tuerca de la clase. |
 | **Manos 2** | 25 min | El ejercicio grande, de a dos. |
-| **Cierre** | 15 min | `[EL LUNES]` + puente a la clase siguiente + la pregunta abierta. |
+| **Cierre** | 15 min | `[EN TU INVESTIGACIÓN]` + puente a la clase siguiente + la pregunta abierta. |
 
 El plan minuto a minuto de cada clase respeta esta forma, con variaciones declaradas.
+
+> **El calendario.** El curso se dicta en **tres encuentros por semana: lunes, miércoles y
+> viernes**. Las diez clases ocupan unas tres semanas y media, y entre una clase y la siguiente
+> hay entre 48 y 72 horas. De ahí sale el tope de carga: **toda tarea entre clases tiene que
+> caber en una hora**, y en dos como mucho cuando en el medio hay un fin de semana (de la
+> clase 3 a la 4, de la 6 a la 7 y de la 9 a la 10). Lo que no entra en ese tope —una lectura
+> larga, la receta completa de la clase 9 aplicada a un corpus propio— se presenta como
+> proyecto de mediano plazo, no como tarea para la clase siguiente. Por eso ningún material
+> del curso pone plazos por día de la semana: se dicen por número de clase. La clase 10 es la
+> última; su cierre habla de *después del curso*.
 
 > **Cuál documento manda cuando los minutos no coinciden.** Los planes de este programa son
 > el **presupuesto de diseño**; los de `clases/NN-slug/notas-docente.md` son el **plan operativo**,
@@ -117,7 +129,7 @@ El plan minuto a minuto de cada clase respeta esta forma, con variaciones declar
 
 ## 1. Tabla resumen de las 10 clases
 
-| # | Título | Intuición central (la única idea) | Metáfora del dibujo | Herramienta nueva | `[EL LUNES]` |
+| # | Título | Intuición central (la única idea) | Metáfora del dibujo | Herramienta nueva | `[EN TU INVESTIGACIÓN]` |
 |---|---|---|---|---|---|
 | 1 | **Una función es una máquina con perillas** | Una función tiene *entradas* que recorren la figura y *parámetros* que deforman la figura. Aprender = mover parámetros. | Dibujamos una figura simple con 2 perillas | Python, numpy, gráficos | Graficar tu serie y ajustarle una curva entendiendo qué hace cada perilla |
 | 2 | **Componer funciones: dibujar lo imposible** | Apilando funciones simples con un doblez en el medio se dibuja *cualquier* figura. Eso, y no otra cosa, es una red neuronal. | Componemos funciones para dibujar figuras imposibles con una sola máquina | Composición, ReLU, la primera red a mano | Entender qué promete y qué no promete un modelo "flexible" |
@@ -138,7 +150,7 @@ El plan minuto a minuto de cada clase respeta esta forma, con variaciones declar
 `clases/01-funciones-y-parametros/` · Espec: `_shared/especificaciones/clase-01-funciones-y-parametros.md`
 
 **Gancho (10 min).**
-En pantalla, una nube de puntos sin ejes rotulados: 40 puntos que suben y bajan. Pregunta:
+En pantalla, una nube de puntos sin ejes rotulados: 36 puntos que suben y bajan. Pregunta:
 "¿Qué le pasó a este país?". Se discute 3 minutos. Después se revelan los ejes: es el porcentaje
 de palabras del discurso presidencial de apertura de sesiones dedicadas al tema *seguridad*, año a
 año. Segunda pregunta, la que importa: **"si yo quisiera resumir esto con una línea, ¿qué línea
@@ -168,7 +180,7 @@ es la figura; entrenar es girar las perillas.
 | 60-70 | Pausa | |
 | 70-85 | Exposición: el zoo de funciones | Recta, parábola, sigmoide, exponencial, seno: qué forma tiene cada una y para qué sirve como pieza. `viz/zoo-de-funciones.html`. Se planta la semilla: "guardá la sigmoide, va a ser importante". |
 | 85-105 | Manos 2: ajuste a ojo | De a dos. Datos reales de discurso político; ajustan a mano `a` y `b`; el notebook les muestra el número de desajuste. Competencia sana: quién llega más bajo. |
-| 105-120 | Cierre | `[EL LUNES]`: tomá una serie tuya, graficala, ajustale una curva y explicá qué significa cada parámetro *sustantivamente* (una pendiente es "cuánto sube por año"). **Puente**: "hoy dibujamos con una recta. Pero los datos no son una recta. ¿Qué hacemos, buscamos una fórmula más rara? No: **componemos**. Eso es la clase que viene." |
+| 105-120 | Cierre | `[EN TU INVESTIGACIÓN]`: tomá una serie tuya, graficala, ajustale una curva y explicá qué significa cada parámetro *sustantivamente* (una pendiente es "cuánto sube por año"). **Puente**: "hoy dibujamos con una recta. Pero los datos no son una recta. ¿Qué hacemos, buscamos una fórmula más rara? No: **componemos**. Eso es la clase que viene." |
 
 **Conexión hacia atrás:** es la primera. **Hacia adelante:** la limitación evidente (la recta no
 alcanza) es el motor de la clase 2; el "medidor de desajuste" que ajustaron a ojo es exactamente
@@ -211,7 +223,7 @@ no es un cerebro: es una **suma de rampas** con las alturas y los puntos de quie
 | 55-65 | Pausa | |
 | 65-85 | El momento fuerte: sumar rampas | `viz/rampas.html`. El docente arranca con 1 rampa, después 2, 4, 8, contra la curva objetivo. **Aha del curso.** Se nombra: "esto que acabás de ver es el teorema de aproximación universal, y no vamos a demostrarlo porque acabás de verlo". |
 | 85-105 | Manos 2 | `viz/red-como-dibujante.html` en pantalla; en el notebook, escriben a mano (sin PyTorch) una red de 1 capa oculta con 4 neuronas, con los pesos puestos a dedo, y la grafican. TODO: llevarla a 8 neuronas. |
-| 105-120 | Cierre | `[EL LUNES]`: cuando leas "usamos una red neuronal", traducí mentalmente "usamos una función muy flexible con muchísimas perillas", y preguntá lo que hay que preguntar: ¿cuántas perillas? ¿cuántos datos? **Puente**: "sabemos dibujar cualquier cosa. Pero pusimos los pesos a mano. Con 8 perillas ya es un infierno; con 8 millones es imposible. ¿Cómo hace la máquina para encontrarlas sola? Clase que viene." |
+| 105-120 | Cierre | `[EN TU INVESTIGACIÓN]`: cuando leas "usamos una red neuronal", traducí mentalmente "usamos una función muy flexible con muchísimas perillas", y preguntá lo que hay que preguntar: ¿cuántas perillas? ¿cuántos datos? **Puente**: "sabemos dibujar cualquier cosa. Pero pusimos los pesos a mano. Con ocho rampas ya son 25 perillas (3 por rampa, más el sesgo final) y girarlas a mano es un infierno; con 8 millones es imposible. ¿Cómo hace la máquina para encontrarlas sola? Clase que viene." |
 
 **Conexión hacia atrás:** la recta de la clase 1 fracasa, y esa es la puerta. **Hacia adelante:**
 poner pesos a mano es insostenible → clase 3.
@@ -253,7 +265,7 @@ y dejarla rodar hasta el fondo.
 | 60-70 | Pausa | |
 | 70-90 | El gradiente y el learning rate | La flecha en `viz/valle-de-loss.html` y `viz/loss-1d.html` (derivada = pendiente de la tangente, sin epsilon ni límites). Botón **"soltar la pelota"** con rastro. Slider de learning rate: chico (tarda una eternidad), justo, enorme (sale despedida). `viz/tasa-de-aprendizaje.html` corre tres pelotas en paralelo. |
 | 90-110 | Manos 1b / 2 | Notebook: descenso por gradiente escrito a mano en 10 líneas, con derivadas numéricas (nada de cálculo simbólico). Ven la curva de loss bajar. TODO: romperlo con un lr de 1.5 y explicar el gráfico resultante. |
-| 110-120 | Cierre | `[EL LUNES]`: cuando un paper dice "optimizamos", ahora sabés que quiere decir "soltamos una pelota en un paisaje que definimos nosotros". Y la pregunta de revisor: *¿qué paisaje?* **Puente**: "ya sabemos dibujar (clase 2) y sabemos buscar solos las perillas (hoy). La clase que viene juntamos las dos cosas y entrenamos de verdad, con PyTorch, y descubrimos el primer modo de mentirse a uno mismo." |
+| 110-120 | Cierre | `[EN TU INVESTIGACIÓN]`: cuando un paper dice "optimizamos", ahora sabés que quiere decir "soltamos una pelota en un paisaje que definimos nosotros". Y la pregunta de revisor: *¿qué paisaje?* **Puente**: "ya sabemos dibujar (clase 2) y sabemos buscar solos las perillas (hoy). La clase que viene juntamos las dos cosas y entrenamos de verdad, con PyTorch, y descubrimos el primer modo de mentirse a uno mismo." |
 
 **Conexión hacia atrás:** resuelve el problema que dejó abierto la clase 2. **Hacia adelante:**
 tenemos todas las piezas; falta el ciclo que las une y las trampas que trae.
@@ -291,7 +303,7 @@ aprender, es memorizar tu muestra. La única defensa es guardar datos que el mod
 | 50-60 | Pausa | |
 | 60-80 | Calcar vs dibujar | `viz/sobreajuste.html`: slider de capacidad y slider de cantidad de datos; curvas de train y val; la figura pasando por todos los puntos. Analogía: el codificador que aprendió las manías del corpus piloto. Se introduce *early stopping* como "pará cuando la validación empieza a empeorar". |
 | 80-105 | Manos 2 | Notebook: partición train/val/test, curvas, early stopping, y un experimento de a dos con hipótesis escrita antes de correr. |
-| 105-120 | Cierre + evaluación de la unidad | `[EL LUNES]`: la regla de oro (test una sola vez) y cómo se escribe en un paper. Repaso del arco 1-4 en una sola slide: perillas → composición → loss → ciclo. **Puente**: "todo esto lo hicimos con un número que entra y un número que sale. Pero tus datos no son números sueltos: son fotos, son discursos, son secuencias. Y ahí la *forma* del dato cambia todo. Clase que viene: por qué la arquitectura es una teoría sobre el mundo." |
+| 105-120 | Cierre + evaluación de la unidad | `[EN TU INVESTIGACIÓN]`: la regla de oro (test una sola vez) y tres preguntas para escribir sobre tu propio corpus (¿mis casos son independientes?, ¿hay tiempo en mis datos?, ¿contra qué baseline comparo?), que se traen a la clase 5. Repaso del arco 1-4 en una sola slide: perillas → composición → loss → ciclo. **Puente**: "todo esto lo hicimos con un número que entra y un número que sale. Pero tus datos no son números sueltos: son fotos, son discursos, son secuencias. Y ahí la *forma* del dato cambia todo. Clase que viene: por qué la arquitectura es una teoría sobre el mundo." |
 
 **Conexión hacia atrás:** integra las clases 1-3. **Hacia adelante:** hasta acá el dato era un
 escalar; la clase 5 rompe eso.
@@ -326,13 +338,13 @@ Cuando esa teoría es cierta, la CNN necesita muchísimos menos datos. Cuando es
 | Min | Bloque | Qué pasa |
 |---|---|---|
 | 0-10 | Gancho | La foto corrida 20 píxeles. |
-| 10-25 | La imagen como grilla | `viz/vecindad-de-pixeles.html`: botón **"barajar los píxeles"**. La red densa da exactamente el mismo resultado con los píxeles barajados; tu ojo no puede ni ver qué es. **Aha**: la red densa nunca supo que había una grilla. |
+| 10-25 | La imagen como grilla | `viz/vecindad-de-pixeles.html`: botón **"barajar los píxeles"**. La red densa da prácticamente el mismo resultado con los píxeles barajados (unas décimas de diferencia: ruido de inicialización); tu ojo no puede ni ver qué es. **Aha**: la red densa nunca supo que había una grilla. |
 | 25-45 | La convolución | `viz/kernel-deslizante.html`: filtro 3x3 con 9 sliders sobre una foto de prensa; presets de borde vertical, horizontal, desenfoque. `[CALLBACK DIBUJO]`: "el filtro es un pincel; la red aprende sus pinceles". |
 | 45-60 | Manos 1 | Notebook: aplicar filtros a mano con numpy sobre una foto; después `nn.Conv2d`; ver los mapas de activación. |
 | 60-70 | Pausa | |
 | 70-85 | Jerarquía y supuestos | `viz/jerarquia.html` (bordes → texturas → partes → objeto) y `viz/supuestos-de-arquitectura.html` (tabla interactiva: qué supone cada arquitectura, cuándo se rompe). |
-| 85-105 | Manos 2 | Entrenar una CNN chica en un sandbox rápido (FashionMNIST) y comparar contra la densa: misma cantidad de parámetros, mejor resultado. Después, el caso real: un clasificador binario sobre imágenes de prensa (multitud / no multitud) con transferencia mínima. |
-| 105-120 | Cierre | `[EL LUNES]`: la lectura crítica de *Jean et al. 2016* (predecir pobreza desde imágenes satelitales) y las tres preguntas: ¿qué está midiendo realmente el modelo? ¿el supuesto de invariancia vale acá? ¿qué pasa fuera de la región de entrenamiento? **Puente**: "las imágenes tienen estructura espacial. El texto tiene otra estructura: el **orden**. Y el orden es más difícil, porque el significado de una palabra depende de las que están lejos." |
+| 85-105 | Manos 2 | Entrenar una CNN chica en un sandbox rápido (FashionMNIST) y comparar contra la densa: menos de la mitad de los parámetros (23.946 contra 50.890), mejor resultado y mucho más robusta al corrimiento. Después, el caso de archivo: un clasificador binario (movilización / no movilización) sobre un archivo fotográfico **sintético** donde sabemos la verdad, con el follaje puesto a propósito como trampa. |
+| 105-120 | Cierre | `[EN TU INVESTIGACIÓN]`: la lectura crítica de *Jean et al. 2016* (predecir pobreza desde imágenes satelitales) y las tres preguntas: ¿qué está midiendo realmente el modelo? ¿el supuesto de invariancia vale acá? ¿qué pasa fuera de la región de entrenamiento? **Puente**: "las imágenes tienen estructura espacial. El texto tiene otra estructura: el **orden**. Y el orden es más difícil, porque el significado de una palabra depende de las que están lejos." |
 
 **Conexión hacia atrás:** la red densa de la clase 4 muestra su límite. **Hacia adelante:** si la
 estructura espacial pide una arquitectura, la estructura secuencial pide otra.
@@ -345,8 +357,8 @@ estructura espacial pide una arquitectura, la estructura secuencial pide otra.
 **Gancho (10 min).**
 Dos frases en pantalla:
 *"La comisión rechazó al ministro."* / *"El ministro rechazó a la comisión."*
-"¿Significan lo mismo?" Risas. Ahora se muestran las dos convertidas en bolsa de palabras: **son el
-vector idéntico**. La técnica de análisis de texto más usada en ciencias sociales durante treinta
+"¿Significan lo mismo?" Risas. Ahora se muestran las dos convertidas en bolsa de palabras (sin palabras vacías): **son el
+mismo vector**. La técnica de análisis de texto más usada en ciencias sociales durante treinta
 años no puede distinguir quién le hizo qué a quién. Hoy arreglamos eso.
 
 **Objetivos. Vas a poder:**
@@ -369,13 +381,13 @@ significado que el modelo maneja.
 | Min | Bloque | Qué pasa |
 |---|---|---|
 | 0-10 | Gancho | La comisión y el ministro. |
-| 10-30 | De texto a números | `viz/tokenizador.html`: escribís una frase y ves cómo se parte. "Inconstitucionalidad" son varios pedazos. **Semilla plantada** para la clase 8 (por qué no sabe contar letras). One-hot: `viz/one-hot-vs-embedding.html`, la matriz gigante y absurda. Y la idea del embedding: darle a cada palabra un lugar. |
-| 30-50 | Manos 1 | Notebook: tokenizar un corpus de discursos, construir vocabulario, contar, matriz de coocurrencia, y ver que "vecino en el mapa" ≈ "aparece en contextos parecidos". **Tienen que tokenizar antes de poder mirar el mapa**: por eso este bloque va antes que el siguiente. |
-| 50-60 | Pausa | |
-| 60-78 | El mapa de palabras | `viz/espacio-de-embeddings.html`: nube 2D del vocabulario político **construida con el corpus que acaban de tokenizar**, buscador, vecinos más cercanos, aritmética de vectores, y un panel de **sesgo** (qué ocupaciones caen cerca de qué género). Discusión: el sesgo del modelo es un dato sobre el corpus, y eso puede ser un hallazgo, no sólo un problema. |
-| 78-95 | Manos 2 | Notebook: entrenar embeddings chiquitos sobre el corpus y explorarlos; medir similitud coseno entre discursos de distintos años. `[EL LUNES]` incorporado acá. |
-| 95-110 | El orden importa | `viz/bolsa-vs-orden.html`. Después, la RNN contada en un minuto: leer palabra por palabra arrastrando una mochila de memoria. **Y su falla**: `viz/memoria-que-se-olvida.html`, una frase larga donde el sujeto queda a 30 palabras del verbo. |
-| 110-120 | Cierre | Se plantea el problema abierto: "necesitamos algo que, al leer la palabra 'lo' de la línea 30, pueda mirar directamente a la palabra 'proyecto' de la línea 2, sin haber tenido que acordarse todo el camino. ¿Y si en vez de memoria le damos **atención**?" **Bloque apretado: si se atrasa, se recorta «las RNN en 30 segundos», nunca el puente.** |
+| 10-31 | De texto a números | `viz/tokenizador.html`: escribís una frase y ves cómo se parte. "Inconstitucionalidad" son varios pedazos. **Semilla plantada** para la clase 8 (por qué no sabe contar letras). One-hot: `viz/one-hot-vs-embedding.html`, la matriz gigante y absurda. Y la idea del embedding: darle a cada palabra un lugar. |
+| 31-51 | Manos 1 | Notebook: tokenizar un corpus de discursos, construir vocabulario, contar, matriz de coocurrencia, y ver que "vecino en el mapa" ≈ "aparece en contextos parecidos". **Tienen que tokenizar antes de poder mirar el mapa**: por eso este bloque va antes que el siguiente. |
+| 51-61 | Pausa | |
+| 61-87 | El mapa de palabras | `viz/espacio-de-embeddings.html`: nube 2D del vocabulario político **construida con el corpus que acaban de tokenizar**, buscador, vecinos más cercanos, aritmética de vectores, y un panel de **sesgo** (qué ocupaciones caen cerca de qué género). Discusión: el sesgo del modelo es un dato sobre el corpus, y eso puede ser un hallazgo, no sólo un problema. |
+| 87-104 | Manos 2 | Notebook: entrenar embeddings chiquitos sobre el corpus y explorarlos; medir similitud coseno entre discursos de distintos años. `[EN TU INVESTIGACIÓN]` incorporado acá. |
+| 104-114 | El orden importa | `viz/bolsa-vs-orden.html`. Después, la RNN contada en un minuto: leer palabra por palabra arrastrando una mochila de memoria. **Y su falla**: `viz/memoria-que-se-olvida.html`, una frase larga donde el sujeto queda a 30 palabras del verbo. |
+| 114-120 | Cierre | Se plantea el problema abierto: "necesitamos algo que, al leer la palabra 'lo' de la línea 30, pueda mirar directamente a la palabra 'proyecto' de la línea 2, sin haber tenido que acordarse todo el camino. ¿Y si en vez de memoria le damos **atención**?" **Bloque apretado: si se atrasa, se recorta «las RNN en 30 segundos», nunca el puente.** |
 
 **Conexión hacia atrás:** la clase 5 mostró que la forma del dato define la arquitectura; el texto
 tiene otra forma. **Hacia adelante:** el fracaso de la memoria secuencial es exactamente el hueco
@@ -397,13 +409,13 @@ lo único nuevo del transformer.
   para ella, y se arma un resumen ponderado".
 - Explicar qué son query, key y value con una analogía que te acordás (el aviso clasificado).
 - Explicar por qué hace falta la máscara causal en un modelo que genera texto, y qué pasa sin ella.
-- Explicar para qué está el *positional encoding*: sin él, el transformer también sería una bolsa
-  de palabras.
+- Explicar para qué está el *positional encoding*: sin él (y sin máscara), el transformer
+  también sería una bolsa de palabras.
 - Leer un mapa de atención y decir qué se puede y qué **no** se puede concluir de él.
 
 **Intuición central.**
-Attention es lo contrario de la memoria: en vez de acumular todo en una mochila que se va
-desbordando, cada palabra **mira a todas las demás en paralelo** y se arma su propio resumen a
+Attention es lo contrario de la memoria: en vez de meter todo en una mochila de tamaño fijo que
+se va sobrescribiendo, cada palabra **mira a todas las demás en paralelo** y se arma su propio resumen a
 medida. `[CALLBACK DIBUJO]`: cada palabra dibuja su propio mapa de a quién mira; ese mapa tiene
 perillas (Q, K, V) y se aprende con el mismo descenso por gradiente de la clase 3. Nada nuevo bajo
 el sol, sólo mejor organizado.
@@ -418,10 +430,11 @@ el sol, sólo mejor organizado.
 | 60-70 | Pausa | |
 | 70-85 | Máscara causal, cabezas, posición | `viz/matriz-de-atencion.html` (heatmap con triángulo), `viz/cabezas.html` (varias cabezas con patrones distintos). Por qué sin *positional encoding* volvemos a la bolsa de palabras de la clase 6. |
 | 85-105 | Manos 2 | Notebook: armar el bloque transformer completo (attention + MLP + residual + norm) como piezas de Lego, y verificar formas de tensores. No se entrena todavía: se **construye**. |
-| 105-120 | Cierre | `[EL LUNES]`: cómo leer (y cómo no) un paper que "interpreta" los mapas de atención de un modelo. Attention **no** es explicación causal. **Puente**: "tenemos el bloque. La clase que viene lo apilamos, lo entrenamos con datos de verdad, y lo vemos escribir. Y después traducimos cada pieza a algo que ChatGPT hace y que te vuelve loco." |
+| 105-120 | Cierre | `[EN TU INVESTIGACIÓN]`: cómo leer (y cómo no) un paper que "interpreta" los mapas de atención de un modelo. Attention **no** es explicación causal. **Puente**: "tenemos el bloque. La clase que viene apilamos cuatro bloques como éste en un mini-GPT que lee letra por letra, lo entrenamos con datos de verdad, y lo vemos escribir. Y después traducimos cada pieza a algo que ChatGPT hace y que te vuelve loco." |
 
-**Conexión hacia atrás:** resuelve la falla de memoria de la clase 6. **Hacia adelante:** el bloque
-construido hoy se entrena mañana.
+**Conexión hacia atrás:** resuelve la falla de memoria de la clase 6. **Hacia adelante:** en la clase
+siguiente se entrena un mini-GPT hecho de cuatro bloques como el de hoy, a nivel de caracteres (no el
+modelo exacto que se arma hoy: más chico, para que entrene en minutos en CPU).
 
 ---
 
@@ -432,7 +445,8 @@ construido hoy se entrena mañana.
 Se lee en voz alta un párrafo de un debate parlamentario. Tiene la cadencia, las fórmulas de
 cortesía, los giros. Se vota si es real o generado. Es generado — por un modelo de un millón y medio de
 parámetros que entrenamos en menos de siete minutos, en esta misma clase, y que vas a poder mirar por dentro
-línea por línea. **Todo lo que hace ChatGPT que te resulta mágico o irritante lo vas a poder
+línea por línea. (Y buena parte de ese párrafo el modelo la memorizó del corpus, que sale de
+plantillas: eso también es contenido de la clase.) **Todo lo que hace ChatGPT que te resulta mágico o irritante lo vas a poder
 explicar antes de que termine la clase.**
 
 **Objetivos. Vas a poder:**
@@ -449,8 +463,8 @@ explicar antes de que termine la clase.**
 **Intuición central.**
 Un modelo de lenguaje es una máquina de dibujar **la distribución de probabilidad de la próxima
 ficha**, condicionada por lo que hay en la ventana. No hay base de datos adentro, no hay
-verificador de verdad, no hay casillero para "no sé". `[CALLBACK DIBUJO — el grande]`: en la clase
-1 dibujábamos una recta con 2 perillas; hoy dibujamos una distribución sobre 5.000 palabras
+verificador de verdad, y nada adentro detecta que no sabe (si dice "no sé", es una continuación aprendida). `[CALLBACK DIBUJO — el grande]`: en la clase
+1 dibujábamos una recta con 2 perillas; hoy dibujamos una distribución sobre 71 caracteres
 posibles con un millón y medio de perillas. **Es la misma máquina.**
 
 **Plan minuto a minuto.**
@@ -458,11 +472,11 @@ posibles con un millón y medio de perillas. **Es la misma máquina.**
 |---|---|---|
 | 0-10 | Gancho | ¿Real o generado? Se vota. |
 | 10-20 | El objetivo más tonto del mundo | Predecir la próxima ficha. Se muestra el dataset: ventana de texto → siguiente ficha. Se muestra el modelo bigram tonto, que ya escribe algo, y se ve por qué no alcanza. |
-| 20-40 | Manos 1: entrenar | Notebook: se apilan los bloques de la clase 7, se entrena sobre el corpus de debates. La loss baja. Cada 500 pasos se imprime una muestra: de sopa de letras a palabras a sintaxis a cadencia parlamentaria. **Es el momento más lindo del curso.** |
+| 20-40 | Manos 1: entrenar | Notebook: se apilan los bloques de la clase 7, se entrena sobre el corpus de debates. La loss baja. A lo largo del entrenamiento (pasos 50, 150, 400, 800 y 1200) se imprime una muestra: de sopa de letras a palabras a sintaxis a cadencia parlamentaria. **Es el momento más lindo del curso.** |
 | 40-50 | Pausa (mientras entrena) | El entrenamiento sigue corriendo de fondo. |
 | 50-75 | **La traducción**: el modelo → ChatGPT | El bloque que paga todo el módulo. Una pieza a la vez, con su viz, y cada una termina en un comportamiento observable: `viz/temperatura.html`, `viz/ventana-de-contexto.html`, `viz/por-que-alucina.html`, `viz/contar-letras.html`. Ver la tabla de traducción en la especificación de la clase. |
 | 75-100 | Manos 2 | Notebook: jugar con la temperatura sobre tu propio modelo; medir cuánto empeora al pasarse de ventana; hacer que alucine a propósito y explicar por qué; probar el conteo de letras. Ejercicio de a dos: *escribí el prompt que rompe el modelo* y explicá por qué se rompió. |
-| 100-120 | Cierre | Qué le falta a tu mini-GPT para ser ChatGPT (escala, datos, instruction tuning y RLHF contados en 5 minutos) y qué **no** cambia con la escala. `[EL LUNES]`: usar LLMs en investigación — para qué sí (asistente de codificación con validación humana), para qué no (fuente de hechos). **Puente**: "entrenar uno tuyo desde cero es carísimo y casi nunca es lo que necesitás. Lo que vas a hacer de verdad es agarrar uno entrenado por otro. Clases 9 y 10." |
+| 100-120 | Cierre | Qué le falta a tu mini-GPT para ser ChatGPT (escala, datos, instruction tuning y RLHF contados en 5 minutos) y qué **no** cambia con la escala. `[EN TU INVESTIGACIÓN]`: usar LLMs en investigación — para qué sí (asistente de codificación con validación humana), para qué no (fuente de hechos). **Puente**: "entrenar uno tuyo desde cero es carísimo y casi nunca es lo que necesitás. Lo que vas a hacer de verdad es agarrar uno entrenado por otro. Clase que viene." |
 
 **Conexión hacia atrás:** entrena el bloque de la clase 7 con las herramientas de las clases 3 y 4.
 **Hacia adelante:** el costo del pre-entrenamiento motiva el transfer learning.
@@ -501,9 +515,9 @@ enseñamos nuestro estilo con cuatro trazos.
 | 10-25 | Transfer learning | Qué se congela y qué se reentrena, dibujado como capas. Por qué las primeras capas son genéricas y las últimas específicas (callback a la jerarquía de la clase 5). Modelos en español: BETO, RoBERTuito, modelos multilingües. |
 | 25-45 | Manos 1 | Notebook: `pipeline()` sobre titulares reales; embeddings de oraciones; búsqueda semántica en tu corpus; `viz/similitud-semantica.html`. |
 | 45-55 | Pausa | |
-| 55-75 | Evaluar de verdad | `viz/matriz-de-confusion.html` con slider de umbral: se ve cómo precisión y recall se pelean. Traducción a lenguaje llano: "de cada 100 notas que llamó *protesta*, 23 no lo eran". Baseline tonto. Kappa y el acuerdo entre humanos como techo realista. |
-| 75-100 | Manos 2: el proyecto chico | Notebook: fine-tuning de un clasificador sobre ~500 titulares etiquetados; comparación honesta contra zero-shot y contra el baseline; `viz/zero-shot-vs-finetune.html` (cuántas etiquetas hacen falta). |
-| 100-120 | Cierre | `[EL LUNES]`: la receta reproducible para clasificar un corpus propio, y qué números hay que reportar sí o sí. **Puente**: "sabés hacerlo andar y sabés medirlo. Falta lo más difícil: convencer a otro —y a vos mismo— de que lo que medís es lo que decís que medís. Última clase." |
+| 55-75 | Evaluar de verdad | `viz/matriz-de-confusion.html` con slider de umbral: se ve cómo precisión y recall se pelean. Traducción a lenguaje llano: "de cada 100 notas que llamó *protesta*, 23 no lo eran". Baseline tonto. El acuerdo entre humanos como techo realista, medido con la **misma** métrica que el modelo (el F1 de un codificador contra el otro); kappa sirve para reportar ese acuerdo, no como techo del F1. |
+| 75-100 | Manos 2: el proyecto chico | Notebook: un clasificador sobre titulares etiquetados, con las representaciones de un modelo pre-entrenado más una regresión logística; comparación honesta contra aprender el vocabulario desde cero (TF-IDF) y contra el baseline; `viz/zero-shot-vs-finetune.html` (cuántas etiquetas hacen falta). El fine-tuning completo y el zero-shot se discuten con la viz, pero no son el ejercicio central de la clase. |
+| 100-120 | Cierre | `[EN TU INVESTIGACIÓN]`: la receta reproducible para clasificar un corpus propio, y qué números hay que reportar sí o sí. **Puente**: "sabés hacerlo andar y sabés medirlo. Falta lo más difícil: convencer a otro —y a vos mismo— de que lo que medís es lo que decís que medís. Última clase." |
 
 **Conexión hacia atrás:** aprovecha lo aprendido sobre pre-entrenamiento en la clase 8.
 **Hacia adelante:** la métrica no alcanza; falta validez.
@@ -514,11 +528,14 @@ enseñamos nuestro estilo con cuatro trazos.
 `clases/10-criterio-validacion-y-etica/` · Espec: `_shared/especificaciones/clase-10-criterio-validacion-y-etica.md`
 
 **Gancho (10 min).**
-Se muestra un resultado precioso: un gráfico donde la "agresividad" del discurso opositor sube
-sostenidamente durante una década. F1 de 0.91. Todos lo publicarían. Después se muestra el pliegue:
-el modelo aprendió a detectar **la palabra "gobierno"**, que la oposición usa más. La serie
-temporal es real, la métrica es real, y el hallazgo es falso. Bienvenidos a la clase más importante
-del curso.
+Se muestra un resultado prolijo: un clasificador de "esta nota de prensa es sobre política",
+con F1 0,68 en un test que nunca vio y ganándole al piso. Todos lo publicarían. Después se muestra
+el pliegue: uno de cada tres términos con más peso es un nombre propio de la coyuntura mexicana
+del corpus. Y el golpe: aplicado a 824 oraciones de discursos presidenciales argentinos —100 %
+política, por definición— encuentra 22 de cada 100 (en oraciones del mismo largo de su propio
+corpus, 49). El modelo no cambió ni una coma; cambió dónde
+lo medimos. La métrica es real, y la frase "esto mide contenido político" no lo es. Bienvenidos a
+la clase más importante del curso.
 
 **Objetivos. Vas a poder:**
 - Distinguir desempeño (¿acierta?) de **validez** (¿mide lo que digo que mide?) y aplicar los tres
@@ -573,7 +590,7 @@ poner frases inventadas en boca de personas reales.
 
 2. **Corpus reales de dominio público**, cuando se consigan y se verifiquen: discursos oficiales
    publicados por organismos públicos, textos de leyes, documentos históricos fuera de derechos.
-   Se usan para los momentos de "esto es real" y para el `[EL LUNES]`. **Toda URL de descarga tiene
+   Se usan para los momentos de "esto es real" y para el `[EN TU INVESTIGACIÓN]`. **Toda URL de descarga tiene
    que ser verificada por el equipo que construye la clase** (el entorno de desarrollo tiene la red
    restringida; Colab no). Cada notebook implementa el patrón de descarga con red:
 
@@ -614,7 +631,7 @@ La regla: **una abstracción sólo se permite después de que hayan hecho a mano
   aplicada**. Se resuelve en 15 minutos, no se corrige con nota: se usa para conversar.
   > **Excepción declarada, clase 10.** Su cuestionario incluye tres ítems de diseño y uno de una
   > página, y declara 50 minutos. **Manda el archivo de la clase**: para los 15 minutos de rutina
-  > se usan las cinco preguntas mínimas que el propio `cuestionario.md` lista, y el resto queda
+  > se usan las preguntas mínimas que el propio `cuestionario.md` lista (la 1, la 2, la 4 y la 5), y el resto queda
   > como integrador o como parte del proyecto final.
 - **Proyecto final opcional**: aplicar el pipeline de las clases 9-10 al corpus propio del
   estudiante, con el checklist de la clase 10 como rúbrica. **La consigna completa, en seis

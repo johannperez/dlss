@@ -2,6 +2,11 @@
 **Directorio:** `clases/10-criterio-validacion-y-etica/`
 **Duración:** 120 min · **Prerrequisitos:** clases 1-9 · **Cierre del curso**
 
+> **Nota de construcción.** La clase construida cambió el gancho de esta especificación: en vez de la
+> "agresividad" con F1 0,91 y la palabra "gobierno", usa un clasificador de "esta nota es sobre
+> política" (F1 0,68) que, aplicado a 824 oraciones de discursos presidenciales argentinos, encuentra 22 de
+> cada 100. Donde esta especificación y la clase difieran, manda la clase (`PROGRAMA.md` §0.2).
+
 ---
 
 ## 1. Narrativa de la clase
@@ -110,7 +115,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 29 | El juicio | discusión | La actividad. | El docente modera y anota en el pizarrón las objeciones que aparecen. |
 | 30 | Veredicto | discusión | Se ordenan las objeciones por gravedad. ¿Cuáles son fatales y cuáles se arreglan con una revisión menor? | "Esta distinción es la que hace a un buen revisor: no todo problema es fatal, y decir que sí lo es también es un error." |
 | 31 | **Cuándo NO usar deep learning** | texto | Seis situaciones: n chico; necesitás coeficientes interpretables para el argumento; una regresión o un diccionario ya resuelve; el costo del error es alto y no hay revisión humana; no tenés cómo validar; el problema es que la categoría está mal definida. | "Si esta lista los hace usar menos deep learning, el curso fue exitoso. En serio." |
-| 32 | **Qué le decís a un revisor** | VIZ | `viz/checklist-revisor.html`. | Completa el checklist en vivo y genera el párrafo de métodos. "Esto se lo llevan y lo usan el lunes." |
+| 32 | **Qué le decís a un revisor** | VIZ | `viz/checklist-revisor.html`. | Completa el checklist en vivo y genera el párrafo de métodos. "Esto se lo llevan y lo usan en el próximo paper que escriban." |
 | 33 | Las seis objeciones que te van a hacer | texto | (1) ¿Cómo sabemos que mide lo que decís? (2) ¿Cuál es el baseline? (3) ¿Cómo partiste los datos? (4) ¿Cuánta validación humana hay? (5) ¿Es reproducible? (6) ¿Qué pasa con los errores y a quién afectan? | "Las seis. Siempre. Si su paper las contesta en el texto, van a tener una revisión mucho más tranquila." |
 | 34 | **El mapa del curso** | figura | Una sola figura con las 10 clases: perilla → composición → loss → ciclo → convolución → embedding → attention → GPT → transfer → criterio. Con la metáfora del dibujo atravesándola. | Lo recorre en tres minutos. "Miren de dónde salieron. La primera clase movíamos dos sliders." |
 | 35 | Adónde seguir | texto | Recursos para continuar, comunidades, y la sugerencia principal: **hacé un proyecto chico con tus datos**, no otro curso. | |

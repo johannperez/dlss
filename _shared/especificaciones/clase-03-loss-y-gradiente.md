@@ -67,7 +67,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 60-70 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 19. |
 | 70-90 | El gradiente y el learning rate | 20-23 | Soltá la pelota. Los dos síntomas de una lr mal elegida. |
 | 90-110 | Manos 1b / 2 | 24 | De a dos: romper el learning rate a propósito y explicar el síntoma. |
-| 110-120 | Cierre | 25-34 | Mini-batch, optimizadores, `[EL LUNES]`, el puente a la clase 4. |
+| 110-120 | Cierre | 25-34 | Mini-batch, optimizadores, `[EN TU INVESTIGACIÓN]`, el puente a la clase 4. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -107,7 +107,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 27 | Lo que hace la computadora de verdad | texto | Se nombra **backpropagation** en una sola slide: es la regla de la cadena aplicada con inteligencia para calcular todas las derivadas de una pasada. **No se deriva.** | "Es el truco que hace que esto sea factible. Es importante que exista y no es importante que lo sepas hacer a mano. PyTorch lo hace y en la clase 4 vas a ver que son dos palabras: `loss.backward()`." |
 | 28 | La honestidad | texto | Los paisajes reales tienen mesetas, valles laterales, sillas de montar. El descenso no garantiza el mínimo global. Y funciona igual. | "Nadie tiene una teoría completa de por qué esto anda tan bien. Es un campo con más ingeniería que teoría, y eso hay que saberlo cuando leés un paper que suena muy seguro de sí mismo." |
 | 29 | Optimizadores | texto | Adam, SGD con momento, en una línea cada uno: variantes de cómo dar el paso (con inercia, con paso adaptativo). | "Van a ver `Adam` en todos lados. Es 'la pelota con inercia y con paso que se autorregula'. Con eso alcanza." |
-| 30 | `[EL LUNES]` | texto | Cuando leas "el modelo fue optimizado", preguntá: ¿optimizado para minimizar **qué**? Y si la respuesta es "el default", ahí hay una decisión escondida que alguien no discutió. | "Esta es una pregunta de revisor que casi nadie hace y que casi siempre encuentra algo." |
+| 30 | `[EN TU INVESTIGACIÓN]` | texto | Cuando leas "el modelo fue optimizado", preguntá: ¿optimizado para minimizar **qué**? Y si la respuesta es "el default", ahí hay una decisión escondida que alguien no discutió. | "Esta es una pregunta de revisor que casi nadie hace y que casi siempre encuentra algo." |
 | 31 | La escalera de la clase | figura | Resumen visual: función → loss → paisaje → gradiente → paso → repetir. | |
 | 32 | Ya tenemos todo | texto | Clase 1: la máquina. Clase 2: la máquina flexible. Clase 3: cómo se ajusta sola. | "Falta una sola cosa: hacerlo bien, sin engañarnos." |
 | 33 | El puente | texto | "Clase 4: entrenamos de verdad con PyTorch. Y descubrimos que un modelo puede sacarse un 99% y ser un desastre." | |

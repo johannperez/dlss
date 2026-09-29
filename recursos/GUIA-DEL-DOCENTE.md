@@ -22,7 +22,7 @@ Se lee de una sentada, y después se vuelve a la sección que haga falta.
 |---|---|
 | `PROGRAMA.md`, entero | La filosofía, el plan de las diez clases, y sobre todo la **§4, el mapa de puentes**. Si no tenés el mapa de puentes en la cabeza, las clases se sienten sueltas. |
 | `datos/README.md`, entero | **La media hora que más rinde de toda la preparación.** Cada corpus tiene una trampa documentada, y varias de esas trampas *son* contenido del curso. Si no las conocés, vas a afirmar cosas que no son. |
-| `recursos/glosario.md` | Para tener a mano la traducción que usa el curso. Si vos decís "pérdida" y las slides dicen "loss", el aula reaprende vocabulario cada martes. |
+| `recursos/glosario.md` | Para tener a mano la traducción que usa el curso. Si vos decís "pérdida" y las slides dicen "loss", el aula reaprende vocabulario en cada clase. |
 | `_shared/especificaciones/00-ESTADO-CURSO.md` | Qué está medido, qué quedó abierto y qué hay que arreglar antes de dictar. |
 
 ### Antes de cada clase (una hora y media, la noche anterior)
@@ -117,6 +117,36 @@ planificado: se lanza el entrenamiento a los 20 minutos, **la pausa de 10 minuto
 se toma mientras entrena**, y a los 40 está listo. Si en tu aula tarda más, no
 pasa nada: el bloque siguiente no lo necesita terminado.
 
+### Los números, y por qué los tuyos pueden no coincidir
+
+Los notebooks fijan semillas y son **deterministas en la misma máquina y con las
+mismas versiones de las librerías**. Con otra versión de torch, numpy o
+scikit-learn (y Colab las actualiza sin avisar) los números cambian un poco: un
+decimal en una loss, un punto en una accuracy, otra muestra de texto en la
+clase 8. El argumento de cada clase no depende de eso, pero **algunos momentos
+sí dependen de un resultado concreto**: los mapas de atención "aha" de la
+clase 7 y la alucinación de la clase 8 son los dos más sensibles.
+
+La regla práctica: **proyectá tu propia corrida, no la cifra de la slide.**
+Corré el notebook la noche anterior en el mismo entorno que van a usar los
+estudiantes (ver §1), anotá los números que te dieron, y si alguno difiere de
+la slide, decilo en voz alta: *"la slide dice un número y a mí me dio otro parecido;
+con otra versión de las librerías cambia el último decimal, y eso también es
+contenido"*.
+Es un anticipo gratis de la clase 10. Si un momento clave no aparece en tu
+corrida, las notas de esa clase dicen qué mostrar en su lugar.
+
+### El calendario: tres encuentros por semana
+
+El formato de diez clases se dicta **lunes, miércoles y viernes** (ver
+`PROGRAMA.md` §0.2): entre una clase y la siguiente hay 48 a 72 horas. Por eso
+**la tarea entre clases no pasa de una hora** (dos cuando hay un fin de semana en
+el medio: de la 3 a la 4, de la 6 a la 7 y de la 9 a la 10), y los plazos se
+dicen siempre por número de clase, nunca por día. Opcional, y funciona bien:
+abrí las clases 4, 7 y 10 con diez minutos de puesta en común donde dos o tres
+personas cuentan qué hicieron con el `[EN TU INVESTIGACIÓN]` de las clases
+anteriores.
+
 ---
 
 ## 4. Un aula con niveles de programación muy distintos
@@ -179,14 +209,16 @@ por miedo, no por dificultad. Cinco cosas concretas:
    no, lo resuelve en los primeros diez minutos del práctico con el compañero.
 5. **El chiste de la clase 1 que hay que hacer.** Al final del segundo práctico,
    cuando compitieron por bajar el desajuste a mano: *"ustedes acaban de hacer, a
-   mano, con dos perillas y en diez minutos, lo que una computadora hace con mil
-   millones de perillas en dos semanas. La idea es exactamente la misma. Lo único
-   que falta es que la máquina sepa para dónde mover."* Es verdad, y es la mejor
-   inyección de confianza del curso.
+   mano, con dos perillas y en diez minutos, lo que una computadora hace con miles
+   de millones de perillas, durante semanas y con miles de procesadores. La idea de
+   fondo es la misma. Lo primero que falta es que la máquina sepa para dónde
+   mover."* Es verdad (el corazón es el mismo; encima se suman la dirección, la
+   arquitectura, los datos y las personas), y es la mejor inyección de confianza
+   del curso.
 
 **Y una cosa que no hay que hacer:** no prometas que "al final del curso van a
-poder hacer X con sus datos". Prometé lo del `[EL LUNES]`: algo chiquito y
-concreto **esta semana**. El curso está diseñado alrededor de eso.
+poder hacer X con sus datos". Prometé lo del `[EN TU INVESTIGACIÓN]`: algo chiquito y
+concreto que ya pueden usar **desde ya**. El curso está diseñado alrededor de eso.
 
 ---
 
@@ -378,8 +410,8 @@ recortás una punta, **avisá o recortá las dos**:
 | Se planta en | Se cobra en | Qué es |
 |---|---|---|
 | Clase 1, viz del zoo | Clase 2 | **La rampa** aparece sin explicación entre las seis formas. |
-| Clase 2, botón "32 rampas" | Clase 4 | 96 perillas para 36 datos, desajuste 0,00001. Es el sobreajuste antes de tener nombre. **El golpe fuerte es el numérico, no el visual: cobralo con ese par de números.** |
-| Clase 5, `viz/supuestos-de-arquitectura.html` | Clase 7 | Se construye con dos filas grises (RNN y Transformer) y la clase 7 las desbloquea con el cartel *"prometido en la clase 5, cumplido"*. |
+| Clase 2, botón "32 rampas" | Clase 4 | 97 perillas como red (la viz ajusta 33 números, con los codos fijos) para 36 datos, desajuste 0,000008. Es el sobreajuste antes de tener nombre. **El golpe fuerte es el numérico, no el visual: cobralo con ese par de números.** |
+| Clase 5, `viz/supuestos-de-arquitectura.html` | Clases 6 y 7 | Se construye con dos filas grises (RNN y Transformer). Cada fila se desbloquea por separado: en la clase 6, la de C5 con `?hasta=6` abre sólo la RNN; la clase 7 tiene su copia con las dos abiertas y el cartel *"prometido en la clase 5, cumplido"*. |
 | Clase 6, panel "¿cuántas erres tiene?" | Clase 8 | El tokenizador plantea la pregunta y no la contesta. La clase 8 la cierra con la viz de contar letras. |
 | Clase 6, slide 36 (el puente) | Clase 7 | *"¿y si en vez de recordar, miramos directamente?"* — **es lo único de la clase 6 que nunca se recorta.** |
 
@@ -407,9 +439,10 @@ de 10.** Cuatro horas seguidas de esto no las aguanta nadie. Y **al menos tres
 bloques de manos** por encuentro: el riesgo del formato largo es que se convierta
 en una charla.
 
-**Lo que se pierde:** la semana entre clase y clase, que es donde el `[EL LUNES]`
-se hace. Compensalo pidiendo el `[EL LUNES]` de las dos clases como una sola
-tarea entre encuentros, y dedicando los primeros diez minutos del encuentro
+**Lo que se pierde:** el tiempo entre clase y clase (en el formato de diez
+clases, las 48 a 72 horas entre un encuentro y el siguiente), que es donde el
+`[EN TU INVESTIGACIÓN]` se prueba. Compensalo pidiendo el `[EN TU INVESTIGACIÓN]`
+de las dos clases como una sola tarea entre encuentros, y dedicando los primeros diez minutos del encuentro
 siguiente a que dos o tres personas cuenten qué les pasó.
 
 ### 20 clases de 1 hora
@@ -430,7 +463,7 @@ Ajustes obligatorios:
 2. **La media A necesita un cierre que no existe.** No la termines en el medio de
    un práctico: cerrala con la pregunta que la media B va a contestar. Escribila
    antes, no improvises.
-3. **El `[EL LUNES]` va siempre en la media B.** Nunca lo partas.
+3. **El `[EN TU INVESTIGACIÓN]` va siempre en la media B.** Nunca lo partas.
 4. **La clase 8 no se parte bien**: su entrenamiento arranca a los 20 minutos y la
    pausa está diseñada para ocurrir *mientras entrena*. Para 20×1h, dale a la
    clase 8 dos horas seguidas o lanzá el entrenamiento al final de la media A y
@@ -445,7 +478,7 @@ Si podés elegir, elegí el formato de 2 h.
 ### Otras variantes que se piden y no recomendamos
 
 - **Un taller intensivo de dos días.** Se puede, pero el curso deja de funcionar:
-  no hay `[EL LUNES]` posible y el 70 % de lo que se lleva la gente es criterio,
+  no hay `[EN TU INVESTIGACIÓN]` posible y el 70 % de lo que se lleva la gente es criterio,
   que necesita reposo. Si te obligan, dictá las clases 1, 2, 3, 4, 8, 9 y 10 y
   dejá 5, 6 y 7 como material de lectura con las viz.
 - **Sacar la clase 10 "por falta de tiempo".** Es la clase más importante del
@@ -482,6 +515,8 @@ Si podés elegir, elegí el formato de 2 h.
    la honestidad, no de tener todas las respuestas.
 10. **Antes de publicar el curso**, hay dos cosas pendientes que no son opcionales:
     escribirles a los recopiladores de los dos corpus de discursos (no declaran
-    licencia) y reemplazar la URL del repositorio en la celda de bootstrap de los
-    diez notebooks, en la plantilla y en `recursos/setup.md`. Está detallado en
+    licencia) y **hacer público el repositorio** `github.com/johannperez/dlss`
+    (rama `main`), que es el que clona la celda de bootstrap de los diez notebooks.
+    Mientras no sea público, el camino en Colab es subir el `.zip` del repo
+    (`recursos/setup.md`). Está detallado en
     `_shared/especificaciones/00-ESTADO-CURSO.md`.

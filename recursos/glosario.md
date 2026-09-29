@@ -48,12 +48,12 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **ReLU** (*rectified linear unit*) | la rampa | `max(0, x)`: si el número es negativo devuelve cero, si no lo deja pasar. | Una rampa: plancha hasta cierto punto y después sube. La pieza de Lego del curso. |
 | **activation function** | función de activación | El nombre técnico del doblez que va entre capa y capa. | ReLU, sigmoide y tanh son tres dobleces distintos. |
 | **weight** | peso | Un parámetro que multiplica a lo que entra. | Cuánto pesa esa entrada en la cuenta. |
-| **bias** | sesgo, ordenada | Un parámetro que suma, sin multiplicar nada. | Corre la figura entera para arriba o para abajo. **Ojo:** no es el "sesgo" social de la clase 10. |
+| **bias** | sesgo, ordenada | Un parámetro que suma, sin multiplicar nada. | Desplaza la figura: el de la salida la corre entera para arriba o para abajo; el de una neurona oculta corre su codo a izquierda o derecha. **Ojo:** no es el "sesgo" social de la clase 10. |
 | **neuron** | neurona | Una rampa con sus perillas: multiplicar, sumar y doblar. | Ni una célula ni algo que piense. El nombre viene de una analogía de 1943 que hoy confunde más de lo que ayuda. |
 | **layer** | capa | Un grupo de neuronas que miran la misma entrada en paralelo. | Cien codificadores leyendo todos el mismo documento. |
 | **hidden layer** | capa oculta | Una capa que no es ni la entrada ni la salida. | "Oculta" sólo quiere decir "del medio". No hay misterio. |
 | **deep** | profundo | Muchas capas, una atrás de la otra. | Cinco analistas donde cada uno trabaja sobre la síntesis del anterior. De ahí sale *deep learning*, y de nada más profundo que eso. |
-| **universal approximation** | aproximación universal | El teorema que dice que con suficientes rampas se dibuja cualquier figura. | Dice que la figura *existe*; no dice que la vayas a encontrar, ni que sirva para predecir. |
+| **universal approximation** | aproximación universal | El teorema que dice que con suficientes rampas se dibuja cualquier figura continua, dentro de un rango acotado (para la rampa, Leshno et al. 1993). | Dice que la figura *existe*; no dice que la vayas a encontrar, ni que sirva para predecir. |
 | **dying ReLU** | rampa muerta | Una rampa cuyo codo queda fuera del rango de los datos: nunca se activa y no aporta nada. | Un codificador al que le tocó una parte del corpus que está vacía. |
 
 ## Clase 3 — Estar equivocado es un número, y ese número tiene pendiente
@@ -63,15 +63,15 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **loss** | pérdida | El número que mide qué tan mal está el dibujo. Más chico es mejor. | El medidor de desajuste de la clase 1, con nombre propio. |
 | **loss function / cost function** | función de pérdida, de costo | La receta con la que se calcula ese número. | El criterio. **Y el criterio no viene con los datos: lo escribe alguien.** |
 | **MSE** (*mean squared error*) | error cuadrático medio | El promedio de los errores elevados al cuadrado. | Al elevar al cuadrado, un caso extremo pesa muchísimo: la recta se le va atrás. |
-| **MAE** (*mean absolute error*) | error absoluto medio | El promedio de los errores sin signo, sin elevar. | Los casos extremos pesan igual que el resto: la recta los ignora. |
+| **MAE** (*mean absolute error*) | error absoluto medio | El promedio de los errores sin signo, sin elevar. | Cada caso empuja la recta con la misma fuerza, esté cerca o lejos: un caso extremo no la arrastra. El MSE persigue el promedio; el MAE, la mediana. |
 | **gradient** | gradiente | Para qué lado sube la loss si movés un poquito cada perilla. | La flecha que apunta cuesta arriba. Vos vas exactamente al revés. |
 | **gradient descent** | descenso por gradiente | Mover las perillas de a pasitos en la dirección contraria al gradiente. | Bajar una colina con niebla: tanteás la pendiente con el pie y das un paso. |
-| **learning rate** | tasa de aprendizaje | El tamaño de cada paso. | Chico: tardás una eternidad. Enorme: salís despedido de la ladera. |
+| **learning rate** | tasa de aprendizaje | El número que multiplica a la pendiente para decidir cuánto moverse: paso = tasa × pendiente. | Chico: tardás una eternidad. Enorme: salís despedido de la ladera. Y como multiplica a la pendiente, el paso se achica solo cerca del fondo. |
 | **batch** | lote | Cuántos casos mira el modelo antes de mover las perillas una vez. | Censo (todos) contra muestra (un puñado). |
 | **mini-batch** | lote chico | Un puñado de casos en vez del conjunto entero. Es lo que se usa siempre. | Encuestar a 400 personas en vez de al país. |
 | **SGD** (*stochastic gradient descent*) | descenso estocástico | Descenso por gradiente mirando un lote chico por vez. | "Estocástico" quiere decir "con azar en qué casos mirás". |
 | **backpropagation** | retropropagación | El procedimiento que calcula todas las pendientes de una sola pasada hacia atrás. | La contabilidad que reparte la culpa del error, capa por capa. No hace falta saber derivarla para usarla. |
-| **Adam** | Adam | Un optimizador que regula solo el tamaño del paso, con algo de inercia. | Una pelota con peso: no se frena en cada pocito y acelera en las bajadas largas. |
+| **Adam** | Adam | Un optimizador que adapta el paso de cada perilla por separado, con algo de inercia. Igual hay que darle un learning rate. | Una pelota con peso: no se frena en cada pocito y acelera en las bajadas largas. |
 | **local minimum** | mínimo local | Un pozo del paisaje que no es el pozo más hondo. | Se sale menos seguido de lo que uno teme, y con muchas perillas casi nunca es el problema. |
 | **hyperparameter** | hiperparámetro | Un número que elegís vos antes de entrenar, y que el modelo no aprende. | La tasa de aprendizaje y la cantidad de rampas son hiperparámetros; los pesos, no. |
 | **proxy** | proxy, medida indirecta | Una variable que usás en lugar de la que te importa, porque la que te importa no se mide. | Menciones en el discurso como proxy de agenda de gobierno. Toda la validez del análisis cuelga de ahí. |
@@ -84,7 +84,7 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **epoch** | época, pasada | Una pasada completa por todos los datos de entrenamiento. | Leer el corpus entero de punta a punta, una vez. |
 | **iteration / step** | iteración, paso | Una vuelta del ciclo: una actualización de las perillas. | Con 1.200 casos y lotes de 200, una época son 6 pasos. No es lo mismo época que paso. |
 | **tensor** | tensor | Una tabla de números con las dimensiones que haga falta. | Un número es un tensor; una foto también; un lote de fotos también. |
-| **autograd** | derivación automática | La maquinaria de PyTorch que calcula sola todas las pendientes. | Es la resta de la clase 3, hecha exacta y para millones de perillas a la vez. |
+| **autograd** | derivación automática | La maquinaria de PyTorch que calcula sola todas las pendientes. | Mismo resultado que la resta de la clase 3, otra cuenta: la resta *mide* la pendiente; autograd la *calcula* exacta con la regla de la cadena, para millones de perillas a la vez. |
 | **forward** | paso hacia adelante | Meter el dato y sacar la predicción. | La ida. |
 | **backward** | paso hacia atrás | Calcular de quién es la culpa del error. | La vuelta. Anota; no mueve nada. |
 | **optimizer** | optimizador | El objeto que efectivamente mueve las perillas con lo que anotó el `backward`. | El que gira las perillas después de que el contador dijo cuánto. |
@@ -115,10 +115,10 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **feature map** | mapa de activación | El dibujo que produce un filtro: dónde apareció eso que busca. | El calco que deja el pincel. |
 | **pooling** | submuestreo | Achicar el mapa quedándose con lo más fuerte de cada vecindario. | Resumir cada barrio por su valor más alto. |
 | **CNN** (*convolutional neural network*) | red convolucional | La arquitectura que supone que lo importante es local y se repite. | Una teoría sobre el mundo, escrita en forma de red. |
-| **translation invariance** | invariancia traslacional | Que el resultado no cambie si el objeto se corre unos píxeles. | Un gato sigue siendo un gato tres píxeles más a la derecha. |
+| **translation invariance** | invariancia traslacional | Que el resultado no cambie si el objeto se corre unos píxeles. | Un gato sigue siendo un gato tres píxeles más a la derecha. **Técnicamente:** la convolución *acompaña* el corrimiento (el mapa se corre con la imagen: equivariancia); el que lo *ignora* es el máximo final (invariancia). |
 | **inductive bias** | sesgo inductivo | Lo que el modelo supone por diseño, antes de ver un solo dato. | Es una teoría, y puede ser falsa. Igual que un marco teórico. |
 | **feature hierarchy** | jerarquía de representaciones | Que cada capa arme sobre lo que armó la anterior. | Bordes → texturas → partes → objetos. |
-| **flatten** | aplanar | Estirar la grilla de 28×28 en una fila de 784 números. | Es lo que hacía la red de la clase 4, y es exactamente donde se pierde la vecindad. |
+| **flatten** | aplanar | Estirar la grilla de 28×28 en una fila de 784 números. | Es lo que hace la red densa de esta clase antes de mirar la foto, y es exactamente donde se pierde la vecindad. |
 | **parameter sharing** | compartir parámetros | Usar los **mismos** nueve números en toda la imagen. | De ahí sale que una capa convolucional tenga muchísimas menos perillas que una densa. |
 | **receptive field** | campo receptivo | Qué pedazo de la foto original influye sobre una unidad. | Crece al apilar capas, no al agrandar el filtro. |
 | **stride / padding** | paso / relleno | Cada cuántos píxeles salta el filtro, y cuánto borde se agrega para que entre. | Detalles de plomería: se googlean el día que armes una red. No los estudies. |
@@ -137,9 +137,9 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **dimension** | dimensión | Cuántos números tiene el vector de cada palabra. | No corresponden a conceptos interpretables, por más ganas que dé. |
 | **cosine similarity** | similitud coseno | Qué tan parecido apuntan dos vectores, de −1 a 1. | Dos flechas: importa el ángulo, no el largo. |
 | **distributional hypothesis** | hipótesis distribucional | Que el significado de una palabra se deduce de la compañía que frecuenta. | "Conocerás una palabra por la compañía que mantiene" (Firth, 1957). Es el supuesto sustantivo detrás de todos los embeddings. |
-| **bag-of-words** | bolsa de palabras | Representar un texto por sus conteos, tirando el orden. | "La comisión rechazó al ministro" y "el ministro rechazó a la comisión" dan el **mismo** vector. |
-| **RNN** (*recurrent neural network*) | red recurrente | Un modelo que lee palabra por palabra arrastrando una memoria. | Una mochila que se va llenando. Al final ya no entra nada más. |
-| **LSTM** | LSTM | Una RNN con una mochila más grande y con candados. | Mejora la memoria; no la arregla. |
+| **bag-of-words** | bolsa de palabras | Representar un texto por sus conteos, tirando el orden. | "La comisión rechazó al ministro" y "el ministro rechazó a la comisión" dan el **mismo** vector (una vez que sacás las palabras vacías: «al» contra «a» + «el» cambian un conteo). |
+| **RNN** (*recurrent neural network*) | red recurrente | Un modelo que lee palabra por palabra arrastrando una memoria. | Una mochila de tamaño fijo que se va sobrescribiendo: cada palabra nueva entra pisando algo, y lo del principio se va perdiendo. |
+| **LSTM** | LSTM | Una RNN con compuertas que deciden qué guardar y qué olvidar. | La misma mochila, con alguien en la puerta que elige qué entra y qué sale. Mejora la memoria; no la arregla. |
 | **secuencia** | secuencia | Datos donde el orden es información, no un detalle de presentación. | El texto tiene forma, igual que la imagen. Su forma es el orden. |
 | **BPE** (*byte pair encoding*) | fusión de pares frecuentes | El algoritmo que arma las sub-palabras pegando el par de letras que más aparece. | Empieza por letras sueltas y va pegando. El de GPT es éste, en grande. |
 | **coocurrencia** | coocurrencia | Cuántas veces dos palabras aparecen cerca en el corpus. | La materia prima de todo embedding. Es una tabla de contingencia. |
@@ -149,7 +149,7 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **ley de Zipf** | ley de Zipf | Un puñado de palabras se lleva casi todo el texto. | Pasa en todos los idiomas, y nadie lo diseñó. |
 | **hapax legomenon** | dicho una sola vez | Una palabra que aparece exactamente una vez en el corpus. | En los discursos de apertura son casi la mitad del vocabulario. |
 | **cambio semántico** | cambio semántico | Que las vecinas de una palabra sean otras en dos períodos distintos. | Se mide entrenando un embedding por época y comparando vecindarios. |
-| **spaCy / gensim** | — | Las dos bibliotecas que vas a usar de verdad el lunes para texto en castellano. | Lo de hoy es para entender qué hace la rueda cuando te dé un número raro. |
+| **spaCy / gensim** | — | Las dos bibliotecas que vas a usar de verdad en tu investigación para texto en castellano. | Lo de hoy es para entender qué hace la rueda cuando te dé un número raro. |
 
 ## Clase 7 — Attention: cada palabra arma su propio resumen del contexto
 
@@ -164,7 +164,7 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **softmax** | softmax | Convertir puntajes cualesquiera en porcentajes que suman 100. | Reparte, no inventa: si le da más a una, le da menos a otra. |
 | **causal mask** | máscara causal | Taparle el futuro al modelo mientras aprende a generar. | Al predecir la palabra 5 no puede espiar la 6. Sin esto, hace trampa y no aprende nada. |
 | **head / multi-head** | cabeza | Una copia del mecanismo de atención con su propio juego de perillas Q, K y V. | Varias cabezas en paralelo, cada una mirando una relación distinta — aunque la mayoría no se deja resumir en un rol lingüístico prolijo, y la clase 7 lo muestra midiendo. |
-| **positional encoding** | codificación posicional | Marcarle a cada palabra en qué lugar de la frase está. | El sellito con el número de orden. Sin él, el transformer también sería una bolsa de palabras. |
+| **positional encoding** | codificación posicional | Marcarle a cada palabra en qué lugar de la frase está. | El sellito con el número de orden. Sin él (y sin máscara), el transformer también sería una bolsa de palabras. Hoy lo más usado son las posiciones rotatorias (RoPE); el GPT original las aprendía. |
 | **residual connection** | conexión residual | Un atajo que suma la entrada sin tocar a la salida de la capa. | El original del expediente, siempre adjunto. Hace entrenables las redes profundas. |
 | **layer norm** | normalización | Reescalar los números de cada palabra para que no se disparen entre capa y capa. | Plomería honesta: no aporta ninguna idea, y sin ella no entrena. |
 | **transformer block** | bloque transformer | Attention + MLP + dos residuales + dos normalizaciones. | La pieza que se apila. No hay una idea nueva por piso: es el mismo piso, repetido. |
@@ -181,11 +181,11 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **cross-entropy** | entropía cruzada | La loss de los modelos que predicen una categoría: qué probabilidad le diste a la respuesta que efectivamente vino. | Castiga muchísimo más estar confiadamente equivocado que estar dudando. |
 | **sampling** | sorteo, muestreo | Elegir la próxima ficha sorteando sobre la distribución en vez de tomar siempre la más probable. | De acá sale que el mismo prompt dé respuestas distintas. |
 | **temperature** | temperatura | La perilla del riesgo al sortear la próxima ficha. | Baja: elige lo más probable y se repite. Alta: arriesga y desbarranca. **No lo hace más inteligente.** |
-| **context window** | ventana de contexto | Cuántas fichas puede mirar hacia atrás. | Lo que queda afuera, para el modelo **no existe**. Por eso tu prompt largo se olvidó de la primera instrucción. |
+| **context window** | ventana de contexto | Cuántas fichas puede mirar hacia atrás. | Lo que queda afuera, para el modelo **no existe**. Y en los modelos grandes, lo de adentro tampoco se usa parejo: lo del principio y lo del final se aprovechan mejor que lo del medio (*lost in the middle*, una U). |
 | **prompt** | consigna, prompt | El texto con el que arranca la generación. | Elige el género y el registro de lo que sigue. **Es tu instrumento de medición**, y va en el apéndice. |
-| **hallucination** | alucinación | Generar algo bien formado y falso, con total confianza. | No es una falla del sistema: es exactamente lo que el sistema hace. No hay casillero para "no sé". |
+| **hallucination** | alucinación | Generar algo bien formado y falso, con total confianza. | No es una falla del sistema: es exactamente lo que el sistema hace. Nada adentro detecta que no sabe; si contesta "no sé", es una continuación aprendida, no un chequeo. |
 | **instruction tuning** | ajuste por instrucciones | Un segundo entrenamiento que lo convierte de autocompletador en asistente. | Lo que separa a tu mini-GPT de ChatGPT, más que la escala. |
-| **RLHF** (*reinforcement learning from human feedback*) | ajuste con preferencias humanas | Afinarlo con juicios de personas sobre qué respuesta es mejor. | De acá sale, entre otras cosas, la adulación. |
+| **RLHF** (*reinforcement learning from human feedback*) | ajuste con preferencias humanas | Afinarlo con juicios de personas sobre qué respuesta es mejor. | La adulación ya asoma sin RLHF y crece con la escala; el RLHF la refuerza (Perez et al. 2022; Sharma et al. 2023). |
 | **checkpoint** | punto de guardado | El archivo con los pesos del modelo en un momento dado. | Guardar el checkpoint es guardar el millón y medio de números que *son* el modelo. |
 | **emergente** | emergente | Una capacidad que aparece sola al crecer la escala, sin que nadie la programara. | Ojo con la palabra: mucho de lo que se cuenta como emergente en realidad fue **entrenado**. |
 
@@ -197,7 +197,7 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **modelo pre-entrenado** | modelo pre-entrenado | Un modelo que otro entrenó y publicó, listo para usar o adaptar. | Un informante clave: sabe muchísimo, te ahorra meses, y tiene su posición y sus puntos ciegos. |
 | **fine-tuning** | ajuste fino | Seguir entrenando ese modelo con tus ejemplos y tu tarea. | Enseñarle tu campo a alguien que ya sabe el idioma. |
 | **freezing** | congelar capas | Dejar quietas las capas de abajo y mover sólo las de arriba. | No es una optimización técnica: es **bajar la capacidad a propósito** para que 200 ejemplos alcancen. |
-| **zero-shot** | sin ejemplos | Pedirle la tarea describiéndola con palabras, sin entrenarlo para eso. | Sale gratis. Y no tenés con qué saber si anda. |
+| **zero-shot** | sin ejemplos | Pedirle la tarea describiéndola con palabras, sin entrenarlo para eso. | Cero etiquetas para entrenarlo, pero igual 200 o 300 para evaluarlo, como todo. Sin esas, no tenés con qué saber si anda. |
 | **few-shot** | con poquitos ejemplos | Darle tres o cuatro ejemplos en el prompt y que siga el patrón. | Mostrarle cómo se codifica, en vez de explicárselo. |
 | **pipeline** | la cañería | La cadena completa: texto crudo entra, etiqueta sale. | Muy cómoda, y por eso hay que abrirla y mirar qué hace adentro. |
 | **sentence embedding** | representación de oración | Un vector para un texto entero, no para una palabra. | Sirve para medir parecido entre documentos de tu corpus. |
@@ -209,8 +209,8 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **precision** | precisión | De lo que marcaste, cuánto era de verdad. | "De cada 100 notas que el modelo llamó protesta, 73 lo eran." |
 | **recall** | exhaustividad, cobertura | De lo que había, cuánto encontraste. | "De cada 100 que lo eran, encontró 64." |
 | **F1** | F1 | El promedio armónico de precisión y recall. | Un número que esconde dos. Nunca lo reportes solo. |
-| **threshold** | umbral | El corte a partir del cual una probabilidad se vuelve un "sí". | Moverlo empuja precisión y recall en direcciones opuestas. La decisión es tuya, no del modelo. |
-| **kappa** (*Cohen's kappa*) | kappa de Cohen | Cuánto coinciden dos codificadores, descontando el acuerdo por azar. | El techo realista de tu modelo: no le pidas más acuerdo del que tienen dos humanos. |
+| **threshold** | umbral | El corte a partir del cual una probabilidad se vuelve un "sí". | Bajarlo sube el recall (o lo deja igual); la precisión tiende a bajar, aunque puede dar saltitos. No hay un umbral que mejore las dos de forma sostenida. La decisión es tuya, no del modelo. |
+| **kappa** (*Cohen's kappa*) | kappa de Cohen | Cuánto coinciden dos codificadores, descontando el acuerdo por azar. | Sirve para reportar el acuerdo entre humanos, pero no es el techo del F1: está en otra escala. El techo realista es el acuerdo entre dos humanos medido con **la misma métrica** que el modelo (el F1 de un codificador contra el otro). |
 | **muestra estratificada** | muestra estratificada | Elegir al azar pero garantizando casos de cada grupo que te importa. | Que la muestra que leés a mano no sea todo lo fácil. |
 | **intervalo de confianza / bootstrap** | banda de incertidumbre | Cuánto se movería tu número con otra muestra. Se estima remuestreando. | Un F1 sin banda es un número sin escala. |
 
@@ -225,17 +225,18 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **sesgo de muestreo** | sesgo de muestreo | Tu corpus no representa a la población de la que querés hablar. | Twitter no es la opinión pública. |
 | **sesgo de medición** | sesgo de medición | El instrumento mide distinto según a quién. | El mismo texto puntúa distinto si el sujeto cambia de género o de nacionalidad. |
 | **sesgo de representación** | sesgo de representación | Lo que el modelo aprendió del mundo tal como está escrito, prejuicios incluidos. | El sesgo del modelo es un dato sobre el corpus. Puede ser un hallazgo, no sólo un problema. |
-| **shortcut learning** | atajo | Algo que separa las clases pero **no es el concepto**. | El clasificador de "agresividad" que aprendió la palabra "gobierno". Sube el F1 igual, y no sobrevive fuera del corpus. |
+| **shortcut learning** | atajo | Algo que separa las clases pero **no es el concepto**. | El clasificador de "política" de la clase 10: anda bien en su test y en oraciones de discursos presidenciales (824 oraciones) encuentra 22 de cada 100. Aprendió algo que separa sus dos montones, no el concepto. |
 | **spurious correlation** | correlación espuria | Una asociación real en tus datos que no es la relación que te interesa. | La fuente predice la etiqueta al 96 %: tu modelo detecta el medio, no el fenómeno. |
 | **ground truth** | verdad de referencia | Lo que tomás como correcto para evaluar. | **Casi nunca es la verdad: es lo que alguien codificó**, con sus instrucciones y su cansancio. |
-| **ablation** | ablación | Sacarle algo al corpus o al modelo, reentrenar, y mirar cuánto cae el número. | Ojo: en la clase 10 se mide que casi no cae, porque los atajos son redundantes. |
+| **ablation** | ablación | Sacarle algo al corpus o al modelo, reentrenar, y mirar cuánto cae el número. | Ojo: si casi no cae, puede ser que no hubiera atajo o que haya varios que se reemplazan entre sí. Hay que distinguirlo, y medir la caída contra su propio error. |
 | **placebo test** | test de placebo | Aplicar el modelo donde el fenómeno **no debería** aparecer. | Si aparece igual, tenés un problema. |
+| **invariance test** | test de invariancia | Cambiarle al texto algo que no debería importar (por ejemplo, barajar las palabras) y mirar si la predicción cambia. | No es un placebo: el placebo mira dónde el fenómeno no está; este mira si el modelo es sordo a algo. Con una bolsa de palabras da idéntico por construcción, y eso ya dice qué modelo tenés. |
 | **control positivo** | control positivo | El hermano del placebo: aplicarlo donde el fenómeno **tiene que** aparecer. | Si ahí no lo encuentra, tampoco lo encontraba antes. |
 | **minimal pair** | par mínimo | Dos textos idénticos salvo por **una** cosa, escritos a mano. | Es un experimento, no una observación. Tres pares mínimos valen más que una métrica. |
-| **banda de ruido** | banda de ruido | Cuánto se mueve tu métrica sólo por cambiar la semilla. | Un test que se mueve menos que eso no es un test. |
+| **banda de ruido** | banda de ruido | Cuánto se mueve tu métrica sólo por cambiar la semilla. | Para comparar dos versiones, mirá la *diferencia pareada* entre ellas, semilla por semilla (o partición por partición), con su desvío o su intervalo, no el rango de cada una. Si las particiones comparten casos, el intervalo ingenuo es optimista: corregilo (Nadeau y Bengio 2003). Una diferencia más chica que su propio error no es una diferencia. |
 | **out-of-distribution** (OOD) | fuera de dominio | Datos que no se parecen a los del entrenamiento. | Donde todo modelo se rompe, y donde casi nadie lo mide. |
 | **MNAR** (*missing not at random*) | faltante no aleatorio | Los agujeros de tus datos tienen una causa, y la causa suele ser sustantiva. | En el corpus de discursos, los años que faltan son los golpes de Estado. |
-| **reproducibilidad** | reproducibilidad | Que otro —o vos en seis meses— corra lo mismo y obtenga lo mismo. | Semilla, versiones, datos y código. |
+| **reproducibilidad** | reproducibilidad | Que otro —o vos en seis meses— corra lo mismo y obtenga lo mismo. | Semilla, versiones, datos y código. Con la misma máquina y las mismas versiones, da lo mismo; con otras versiones de las librerías, los números cambian un poco, y por eso se reportan. |
 | **seed** | semilla | El número que hace repetible el azar. | En este curso siempre es **1983**. |
 | **model card** | ficha del modelo | La media página que dice con qué se entrenó, para qué sirve y para qué **no**. | El prospecto del instrumento. Si publicás el número, publicás la ficha. |
 | **datasheet** | ficha de datos | Lo mismo, pero para el corpus: cómo se recolectó, quién etiquetó, con qué instrucciones, qué se excluyó. | Es la sección de fuentes que ya escribías, con más disciplina. |
@@ -300,7 +301,7 @@ self-attention 7 · semilla (*seed*) 10 · sentence embedding 9 ·
 sesgo de medición 10 · sesgo de muestreo 10 · sesgo de representación 10 ·
 sesgo inductivo 5 · SGD 3 · shortcut learning 10 · softmax 7 · spaCy 6 ·
 stride / padding 5 · subajuste 4 · SVD 6 · temperature 8 · tensor 4 ·
-test de placebo 10 · TF-IDF 9 · threshold 9 · to fit 1 · token 6 ·
+test de invariancia 10 · test de placebo 10 · TF-IDF 9 · threshold 9 · to fit 1 · token 6 ·
 tokenización 6 · train / validation / test 4 · training loop 4 ·
 transfer learning 9 · transformer block 7 · validez de constructo 10 ·
 validez de contenido 10 · validez externa 10 · value 7 · variable 1 ·

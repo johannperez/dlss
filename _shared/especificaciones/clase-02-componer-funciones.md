@@ -55,7 +55,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 55-65 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 18. |
 | 65-85 | El momento fuerte: sumar rampas | 19-29 | 1 → 2 → 4 → 8 rampas. La viz más importante del curso. |
 | 85-105 | Manos 2 | 30 | De a dos: dibujar la figura objetivo apilando rampas. |
-| 105-120 | Cierre | 31-35 | Lo que NO es, `[EL LUNES]`, el puente a la clase 3, el glosario. |
+| 105-120 | Cierre | 31-35 | Lo que NO es, `[EN TU INVESTIGACIÓN]`, el puente a la clase 3, el glosario. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -90,14 +90,14 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 22 | **2 rampas** | VIZ | Misma viz, botón "agregar rampa". | "Un poquito mejor." |
 | 23 | **4 rampas** | VIZ | | "Uy." |
 | 24 | **8 rampas** | VIZ | La curva objetivo prácticamente reproducida. | **Silencio de 5 segundos.** "Esto es una red neuronal. Ya está. Eso es todo lo que hay." |
-| 25 | Lo que acaban de ver tiene nombre | texto | *Teorema de aproximación universal* (Cybenko 1989, Hornik 1991), enunciado en castellano llano: con suficientes rampas se aproxima cualquier función continua tan bien como quieras. | "No lo vamos a demostrar porque lo acaban de ver. Y ojo: el teorema dice que **existe** la combinación. No dice que la vayas a encontrar, ni con cuántos datos. Esa distinción va a importar en la clase 4." |
+| 25 | Lo que acaban de ver tiene nombre | texto | *Teorema de aproximación universal* (Cybenko 1989, Hornik 1991; para la rampa, Leshno et al. 1993), enunciado en castellano llano: con suficientes rampas se aproxima cualquier función continua tan bien como quieras. | "No lo vamos a demostrar porque lo acaban de ver. Y ojo: el teorema dice que **existe** la combinación. No dice que la vayas a encontrar, ni con cuántos datos. Esa distinción va a importar en la clase 4." |
 | 26 | Lo mismo, dibujado como red | figura | Diagrama clásico de círculos y flechas (1 entrada → 8 ocultas → 1 salida), con **cada círculo oculto pintado del color de su rampa** en el gráfico de al lado. | "Cada bolita es una rampa. Cada flecha es una perilla. El diagrama no tiene nada místico: es la misma suma de rampas con otra notación." |
 | 27 | **Tocá una perilla, mirá la curva** | VIZ | `viz/red-como-dibujante.html`. | "Muevo este peso... y se movió **esta parte** de la curva. Cada perilla tiene su territorio." |
 | 28 | El vocabulario mínimo | texto | Tabla: *peso* = perilla multiplicativa; *sesgo/bias* = perilla que desplaza; *neurona* = una rampa; *capa* = un grupo de rampas en paralelo; *capa oculta* = las del medio; *activación* = el doblez; *profunda* = muchas capas. | "Siete palabras. Con estas siete entendés el 90% del vocabulario de cualquier paper." |
 | 29 | ¿Por qué "profundo"? | figura | Comparación: una capa ancha (muchas rampas) vs varias capas angostas. La segunda arma "partes de partes". | "Ancho: muchas piezas simples. Profundo: piezas hechas de piezas. Lo segundo es más eficiente y es de donde sale la palabra *deep*. Lo vamos a ver muy claro con imágenes en la clase 5." |
 | 30 | Bloque práctico 2 | texto | Consignas parte 2: la red a mano con 4 neuronas. | "Van a escribir una red neuronal en 6 líneas, sin PyTorch, sin nada." |
 | 31 | Lo que NO es | texto | No es un cerebro. No piensa. No entiende. Es una suma de rampas con las perillas bien puestas. | "Y esto no lo digo por humildad: lo digo porque si creés que piensa, vas a interpretar mal sus errores. Vas a ver en la clase 8." |
-| 32 | `[EL LUNES]` | texto | Cuando leas "usamos una red neuronal", traducí: "usamos una función muy flexible con muchísimas perillas". Y hacé las dos preguntas de revisor: ¿cuántas perillas? ¿cuántos datos? | "Un modelo con más perillas que datos puede dibujar cualquier cosa, incluido el ruido. Ese es el tema de la clase 4 y es el error más común en los papers que van a revisar." |
+| 32 | `[EN TU INVESTIGACIÓN]` | texto | Cuando leas "usamos una red neuronal", traducí: "usamos una función muy flexible con muchísimas perillas". Y hacé las dos preguntas de revisor: ¿cuántas perillas? ¿cuántos datos? | "Un modelo con más perillas que datos puede dibujar cualquier cosa, incluido el ruido. Ese es el tema de la clase 4 y es el error más común en los papers que van a revisar." |
 | 33 | El problema que queda | figura | El panel de la viz de 8 rampas con sus 24 sliders, todos desordenados. | "Yo puse estos 24 números a mano y me llevó una tarde. Un modelo de verdad tiene millones. ¿Cómo se encuentran?" |
 | 34 | El puente | texto | "Clase 3: la máquina busca sola. Necesitamos dos cosas: un número que mida qué tan mal está, y una brújula que diga para dónde ir." | "Y las dos ya las vieron sin saberlo: el número es el 'desajuste' del ajuste a ojo." |
 | 35 | Glosario de hoy | texto | composición, no linealidad, ReLU, activación, peso, sesgo, neurona, capa, capa oculta, profundo, aproximación universal. | |
@@ -236,7 +236,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 - **Ancho vs profundo.** Un equipo de 100 codificadores que leen todos lo mismo (ancho) vs una
   cadena de 5 analistas donde cada uno trabaja sobre la síntesis del anterior (profundo). El segundo
   construye abstracciones; el primero, cobertura.
-- **El ecualizador, ahora con 24 perillas.** Callback a la clase 1: nadie ecualiza 24 bandas a mano,
+- **El ecualizador, ahora con 25 perillas** (8 rampas × 3, más el sesgo final). Callback a la clase 1: nadie ecualiza 25 bandas a mano,
   por eso existen los presets. El descenso por gradiente es la máquina que fabrica presets.
 
 ---

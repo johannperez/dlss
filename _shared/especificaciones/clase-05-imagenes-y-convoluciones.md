@@ -22,7 +22,7 @@ El hilo:
    nosotros es tan obvio que ni lo pensamos?
 2. **La demostración brutal: barajar los píxeles.** Se entrena la red densa con las imágenes
    normales y con los píxeles permutados (la misma permutación para todas). El desempeño es
-   **idéntico**. Para vos, la segunda versión es ruido puro. Conclusión inevitable: **la red densa
+   **prácticamente idéntico** (unas décimas: ruido de inicialización). Para vos, la segunda versión es ruido puro. Conclusión inevitable: **la red densa
    nunca supo que había una grilla.** Este es el argumento más contundente de la clase y hay que
    correrlo de verdad, no contarlo.
 3. **La solución: mirar de a pedacitos.** La convolución, presentada primero como gesto (una
@@ -38,7 +38,7 @@ El hilo:
    el norte y el sur del país se ven distinto por razones que no son las que te interesan.
 7. **El caso real y su lectura crítica.** Predicción de pobreza desde imágenes satelitales
    (Jean et al. 2016). Impresionante, útil y lleno de trampas. Se lee con las tres preguntas del
-   curso. Este bloque es el `[EL LUNES]` y es el que le da peso de ciencias sociales a la clase.
+   curso. Este bloque es el `[EN TU INVESTIGACIÓN]` y es el que le da peso de ciencias sociales a la clase.
 8. **El puente.** Si la estructura espacial exige una arquitectura, ¿qué exige la estructura
    secuencial del lenguaje?
 
@@ -69,7 +69,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 60-70 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 17. |
 | 70-85 | Jerarquía y supuestos | 18-25 | La arquitectura como teoría sobre la forma del mundo, y cuándo es falsa. |
 | 85-105 | Manos 2 | 26 | De a dos: entrenar la CNN chica y mirar los filtros aprendidos. |
-| 105-120 | Cierre | 27-34 | El caso «pobreza desde el espacio», `[EL LUNES]`, el puente a la clase 6. |
+| 105-120 | Cierre | 27-34 | El caso «pobreza desde el espacio», `[EN TU INVESTIGACIÓN]`, el puente a la clase 6. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -87,7 +87,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 5 | Una imagen es una tabla de números | figura | Zoom progresivo sobre un pedacito de la foto hasta ver la grilla con los valores 0-255. | "Esto es lo único que ve la computadora." |
 | 6 | Cómo la comía el modelo de la clase 4 | figura | La grilla 28x28 "desenrollada" en una fila larguísima de 784 números. | "Le agarrábamos la imagen y la estirábamos en una fila. Y ahí se perdió algo enorme." |
 | 7 | Apuesta | discusión | "Si barajo los píxeles de todas las imágenes con la misma permutación y reentreno, ¿el modelo va a andar peor?" Votan. | Casi todos dicen que sí. |
-| 8 | **Barajemos** | VIZ | `viz/vecindad-de-pixeles.html`, botón "barajar". | "Miren lo que ve el modelo. Ahora miren el resultado: **exactamente el mismo desempeño**." |
+| 8 | **Barajemos** | VIZ | `viz/vecindad-de-pixeles.html`, botón "barajar". | "Miren lo que ve el modelo. Ahora miren el resultado: **prácticamente el mismo desempeño** (unas décimas)." |
 | 9 | La conclusión incómoda | texto | "La red densa nunca supo que había una grilla. Para ella, los 784 números eran 784 variables sueltas." | "Ustedes reconocen un gato en cualquier parte de la foto. La red tendría que aprender 'gato acá', 'gato allá', 'gato en la esquina' por separado. Con muchísimos ejemplos de cada posición." |
 | 10 | Lo que nosotros sabemos y ella no | texto | Tres cosas: los píxeles cercanos se relacionan; un patrón vale igual en cualquier posición; las cosas grandes están hechas de cosas chicas. | "Estas tres cosas se las vamos a **regalar** al modelo. Se las metemos en la estructura." |
 | 11 | Mirar de a pedacitos | figura | Una lupa de 3x3 sobre la imagen, en una posición. | "En vez de mirar los 784 de una, miramos de a nueve." |
@@ -95,7 +95,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 13 | **Movés el filtro vos** | VIZ | `viz/kernel-deslizante.html`. | Pone el preset "borde vertical". "Miren dónde se enciende: en los bordes verticales. Este filtro es un detector de bordes verticales y son nueve números." |
 | 14 | El filtro es un pincel | figura | La imagen original y tres mapas de activación al lado (bordes verticales, horizontales, blur), en falso color. | `[CALLBACK DIBUJO]` "En la clase 2 sumábamos rampas para dibujar una curva. Acá el modelo **dibuja sobre la imagen**: cada filtro produce un dibujo nuevo que resalta lo que ese filtro busca." |
 | 15 | Y los pinceles se aprenden | texto | Los 9 números del filtro son parámetros. Se aprenden con la loss y el gradiente de la clase 3. | "No hay nada nuevo en el mecanismo. Lo único nuevo es **qué forma tiene la máquina**." |
-| 16 | La cuenta que importa | figura | Comparación de parámetros: capa densa de 784→64 = 50.176 pesos. Capa convolucional con 32 filtros de 3x3 = 288 pesos. | "Ciento setenta veces menos perillas. Y anda mejor. Porque le dijimos algo verdadero sobre el mundo." |
+| 16 | La cuenta que importa | figura | Comparación de parámetros: capa densa de 784→64 = 50.176 pesos. Capa convolucional con 16 filtros de 3x3 = 144 pesos (nota de construcción: la clase usa 16 filtros; manda la clase). | "Unas trescientas cincuenta veces menos perillas. Y anda mejor. Porque le dijimos algo verdadero sobre el mundo." |
 | 17 | Bloque práctico 1 | texto | Consignas: filtros a mano con numpy. | "25 minutos. Van a hacer un detector de bordes con nueve números." |
 | 18 | Volvimos | discusión | ¿Qué filtro inventaron? | Se proyecta alguno del aula. |
 | 19 | Apilar filtros | figura | Capa 1 sobre la imagen → capa 2 sobre los mapas de la capa 1 → capa 3. | "La segunda capa no mira la imagen: mira los dibujos que hizo la primera." |
@@ -110,7 +110,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 28 | **El caso: pobreza desde el espacio** | figura | Descripción del enfoque de Jean et al. 2016: imágenes satelitales diurnas + luces nocturnas como señal intermedia → predicción de consumo/riqueza en zonas sin encuestas. | "Esto se publicó en Science y es genuinamente importante: hay países donde no hay datos de pobreza y esto los produce." |
 | 29 | Las tres preguntas | texto | (1) ¿Qué está midiendo **realmente**? (2) ¿Valen los supuestos de la arquitectura acá? (3) ¿Qué pasa fuera de donde se entrenó? | "Estas tres preguntas se le hacen a cualquier paper de este tipo, y a su propio trabajo." |
 | 30 | Las respuestas incómodas | texto | (1) Puede estar midiendo techos de chapa, densidad de construcción o presencia de rutas, y todas correlacionan con pobreza **en el país donde se entrenó**. (2) La invariancia traslacional vale; la de escala y la de región, no necesariamente. (3) Transferir a otro país es una apuesta fuerte y hay literatura que muestra que se degrada. | "Nada de esto invalida el trabajo. Todo esto tiene que estar discutido en el paper. Si no está, ahí está su comentario de revisor." |
-| 31 | `[EL LUNES]` | texto | Cómo leer un paper que usa imágenes: pedir la partición **geográfica**, el desempeño fuera de muestra, y qué pasa con los falsos positivos. Y: si tenés un archivo fotográfico o de prensa gráfica, esto es aplicable con pocos ejemplos etiquetados (se anticipa la clase 9). | |
+| 31 | `[EN TU INVESTIGACIÓN]` | texto | Cómo leer un paper que usa imágenes: pedir la partición **geográfica**, el desempeño fuera de muestra, y qué pasa con los falsos positivos. Y: si tenés un archivo fotográfico o de prensa gráfica, esto es aplicable con pocos ejemplos etiquetados partiendo de un modelo pre-entrenado (la clase 9 lo hace con texto; con imágenes la lógica es la misma, pero no hay ejercicio de imágenes en la 9). | |
 | 32 | Otros usos en ciencias sociales | texto | Lista corta y concreta: digitalización de archivos históricos (OCR de manuscritos, censos), análisis de imágenes de campaña, detección de contenido en redes, conteo de multitudes, cambio en el uso del suelo, análisis de material visual etnográfico. | "Si tienen imágenes en su investigación, hablen conmigo en el recreo." |
 | 33 | El puente | texto | "La estructura del espacio pide convoluciones. ¿Y la estructura del lenguaje? El texto no es una grilla: es una **secuencia**, y el significado depende de cosas que están lejos." | "Clase 6: cómo se convierte un discurso en números sin perder el orden." |
 | 34 | Glosario de hoy | texto | píxel, canal, filtro/kernel, convolución, mapa de activación, pooling, CNN, invariancia traslacional, sesgo inductivo, jerarquía de representaciones. | |

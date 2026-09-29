@@ -66,7 +66,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 50-60 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 16. |
 | 60-80 | Calcar vs dibujar | 17-29 | Sobreajuste, validación, early stopping, la tijera. |
 | 80-105 | Manos 2 | 30 | De a dos: provocar el sobreajuste y verlo en la curva de validación. |
-| 105-120 | Cierre + evaluación de la unidad | 31-36 | La regla de oro, `[EL LUNES]`, cierre del módulo 1, el puente a la clase 5. |
+| 105-120 | Cierre + evaluación de la unidad | 31-36 | La regla de oro, `[EN TU INVESTIGACIÓN]`, cierre del módulo 1, el puente a la clase 5. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -109,7 +109,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 30 | Bloque práctico 2 | texto | Consignas: partición, curvas, early stopping, y el experimento de a dos con hipótesis escrita previa. | "**Escriban la hipótesis antes de correr.** Sí, como en un preregistro. Por algo será." |
 | 31 | Resultados del aula | discusión | Espacio para poner en común. | "¿A quién le dio distinto de lo que esperaba? Esos son los interesantes." |
 | 32 | La regla de oro | texto | **El test se mira una sola vez, al final, cuando ya no vas a cambiar nada.** | "Si mirás el test, ajustás, y volvés a mirar, estás optimizando contra el test a mano. Es p-hacking artesanal." |
-| 33 | `[EL LUNES]` | texto | La receta: partí los datos **antes** de mirar nada; separá por tiempo o por grupo si tu problema lo pide (no siempre al azar); reportá train, val y test. Y para revisar papers: si no dice cómo partió los datos, preguntalo. | "Si un paper reporta desempeño y no dice sobre qué datos, no reportó nada." |
+| 33 | `[EN TU INVESTIGACIÓN]` | texto | La receta: partí los datos **antes** de mirar nada; separá por tiempo o por grupo si tu problema lo pide (no siempre al azar); reportá train, val y test. Y para revisar papers: si no dice cómo partió los datos, preguntalo. | "Si un paper reporta desempeño y no dice sobre qué datos, no reportó nada." |
 | 34 | Cuidado con partir al azar | figura | Dos casos donde partir al azar te miente: datos temporales (predecir el pasado con el futuro) y datos agrupados (el mismo diputado en train y en test). | "Este es un error de nivel avanzado que van a cometer igual. Anótenlo." |
 | 35 | Cierre del módulo 1 | figura | Una sola slide con las cuatro clases: **perilla → composición → loss → ciclo**, con una miniatura de la viz emblemática de cada una. | "Esto es todo el deep learning. Lo que viene son variaciones sobre esto para tipos de datos distintos." |
 | 36 | El puente | texto | "Hasta acá: entra un número, sale un número. Pero tus datos son fotos, discursos, secuencias. **La forma del dato cambia la arquitectura, y la arquitectura es una teoría sobre el mundo.**" | "Clase 5: imágenes." |
@@ -174,7 +174,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
   entrenamiento; con datos agrupados, mete al mismo sujeto en train y en test. La viz muestra
   explícitamente las **fugas** (leakage) resaltando en rojo los casos problemáticos.
 - **Momento aha.** "Con datos de panel, partir al azar es hacer trampa sin darte cuenta."
-- **Nota.** Es la viz que más directamente les sirve *el lunes*. Corta pero indispensable.
+- **Nota.** Es la viz que más directamente les sirve *en su investigación*. Corta pero indispensable.
 
 ---
 

@@ -59,7 +59,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 60-70 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 15. |
 | 70-85 | Exposición: el zoo de funciones | 16-24 | Recta, parábola, exponencial, sigmoide, seno. «Guardá la sigmoide». |
 | 85-105 | Manos 2: ajuste a ojo | 25 | De a dos, con datos reales de discurso político. |
-| 105-120 | Cierre | 26-32 | El ranking, `[EL LUNES]`, el puente a la clase 2, el glosario. |
+| 105-120 | Cierre | 26-32 | El ranking, `[EN TU INVESTIGACIÓN]`, el puente a la clase 2, el glosario. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -74,7 +74,7 @@ Tipos: `[texto]` `[figura]` `[VIZ]` (embebida en iframe) `[código]` `[discusió
 | # | Slide | Tipo | Contenido | Qué dice el docente |
 |---|---|---|---|---|
 | 1 | Deep Learning para Cientistas Sociales | portada | Título, clase 1, nombre del docente. Fondo: una nube de puntos tenue. | "Antes de que empecemos: nadie acá va a tener que derivar nada. Si en algún momento sentís que se puso matemático de más, es culpa mía y quiero que me lo digas." |
-| 2 | ¿Qué le pasó a este país? | figura | 40 puntos, sin ejes rotulados, patrón claro pero con ruido. | "Tómense un minuto. ¿Qué historia cuenta esto?" Deja hablar. No corrige nada. |
+| 2 | ¿Qué le pasó a este país? | figura | 36 puntos, sin ejes rotulados, patrón claro pero con ruido. | "Tómense un minuto. ¿Qué historia cuenta esto?" Deja hablar. No corrige nada. |
 | 3 | (los mismos puntos, con ejes) | figura | Eje X: año 1983-2023. Eje Y: % de palabras del discurso de apertura dedicadas a *seguridad*. Fuente rotulada. | "Ah. Bueno. ¿Cambia lo que dijeron? ¿Alguien mantiene su historia?" |
 | 4 | La pregunta del curso | texto | "Si tuvieras que resumir esto con **una línea**, ¿cuál dibujarías?" | "No con palabras: con una línea. Con el dedo en el aire." Que lo hagan. |
 | 5 | Tres candidatas | figura | La misma nube con tres líneas: una recta, una curva suave, una que pasa por todos los puntos. | "Tres personas dibujaron esto. Guarden cuál les gusta más: en la clase 4 vamos a descubrir que una de las tres es una trampa." |
@@ -93,14 +93,14 @@ Tipos: `[texto]` `[figura]` `[VIZ]` (embebida en iframe) `[código]` `[discusió
 | 18 | La recta | figura | Con su fórmula y su interpretación social: "cambio constante por unidad". | "Cuando decís 'creció linealmente' estás diciendo esto." |
 | 19 | La parábola | figura | "Sube y después baja" — la curva de Kuznets, la U invertida, el ciclo. | "Toda ciencia social tiene su U invertida favorita." |
 | 20 | La exponencial | figura | Crecimiento explosivo. Ejemplo: difusión de una noticia en redes. | "Nuestro cerebro es malísimo para lo exponencial. Por eso nos sorprende siempre." |
-| 21 | **La sigmoide** (guardá esta) | figura | La S. Rotulada: "empieza lento, se acelera, se satura". Ejemplos: adopción de una innovación, saturación de un tema en la agenda mediática. | "Márquenla. Esta función vuelve en la clase 2, en la 3 y en la 9. Es la más importante del curso después de la recta." |
+| 21 | **La sigmoide** (guardá esta) | figura | La S. Rotulada: "empieza lento, se acelera, se satura". Ejemplos: adopción de una innovación, saturación de un tema en la agenda mediática. | "Márquenla. Esta función vuelve en la clase 2, como otro doblez posible entre capa y capa." |
 | 22 | El seno | figura | Periodicidad: ciclo electoral, estacionalidad de las noticias. | "Todo lo que se repite." |
 | 23 | **Jugá con el zoo** | VIZ | `viz/zoo-de-funciones.html`. | "Cada una tiene dos perillas. El desafío: reproducir la figura gris." |
 | 24 | La misma fórmula, otra historia | texto | La sigmoide con parámetros distintos y las tres lecturas sustantivas correspondientes. | "El parámetro no es un detalle técnico: es la afirmación sustantiva. Cuando cambiás el parámetro, cambiás la teoría." |
 | 25 | Bloque práctico 2: ajuste a ojo | texto | Consignas del desafío en parejas. | "De a dos. Uno mueve, el otro mira el número. Quien llegue más bajo gana el prestigio eterno." |
 | 26 | El ranking | discusión | Espacio en blanco para anotar los mejores resultados del aula. | "¿Cuánto sacaron? ¿Cómo hicieron para bajar? Escuchen lo que acaban de describir: una estrategia de búsqueda." |
-| 27 | Lo que acaban de hacer tiene nombre | texto | "Mover perillas para minimizar un número" = **optimización**. Y hacerlo a mano = insoportable. | "Ustedes acaban de hacer a mano, con dos perillas y en diez minutos, lo que una computadora hace con mil millones de perillas en dos semanas. La idea es la misma." |
-| 28 | `[EL LUNES]` | texto | Tres pasos concretos: 1) tomá una serie de tu investigación; 2) graficala; 3) ajustale una recta y decí **en castellano sustantivo** qué significa cada parámetro. | "Si tu pendiente es 0.4, no digas 'la pendiente es 0.4'. Decí 'cada año sube 0.4 puntos'. Esa traducción es tu trabajo, no el del modelo." |
+| 27 | Lo que acaban de hacer tiene nombre | texto | "Mover perillas para minimizar un número" = **optimización**. Y hacerlo a mano = insoportable. | "Ustedes acaban de hacer a mano, con dos perillas y en diez minutos, lo que una computadora hace con miles de millones de perillas, durante semanas y con miles de procesadores. La idea de fondo es la misma." |
+| 28 | `[EN TU INVESTIGACIÓN]` | texto | Tres pasos concretos: 1) tomá una serie de tu investigación; 2) graficala; 3) ajustale una recta y decí **en castellano sustantivo** qué significa cada parámetro. | "Si tu pendiente es 0.4, no digas 'la pendiente es 0.4'. Decí 'cada año sube 0.4 puntos'. Esa traducción es tu trabajo, no el del modelo." |
 | 29 | Pero... | figura | La curva de menciones a "inflación": dos picos y un valle. Con la mejor recta posible encima, fracasando gloriosamente. | "Esto es lo que nos espera la clase que viene. Miren qué mal le va a la recta." |
 | 30 | Dos caminos | texto | Camino A: buscar una fórmula más complicada para cada caso. Camino B: **combinar** funciones simples. | "El camino A es lo que hizo la estadística durante un siglo, y funciona. El camino B es lo que hace el deep learning. Vamos por B." |
 | 31 | El puente | texto | "Clase 2: componer funciones para dibujar figuras imposibles con una sola máquina." | "Van a ver algo que a mí todavía me parece magia, y no lo es." |
@@ -111,7 +111,7 @@ Tipos: `[texto]` `[figura]` `[VIZ]` (embebida en iframe) `[código]` `[discusió
 ## 3. Visualizaciones interactivas
 
 ### 3.1 `viz/maquina-de-perillas.html`
-- **Qué se ve.** Panel único. Un scatter de 40 puntos (año vs % menciones a *seguridad*, corpus
+- **Qué se ve.** Panel único. Un scatter de 36 puntos (año vs % menciones a *seguridad*, corpus
   Aguasclaras). Encima, una recta azul gruesa. A la derecha, un dibujo esquemático de la caja con
   dos perillas que **giran de verdad** cuando movés los sliders (feedback redundante: el slider y
   la perilla dibujada se mueven juntos).
@@ -190,7 +190,7 @@ Tipos: `[texto]` `[figura]` `[VIZ]` (embebida en iframe) `[código]` `[discusió
 | 18 | md | **El zoo, en código.** | |
 | 19 | code | Definición de las 5 funciones del zoo y una grilla de subplots con las 5. | |
 | 20 | code | Celda de juego: elegí una función del zoo y cambiale los parámetros. | |
-| 21 | md | `TODO 4` — ¿Podés hacer que la sigmoide parezca casi un escalón? ¿Qué parámetro tuviste que exagerar? *Pista: uno de los dos controla lo empinado.* | Prefigura saturación y, mucho después, la temperatura de la clase 8. |
+| 21 | md | `TODO 4` — ¿Podés hacer que la sigmoide parezca casi un escalón? ¿Qué parámetro tuviste que exagerar? *Pista: uno de los dos controla lo empinado.* | Prefigura saturación. |
 | 22 | md | **Para llevarte.** Resumen en 5 viñetas + la pregunta abierta de la clase 2 + link al glosario. | |
 
 ---

@@ -36,8 +36,8 @@ de la invención** y mostrar exactamente en qué momento el modelo se inventó u
 existe. Es una demostración imposible con un corpus real y hay que explotarla al máximo.
 
 `[CALLBACK DIBUJO — el grande del curso]` — Slide obligatoria: en la clase 1 dibujábamos una recta
-con 2 perillas contra 40 puntos. Hoy dibujamos, para cada posición del texto, **una distribución de
-probabilidad sobre 5.000 fichas posibles**, con un millón y medio de perillas. **Es la misma máquina.**
+con 2 perillas contra 36 puntos. Hoy dibujamos, para cada posición del texto, **una distribución de
+probabilidad sobre 71 caracteres posibles**, con un millón y medio de perillas. **Es la misma máquina.**
 Misma loss (clase 3), mismo descenso (clase 3), mismo ciclo (clase 4), mismo riesgo de calcar
 (clase 4), mismos embeddings (clase 6), mismo bloque (clase 7). No hay ninguna pieza nueva hoy.
 Decirlo así, explícitamente, es el cierre intelectual del curso.
@@ -62,7 +62,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 40-50 | **PAUSA** | — | **En serio, pausa.** El modelo entrena solo. Slide propia después de la 12. |
 | 50-75 | **La traducción**: el modelo → ChatGPT | 13-33 | Siete comportamientos de ChatGPT explicados desde el modelo que acaban de entrenar. |
 | 75-100 | Manos 2 | 34 | **25 minutos.** Temperatura, romper el contexto, hacerlo alucinar, contar letras. |
-| 100-120 | Cierre | 35-38 | Qué le falta para ser ChatGPT, qué no cambia con la escala, `[EL LUNES]`, el puente. |
+| 100-120 | Cierre | 35-38 | Qué le falta para ser ChatGPT, qué no cambia con la escala, `[EN TU INVESTIGACIÓN]`, el puente. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -109,7 +109,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 34 | Bloque práctico 2 | texto | Consignas: jugar con temperatura, romper el contexto, hacerlo alucinar, contar letras. Y el desafío: **escribí el prompt que rompe el modelo**. | "25 minutos. Rómpanlo y expliquen por qué se rompió." |
 | 35 | Qué le falta para ser ChatGPT | texto | Tres cosas: (1) **escala** (~1,5M vs cientos de miles de millones de parámetros; 1 MB vs billones de fichas); (2) **instruction tuning** (enseñarle a responder consignas en vez de sólo completar); (3) **RLHF** (ajustarlo con preferencias humanas para que sea útil e inofensivo). Cada una en dos líneas. | "El paso 2 y 3 son los que lo convierten de 'autocompletar' en 'asistente'. Y son los que introducen otras cosas: la adulación, por ejemplo, sale de ahí." |
 | 36 | Qué **no** cambia con la escala | texto | Sigue sin haber casillero de "no sé". Sigue habiendo tokenización. Sigue habiendo ventana finita. Sigue siendo un sorteo. La escala mejora la calidad, no cambia la naturaleza. | "Esto es lo más importante de la clase. Los modelos de 2030 van a ser mucho mejores y van a seguir teniendo estas propiedades." |
-| 37 | `[EL LUNES]` | texto | **Para qué sí**: primer pase de codificación con validación humana obligatoria; generar variantes de instrumentos; resumir con el texto fuente a la vista; explorar un corpus. **Para qué no**: como fuente de hechos, citas o referencias bibliográficas; para codificar sin validar; como sustituto de leer. Y: siempre reportar modelo, versión, fecha, temperatura, prompt exacto. | "El prompt exacto va en el apéndice del paper. Es su instrumento de medición." |
+| 37 | `[EN TU INVESTIGACIÓN]` | texto | **Para qué sí**: primer pase de codificación con validación humana obligatoria; generar variantes de instrumentos; resumir con el texto fuente a la vista; explorar un corpus. **Para qué no**: como fuente de hechos, citas o referencias bibliográficas; para codificar sin validar; como sustituto de leer. Y: siempre reportar modelo, versión, fecha, temperatura, prompt exacto. | "El prompt exacto va en el apéndice del paper. Es su instrumento de medición." |
 | 38 | El puente | texto | "Entrenar uno desde cero cuesta una fortuna y casi nunca es lo que necesitás. Lo que vas a hacer de verdad es agarrar uno que ya entrenó otro y adaptarlo a tu problema. Clases 9 y 10." | |
 
 **Tabla de traducción (versión de referencia para el equipo — debe quedar también en
@@ -288,7 +288,7 @@ contexto=128, ~1.5M params, 3000 pasos); ~3 min en GPU T4 con la configuración 
   temperatura: más variable, menos predecible. Uno rígido codifica siempre igual y pierde matices.
   Ni un extremo ni el otro es "el correcto"; depende de la tarea. Y —el punto metodológico— si tu
   instrumento tiene variabilidad, tenés que **reportarla**.
-- **El prompt como instrumento de medición.** El punto más importante para el `[EL LUNES]`: si
+- **El prompt como instrumento de medición.** El punto más importante para el `[EN TU INVESTIGACIÓN]`: si
   usaste un LLM para codificar tu corpus, el prompt es tu libro de códigos y va en el apéndice.
   Cambiar el prompt es cambiar el instrumento, y por lo tanto los resultados no son comparables.
 

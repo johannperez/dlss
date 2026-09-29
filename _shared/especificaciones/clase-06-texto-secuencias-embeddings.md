@@ -43,7 +43,7 @@ El hilo:
    propiedad.** Si el mapa captura regularidades de uso, captura *todas* las regularidades de uso,
    incluidas las que no nos gustan. Y para un cientista social eso puede ser un **hallazgo**: el
    embedding como instrumento de medición de estereotipos en un corpus (Garg et al. 2018,
-   Kozlowski et al. 2019). Este es el `[EL LUNES]` más fuerte del curso.
+   Kozlowski et al. 2019). Este es el `[EN TU INVESTIGACIÓN]` más fuerte del curso.
 6. **El orden, de nuevo.** Una vez que tenemos vectores por palabra, ¿cómo combinamos una secuencia?
    Promediar (= bolsa de palabras con embeddings: mejor, pero sigue sin orden). Leer en orden
    acumulando memoria (RNN). Y la falla de la RNN: se olvida.
@@ -109,18 +109,18 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 21 | Aritmética de palabras | figura | El clásico rey − hombre + mujer ≈ reina, y una versión del dominio: presidente − ejecutivo + legislativo ≈ ... | "No siempre funciona y se exageró muchísimo en la divulgación. Pero cuando funciona, dice algo sobre la estructura del corpus." |
 | 22 | **La misma propiedad, el otro lado** | VIZ | `viz/espacio-de-embeddings.html`, panel de sesgo. | Muestra ocupaciones proyectadas sobre el eje género. "Esto no es un error del modelo. El modelo aprendió cómo se usa el lenguaje en el corpus. El sesgo estaba en el corpus, es decir, en nosotros." |
 | 23 | Problema... o instrumento | texto | Dos lecturas: (a) si usás el embedding para decidir sobre personas, el sesgo es un daño; (b) si lo usás para **medir**, el sesgo es tu variable dependiente. Garg et al. 2018: 100 años de estereotipos medidos en embeddings entrenados década por década. | "Este es uno de los usos más lindos de esta tecnología en ciencias sociales, y es exactamente lo contrario de lo que la industria considera un problema." |
-| 24 | `[EL LUNES]` | texto | Tres cosas concretas: medir similitud entre documentos de tu corpus; encontrar el vocabulario asociado a un concepto; medir cambio semántico entre dos períodos entrenando dos embeddings. | "Con lo de hoy, el lunes podés medir si el vocabulario de 'seguridad' se acercó al de 'inmigración' entre 2005 y 2020. Eso es una tesis." |
+| 24 | `[EN TU INVESTIGACIÓN]` | texto | Tres cosas concretas: medir similitud entre documentos de tu corpus; encontrar el vocabulario asociado a un concepto; medir cambio semántico entre dos períodos entrenando dos embeddings. | "Con lo de hoy, ya podés medir si el vocabulario de 'seguridad' se acercó al de 'inmigración' entre 2005 y 2020. Eso es una tesis." |
 | 25 | Advertencia de validez | texto | Cercanía en el mapa = uso parecido, **no** significado parecido. Los antónimos suelen quedar cerquísima ("guerra" y "paz" aparecen en los mismos contextos). | "Este es el error de interpretación número uno con embeddings, y aparece en papers publicados." |
 | 26 | Bloque práctico 2 | texto | Consignas: entrenar embeddings, explorar, medir similitud entre discursos. | "30 minutos." |
 | 27 | Y ahora, el orden | texto | Tenemos vectores por palabra. ¿Cómo armamos el vector de una **frase**? | |
 | 28 | Opción 1: promediar | figura | El promedio de los vectores de las palabras. Y las dos frases del inicio dando **el mismo promedio**. | "Volvimos al mismo problema. Mejor que contar palabras, pero sigue sin orden." |
 | 29 | **Bolsa vs orden** | VIZ | `viz/bolsa-vs-orden.html`. | |
 | 30 | Opción 2: leer en orden | figura | Una persona leyendo palabra por palabra con una mochila en la espalda donde va metiendo lo que va entendiendo. | "Esto es una RNN. Lee en orden y arrastra un resumen de todo lo anterior." |
-| 31 | **Y se olvida** | VIZ | `viz/memoria-que-se-olvida.html`. | Frase larga, el sujeto a 30 palabras del verbo. "Miren cómo se desvanece la información del principio. La mochila tiene capacidad fija y se va llenando." |
+| 31 | **Y se olvida** | VIZ | `viz/memoria-que-se-olvida.html`. | Frase larga, el sujeto a 30 palabras del verbo. "Miren cómo se desvanece la información del principio. La mochila tiene tamaño fijo y se va sobrescribiendo: cada palabra nueva pisa algo de lo viejo." |
 | 32 | Las RNN en 30 segundos | texto | LSTM y GRU: variantes con compuertas para olvidar mejor. Fueron el estado del arte hasta 2017. | "No las vamos a implementar. Están acá para que entiendan qué problema vino a resolver lo de la clase que viene." |
 | 33 | La pregunta que abre la clase 7 | texto | En grande: **"¿Y si en vez de recordar, miramos directamente?"** | "Cuando ustedes leen 'lo' al final de un párrafo largo, no recuerdan todo el párrafo: **saltan** al sustantivo. Eso es lo que vamos a construir." |
 | 34 | El puente | texto | "Clase 7: attention." | |
-| 35 | Herramientas que ya podés usar | texto | Mención honesta y breve: spaCy para procesamiento en español, gensim para embeddings, y los modelos preentrenados que vienen en la clase 9. | "No reinventen la rueda el lunes. Lo de hoy es para entender qué hace la rueda." |
+| 35 | Herramientas que ya podés usar | texto | Mención honesta y breve: spaCy para procesamiento en español, gensim para embeddings, y los modelos preentrenados que vienen en la clase 9. | "No reinventen la rueda en su investigación. Lo de hoy es para entender qué hace la rueda." |
 | 36 | Glosario de hoy | texto | token, tokenización, vocabulario, OOV, one-hot, embedding, dimensión, similitud coseno, hipótesis distribucional, bag-of-words, RNN, LSTM, secuencia. | |
 
 ---
@@ -250,7 +250,7 @@ scikit-learn para PCA.
 | 16 | code | Proyección a 2D (PCA) y scatter con las 150 palabras más frecuentes rotuladas. | Su propia versión de la viz 3.3. |
 | 17 | md | **Medir similitud entre documentos.** | |
 | 18 | code | Vector de documento = promedio de los embeddings de sus palabras. Matriz de similitud entre 20 discursos de años distintos. Heatmap. | |
-| 19 | md | `TODO 4 (el del lunes)` — ¿Qué dos años tienen los discursos más parecidos? ¿Y los más distintos? ¿Coincide con lo que sabés de la historia política de ese período? *Pista: mirá el heatmap y buscá el máximo fuera de la diagonal.* | Momento donde el conocimiento sustantivo del estudiante vale más que el código. Hay que decírselo. |
+| 19 | md | `TODO 4 (el de tu investigación)` — ¿Qué dos años tienen los discursos más parecidos? ¿Y los más distintos? ¿Coincide con lo que sabés de la historia política de ese período? *Pista: mirá el heatmap y buscá el máximo fuera de la diagonal.* | Momento donde el conocimiento sustantivo del estudiante vale más que el código. Hay que decírselo. |
 | 20 | md | **Sesgo, o medición.** | |
 | 21 | code | Definir un eje con dos palabras (`él`/`ella`) y proyectar una lista de sustantivos sobre él. Tabla ordenada. | |
 | 22 | md | `TODO 5 (criterio)` — Este resultado, ¿es un defecto del modelo o un dato sobre el corpus? Escribí tres oraciones. ¿Cómo lo reportarías en un paper? *Pista: la respuesta cambia según para qué vayas a usar el modelo.* | |

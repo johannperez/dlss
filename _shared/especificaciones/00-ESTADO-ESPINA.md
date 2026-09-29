@@ -8,7 +8,7 @@
 > Lo que sigue vale entero **salvo la sección 6**, que quedó desactualizada: de
 > sus seis ítems abiertos, el **1** (los enlaces) sigue abierto, el **6** (la
 > licencia de los corpus de discursos) sigue abierto, y los otros cuatro se
-> cerraron. Los detalles están en `00-ESTADO-CURSO.md` §6.
+> cerraron. Los detalles están en `00-ESTADO-CURSO.md` §4.
 > **La sección 5 —las trampas— sigue siendo obligatoria y no cambió.**
 
 **Verificación adversarial de la base compartida antes de construir las 10 clases.**
@@ -298,7 +298,7 @@ para la nube y para la frontera.
 > **3** sigue abierto (nadie pudo probar Hugging Face) · **4 cerrado** (el
 > entrenamiento del mini-GPT está medido ocho veces: 4 a 7 minutos) ·
 > **5 cerrado** (la clase 6 entra en su presupuesto) · **6** sigue abierto.
-> Ver `00-ESTADO-CURSO.md` §6.
+> Ver `00-ESTADO-CURSO.md` §4.
 
 | # | Qué | Para quién |
 |---|---|---|

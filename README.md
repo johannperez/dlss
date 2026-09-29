@@ -29,8 +29,8 @@ tiene un objeto concreto que se puede manosear con el dedo, y en varias
 visualizaciones el aula **apuesta primero y se equivoca**, porque la predicción
 fallida es el momento en que se aprende. Todos los ejemplos viven en discurso
 político y en prensa: no hay precios de casas en Boston ni flores iris. Y cada
-clase tiene un **`[EL LUNES]`**: algo chiquito y concreto que ya sirve en la
-investigación de ellos esta semana.
+clase tiene un **`[EN TU INVESTIGACIÓN]`**: algo chiquito y concreto que ya sirve
+en la investigación de ellos, desde ya.
 
 ---
 
@@ -200,8 +200,8 @@ python3 clases/05-imagenes-y-convoluciones/medir-experimentos.py
 Para el HTML: Chromium por Playwright, abriendo por `file://` con un
 `context.route('**/*')` que **aborta cualquier URL `http(s)`** y falla si alguna
 sale. Así se comprobó que las 10 slides y las 39 visualizaciones no hacen ni una
-sola request externa. El procedimiento exacto y los resultados están en
-`_shared/especificaciones/00-ESTADO-CURSO.md`.
+sola request externa. Los resultados de cada clase están en su `VERIFICACION.md`,
+y el índice, en `_shared/especificaciones/00-ESTADO-CURSO.md`.
 
 ---
 

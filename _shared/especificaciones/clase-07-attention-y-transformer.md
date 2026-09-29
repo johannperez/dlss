@@ -39,9 +39,11 @@ El hilo:
    piezas con una función clara cada una. La conexión residual se explica como "un desvío que deja
    pasar la información original", que es lo que evita que la señal se pierda al apilar.
 7. **Construir sin entrenar.** El notebook arma el bloque y verifica formas. Se termina la clase con
-   una máquina completa y apagada. Encenderla es la clase 8, y esa expectativa es deliberada.
+   una máquina completa y apagada. En la clase 8 se enciende una máquina hecha de estos mismos bloques
+   (más chica: 4 bloques, que lee letra por letra, para que entrene en minutos), y esa expectativa
+   es deliberada.
 8. **La advertencia interpretativa.** Los mapas de atención se ven hermosos y se sobreinterpretan
-   constantemente. Attention **no es explicación**. Es un `[EL LUNES]` en negativo: lo más útil de
+   constantemente. Attention **no es explicación**. Es un `[EN TU INVESTIGACIÓN]` en negativo: lo más útil de
    hoy es lo que van a poder no creerse.
 
 `[CALLBACK DIBUJO]` — "cada palabra dibuja su propio mapa de a quién mirar. Y esos mapas se dibujan
@@ -69,7 +71,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 60-70 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 18. |
 | 70-85 | Máscara causal, cabezas, posición | 19-30 | Las tres decisiones de diseño y el bloque transformer completo. |
 | 85-105 | Manos 2 | 31 | De a dos: leer mapas de atención sobre texto real. |
-| 105-120 | Cierre | 32-35 | La advertencia contra la sobreinterpretación, `[EL LUNES]`, el puente a la clase 8. |
+| 105-120 | Cierre | 32-35 | La advertencia contra la sobreinterpretación, `[EN TU INVESTIGACIÓN]`, el puente a la clase 8. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -103,16 +105,16 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 21 | **La matriz** | VIZ | `viz/matriz-de-atencion.html`. | Muestra la matriz completa y después con máscara. |
 | 22 | Decisión 2: varias cabezas | figura | Tres mapas de atención de la misma oración con patrones distintos: uno que conecta verbos con sujetos, uno que conecta con la palabra anterior, uno que agrupa por tema. | "Distintos tipos de relación al mismo tiempo. Como tener tres codificadores leyendo el mismo texto con tres libros de códigos distintos." |
 | 23 | **Las cabezas** | VIZ | `viz/cabezas.html`. | |
-| 24 | Decisión 3: la posición | figura | La misma oración desordenada. Para attention pura, **es la misma entrada**: no hay noción de orden. | "Volvimos a la bolsa de palabras de la clase pasada. Attention sola no sabe qué viene antes." |
+| 24 | Decisión 3: la posición | figura | La misma oración desordenada. Para attention pura (sin máscara), **es la misma entrada**: no hay noción de orden. | "Volvimos a la bolsa de palabras de la clase pasada. Attention sola no sabe qué viene antes." |
 | 25 | Positional encoding | figura | A cada palabra se le suma un vector que codifica su posición. Dibujado como "un sellito de número de orden". | "Se le pega un sello con el número de posición. Con eso, la palabra 'no' en la posición 3 es distinta de la misma en la posición 20." |
 | 26 | El bloque completo | figura | Diagrama del bloque: entrada → attention → (+entrada) → norm → MLP → (+) → norm → salida. Con cada pieza rotulada con su función en castellano. | "Cuatro piezas. Vamos una por una." |
 | 27 | La conexión residual | figura | Un desvío que rodea el bloque y vuelve a sumarse. | "Es una fotocopia de lo que entró, que se suma a la salida. Sirve para que la información no se pierda al apilar 12 bloques, y para que el gradiente de la clase 3 llegue hasta abajo. Es una de esas ideas simples que cambiaron todo." |
 | 28 | El MLP de adentro | figura | Las dos capas densas con ReLU. | "¿Se acuerdan de la clase 2? Ahí está, la misma suma de rampas. Nunca se fue." |
 | 29 | La normalización | texto | Reescalar para que los números no se vayan a las nubes ni se aplasten. | "Plomería. Importa que esté, no importa el detalle." |
-| 30 | Apilar bloques | figura | 6 bloques idénticos, uno arriba del otro. | "Se apila el mismo bloque N veces. GPT-2 chico tiene 12. Los grandes, más de 100. No hay una idea nueva por piso: es el mismo piso repetido." |
+| 30 | Apilar bloques | figura | 6 bloques idénticos, uno arriba del otro. | "Se apila el mismo bloque N veces. GPT-2 chico tiene 12; GPT-3, 96. No hay una idea nueva por piso: es el mismo piso repetido." |
 | 31 | Bloque práctico 2 | texto | Consignas: armar el bloque completo y verificar formas. | "30 minutos. Al final de esto tienen un transformer entero. Apagado, pero entero." |
 | 32 | **La advertencia** | figura | Un mapa de atención hermoso, y al lado la pregunta: ¿esto explica por qué el modelo dijo lo que dijo? | "No. Attention te dice de dónde vino la información, no por qué se tomó la decisión. Hay literatura entera sobre esto: *Attention is not Explanation*." |
-| 33 | `[EL LUNES]` | texto | Si leés un paper que interpreta mapas de atención como si fueran evidencia de razonamiento del modelo, ahí tenés un comentario de revisor. Y si vos los usás, reportalos como exploratorio, no como explicación. | "Esto es de lo más útil que se llevan hoy: saber cuándo NO creerle a una figura linda." |
+| 33 | `[EN TU INVESTIGACIÓN]` | texto | Si leés un paper que interpreta mapas de atención como si fueran evidencia de razonamiento del modelo, ahí tenés un comentario de revisor. Y si vos los usás, reportalos como exploratorio, no como explicación. | "Esto es de lo más útil que se llevan hoy: saber cuándo NO creerle a una figura linda." |
 | 34 | El puente | texto | "Tenemos la máquina construida. La clase que viene le damos de comer 40 años de debates parlamentarios y la vemos aprender a escribir. Y después traducimos cada pieza a algo que ChatGPT hace." | |
 | 35 | Glosario de hoy | texto | attention, self-attention, query, key, value, producto punto, softmax, máscara causal, cabeza, multi-head, positional encoding, conexión residual, normalización, bloque transformer. | |
 
@@ -219,14 +221,14 @@ numpy, matplotlib.
 | 17 | code | Envolver lo anterior en una función `attention(X, Wq, Wk, Wv, mask)`. Llamarla 4 veces con matrices distintas. Concatenar las salidas. Graficar los 4 heatmaps. | Se ve que "multi-head" es literalmente "hacerlo 4 veces con otras perillas y pegar los resultados". |
 | 18 | md | **Positional encoding.** | |
 | 19 | code | Demostración: calcular attention sobre la oración y sobre la **misma oración con las palabras permutadas**, sin positional encoding. Verificar que las salidas son las mismas (permutadas). | La demostración de que attention sola es una bolsa de palabras. Callback a la clase 6, en código. |
-| 20 | code | Agregar el positional encoding (senos y cosenos, o embeddings de posición aprendidos: **preferir los aprendidos, son más simples de explicar**) y repetir. Ahora las salidas difieren. | |
+| 20 | code | Agregar el positional encoding (senos y cosenos, o embeddings de posición aprendidos: **preferir los aprendidos, son más simples de explicar**, y decir que hoy lo más usado son las posiciones rotatorias, RoPE; las aprendidas fueron las del GPT original) y repetir. Ahora las salidas difieren. | |
 | 21 | md | **El bloque completo.** | |
 | 22 | code | Clase `BloqueTransformer(nn.Module)` con attention multi-head, MLP, dos LayerNorm y las dos conexiones residuales. ~30 líneas, **comentadas línea por línea con su función en castellano**. | La celda más larga del notebook. Se lee en clase entera. |
 | 23 | code | Pasar un batch de prueba y verificar que la forma de salida es igual a la de entrada. `print` de todas las formas intermedias. | La verificación de formas es el hábito profesional que se enseña acá. |
-| 24 | md | `TODO 4` — Sacá la conexión residual (borrá el `+ x`) y mirá qué pasa con la magnitud de la salida después de apilar 6 bloques. *Pista: imprimí `salida.std()` con y sin residual.* | Se ve la señal desvanecerse. Motiva la residual con evidencia. |
+| 24 | md | `TODO 4` — Sacá la conexión residual (borrá el `+ x`) y mirá qué pasa con el **parecido entre palabras** (similitud coseno media entre las fichas) después de apilar 6 bloques. *La `std` se muestra al lado a propósito: no cambia con la profundidad y no sirve para verlo.* | Sin residual, todas las palabras terminan casi iguales (parecido > 0,95). Motiva la residual con evidencia (Dong et al. 2021). *Nota de construcción: la clase cambió la medida de la `std` al parecido; manda la clase.* |
 | 25 | code | Apilar 6 bloques y contar parámetros. Comparar con la red de la clase 4. | "Pasamos de 65 parámetros a 300.000. Y en la clase 8 vamos a un millón y medio." |
 | 26 | md | `TODO 5 (interpretación)` — Mirá el mapa de atención de una cabeza. Escribí una hipótesis de qué está haciendo. Y después escribí por qué esa hipótesis **no es una explicación** del comportamiento del modelo. | El ejercicio de humildad epistémica de la clase. |
-| 27 | md | **Para llevarte** + puente: "en la clase 8 le damos de comer". | |
+| 27 | md | **Para llevarte** + puente: "en la clase 8 le damos de comer a una versión de 4 bloques que lee letra por letra". | |
 
 ---
 

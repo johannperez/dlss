@@ -25,7 +25,7 @@ El hilo:
    genéricas, las de arriba son específicas. Por eso se congelan las de abajo.
 3. **Las tres estrategias, con su regla de decisión.** No es "cuál es la mejor" sino "cuál según
    cuántas etiquetas tengas": (a) **embeddings + clasificador simple** (50-500 etiquetas, barato,
-   interpretable, corre en CPU); (b) **zero-shot / LLM con prompt** (0 etiquetas, útil para explorar
+   interpretable, corre en CPU); (b) **zero-shot / LLM con prompt** (0 etiquetas para entrenar, las mismas 200-300 para evaluar; útil para explorar
    y para el primer pase, hay que validar igual); (c) **fine-tuning** (300+ etiquetas, mejor
    desempeño, más costo). Esta regla de decisión es uno de los entregables prácticos de la clase.
 4. **Modelos en español.** Que no usen un modelo en inglés sobre texto en español, que pasa. BETO,
@@ -34,8 +34,9 @@ El hilo:
 5. **El giro: evaluar.** La segunda mitad de la clase. Etiquetar a mano una muestra, la matriz de
    confusión, precisión y recall traducidos al problema sustantivo, el baseline tonto, y —el punto
    que esta audiencia entiende mejor que nadie— **el acuerdo entre codificadores humanos como techo
-   realista**. Si dos humanos coinciden en el 80%, un modelo con 85% no es "mejor que un humano":
-   es sospechoso.
+   realista**, medido con la misma métrica que el modelo (el F1 de un codificador contra el otro, no el
+   kappa, que está en otra escala). Si dos humanos coinciden con F1 0,80, un modelo con 0,85 contra uno
+   de ellos no es "mejor que un humano": es raro, y si pasa, sospechá.
 6. **El proyecto chico.** Fine-tuning de verdad sobre titulares etiquetados, con comparación honesta
    contra las alternativas más baratas. Muchas veces la más barata gana, y cuando gana hay que
    decirlo.
@@ -65,7 +66,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 45-55 | **PAUSA** | — | **En serio, pausa.** Slide propia después de la 16. |
 | 55-75 | Evaluar de verdad | 17-25 | Etiquetar a mano, matriz de confusión, precisión y recall, el baseline tonto. |
 | 75-100 | Manos 2: el proyecto chico | 26 | De a dos: clasificar y reportar métricas que un revisor acepte. |
-| 100-120 | Cierre | 27-34 | Mirá los errores, qué hay que reportar, `[EL LUNES]`, el puente a la clase 10. |
+| 100-120 | Cierre | 27-34 | Mirá los errores, qué hay que reportar, `[EN TU INVESTIGACIÓN]`, el puente a la clase 10. |
 
 **La pausa de 10 minutos no es negociable y va marcada con una slide propia**
 (`<section class="pausa">`), para que no se la coma el entusiasmo.
@@ -87,7 +88,7 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 9 | La metáfora | texto | Un investigador que ya habla el idioma, conoce el país y sabe hacer trabajo de campo. Sólo hay que ponerlo al día con tu tema. Contratás eso, no a alguien desde cero. | "Y como todo informante: sabe muchísimo y tiene sus sesgos. Se lo usa y se lo contrasta." |
 | 10 | **Las tres estrategias** | figura | Tabla de decisión: cuántas etiquetas tenés → qué usar. Con costos, requisitos y desempeño esperable. | "Esta tabla se la llevan. Es la decisión práctica que van a tomar de verdad." |
 | 11 | Estrategia A: embeddings + clasificador | figura | Texto → vector (modelo pre-entrenado) → regresión logística. | "El clasificador es de estadística clásica y es **interpretable**. Corre en tu notebook. Con 200 etiquetas anda sorprendentemente bien y es mi primera recomendación siempre." |
-| 12 | Estrategia B: zero-shot | figura | Se le describe la categoría con palabras y clasifica sin ejemplos. | "Cero etiquetas. Mágico y poco confiable. Excelente para explorar; hay que validarlo igual que todo lo demás." |
+| 12 | Estrategia B: zero-shot | figura | Se le describe la categoría con palabras y clasifica sin ejemplos. | "Cero etiquetas para entrenar; para evaluar, las mismas que cualquier otra. Mágico y poco confiable. Excelente para explorar; hay que validarlo igual que todo lo demás." |
 | 13 | Estrategia C: fine-tuning | figura | Se reentrena el modelo con tus ejemplos. | "El mejor desempeño si tenés unos cientos de ejemplos bien etiquetados." |
 | 14 | ¿Cuántas etiquetas hacen falta? | VIZ | `viz/zero-shot-vs-finetune.html`. | "Miren la curva: los primeros 100 ejemplos etiquetados valen muchísimo. Del 500 al 1000, mucho menos. **Etiquetar bien 200 casos vale más que cualquier prompt ingenioso.**" |
 | 15 | Modelos en español | texto | BETO, RoBERTuito (entrenado en tuits en español), modelos multilingües. Y la advertencia: el desempeño reportado en inglés no transfiere. | "Si usan un modelo entrenado en inglés sobre texto en castellano, va a andar y va a andar mal. Y no se van a dar cuenta si no evalúan." |
@@ -96,16 +97,16 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
 | 18 | **Segunda parte: evaluar** | portada de sección | | "Ahora sí, lo importante." |
 | 19 | Primero: etiquetá a mano | texto | Una muestra al azar de 200-300 casos, etiquetada por vos (mejor: por dos personas). **Sin mirar lo que dijo el modelo.** | "Sí, a mano. No hay atajo. Es la parte más aburrida y es la que hace que tu trabajo sea investigación." |
 | 20 | La matriz de confusión | figura | La matriz 2x2 con los cuatro casilleros nombrados en el problema sustantivo, no en abstracto. | "Cuatro números. Y cada uno significa algo distinto para tu pregunta." |
-| 21 | **Movés el umbral** | VIZ | `viz/matriz-de-confusion.html`. | "Miren: si bajo el umbral, agarro más protestas de verdad y también más falsas alarmas. **No podés tener las dos cosas.** Elegir el umbral es elegir qué error preferís, y eso es la clase 3 otra vez." |
+| 21 | **Movés el umbral** | VIZ | `viz/matriz-de-confusion.html`. | "Miren: si bajo el umbral, agarro más protestas de verdad y también más falsas alarmas. **No podés tener las dos cosas de forma sostenida** (la precisión puede dar algún saltito, el recall nunca baja). Elegir el umbral es elegir qué error preferís, y eso es la clase 3 otra vez." |
 | 22 | Precisión y recall, en castellano | texto | **Precisión**: de lo que el modelo llamó X, cuánto era X de verdad. **Recall**: de todo lo que era X, cuánto encontró. Con la frase operativa de cada uno en el problema del corpus de prensa. | "Nunca digan 'precisión de 0.83'. Digan 'de cada 100 notas que el modelo llamó protesta, 83 lo eran'. Si no lo pueden decir así, no lo entendieron." |
 | 23 | ¿Cuál te importa más? | texto | Depende de la pregunta: para estimar una **prevalencia** te importan los dos y su balance; para armar un corpus que después vas a leer, te importa el recall; para hacer una afirmación fuerte sobre casos concretos, la precisión. | "Otra vez: es una decisión de investigación, no una métrica que se optimiza sola." |
 | 24 | El baseline tonto | figura | Un corpus donde el 92% son "no protesta". Un modelo que dice "no protesta" siempre saca 92% de accuracy. | "Si su clase mayoritaria es el 92%, el 93% de accuracy es un desastre y suena bien. **Siempre reporten el baseline.**" |
-| 25 | El techo humano | texto | Acuerdo entre codificadores (kappa de Cohen). Si dos humanos entrenados coinciden en el 80%, ese es tu techo realista. | "Y si el modelo saca 95% donde dos humanos coinciden en el 78%, **no festejen: busquen el error**. Casi siempre hay una fuga de datos." |
+| 25 | El techo humano | texto | Acuerdo entre codificadores: se reporta con kappa de Cohen, pero el techo se compara en la **misma métrica** que el modelo (el F1 de un codificador contra el otro). Si dos humanos coinciden con F1 0,78, ese es tu techo realista. | "Y si el modelo saca 0,95 donde dos humanos coinciden en 0,78, **no festejen: busquen el error**. Muchas veces hay una fuga de datos." |
 | 26 | Bloque práctico 2: el proyecto chico | texto | Consignas: fine-tuning, comparación honesta, matriz de confusión, análisis de errores. | "40 minutos. De a dos." |
 | 27 | Resultados del aula | discusión | Poner en común. | "¿A quién le ganó la regresión logística sobre embeddings al fine-tuning? Levanten la mano. Eso pasa seguido y hay que reportarlo." |
 | 28 | Mirá los errores | texto | Los falsos positivos y falsos negativos son donde está el conocimiento: te dicen qué entendió el modelo por tu categoría. | "Leer 30 errores del modelo te enseña más sobre tu propia definición operativa que leer 300 aciertos." |
 | 29 | Lo que hay que reportar | texto | Checklist: modelo y versión exactos, cantidad de datos etiquetados y por quién, partición, baseline, métricas con intervalos, matriz de confusión, y ejemplos de errores. | "Esto es la sección de métodos. Se los damos hecho en la clase 10." |
-| 30 | `[EL LUNES]` | texto | La receta completa en 7 pasos, imprimible: definí la categoría → etiquetá 300 al azar → medí el acuerdo entre dos codificadores → elegí estrategia según cuántas etiquetas tengas → evaluá en test → mirá los errores → reportá. | "Con esto, el lunes clasifican su corpus. En serio." |
+| 30 | `[EN TU INVESTIGACIÓN]` | texto | La receta completa en 7 pasos, imprimible: definí la categoría → etiquetá 300 al azar → medí el acuerdo entre dos codificadores → elegí estrategia según cuántas etiquetas tengas → evaluá en test → mirá los errores → reportá. | "Con esto, la próxima vez que se sienten con su corpus, lo clasifican. En serio. No es tarea para la clase que viene: es un proyecto de mediano plazo." |
 | 31 | Cuando el modelo no es la respuesta | texto | Si tenés 200 documentos, leelos. Si tu categoría es ambigua para dos humanos, ningún modelo la va a resolver: el problema es la definición, no la herramienta. | "El mejor consejo de la clase: si dos codificadores no se ponen de acuerdo, no tenés un problema de modelo. Tenés un problema de concepto." |
 | 32 | Lo que falta | texto | Tenemos un número bueno. ¿Prueba que medimos lo que decimos? | "No. Y esa es la última clase." |
 | 33 | El puente | texto | "Clase 10: validez, sesgo, reproducibilidad, y el revisor 2." | |
@@ -130,9 +131,9 @@ nunca la pausa. Qué se recorta si se atrasa y qué se agrega si sobra va en
   - Toggle "mostrar el baseline tonto" que agrega una barra con la accuracy de "decir siempre la
     clase mayoritaria".
 - **Qué tiene que hacer clic.** Dos cosas: (1) precisión y recall se mueven en direcciones opuestas
-  y no hay umbral que optimice ambos; (2) **con clases desbalanceadas, la accuracy es una medida
+  y no hay umbral que mejore ambos de forma sostenida; (2) **con clases desbalanceadas, la accuracy es una medida
   inútil**, y la precisión se derrumba aunque el modelo sea el mismo.
-- **Momento aha.** Bajar la prevalencia al 5% sin tocar nada más: la accuracy sube (!) y la precisión
+- **Momento aha.** Bajar la prevalencia al 5% sin tocar nada más: la accuracy casi no se mueve (!) y la precisión
   se desploma. "El modelo es exactamente el mismo. Cambió sólo cuán raro es el fenómeno. Y por eso
   detectar cosas raras es mucho más difícil de lo que parece."
 - **Detalle.** Un panel "traducción a tu paper" que arma la oración: *"El clasificador identificó
@@ -223,9 +224,9 @@ una regresión logística, y se saltean las celdas de HF.
 | **"Anda porque el output tiene sentido"** | Validan leyendo 5 casos que salieron bien. | Se muestra que 5 casos elegidos por uno mismo no son una muestra. Se exige la muestra al azar etiquetada a ciegas. |
 | **Confundir accuracy con desempeño** | Reportan 93% en un corpus con 92% de clase mayoritaria. | Viz 3.1 con el slider de prevalencia. Es la lección más transferible de la clase. |
 | **Confundir precisión con recall** | Los usan indistintamente. | Se prohíbe decir el número sin la frase en castellano. La regla del curso: si no podés decir "de cada 100 que el modelo llamó X, N lo eran", no lo entendiste. |
-| **"El modelo es mejor que los codificadores humanos"** | Festejan un F1 alto. | El techo del acuerdo humano. Un modelo que supera claramente el acuerdo inter-codificador está midiendo otra cosa, o hay fuga. |
+| **"El modelo es mejor que los codificadores humanos"** | Festejan un F1 alto. | El techo del acuerdo humano, en la misma métrica que el modelo. Un modelo que lo supera claramente es raro: sospechá que mide otra cosa, o que hay fuga. |
 | **Usar modelos en inglés sobre texto en español** | Muy frecuente, porque son los que aparecen primero en los tutoriales. | Se muestra en vivo el mismo texto clasificado por un modelo en inglés y uno en español. |
-| **Fine-tuning como default** | Creen que es "la manera correcta". | Viz 3.3 y la tabla comparativa del notebook. Con pocos datos pierde, y siempre cuesta más. |
+| **Fine-tuning como default** | Creen que es "la manera correcta". | Viz 3.3 y la tabla comparativa del notebook. No es el default: se elige según cuántas etiquetas tenés, y cuesta más cómputo que las otras dos estrategias. |
 | **No mirar los errores** | Terminan en la métrica. | El TODO 6, que casi siempre revela etiquetas humanas mal puestas. Es la experiencia que cambia el hábito. |
 | **Creer que zero-shot no necesita validación** | "Como no entrené nada, no hay sobreajuste." | Hay que validar **más**, no menos: no tenés ni idea de qué entendió el modelo por tu categoría. Y probar varios prompts y quedarse con el mejor **es** ajustar contra el test. |
 | **Ignorar la versión del modelo** | Escriben "usamos BERT". | Los modelos se actualizan y se despublican. Hay que fijar la versión exacta (el hash del commit en HF). Se retoma en la clase 10. |
@@ -242,7 +243,7 @@ una regresión logística, y se saltean las celdas de HF.
   aprende tu libro de códigos, y después codifica el resto. Todo lo que sabemos de la codificación
   humana aplica: hace falta acuerdo inter-codificador, hace falta un manual explícito, y hace falta
   revisar los casos límite.
-- **El kappa como techo.** El acuerdo inter-codificador es un límite epistemológico, no un detalle
+- **El acuerdo humano como techo.** El acuerdo inter-codificador (reportado con kappa; comparado con el modelo en la misma métrica) es un límite epistemológico, no un detalle
   de calidad: si dos expertos no coinciden, la categoría no está bien definida, y ninguna máquina va
   a resolver un problema conceptual. Este es probablemente el punto más valioso que un cientista
   social aporta a un equipo de ML, y hay que decírselo así.
