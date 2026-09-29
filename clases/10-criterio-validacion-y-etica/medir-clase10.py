@@ -13,10 +13,16 @@ Produce:
     clases/10-criterio-validacion-y-etica/datos-clase10.js     (el mismo, como global)
 
 Corre en CPU, sin red, en menos de un minuto.
+
+Es determinista en la misma máquina y con las mismas versiones de las
+librerías; con otras versiones los números pueden cambiar un poco (en el
+tercer decimal). Por eso el JSON guarda las versiones con las que se midió
+(clave `entorno`): si tus números no coinciden, empezá por comparar eso.
 """
 import json
-import os
+import math
 import pathlib
+import platform
 import re
 import sys
 
@@ -24,6 +30,7 @@ RAIZ = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RAIZ / "_shared"))
 
 import numpy as np  # noqa: E402
+import sklearn  # noqa: E402
 from sklearn.feature_extraction.text import CountVectorizer  # noqa: E402
 from sklearn.linear_model import LogisticRegression  # noqa: E402
 from sklearn.model_selection import train_test_split  # noqa: E402
@@ -99,17 +106,18 @@ R["modelo"] = {
 # =============================================================================
 # 2. EL RUIDO DE LA PARTICION — cuanto se mueve el F1 solo por cambiar la semilla
 # =============================================================================
-# Esto va ANTES de la ablacion a proposito: sin la banda de ruido, cualquier
-# diferencia que midas despues es indistinguible de haber barajado distinto.
+# Esto es el ruido de UN modelo. Ojo: no es el error de una COMPARACION entre
+# dos versiones evaluadas sobre la misma particion (eso es la seccion 3b).
+N_SEMILLAS = 25
+PARTICIONES = [train_test_split(np.arange(len(y)), test_size=0.25,
+                                stratify=y, random_state=s) for s in range(N_SEMILLAS)]
 efes = []
-for s in range(25):
-    tr, te = train_test_split(np.arange(len(y)), test_size=0.25,
-                              stratify=y, random_state=s)
+for tr, te in PARTICIONES:
     v_s, m_s = entrenar(documentos, tr, y)
     efes.append(evaluar(v_s, m_s, documentos, te, y)["f1"])
 efes = np.array(efes)
 R["ruido_de_particion"] = {
-    "n_particiones": 25, "media": float(efes.mean()), "sd": float(efes.std()),
+    "n_particiones": N_SEMILLAS, "media": float(efes.mean()), "sd": float(efes.std()),
     "minimo": float(efes.min()), "maximo": float(efes.max()),
     "rango": float(efes.max() - efes.min()),
     "valores": [float(v) for v in efes],
@@ -128,44 +136,128 @@ def quitar(corpus, palabras):
 # MISMA lista que la del notebook (celda de la seccion 3). Si cambia una,
 # cambia la otra: dos definiciones del mismo experimento en un curso sobre
 # reproducibilidad seria exactamente el error que la clase denuncia.
+# `lopezobrador_` es la ficha que deja la cuenta @lopezobrador_: es un nombre
+# propio (el TODO 1 la cuenta como tal) y antes no se sacaba en la ablacion.
 NOMBRES_PROPIOS = ["amlo", "meade", "morena", "anaya", "epn", "salinas", "pri",
                    "peña", "bronco", "sánchez", "putin", "irán", "cienfuegos",
-                   "pp", "lópez", "obrador", "trump", "biden"]
+                   "pp", "lópez", "obrador", "trump", "biden", "lopezobrador_"]
 
+ABLACIONES = [
+    ("nada (el modelo original)", []),
+    ("el termino n.o 1", [top_pos[0]["termino"]]),
+    ("los 5 primeros", [t["termino"] for t in top_pos[:5]]),
+    ("los 20 primeros", [t["termino"] for t in top_pos[:20]]),
+    (f"los {len(NOMBRES_PROPIOS)} nombres propios", NOMBRES_PROPIOS)]
+CORPUS_ABLADO = [quitar(documentos, q) for _, q in ABLACIONES]
+
+# (3a) UNA sola particion: lo que haria cualquiera
 ablaciones = []
-for etiqueta, quitados in [
-        ("nada (el modelo original)", []),
-        ("el termino n.o 1", [top_pos[0]["termino"]]),
-        ("los 5 primeros", [t["termino"] for t in top_pos[:5]]),
-        ("los 20 primeros", [t["termino"] for t in top_pos[:20]]),
-        (f"los {len(NOMBRES_PROPIOS)} nombres propios", NOMBRES_PROPIOS)]:
-    corpus2 = quitar(documentos, quitados)
+for (etiqueta, quitados), corpus2 in zip(ABLACIONES, CORPUS_ABLADO):
     v2, m2 = entrenar(corpus2, i_train, y)
     met = evaluar(v2, m2, corpus2, i_test, y)
     ablaciones.append({"quitado": etiqueta, "n_quitados": len(quitados),
                        "metricas": met, "f1": met["f1"]})
 R["ablacion"] = ablaciones
 
+# (3b) La comparacion bien hecha: la MISMA intervencion repetida con cada una
+# de las 25 particiones, y la diferencia PAREADA (ablado - original, sobre la
+# misma particion). El error que importa es el de esa diferencia, no el rango
+# del F1 suelto. Las 25 particiones comparten datos, asi que no son 25
+# repeticiones independientes: el error estandar ingenuo (DE/raiz(25)) es
+# optimista. Usamos la correccion de Nadeau y Bengio (2003):
+#     EE = DE * raiz(1/J + n_test/n_train)
+n_te, n_tr = len(PARTICIONES[0][1]), len(PARTICIONES[0][0])
+factor_nb = math.sqrt(1 / N_SEMILLAS + n_te / n_tr)
+pareadas = []
+for (etiqueta, quitados), corpus2 in zip(ABLACIONES[1:], CORPUS_ABLADO[1:]):
+    deltas = []
+    for (tr, te), f0 in zip(PARTICIONES, efes):
+        v2, m2 = entrenar(corpus2, tr, y)
+        deltas.append(evaluar(v2, m2, corpus2, te, y)["f1"] - f0)
+    deltas = np.array(deltas)
+    de = float(deltas.std(ddof=1))
+    ee = de * factor_nb
+    pareadas.append({
+        "quitado": etiqueta, "n_quitados": len(quitados),
+        "deltas": [float(d) for d in deltas],
+        "media": float(deltas.mean()), "de": de,
+        "ee_corregido": ee,
+        "ic95_bajo": float(deltas.mean() - 2 * ee), "ic95_alto": float(deltas.mean() + 2 * ee),
+        "negativas": int((deltas < 0).sum()),
+    })
+R["ablacion_pareada"] = {
+    "n_particiones": N_SEMILLAS, "factor_nadeau_bengio": factor_nb,
+    "filas": pareadas,
+    "de_del_f1_suelto": float(efes.std()),
+}
 R["ablacion_vs_ruido"] = {
-    "movimiento_maximo": float(max(abs(a["f1"] - base["f1"]) for a in ablaciones)),
-    "rango_del_ruido": R["ruido_de_particion"]["rango"],
+    "movimiento_maximo_una_particion": float(max(abs(a["f1"] - base["f1"]) for a in ablaciones)),
+    "rango_del_f1_suelto": R["ruido_de_particion"]["rango"],
+    "nota": "comparar una diferencia pareada con el rango del F1 suelto es comparar mal; "
+            "ver ablacion_pareada",
 }
 
 # =============================================================================
-# 4. PLACEBO Y CONTROL POSITIVO
+# 4. CONTROL POSITIVO, PLACEBO, INVARIANCIA Y FUERA DE DOMINIO
 # =============================================================================
-# (a) Control positivo: discursos presidenciales argentinos. Son 100% politica.
+def oraciones(texto):
+    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto) if 60 < len(f.strip()) < 220]
+
+
+# (a) Control positivo: TODAS las oraciones de 60-220 caracteres de los
+# discursos presidenciales argentinos (no las primeras N, que salian casi todas
+# de los discursos que aparecen primero en el archivo). Son 100 % politica.
 discursos = datos.discursos_casarosada()
-fragmentos = []
-for x in discursos:
-    for frase in re.split(r"(?<=[.!?])\s+", x["discurso"]):
-        frase = frase.strip()
-        if 60 < len(frase) < 220:
-            fragmentos.append(frase)
-fragmentos = fragmentos[:600]
+fragmentos, de_que_discurso = [], []
+for k, x in enumerate(discursos):
+    for frase in oraciones(x["discurso"]):
+        fragmentos.append(frase)
+        de_que_discurso.append(k)
 p_casarosada = float(modelo.predict(vec.transform(fragmentos)).mean())
 
-# (b) Placebo negativo: titulares del corpus con las palabras barajadas.
+# (a') La referencia con el mismo largo: oraciones de 60-220 caracteres de las
+# notas de politica del PROPIO test. El modelo se entreno con documentos de
+# ~100 palabras y los fragmentos tienen ~20: parte de la caida es el largo.
+pos_test = [i for i in i_test if y[i] == 1]
+oraciones_propias = [s for i in pos_test for s in oraciones(notas[i]["texto"])]
+p_oraciones_propias = float(modelo.predict(vec.transform(oraciones_propias)).mean())
+
+# (a'') La hipotesis de los nombres propios, testeada: reentrenar sin ellos y
+# volver a correr el control positivo.
+corpus_sin_np = CORPUS_ABLADO[-1]
+v_np, m_np = entrenar(corpus_sin_np, i_train, y)
+met_np = evaluar(v_np, m_np, corpus_sin_np, i_test, y)
+p_casarosada_sin_np = float(m_np.predict(v_np.transform(fragmentos)).mean())
+p_oraciones_sin_np = float(m_np.predict(v_np.transform(oraciones_propias)).mean())
+
+R["control_positivo"] = {
+    "que_es": "oraciones de 60-220 caracteres de discursos presidenciales argentinos 2015-2024",
+    "n": len(fragmentos), "n_discursos_con_fragmentos": len(set(de_que_discurso)),
+    "n_discursos": len(discursos),
+    "proporcion_marcada": p_casarosada, "esperado": 1.0,
+    "recall_en_su_test": base["recall"],
+    "referencia_mismo_largo": {"que_es": "oraciones de 60-220 caracteres de las notas de politica del test",
+                               "n": len(oraciones_propias), "recall": p_oraciones_propias},
+    "sin_nombres_propios": {"f1_test": met_np["f1"], "recall_test": met_np["recall"],
+                            "proporcion_marcada": p_casarosada_sin_np,
+                            "recall_oraciones_propias": p_oraciones_sin_np},
+}
+
+# (b) Placebo de verdad: donde el fenomeno NO deberia aparecer. Notas de
+# Deporte y Espectaculos del test (el modelo no las vio), mismo corpus, mismo
+# registro. Si el modelo mide "politica", deberia marcar casi ninguna.
+TEMAS_PLACEBO = ("Deporte", "Espectaculos")
+i_placebo = [i for i in i_test if notas[i]["tema"] in TEMAS_PLACEBO]
+pred_placebo = modelo.predict(vec.transform([documentos[i] for i in i_placebo]))
+R["placebo"] = {
+    "que_es": "notas de Deporte y Espectaculos del test (no vistas en el entrenamiento)",
+    "temas": list(TEMAS_PLACEBO), "n": len(i_placebo),
+    "marcadas": int(pred_placebo.sum()), "proporcion_marcada": float(pred_placebo.mean()),
+    "titulares_marcados": [notas[i]["titular"] for i, p in zip(i_placebo, pred_placebo) if p],
+}
+
+# (c) Test de invariancia: el mismo texto con las palabras barajadas. NO es un
+# placebo (el fenomeno sigue ahi): pregunta si el modelo usa el orden.
 rng = np.random.default_rng(SEMILLA)
 def barajar(t):
     partes = t.split()
@@ -176,30 +268,39 @@ def barajar(t):
 docs_test = [documentos[i] for i in i_test]
 pred_orig = modelo.predict(vec.transform(docs_test))
 pred_baraj = modelo.predict(vec.transform([barajar(t) for t in docs_test]))
-iguales = float((pred_orig == pred_baraj).mean())
+R["invariancia"] = {"proporcion_predicciones_identicas": float((pred_orig == pred_baraj).mean()),
+                    "positivos_original": float(pred_orig.mean()),
+                    "positivos_barajado": float(pred_baraj.mean())}
 
-# (c) Placebo de dominio: prensa de Aguasclaras (SINTETICA, otro pais, otra epoca).
+# (d) Fuera de dominio: titulares de Aguasclaras (SINTETICO, pais ficticio,
+# 2015-2024, sin tildes). Son en su mayoria de politica institucional
+# (sesiones, bloques, leyes, protestas): funcionan como un SEGUNDO control
+# positivo, no como placebo.
 ac = datos.prensa_aguasclaras()
 tit_ac = [n["titular"] for n in ac]
 p_aguasclaras = float(modelo.predict(vec.transform(tit_ac)).mean())
-# cuantos de esos titulares son sobre politica parlamentaria de verdad
-p_ac_politica = float(np.mean([n["tema"] in ("legislativo", "politica", "seguridad")
-                               for n in ac]))
-
-R["placebo"] = {
-    "casarosada": {"n": len(fragmentos), "proporcion_marcada": p_casarosada,
-                   "esperado": 1.0,
-                   "que_es": "fragmentos de discursos presidenciales argentinos 2015-2024"},
-    "barajado": {"proporcion_predicciones_identicas": iguales,
-                 "positivos_original": float(pred_orig.mean()),
-                 "positivos_barajado": float(pred_baraj.mean())},
-    "aguasclaras": {"n": len(tit_ac), "proporcion_marcada": p_aguasclaras,
-                    "proporcion_realmente_politica": p_ac_politica},
+VOC_LEGISLATIVO = re.compile(r"\b(ley|leyes|sesion|bloque|recinto|comision|diputad\w*|"
+                             r"senad\w*|oficialismo|legislatur\w*|camara)\b", re.I)
+p_ac_legislativo = float(np.mean([bool(VOC_LEGISLATIVO.search(t)) for t in tit_ac]))
+R["fuera_de_dominio"] = {
+    "que_es": "titulares de Aguasclaras (SINTETICO, pais ficticio, 2015-2024, sin tildes)",
+    "n": len(tit_ac), "proporcion_marcada": p_aguasclaras,
+    "proporcion_con_vocabulario_legislativo": p_ac_legislativo,
+    "anios": [min(n["anio"] for n in ac), max(n["anio"] for n in ac)],
 }
 
-# recall sobre el control positivo: es un corpus donde TODO es positivo
-R["placebo"]["casarosada"]["recall_alli"] = p_casarosada
-R["placebo"]["casarosada"]["recall_en_su_test"] = base["recall"]
+# (e) Prevalencia: el modelo entrena con class_weight="balanced". Contar
+# predicciones no estima bien la prevalencia cuando FP != FN.
+q = float(pred_orig.mean())
+tpr = base["recall"]
+fpr = base["fp"] / (base["fp"] + base["vn"])
+R["prevalencia_por_conteo"] = {
+    "real_en_test": float(y[i_test].mean()), "contando_predicciones": q,
+    "fp": int(base["fp"]), "fn": int(base["fn"]),
+    "corregida_con_tpr_fpr": float((q - fpr) / (tpr - fpr)),
+    "nota": "la correccion usa TPR/FPR medidos sobre el mismo test: es circular; "
+            "en un proyecto se miden en una muestra validada aparte",
+}
 
 # =============================================================================
 # 5. PARES MINIMOS
@@ -214,13 +315,13 @@ PARES = [
     ("cambio de pais", "Morena ganó las elecciones en el estado",
      "El Frente Amplio ganó las elecciones en el departamento"),
     ("cambio de agente", "El diputado presentó un proyecto sobre vivienda",
-     "El futbolista presentó su nuevo club"),
+     "El futbolista presentó un proyecto sobre vivienda"),
     ("cambio de agente", "El ministro visitó el hospital de la ciudad",
      "El cantante visitó el hospital de la ciudad"),
-    ("mismo tema, otras palabras", "El congreso debate la reforma electoral",
+    ("paráfrasis", "El congreso debate la reforma electoral",
      "La cámara discute los cambios al sistema de votación"),
-    ("cambio de epoca", "El presidente presentó su plan de gobierno",
-     "El primer mandatario expuso su programa de gestión"),
+    ("sinónimo", "El presidente presentó su plan de gobierno",
+     "El primer mandatario presentó su plan de gobierno"),
 ]
 filas_pares = []
 for tipo, a, b in PARES:
@@ -286,16 +387,34 @@ R["sesgo"]["pares_genero"] = pares_genero
 R["sesgo"]["peso_los"] = float(pesos[list(vocabulario).index("los")]) if "los" in vocab_set else None
 R["sesgo"]["peso_las"] = float(pesos[list(vocabulario).index("las")]) if "las" in vocab_set else None
 
-# test de permutacion: ¿la diferencia por genero se distingue del azar?
+# ¿De donde sale la diferencia por genero? En logit (antes de la sigmoide) la
+# diferencia de cada par es EXACTAMENTE: peso(las) - peso(los) + (peso del
+# sustantivo femenino - peso del masculino). La parte del articulo es la misma
+# en los 10 pares: no son 10 evidencias independientes.
+w_art = R["sesgo"]["peso_las"] - R["sesgo"]["peso_los"]
+def _peso(p):
+    return float(pesos[vec.vocabulary_[p]]) if p in vec.vocabulary_ else 0.0
+
+
+for p in pares_genero:
+    p["logit_articulo"] = w_art
+    p["logit_sustantivo"] = _peso(p["femenino"].split()[1]) - _peso(p["masculino"].split()[1])
+R["sesgo"]["logit_articulo"] = w_art
+R["sesgo"]["pares_solo_articulo"] = sum(1 for p in pares_genero if p["logit_sustantivo"] == 0)
+
+# Test de signos exacto: con 10 pares hay 2**10 = 1024 patrones de signo, asi
+# que se enumeran todos (muestrear 20.000 no agrega nada).
+import itertools  # noqa: E402
 sm = np.array([p["score_m"] for p in pares_genero])
 sf = np.array([p["score_f"] for p in pares_genero])
 dif_obs = float(np.mean(sf - sm))
-rng2 = np.random.default_rng(SEMILLA)
-signos = rng2.choice([-1, 1], size=(20000, len(sm)))
-nulo = (signos * (sf - sm)).mean(axis=1)
-p_valor = float((np.abs(nulo) >= abs(dif_obs)).mean())
-R["sesgo"]["permutacion"] = {"diferencia_media": dif_obs, "p_valor": p_valor,
-                             "n_pares": len(sm), "n_permutaciones": 20000}
+patrones = np.array(list(itertools.product([-1, 1], repeat=len(sm))))
+nulo = (patrones * (sf - sm)).mean(axis=1)
+p_valor = float((np.abs(nulo) >= abs(dif_obs) - 1e-12).mean())
+R["sesgo"]["permutacion"] = {"diferencia_media": dif_obs, "p_valor_exacto": p_valor,
+                             "n_pares": len(sm), "n_patrones": int(len(patrones)),
+                             "todas_positivas": bool((sf - sm > 0).all())}
+R["sesgo"]["alguno_cruza_05"] = bool(max(float(scores.max()), float(sf.max()), float(sm.max())) >= 0.5)
 
 # =============================================================================
 # 7. CASO 2 DE LA VIZ — el confusor temporal, con datos reales
@@ -371,70 +490,9 @@ R["cobertura_parcial"] = {
 }
 
 
-# =============================================================================
-# 9. LA ETIQUETA CIRCULAR — Aguasclaras (SINTETICO), el F1 = 1,00 que no vale
-# =============================================================================
-ac_y = np.array([n["menciona_protesta"] for n in ac])
-ac_tr, ac_te = train_test_split(np.arange(len(ac_y)), test_size=0.25,
-                                stratify=ac_y, random_state=SEMILLA)
-
-
-def circular(palabras):
-    corpus = quitar(tit_ac, palabras)
-    v = CountVectorizer(min_df=2, binary=True)
-    A = v.fit_transform([corpus[i] for i in ac_tr])
-    m = LogisticRegression(max_iter=3000, class_weight="balanced",
-                           random_state=SEMILLA).fit(A, ac_y[ac_tr])
-    return g.metricas_binarias(ac_y[ac_te],
-                               m.predict(v.transform([corpus[i] for i in ac_te])))
-
-
-R["etiqueta_circular"] = {
-    "corpus": "prensa de Aguasclaras — SINTETICO, pais ficticio",
-    "n": int(len(ac_y)), "prevalencia": float(ac_y.mean()),
-    "original": circular([]),
-    "sin_protesta": circular(["protesta", "protestas"]),
-    "sin_cinco_palabras": circular(["protesta", "protestas", "marcha", "marchas",
-                                    "reclamo", "reclamos", "paro", "paros",
-                                    "movilizacion", "movilizaciones"]),
-}
-
-# =============================================================================
-# 10. LA FUGA POR LA FUENTE — verdadero/falso, al azar vs por medio
-# =============================================================================
-from sklearn.model_selection import GroupShuffleSplit  # noqa: E402
-
-y_falso = np.array([n["es_falso"] for n in notas])
-fuentes = np.array([n["fuente"] for n in notas])
-
-tr_az, te_az = train_test_split(np.arange(len(y_falso)), test_size=0.25,
-                                stratify=y_falso, random_state=SEMILLA)
-gss = GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=SEMILLA)
-tr_gr, te_gr = next(gss.split(documentos, y_falso, groups=fuentes))
-
-
-def falso(indices_tr, indices_te):
-    v = CountVectorizer(min_df=2, binary=True)
-    A = v.fit_transform([documentos[i] for i in indices_tr])
-    m = LogisticRegression(max_iter=3000, class_weight="balanced",
-                           random_state=SEMILLA).fit(A, y_falso[indices_tr])
-    return g.metricas_binarias(y_falso[indices_te],
-                               m.predict(v.transform([documentos[i] for i in indices_te])))
-
-
-met_az = falso(tr_az, te_az)
-met_gr = falso(tr_gr, te_gr)
-prev_gr = float(y_falso[te_gr].mean())
-medios = {}
-for n in notas:
-    medios.setdefault(n["fuente"], set()).add(n["categoria"])
-R["fuga_por_fuente"] = {
-    "tarea": "¿la nota es falsa?",
-    "al_azar": met_az, "por_medio": met_gr,
-    "piso_por_medio": max(prev_gr, 1 - prev_gr),
-    "n_medios": len(medios),
-    "medios_con_una_sola_clase": sum(1 for v in medios.values() if len(v) == 1),
-}
+# (Las secciones "etiqueta circular" y "fuga por la fuente" que habia aca no las
+# usaba ninguna slide ni viz: se sacaron. La fuga por la fuente es tema de la
+# clase 9 y esta medida en datos/README.md §1.3.)
 
 # =============================================================================
 # 11. LOS PESOS DEL MODELO — para que la viz calcule el score en el navegador
@@ -446,8 +504,10 @@ R["fuga_por_fuente"] = {
 PESOS = {str(t): round(float(w), 5) for t, w in zip(vocabulario, pesos)}
 
 # comprobacion: la cuenta a mano tiene que dar lo mismo que sklearn
-import math  # noqa: E402
-_ficha = re.compile(r"[^\W_]{2,}", re.UNICODE)
+# Misma regla que CountVectorizer (r"(?u)\b\w\w+\b"): corridas de 2 o mas
+# caracteres de palabra, guion bajo incluido (por eso `lopezobrador_` existe).
+# La viz usa /[\p{L}\p{N}_]{2,}/gu, que es lo mismo.
+_ficha = re.compile(r"\w{2,}", re.UNICODE)
 
 
 def _score_a_mano(texto):
@@ -457,11 +517,19 @@ def _score_a_mano(texto):
     return 1 / (1 + math.exp(-z))
 
 
-_control = [PLANTILLA.format(s) for _, s in SUJETOS] + [a for _, a, _ in PARES]
+_control = ([PLANTILLA.format(s) for _, s in SUJETOS] + [a for _, a, _ in PARES] +
+            [b for _, _, b in PARES] + ["Critica de @lopezobrador_ al presupuesto"])
 _dif = max(abs(_score_a_mano(t) - float(modelo.predict_proba(vec.transform([t]))[0, 1]))
            for t in _control)
 assert _dif < 1e-4, f"la cuenta a mano no coincide con sklearn (dif {_dif})"
 print(f"[ok] la cuenta a mano coincide con sklearn (dif maxima {_dif:.2e}, por redondeo a 5 decimales)")
+# y la tokenizacion a mano da las mismas fichas que sklearn en todo el corpus
+_analizador = vec.build_analyzer()
+_voc = vec.vocabulary_
+for _t in documentos:
+    assert ({w for w in _ficha.findall(_t.lower()) if w in _voc} ==
+            {w for w in _analizador(_t) if w in _voc}), "la tokenizacion a mano difiere de sklearn"
+print("[ok] la tokenizacion a mano da las mismas fichas que sklearn en los 1471 documentos")
 
 pathlib.Path(__file__).resolve().parent.joinpath("pesos-clase10.js").write_text(
     "// Generado por medir-clase10.py — NO editar a mano.\n"
@@ -473,6 +541,17 @@ pathlib.Path(__file__).resolve().parent.joinpath("pesos-clase10.js").write_text(
 # =============================================================================
 # GUARDAR
 # =============================================================================
+try:
+    import torch  # noqa: F401
+    _torch = torch.__version__
+except ImportError:
+    _torch = "no instalado"
+R["entorno"] = {
+    "python": platform.python_version(), "numpy": np.__version__,
+    "sklearn": sklearn.__version__, "torch": _torch,
+    "nota": "determinista en la misma maquina y con estas versiones; "
+            "con otras, los numeros pueden cambiar un poco",
+}
 R = redondear(R)
 salida = pathlib.Path(__file__).resolve().parent
 (salida / "datos-clase10.json").write_text(
@@ -495,21 +574,41 @@ rp = R["ruido_de_particion"]
 print(f"\nRUIDO DE PARTICION (25 semillas)  F1 media={rp['media']:.3f} "
       f"sd={rp['sd']:.3f}  de {rp['minimo']:.3f} a {rp['maximo']:.3f}  "
       f"(rango {rp['rango']:.3f})")
-print("\nABLACION")
+print("\nABLACION (una particion)")
 for a in R["ablacion"]:
     print(f"  {a['quitado']:<28} F1 = {a['f1']:.3f}")
-print("\nPLACEBO / CONTROL")
+ap = R["ablacion_pareada"]
+print(f"\nABLACION PAREADA ({ap['n_particiones']} particiones, EE corregido x{ap['factor_nadeau_bengio']:.3f})")
+for a in ap["filas"]:
+    print(f"  {a['quitado']:<28} media {a['media']:+.4f}  DE {a['de']:.4f}  "
+          f"IC95 [{a['ic95_bajo']:+.3f}, {a['ic95_alto']:+.3f}]  negativas {a['negativas']}/25")
+print("\nCONTROLES")
+cp_ = R["control_positivo"]
+print(f"  control positivo ({cp_['n']} fragmentos de {cp_['n_discursos_con_fragmentos']} discursos): "
+      f"marca {cp_['proporcion_marcada']:.3f}")
+print(f"  referencia mismo largo ({cp_['referencia_mismo_largo']['n']} oraciones propias): "
+      f"{cp_['referencia_mismo_largo']['recall']:.3f}")
+sn = cp_["sin_nombres_propios"]
+print(f"  sin nombres propios: F1 test {sn['f1_test']:.3f}  control {sn['proporcion_marcada']:.3f}  "
+      f"oraciones propias {sn['recall_oraciones_propias']:.3f}")
 pl = R["placebo"]
-print(f"  Casa Rosada (100% politica): marca {pl['casarosada']['proporcion_marcada']:.3f}")
-print(f"  barajado: {pl['barajado']['proporcion_predicciones_identicas']:.3f} de predicciones identicas")
-print(f"  Aguasclaras: marca {pl['aguasclaras']['proporcion_marcada']:.3f}")
+print(f"  placebo ({pl['n']} notas de {'/'.join(pl['temas'])}): marca {pl['marcadas']} "
+      f"({pl['proporcion_marcada']:.3f})")
+print(f"  invariancia: {R['invariancia']['proporcion_predicciones_identicas']:.3f} identicas")
+fd = R["fuera_de_dominio"]
+print(f"  Aguasclaras: marca {fd['proporcion_marcada']:.3f}; con vocabulario legislativo "
+      f"{fd['proporcion_con_vocabulario_legislativo']:.3f}")
+pc = R["prevalencia_por_conteo"]
+print(f"  prevalencia real {pc['real_en_test']:.3f}, contando {pc['contando_predicciones']:.3f}, "
+      f"corregida {pc['corregida_con_tpr_fpr']:.3f}")
 print("\nSESGO")
 print(f"  diferencia maxima = {R['sesgo']['diferencia_maxima']:.3f}  "
       f"({R['sesgo']['filas'][0]['sujeto']} {R['sesgo']['score_max']:.3f}  vs  "
       f"{R['sesgo']['filas'][-1]['sujeto']} {R['sesgo']['score_min']:.3f})")
 print(f"  peso de 'los' = {R['sesgo']['peso_los']}   peso de 'las' = {R['sesgo']['peso_las']}")
-print(f"  permutacion: dif={R['sesgo']['permutacion']['diferencia_media']:.4f} "
-      f"p={R['sesgo']['permutacion']['p_valor']:.4f}")
+pm = R["sesgo"]["permutacion"]
+print(f"  signos exacto: dif={pm['diferencia_media']:.4f} p={pm['p_valor_exacto']:.5f} "
+      f"({pm['n_patrones']} patrones); pares solo-articulo {R['sesgo']['pares_solo_articulo']}")
 print("\nCONFUSOR TEMPORAL")
 ct = R["confusor_temporal"]
 print(f"  orador  F1={ct['metricas_orador']['f1']:.3f}   "
@@ -520,18 +619,6 @@ print(f"  años Macri={ct['anios_macri']}  Fernandez={ct['anios_fernandez']}  "
 print("\nPARES MINIMOS")
 for f in R["pares_minimos"]:
     print(f"  [{f['tipo']:<26}] {f['score_a']:.3f} -> {f['score_b']:.3f}  ({f['delta']:+.3f})")
-print(f"  la ablacion movio como mucho {R['ablacion_vs_ruido']['movimiento_maximo']:.3f}; "
-      f"el ruido de particion es {R['ablacion_vs_ruido']['rango_del_ruido']:.3f}")
-print("\nETIQUETA CIRCULAR (Aguasclaras, SINTETICO)")
-ec = R["etiqueta_circular"]
-print(f"  original F1={ec['original']['f1']:.3f}  sin 'protesta' F1={ec['sin_protesta']['f1']:.3f}  "
-      f"sin 5 palabras F1={ec['sin_cinco_palabras']['f1']:.3f}")
-print("\nFUGA POR LA FUENTE (¿la nota es falsa?)")
-fu = R["fuga_por_fuente"]
-print(f"  al azar   acc={fu['al_azar']['accuracy']:.3f} F1={fu['al_azar']['f1']:.3f}")
-print(f"  por medio acc={fu['por_medio']['accuracy']:.3f} F1={fu['por_medio']['f1']:.3f}  "
-      f"(el piso ahi es {fu['piso_por_medio']:.3f})")
-print(f"  {fu['medios_con_una_sola_clase']} de {fu['n_medios']} medios aparecen con una sola clase")
 print("\nCOBERTURA PARCIAL (construido)")
 cp = R["cobertura_parcial"]
 print(f"  tono A={cp['tono_foro_a']:.2f}%  tono B={cp['tono_foro_b']:.2f}%")

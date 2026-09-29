@@ -6,7 +6,7 @@
 <title>Tres casos de validez de constructo — Clase 10</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA: "el modelo saca F1 0,68 en su propio test y encuentra el 21 %
+     MOMENTO AHA: "el modelo saca F1 0,68 en su propio test y encuentra el 22 %
      de un corpus que es 100 % política. Entonces el 0,68 no era lo que yo
      pensaba que era."
 
@@ -68,11 +68,12 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> En el caso 1, apretá <em>aplicar el arreglo</em>: el mismo
-      modelo que encuentra 6 de cada 10 notas de política en su propio test encuentra
-      <b>2 de cada 10</b> en un corpus donde <em>todas</em> son política. No cambió el modelo:
-      cambió dónde lo medimos. Y fijate en la banda gris de abajo: la ablación —el test que
-      todo el mundo recomienda— movió el F1 <b>menos de lo que lo mueve cambiar la semilla de
-      la partición</b>. Un test de validez que se mueve menos que el ruido no es un test.
+      modelo que encuentra 6 de cada 10 notas de política en su propio test (y 5 de cada 10
+      en oraciones sueltas de esas notas) encuentra <b>2 de cada 10</b> en oraciones de
+      discursos donde <em>todas</em> son política. No cambió el modelo: cambió dónde lo
+      medimos. Y abajo, la hipótesis de los nombres propios puesta a prueba: sacarlos baja el
+      F1 muy poco, pero de forma consistente en las 25 particiones — y el control positivo
+      sigue lejos de 100. Los nombres explican una parte; el resto es dominio.
     </div>
     <p class="viz-pie">
       Casos 1 y 2: datos <b>reales</b> — prensa en castellano (Spanish Fake News Corpus 2.0,
@@ -95,7 +96,7 @@ const D = window.DATOS10;
    -------------------------------------------------------------------------- */
 const NOMBRES = new Set(['amlo','meade','morena','anaya','epn','salinas','pri','peña',
   'bronco','sánchez','putin','irán','cienfuegos','pp','lópez','obrador','trump','biden',
-  'josé','maría','juan','luis','carlos']);
+  'lopezobrador_','josé','maría','juan','luis','carlos']);
 
 const p = Viz.plano('#lienzo', {
   xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 330,
@@ -104,6 +105,9 @@ const p = Viz.plano('#lienzo', {
 
 // `p.fondo()` usa `p.titulo`, no un argumento: lo cambiamos antes de dibujar.
 function titulo(t) { p.titulo = t; }
+// Accesibilidad: el canvas es una imagen; le damos un texto que diga lo mismo.
+p.canvas.setAttribute('role', 'img');
+function describir(t) { p.canvas.setAttribute('aria-label', t); }
 
 let caso = '1', vista = 'antes';
 p.ejeX = '';
@@ -113,63 +117,75 @@ function dibujarCaso1() {
   p.ejeX = '';
   if (vista === 'antes') {
     p.limites(0, 1, 0, 1);
-    const items = D.modelo.top_positivos.slice(0, 12).map(t => ({
-      etiqueta: t.termino,
+    const top = D.modelo.top_positivos.slice(0, 12);
+    // Los nombres propios van en rojo Y con ★: el color solo no alcanza
+    // (daltonismo, impresión en blanco y negro).
+    const items = top.map(t => ({
+      etiqueta: (NOMBRES.has(t.termino) ? '★ ' : '') + t.termino,
       valor: t.peso,
       color: NOMBRES.has(t.termino) ? 'error' : 'modelo'
     }));
-    titulo('los 12 términos que más pesan en «esto es política»  ·  en rojo, nombres propios de la coyuntura mexicana');
+    titulo('los 12 términos que más pesan en «esto es política»  ·  en rojo y con ★, nombres propios de la coyuntura mexicana');
     p.fondo();
     p.barras(items, { horizontal: true, formato: v => v.toFixed(2) });
+    describir('Barras de los 12 términos con más peso. Nombres propios (marcados con estrella): ' +
+      top.filter(t => NOMBRES.has(t.termino)).map(t => t.termino).join(', ') + '.');
   } else {
-    // Dos cosas en la misma escala 0..1: los dos recalls arriba, y abajo la
-    // banda de ruido del F1 con las ablaciones adentro.
-    p.limites(0, 1, 0.18, 4.3);
-    titulo('arriba: el mismo modelo medido en dos lugares  ·  abajo: F1 según la semilla de la partición');
+    // Arriba, tres barras en la misma escala 0..1 (recall en tres lugares).
+    // Abajo, la ablación de los nombres propios con 25 particiones: la
+    // diferencia PAREADA de F1, con su propio eje, dibujado a mano.
+    p.limites(0, 1, 0, 5.2);
+    titulo('arriba: el mismo modelo medido en tres lugares  ·  abajo: qué pasa si le sacamos los nombres propios');
     p.fondo();
 
-    const L = 0.30;   // donde arrancan las barras, en coordenadas del mundo
+    const cp = D.control_positivo;
+    const L = 0.34;   // donde arrancan las barras, en coordenadas del mundo
     function barra(y, valor, col, etiqueta, lectura) {
-      p.poligono([[L, y - .26], [L + valor * (1 - L - .02), y - .26],
-                  [L + valor * (1 - L - .02), y + .26], [L, y + .26]],
+      p.poligono([[L, y - .24], [L + valor * (1 - L - .06), y - .24],
+                  [L + valor * (1 - L - .06), y + .24], [L, y + .24]],
         { color: col, relleno: col, borde: col });
       p.texto(L - .015, y, etiqueta, { alinear: 'right', tam: 12, color: 'tinta' });
-      p.texto(L + valor * (1 - L - .02) + .012, y, lectura,
+      p.texto(L + valor * (1 - L - .06) + .012, y, lectura,
         { alinear: 'left', tam: 12, peso: '700', color: col, mono: true });
     }
-    barra(3.5, D.modelo.metricas.recall, 'modelo', 'en su propio test',
-      (D.modelo.metricas.recall * 100).toFixed(0) + ' de cada 100');
-    barra(2.75, D.placebo.casarosada.proporcion_marcada, 'error', 'en discursos presidenciales',
-      (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) + ' de cada 100');
-    p.texto(L, 2.2, 'los discursos presidenciales son 100 % política: ahí tendría que dar 100 de cada 100',
+    const pct = v => (v * 100).toFixed(0) + ' de cada 100';
+    barra(4.75, cp.recall_en_su_test, 'modelo', 'notas enteras de su test', pct(cp.recall_en_su_test));
+    barra(4.15, cp.referencia_mismo_largo.recall, 'val', 'oraciones sueltas de esas notas',
+      pct(cp.referencia_mismo_largo.recall));
+    barra(3.55, cp.proporcion_marcada, 'error', 'oraciones de discursos presidenciales',
+      pct(cp.proporcion_marcada));
+    p.texto(L, 3.05, 'los discursos son 100 % política: ahí tendría que dar 100 de cada 100',
       { tam: 11, color: 'tinta2' });
 
-    // la banda de ruido: el mismo modelo, 25 particiones distintas
-    const rp = D.ruido_de_particion;
-    p.poligono([[rp.minimo, 0.75], [rp.maximo, 0.75], [rp.maximo, 1.55], [rp.minimo, 1.55]],
-      { color: 'verdad', relleno: true, borde: 'verdad', opacidad: .30 });
-    p.texto((rp.minimo + rp.maximo) / 2, 1.75,
-      'el F1 del MISMO modelo con 25 semillas de partición: de ' + rp.minimo.toFixed(3) +
-      ' a ' + rp.maximo.toFixed(3),
-      { alinear: 'center', tam: 11, color: 'tinta2' });
-    const marcas = [
-      { f1: D.ablacion[0].f1, txt: 'sin ablación' },
-      { f1: D.ablacion[1].f1, txt: 'sin el término n.º 1' },
-      { f1: D.ablacion[4].f1, txt: 'sin los ' + D.ablacion[4].n_quitados + ' nombres propios' }
-    ];
-    for (const m of marcas) {
-      p.segmento(m.f1, 0.75, m.f1, 1.55, { color: 'parametro', grosor: 2.5 });
-      p.punto(m.f1, 1.15, { color: 'parametro', r: 4.5 });
+    // --- abajo: 25 diferencias pareadas, eje propio de -0,06 a +0,03 -------
+    const ab = D.ablacion_pareada.filas[D.ablacion_pareada.filas.length - 1];
+    const X0 = 0.06, X1 = 0.62, DMIN = -0.06, DMAX = 0.03;
+    const dx = d => X0 + (d - DMIN) / (DMAX - DMIN) * (X1 - X0);
+    const yb = 1.25;
+    p.segmento(X0, 0.55, X1, 0.55, { color: 'tinta3', grosor: 1 });
+    for (const t of [-0.06, -0.04, -0.02, 0, 0.02]) {
+      p.segmento(dx(t), 0.55, dx(t), 0.47, { color: 'tinta3', grosor: 1 });
+      p.texto(dx(t), 0.3, (t > 0 ? '+' : '') + t.toFixed(2).replace('.', ','),
+        { alinear: 'center', tam: 10, color: 'tinta3', mono: true });
     }
-    p.texto((rp.minimo + rp.maximo) / 2, 0.48,
-      marcas.map(m => m.txt + ' ' + m.f1.toFixed(3)).join('   ·   '),
-      { alinear: 'center', tam: 11, color: 'parametro', peso: '700' });
-    p.flecha(rp.minimo - 0.13, 1.15, rp.minimo - 0.012, 1.15,
-      { color: 'error', grosor: 2, cabeza: 9 });
-    p.texto(rp.minimo - 0.15, 1.15, 'las tres ablaciones caen acá adentro',
-      { alinear: 'right', tam: 11.5, color: 'error', peso: '700' });
-    p.ejes({ ticksY: [], ticksX: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-             formatoX: v => v.toFixed(1) });
+    p.segmento(dx(0), 0.6, dx(0), 2.05, { color: 'tinta3', grosor: 1.2, punteada: [4, 4] });
+    ab.deltas.forEach((d, k) => p.punto(dx(d), yb + ((k % 5) - 2) * 0.09, { color: 'verdad', r: 3.2 }));
+    p.segmento(dx(ab.ic95_bajo), yb, dx(ab.ic95_alto), yb, { color: 'parametro', grosor: 3 });
+    p.punto(dx(ab.media), yb, { color: 'parametro', r: 6 });
+    p.texto(0.03, 2.3, 'sacar los ' + ab.n_quitados + ' nombres propios y reentrenar, en 25 particiones: ' +
+      'cambio del F1 (pareado)', { alinear: 'left', tam: 11.5, color: 'tinta2', peso: '700' });
+    p.texto(dx(ab.media), yb + 0.42, 'media ' + ab.media.toFixed(3).replace('.', ',') +
+      ' · bajó en ' + ab.negativas + ' de 25', { alinear: 'center', tam: 11, color: 'parametro', peso: '700' });
+    p.texto(X1 + 0.01, yb, 'y el control positivo: ' +
+      Math.round(cp.proporcion_marcada * 100) + ' → ' +
+      Math.round(cp.sin_nombres_propios.proporcion_marcada * 100) + ' de cada 100',
+      { alinear: 'left', tam: 11, color: 'error', peso: '700' });
+    p.ejes({ ticksY: [], ticksX: [] });
+    describir('Recall del mismo modelo: ' + pct(cp.recall_en_su_test) + ' en notas enteras, ' +
+      pct(cp.referencia_mismo_largo.recall) + ' en oraciones sueltas de sus notas, ' +
+      pct(cp.proporcion_marcada) + ' en oraciones de discursos presidenciales. Sacar los nombres ' +
+      'propios cambia el F1 en ' + ab.media.toFixed(3) + ' en promedio y el control positivo pasa a ' +
+      pct(cp.sin_nombres_propios.proporcion_marcada) + '.');
   }
   actualizarTextos();
 }
@@ -197,6 +213,10 @@ function dibujarCaso2() {
 
   p.texto(2014.7, 2.9, 'la etiqueta que querés: ¿quién habla?', { tam: 12, color: 'tinta2' });
   p.texto(2014.7, 1.9, 'la etiqueta que no querés: ¿qué período es?', { tam: 12, color: 'tinta2' });
+  describir('Años de los discursos: Macri ' + ct.anios_macri[0] + '-' + ct.anios_macri.slice(-1)[0] +
+    ', Fernández ' + ct.anios_fernandez[0] + '-' + ct.anios_fernandez.slice(-1)[0] +
+    '. Quién habla y qué período es coinciden en todos los casos; ' + ct.n_solapados +
+    ' discursos en años compartidos.');
 
   if (vista === 'despues') {
     p.segmento(2019.5, 0.35, 2019.5, 2.85, { color: 'error', grosor: 2.5, punteada: [7, 5] });
@@ -213,21 +233,29 @@ function dibujarCaso3() {
   const cp = D.cobertura_parcial;
   p.ejeX = '';
   p.limites(0, 1, 0, 1);
+  // Cada barra lleva su propia lectura. Antes el formato la adivinaba por el
+  // valor (v > 0,9 → "2 bandos"), y un tono de más de 22,5 % se habría rotulado mal.
   const items = [
-    { etiqueta: 'foro A · tono', valor: cp.tono_foro_a / 25, color: 'modelo' },
-    { etiqueta: 'foro B · tono', valor: cp.tono_foro_b / 25, color: 'modelo' }
+    { etiqueta: 'foro A · tono', valor: cp.tono_foro_a / 25, color: 'modelo',
+      lectura: cp.tono_foro_a.toFixed(1) + ' %' },
+    { etiqueta: 'foro B · tono', valor: cp.tono_foro_b / 25, color: 'modelo',
+      lectura: cp.tono_foro_b.toFixed(1) + ' %' }
   ];
   if (vista === 'despues') {
-    items.push({ etiqueta: 'foro A · con quién', valor: cp.interlocutores_distintos_a / 2, color: 'acento' });
-    items.push({ etiqueta: 'foro B · con quién', valor: cp.interlocutores_distintos_b / 2, color: 'acento' });
+    items.push({ etiqueta: 'foro A · con quién', valor: cp.interlocutores_distintos_a / 2, color: 'acento',
+      lectura: cp.interlocutores_distintos_a + ' bandos' });
+    items.push({ etiqueta: 'foro B · con quién', valor: cp.interlocutores_distintos_b / 2, color: 'acento',
+      lectura: cp.interlocutores_distintos_b + ' solo blanco' });
   }
+  let k = 0;   // p.barras llama a `formato` una vez por barra, en orden
   titulo(vista === 'antes' ? 'polarización medida sólo por tono'
                            : 'la misma medida, más la dimensión que faltaba');
   p.fondo();
   p.barras(items, {
     horizontal: true, max: 1,
-    formato: v => v > 0.9 ? '2 bandos' : (v < 0.6 && v > 0.4 ? '1 solo blanco' : (v * 25).toFixed(1) + ' %')
+    formato: () => items[k++].lectura
   });
+  describir(items.map(it => it.etiqueta + ': ' + it.lectura).join('; ') + '.');
   if (vista === 'antes') {
     p.textoPx((p.L + p.R) / 2, p.T + 6, 'idénticas: ' + cp.tono_foro_a.toFixed(2) + ' % las dos',
       { alinear: 'center', tam: 12, color: 'error', peso: '700', caja: true });
@@ -244,20 +272,24 @@ const T = {
         '<span class="pastilla">F1 ' + D.modelo.metricas.f1.toFixed(2) + '</span> sobre ' +
         D.modelo.n_test + ' casos que nunca vio.',
       usa: 'Miralos: de los 12 términos que más pesan, <b>cuatro</b> son nombres propios de la ' +
-        '<b>política mexicana de 2018-2021</b> — uno de cada tres, y en el top 20 son seis. ' +
-        'No son señales del concepto «política»: son la guía telefónica de una coyuntura.',
+        '<b>política mexicana alrededor de 2018</b> — uno de cada tres, y en el top 20 son seis. ' +
+        'Sospechoso: ¿detecta política, o la guía telefónica de una coyuntura? Por ahora es una ' +
+        'hipótesis.',
       evidencia: 'Todavía ninguna. Con este panel a la vista, esto se publica.'
     },
     despues: {
       conclusion: 'La misma frase de siempre: «nuestro clasificador identifica notas de contenido político».',
-      usa: 'El modelo no cambió. Cambió <b>dónde lo medimos</b>: ' + D.placebo.casarosada.n +
-        ' fragmentos de discursos presidenciales argentinos 2015-2024, que son 100 % política.',
-      evidencia: 'Encuentra el <b>' + (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) +
-        ' %</b> donde debería encontrar el 100 %. Y la ablación —quitar los ' +
-        D.ablacion[4].n_quitados + ' nombres propios y reentrenar— movió el F1 de ' +
-        D.modelo.metricas.f1.toFixed(3) +
-        ' a ' + D.ablacion[4].f1.toFixed(3) + ': menos que el ruido de la partición, que va de ' +
-        D.ruido_de_particion.minimo.toFixed(3) + ' a ' + D.ruido_de_particion.maximo.toFixed(3) + '.'
+      usa: 'El modelo no cambió. Cambió <b>dónde lo medimos</b>: ' + D.control_positivo.n +
+        ' oraciones de discursos presidenciales argentinos 2015-2024, que son 100 % política.',
+      evidencia: 'Encuentra el <b>' + (D.control_positivo.proporcion_marcada * 100).toFixed(0) +
+        ' %</b> donde debería encontrar el 100 % (y el ' +
+        (D.control_positivo.referencia_mismo_largo.recall * 100).toFixed(0) +
+        ' % en oraciones del mismo largo de su propio corpus). La hipótesis de los nombres, ' +
+        'testeada: sin los ' + D.ablacion_pareada.filas[3].n_quitados + ' nombres propios el F1 baja ' +
+        Math.abs(D.ablacion_pareada.filas[3].media).toFixed(3) + ' en promedio (' +
+        D.ablacion_pareada.filas[3].negativas + ' de 25 particiones) y el control positivo sube a ' +
+        (D.control_positivo.sin_nombres_propios.proporcion_marcada * 100).toFixed(0) +
+        ' %. Los nombres explican una parte; el resto es dominio y género textual.'
     }
   },
   '2': {
@@ -362,7 +394,7 @@ function refrescar() {
   const N = {
     '1': vista === 'antes'
       ? '<span class="grande">' + D.modelo.metricas.f1.toFixed(2) + '</span>F1 en su propio test'
-      : '<span class="grande">' + (D.placebo.casarosada.proporcion_marcada * 100).toFixed(0) +
+      : '<span class="grande">' + (D.control_positivo.proporcion_marcada * 100).toFixed(0) +
         ' %</span>de un corpus 100 % político',
     '2': vista === 'antes'
       ? '<span class="grande">' + D.confusor_temporal.metricas_orador.f1.toFixed(2) + '</span>F1 de «¿quién habla?»'

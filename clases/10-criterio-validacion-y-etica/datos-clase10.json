@@ -253,45 +253,243 @@
    "f1": 0.6834
   },
   {
-   "quitado": "los 18 nombres propios",
-   "n_quitados": 18,
+   "quitado": "los 19 nombres propios",
+   "n_quitados": 19,
    "metricas": {
-    "vp": 65,
-    "fp": 26,
-    "vn": 239,
-    "fn": 38,
+    "vp": 64,
+    "fp": 25,
+    "vn": 240,
+    "fn": 39,
     "accuracy": 0.8261,
-    "precision": 0.7143,
-    "recall": 0.6311,
-    "f1": 0.6701,
+    "precision": 0.7191,
+    "recall": 0.6214,
+    "f1": 0.6667,
     "prevalencia": 0.2799
    },
-   "f1": 0.6701
+   "f1": 0.6667
   }
  ],
+ "ablacion_pareada": {
+  "n_particiones": 25,
+  "factor_nadeau_bengio": 0.6113,
+  "filas": [
+   {
+    "quitado": "el termino n.o 1",
+    "n_quitados": 1,
+    "deltas": [
+     0.0137,
+     0.0065,
+     0.0031,
+     0.0,
+     -0.0127,
+     -0.0142,
+     0.0095,
+     -0.0066,
+     0.0076,
+     0.0145,
+     -0.0165,
+     0.0,
+     -0.0179,
+     0.0033,
+     0.003,
+     0.0101,
+     -0.0134,
+     -0.0035,
+     -0.0101,
+     -0.0033,
+     0.0007,
+     0.0207,
+     -0.0133,
+     -0.0066,
+     -0.0175
+    ],
+    "media": -0.0017,
+    "de": 0.011,
+    "ee_corregido": 0.0067,
+    "ic95_bajo": -0.0152,
+    "ic95_alto": 0.0117,
+    "negativas": 12
+   },
+   {
+    "quitado": "los 5 primeros",
+    "n_quitados": 5,
+    "deltas": [
+     0.0041,
+     -0.0265,
+     -0.0403,
+     0.0202,
+     -0.0122,
+     0.0039,
+     0.006,
+     -0.01,
+     -0.0369,
+     -0.0072,
+     0.0005,
+     -0.0413,
+     0.0,
+     -0.0169,
+     -0.0251,
+     0.0039,
+     -0.0206,
+     0.0202,
+     -0.017,
+     0.0,
+     0.0236,
+     0.007,
+     -0.0136,
+     -0.0507,
+     -0.0263
+    ],
+    "media": -0.0102,
+    "de": 0.0201,
+    "ee_corregido": 0.0123,
+    "ic95_bajo": -0.0347,
+    "ic95_alto": 0.0143,
+    "negativas": 14
+   },
+   {
+    "quitado": "los 20 primeros",
+    "n_quitados": 20,
+    "deltas": [
+     -0.0139,
+     -0.0265,
+     -0.0573,
+     0.0101,
+     -0.0388,
+     -0.0238,
+     -0.044,
+     -0.0549,
+     -0.0325,
+     0.0034,
+     -0.0167,
+     -0.0343,
+     -0.0408,
+     -0.0104,
+     -0.0423,
+     -0.0563,
+     -0.0397,
+     -0.0204,
+     -0.0371,
+     -0.0034,
+     0.0037,
+     -0.051,
+     -0.0472,
+     -0.0472,
+     -0.0214
+    ],
+    "media": -0.0297,
+    "de": 0.0198,
+    "ee_corregido": 0.0121,
+    "ic95_bajo": -0.0539,
+    "ic95_alto": -0.0055,
+    "negativas": 22
+   },
+   {
+    "quitado": "los 19 nombres propios",
+    "n_quitados": 19,
+    "deltas": [
+     -0.0176,
+     -0.0066,
+     -0.0266,
+     0.0106,
+     -0.0323,
+     -0.0101,
+     -0.0309,
+     -0.0166,
+     -0.0301,
+     -0.0145,
+     0.0065,
+     -0.0199,
+     -0.0104,
+     -0.0034,
+     -0.0143,
+     0.0028,
+     -0.0206,
+     -0.0034,
+     -0.0337,
+     0.0064,
+     -0.0212,
+     -0.0176,
+     -0.0234,
+     -0.0269,
+     -0.0042
+    ],
+    "media": -0.0143,
+    "de": 0.0129,
+    "ee_corregido": 0.0079,
+    "ic95_bajo": -0.03,
+    "ic95_alto": 0.0014,
+    "negativas": 21
+   }
+  ],
+  "de_del_f1_suelto": 0.0262
+ },
  "ablacion_vs_ruido": {
-  "movimiento_maximo": 0.0332,
-  "rango_del_ruido": 0.1071
+  "movimiento_maximo_una_particion": 0.0332,
+  "rango_del_f1_suelto": 0.1071,
+  "nota": "comparar una diferencia pareada con el rango del F1 suelto es comparar mal; ver ablacion_pareada"
+ },
+ "control_positivo": {
+  "que_es": "oraciones de 60-220 caracteres de discursos presidenciales argentinos 2015-2024",
+  "n": 824,
+  "n_discursos_con_fragmentos": 120,
+  "n_discursos": 123,
+  "proporcion_marcada": 0.2245,
+  "esperado": 1.0,
+  "recall_en_su_test": 0.6408,
+  "referencia_mismo_largo": {
+   "que_es": "oraciones de 60-220 caracteres de las notas de politica del test",
+   "n": 136,
+   "recall": 0.4926
+  },
+  "sin_nombres_propios": {
+   "f1_test": 0.6667,
+   "recall_test": 0.6214,
+   "proporcion_marcada": 0.3204,
+   "recall_oraciones_propias": 0.5515
+  }
  },
  "placebo": {
-  "casarosada": {
-   "n": 600,
-   "proporcion_marcada": 0.2083,
-   "esperado": 1.0,
-   "que_es": "fragmentos de discursos presidenciales argentinos 2015-2024",
-   "recall_alli": 0.2083,
-   "recall_en_su_test": 0.6408
-  },
-  "barajado": {
-   "proporcion_predicciones_identicas": 1.0,
-   "positivos_original": 0.2473,
-   "positivos_barajado": 0.2473
-  },
-  "aguasclaras": {
-   "n": 1400,
-   "proporcion_marcada": 0.1857,
-   "proporcion_realmente_politica": 0.0929
-  }
+  "que_es": "notas de Deporte y Espectaculos del test (no vistas en el entrenamiento)",
+  "temas": [
+   "Deporte",
+   "Espectaculos"
+  ],
+  "n": 65,
+  "marcadas": 7,
+  "proporcion_marcada": 0.1077,
+  "titulares_marcados": [
+   "Creí por las encuestas que México perdería ante Alemania: Peña Nieto",
+   "DURO GOLPE: Despiden a Denise Maerker por conflictiva e ineficiente",
+   "RICARDO ANAYA ACEPTA SER EL VERDADERO PADRE DEL HIJO DE MARJORIE DE SOUSA",
+   "Profeco advierte de fraude en boletos para el Mundial",
+   "El dueño de MVS demanda a Carmen Aristegui por daño moral",
+   "Esposa de AMLO le responde a Niurka Marcos luego de revelar sexualidad del líder de MORENA",
+   "Sofía Castro y Alejandro Peña Pretelini: una inigualable relación de hermanos"
+  ]
+ },
+ "invariancia": {
+  "proporcion_predicciones_identicas": 1.0,
+  "positivos_original": 0.2473,
+  "positivos_barajado": 0.2473
+ },
+ "fuera_de_dominio": {
+  "que_es": "titulares de Aguasclaras (SINTETICO, pais ficticio, 2015-2024, sin tildes)",
+  "n": 1400,
+  "proporcion_marcada": 0.1857,
+  "proporcion_con_vocabulario_legislativo": 0.4836,
+  "anios": [
+   2015,
+   2024
+  ]
+ },
+ "prevalencia_por_conteo": {
+  "real_en_test": 0.2799,
+  "contando_predicciones": 0.2473,
+  "fp": 25,
+  "fn": 37,
+  "corregida_con_tpr_fpr": 0.2799,
+  "nota": "la correccion usa TPR/FPR medidos sobre el mismo test: es circular; en un proyecto se miden en una muestra validada aparte"
  },
  "pares_minimos": [
   {
@@ -329,10 +527,10 @@
   {
    "tipo": "cambio de agente",
    "a": "El diputado presentó un proyecto sobre vivienda",
-   "b": "El futbolista presentó su nuevo club",
+   "b": "El futbolista presentó un proyecto sobre vivienda",
    "score_a": 0.5417,
-   "score_b": 0.4845,
-   "delta": -0.0572
+   "score_b": 0.37,
+   "delta": -0.1717
   },
   {
    "tipo": "cambio de agente",
@@ -343,7 +541,7 @@
    "delta": -0.1542
   },
   {
-   "tipo": "mismo tema, otras palabras",
+   "tipo": "paráfrasis",
    "a": "El congreso debate la reforma electoral",
    "b": "La cámara discute los cambios al sistema de votación",
    "score_a": 0.7128,
@@ -351,12 +549,12 @@
    "delta": -0.3954
   },
   {
-   "tipo": "cambio de epoca",
+   "tipo": "sinónimo",
    "a": "El presidente presentó su plan de gobierno",
-   "b": "El primer mandatario expuso su programa de gestión",
+   "b": "El primer mandatario presentó su plan de gobierno",
    "score_a": 0.8531,
-   "score_b": 0.6697,
-   "delta": -0.1834
+   "score_b": 0.7363,
+   "delta": -0.1168
   }
  ],
  "sesgo": {
@@ -487,7 +685,9 @@
     "score_m": 0.2623,
     "score_f": 0.3069,
     "delta": 0.0446,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0159
    },
    {
     "masculino": "los médicos",
@@ -495,7 +695,9 @@
     "score_m": 0.2752,
     "score_f": 0.3462,
     "delta": 0.071,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.1292
    },
    {
     "masculino": "los empresarios",
@@ -503,7 +705,9 @@
     "score_m": 0.2574,
     "score_f": 0.3069,
     "delta": 0.0495,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0411
    },
    {
     "masculino": "los docentes",
@@ -511,7 +715,9 @@
     "score_m": 0.2654,
     "score_f": 0.3069,
     "delta": 0.0415,
-    "sustantivo_en_vocabulario": 0
+    "sustantivo_en_vocabulario": 0,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    },
    {
     "masculino": "los enfermeros",
@@ -519,7 +725,9 @@
     "score_m": 0.2654,
     "score_f": 0.3069,
     "delta": 0.0415,
-    "sustantivo_en_vocabulario": 0
+    "sustantivo_en_vocabulario": 0,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    },
    {
     "masculino": "los vecinos",
@@ -527,7 +735,9 @@
     "score_m": 0.2482,
     "score_f": 0.3069,
     "delta": 0.0587,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0898
    },
    {
     "masculino": "los estudiantes",
@@ -535,7 +745,9 @@
     "score_m": 0.2816,
     "score_f": 0.3246,
     "delta": 0.0429,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    },
    {
     "masculino": "los jubilados",
@@ -543,7 +755,9 @@
     "score_m": 0.2654,
     "score_f": 0.3069,
     "delta": 0.0415,
-    "sustantivo_en_vocabulario": 0
+    "sustantivo_en_vocabulario": 0,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    },
    {
     "masculino": "los abogados",
@@ -551,7 +765,9 @@
     "score_m": 0.2654,
     "score_f": 0.3069,
     "delta": 0.0415,
-    "sustantivo_en_vocabulario": 0
+    "sustantivo_en_vocabulario": 0,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    },
    {
     "masculino": "los periodistas",
@@ -559,17 +775,23 @@
     "score_m": 0.2941,
     "score_f": 0.3381,
     "delta": 0.044,
-    "sustantivo_en_vocabulario": 1
+    "sustantivo_en_vocabulario": 1,
+    "logit_articulo": 0.2036,
+    "logit_sustantivo": 0.0
    }
   ],
   "peso_los": -0.339,
   "peso_las": -0.1355,
+  "logit_articulo": 0.2036,
+  "pares_solo_articulo": 6,
   "permutacion": {
    "diferencia_media": 0.0477,
-   "p_valor": 0.0024,
+   "p_valor_exacto": 0.002,
    "n_pares": 10,
-   "n_permutaciones": 20000
-  }
+   "n_patrones": 1024,
+   "todas_positivas": 1
+  },
+  "alguno_cruza_05": 0
  },
  "confusor_temporal": {
   "n": 110,
@@ -645,70 +867,11 @@
    "error"
   ]
  },
- "etiqueta_circular": {
-  "corpus": "prensa de Aguasclaras — SINTETICO, pais ficticio",
-  "n": 1400,
-  "prevalencia": 0.3471,
-  "original": {
-   "vp": 121,
-   "fp": 0,
-   "vn": 229,
-   "fn": 0,
-   "accuracy": 1.0,
-   "precision": 1.0,
-   "recall": 1.0,
-   "f1": 1.0,
-   "prevalencia": 0.3457
-  },
-  "sin_protesta": {
-   "vp": 121,
-   "fp": 0,
-   "vn": 229,
-   "fn": 0,
-   "accuracy": 1.0,
-   "precision": 1.0,
-   "recall": 1.0,
-   "f1": 1.0,
-   "prevalencia": 0.3457
-  },
-  "sin_cinco_palabras": {
-   "vp": 121,
-   "fp": 0,
-   "vn": 229,
-   "fn": 0,
-   "accuracy": 1.0,
-   "precision": 1.0,
-   "recall": 1.0,
-   "f1": 1.0,
-   "prevalencia": 0.3457
-  }
- },
- "fuga_por_fuente": {
-  "tarea": "¿la nota es falsa?",
-  "al_azar": {
-   "vp": 121,
-   "fp": 46,
-   "vn": 148,
-   "fn": 53,
-   "accuracy": 0.731,
-   "precision": 0.7246,
-   "recall": 0.6954,
-   "f1": 0.7097,
-   "prevalencia": 0.4728
-  },
-  "por_medio": {
-   "vp": 118,
-   "fp": 31,
-   "vn": 69,
-   "fn": 110,
-   "accuracy": 0.5701,
-   "precision": 0.7919,
-   "recall": 0.5175,
-   "f1": 0.626,
-   "prevalencia": 0.6951
-  },
-  "piso_por_medio": 0.6951,
-  "n_medios": 346,
-  "medios_con_una_sola_clase": 332
+ "entorno": {
+  "python": "3.12.13",
+  "numpy": "2.5.3",
+  "sklearn": "1.9.1",
+  "torch": "2.14.0",
+  "nota": "determinista en la misma maquina y con estas versiones; con otras, los numeros pueden cambiar un poco"
  }
 }

@@ -18,9 +18,9 @@ demostrar aparte.
 
 | distractor | por qué tienta | qué confusión revela |
 |---|---|---|
-| **A** «detecta discurso de odio con un 91 % de eficacia» | Es la traducción automática que hace todo el mundo, incluidos los abstracts publicados. Suena a la misma frase. | **La confusión central de la clase.** Confunde «coincide con las etiquetas» con «detecta el fenómeno». Además cambia F1 por «eficacia», que no significa nada. Si eligen esta, volvé al gancho: el clasificador de política tenía F1 0,68 y encontraba el 21 % de un corpus 100 % positivo. |
-| **C** «es mejor que un humano» | Aparece en la prensa técnica todo el tiempo. | Falta el término de comparación: **el techo humano es el acuerdo entre codificadores**, y no se midió. Un modelo evaluado contra las etiquetas de *un* codificador no se puede comparar con «un humano». (Clase 9, kappa.) |
-| **D** «va a funcionar en otro corpus» | Parece modesta y razonable: es el mismo idioma. | Confunde **validez interna con externa**. Es exactamente lo que falla en el control positivo: mismo idioma, mismo tipo de texto, y el recall se derrumba de 0,64 a 0,21. |
+| **A** «detecta discurso de odio con un 91 % de eficacia» | Es la traducción automática que hace todo el mundo, incluidos los abstracts publicados. Suena a la misma frase. | **La confusión central de la clase.** Confunde «coincide con las etiquetas» con «detecta el fenómeno». Además cambia F1 por «eficacia», que no significa nada. Si eligen esta, volvé al gancho: el clasificador de política tenía F1 0,68 y encontraba el 22 % de un corpus 100 % positivo. |
+| **C** «es mejor que un humano» | Aparece en la prensa técnica todo el tiempo. | Falta el término de comparación: **el techo humano es el acuerdo entre dos codificadores, medido con la misma métrica** (el F1 de uno contra el otro), y no se midió. Un modelo evaluado contra las etiquetas de *un* codificador no se puede comparar con «un humano». (Clase 9.) |
+| **D** «va a funcionar en otro corpus» | Parece modesta y razonable: es el mismo idioma. | Confunde **validez interna con externa**. Es exactamente lo que falla en el control positivo: mismo idioma, y el recall pasa de 0,49 en oraciones de su propio corpus a 0,22 en oraciones de discursos argentinos. |
 
 ---
 
@@ -31,7 +31,7 @@ demostrar aparte.
 | distractor | por qué tienta | qué confusión revela |
 |---|---|---|
 | **A** «está bien construido, sin errores de programación» | «Constructo» suena a «construcción». Es una trampa lingüística real. | Confusión de vocabulario, no conceptual. Se arregla nombrando a Cronbach y Meehl: el constructo es **el concepto teórico**, no el software. |
-| **B** «generaliza bien a datos nuevos del mismo tipo» | Es una propiedad deseable y de hecho es *otra* validez. | Confunde constructo con **externa**. Un modelo puede generalizar perfecto a datos nuevos del mismo corpus y seguir midiendo la cosa equivocada: el de hoy generaliza bien a más prensa mexicana de 2020. |
+| **B** «generaliza bien a datos nuevos del mismo tipo» | Es una propiedad deseable y de hecho es *otra* validez. | Confunde constructo con **externa**. Un modelo puede generalizar perfecto a datos nuevos del mismo corpus y seguir midiendo la cosa equivocada: el de hoy generaliza razonablemente a más notas de su mismo corpus (prensa de 2018 y de 2020-21) y mide, en buena parte, vocabulario de esa coyuntura. |
 | **D** «usa una arquitectura apropiada» | Suena técnicamente sofisticado. | Es la confusión más cara: cree que la validez es una **propiedad del modelo**. La validez es una propiedad de **la inferencia** que hacés con el modelo. El mismo modelo puede ser válido para una afirmación e inválido para otra. |
 
 ---
@@ -58,8 +58,9 @@ del populismo cambió, el instrumento ya no mide lo mismo aunque devuelva númer
   el vocabulario de 2022 sin cambiar el contenido. Si el puntaje cae, es el instrumento.
 
 > **Lo que hay que exigir:** que digan **qué resultado esperarían bajo cada explicación**.
-> Un test que da lo mismo pase lo que pase no es un test. Es el mismo error que la ablación
-> de la slide 18.
+> Un test que da lo mismo pase lo que pase no es un test. Y, como en la slide 18, que digan
+> **contra qué error** van a comparar la diferencia (por ejemplo, la codificación humana de
+> dos períodos, con su intervalo).
 
 ---
 
@@ -99,19 +100,25 @@ diario, en esta provincia, en estos años?».**
 
 ## 5. La auditoría de sesgo mal leída
 
-**(a) Lo que sí se puede concluir:** entre `abogadas` y `abogados` —el único par donde las dos
-palabras están en el vocabulario— hay una diferencia de **0,055** a favor del femenino. Es un
-dato reportable, con esa plantilla y ese modelo.
+**(a) Lo que sí se puede concluir:** con esa plantilla y ese modelo, el femenino puntúa más
+alto en los tres pares: **+0,071** en médicas/médicos y **+0,042** en los otros dos. Es un
+dato reportable, descompuesto. Y la descomposición es la respuesta: en enfermeras/enfermeros
+y obreras/obreros **ninguna** de las dos palabras está en el vocabulario, así que los +0,042
+salen **enteros del artículo** («las» pesa −0,14 y «los» −0,34). En médicas/médicos se suma
+algo del sustantivo (las dos palabras están), y por eso da más.
 
 **(b) Las dos cosas que la persona afirma de más:**
 
-1. **«No hay sesgo de género.»** Cuatro de las seis filas dan **exactamente 0,265** porque las
-   palabras **no están en el vocabulario**. Ese número no es un puntaje del sujeto: es lo que
-   devuelve la oración sin el sujeto. **La igualdad no es equidad, es ceguera.** Y tiene una
-   consecuencia sustantiva: un modelo no puede ser justo con un grupo que no está en sus datos.
-2. **«Los puntajes por ocupación son casi todos iguales.»** No se midió ocupación: se midió
-   **presencia en el vocabulario**. Enfermeras y obreras dan igual entre sí y dan igual que
-   cualquier palabra desconocida. No es un resultado sobre ocupaciones.
+1. **«No discrimina por ocupación: enfermeras y obreras sacan lo mismo.»** Sacan exactamente
+   **0,307** porque las palabras **no están en el vocabulario**. Ese número no es un puntaje
+   del sujeto: es lo que devuelve la oración con «las» y **ningún sustantivo** (con «los»,
+   0,265). **La igualdad no es equidad, es ceguera.** No se midió ocupación: se midió
+   **presencia en el vocabulario**. Y tiene una consecuencia sustantiva: un modelo no puede
+   ser justo con un grupo que no está en sus datos.
+2. **«El sesgo de género es chico y parejo.»** Es parejo porque es **el mismo coeficiente**
+   (el del artículo) repetido en cada par, no porque el modelo trate parejo a los sustantivos.
+   Tres pares que comparten el artículo no son tres evidencias independientes. Y «chico» no se
+   puede juzgar sin saber para qué se usa el puntaje.
 
 Y hay una tercera, más sutil, que vale como bonus: aun donde el par sí está en el vocabulario,
 **una diferencia de puntaje no prueba daño**. Prueba una asociación en el modelo. Para hablar
@@ -119,8 +126,9 @@ de daño hay que mostrar el uso, quién decide con eso y a quién le cae el erro
 
 **(c) Qué pedir antes de aceptar nada:**
 - La **columna de vocabulario** (que en esta tabla, por suerte, está: hay que mirarla).
-- **Más pares** y un test que diga si la diferencia se distingue del azar — con dos pares
-  válidos no hay potencia para nada.
+- **Pares que separen artículo de sustantivo** (por ejemplo, sustantivos que el modelo sí
+  conozca, o plantillas sin artículo) — con estos pares, sumar más pares con el mismo
+  artículo no agrega evidencia: repite el mismo peso.
 - La **plantilla completa** y varias plantillas distintas: el efecto puede ser de la oración
   y no del sujeto.
 - **Para qué se va a usar el modelo.** La misma tabla justifica cosas distintas si el modelo
@@ -144,7 +152,9 @@ No hay respuesta única. Se corrige con estos cuatro criterios:
 - *Debería cambiar:* «El gobierno anunció el plan de obras» / «El gobierno fracasó con el plan
   de obras». Testea si detecta valoración o sólo el tema.
 - *No debería cambiar:* «El ministro criticó la gestión anterior el martes» / «…el jueves».
-  Testea sensibilidad a ruido irrelevante.
+  Testea sensibilidad a ruido irrelevante. (Ojo: en el notebook, cambiar sólo «mañana» por
+  «tarde» movió el puntaje +0,09. Que una palabra «irrelevante» mueva el modelo es un hallazgo,
+  no un error del par.)
 - *Límite:* «La oposición celebró los datos de empleo». ¿Es crítica al gobierno? Depende de si
   la crítica es explícita o inferida por el lector. **Si el codificador humano duda, la
   definición operativa está incompleta, y eso no lo arregla ningún modelo.**
@@ -265,9 +275,10 @@ interpretable.** *Fatal: requiere trabajo empírico nuevo, no reescritura.*
 
 **Fatal 2 — la exactitud del 94 % no dice nada sin la prevalencia ni el piso.**
 En una tarea con clases desbalanceadas, decir siempre la clase mayoritaria puede dar 90 %.
-Faltan prevalencia, precisión, recall y la línea de base. Y falta la **variación por partición**:
-sin ella no se puede juzgar si el aumento del 31 % supera el ruido del propio instrumento.
-*Fatal: puede tumbar el resultado principal.*
+Faltan prevalencia, precisión, recall y la línea de base. Y falta el **error del aumento**:
+un intervalo para el 31 % (por ejemplo, con bootstrap sobre los tuits de cada período, y con
+la variación por partición del clasificador). Sin eso no se puede juzgar si el aumento supera
+el ruido del propio instrumento. *Fatal: puede tumbar el resultado principal.*
 
 **Menor — el salto de la medida a la conclusión causal.**
 «Las redes sociales amplifican la hostilidad» no se sigue de una serie temporal de tuits

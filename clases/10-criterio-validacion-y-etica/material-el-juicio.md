@@ -9,7 +9,9 @@
 >
 > Los números **sí** son internamente coherentes: si un grupo los revisa con cuidado, las
 > cuentas cierran o no cierran por las razones que la clase enseñó, no por descuido de quien
-> los escribió.
+> los escribió. (En el A: 600 notas con prevalencia 19 % son 114 positivas; con recall 0,74
+> se encuentran 84, y con precisión 0,79 eso deja 22 falsos positivos. *Accuracy*
+> (84 + 464) / 600 = 0,91.)
 
 **Cómo se usa.** Son dos. **Se reparte uno solo por cohorte** y el otro queda para la vez
 siguiente, así la actividad se puede repetir con otro grupo sin que corra el boca a boca.
@@ -45,21 +47,24 @@ el acuerdo fue **kappa de Cohen = 0,71** y los desacuerdos se resolvieron discut
 Con esas 600 se ajustó una regresión logística sobre bolsa de palabras (bigramas, mínimo 5
 apariciones) y se aplicó al resto.
 
-**Evaluación.** Partición **por diario y por año** (se entrena con tres diarios y se prueba
-en el cuarto, rotando). Sobre las 150 notas de test: precisión 0,79, recall 0,74, F1 0,76.
-Piso: decir siempre «no hay conflicto» acierta 0,81 de *accuracy* (la prevalencia es 19 %),
-y el modelo llega a 0,90. Repitiendo la partición con 30 semillas, el F1 va de **0,71 a 0,80**.
-Se leyeron los 32 falsos positivos: 19 son notas deportivas con vocabulario de enfrentamiento
-(«marcha», «choque», «reclamo»), 8 son conflictos internos de partidos —que la definición
-excluye a propósito— y 5 son desacuerdos genuinos entre los codificadores. Se reportan los
-20 términos de mayor peso; ninguno es un nombre propio ni un nombre de diario.
+**Evaluación.** Partición **por diario**: se entrena con las notas codificadas de tres
+diarios y se prueba en las del cuarto (unas 150), rotando los cuatro. Juntando las cuatro
+rotaciones, sobre las 600 notas: precisión 0,79, recall 0,74, F1 0,76. Piso: decir siempre
+«no hay conflicto» acierta 0,81 de *accuracy* (la prevalencia es 19 %), y el modelo llega a
+0,91. Con un *bootstrap* de las 600 notas (1.000 remuestreos), el intervalo del 95 % del F1
+va de **0,71 a 0,80**. Se leyeron los **22 falsos positivos** de las cuatro rotaciones: 12
+son notas de la sección Sociedad con vocabulario de enfrentamiento («marcha», «choque»,
+«reclamo») pero sin un colectivo que reclame, 6 son conflictos internos de partidos —que la
+definición excluye a propósito— y 4 son desacuerdos genuinos entre los codificadores. Se
+reportan los 20 términos de mayor peso; ninguno es un nombre propio ni un nombre de diario.
 
 **Validación externa.** La serie mensual del índice se contrasta con el registro de conflictos
 laborales que publica el ministerio de trabajo provincial: correlación de 0,63, y los tres
 picos del registro oficial aparecen en el índice con un mes de desfasaje.
 
-**Resultado.** El índice sube 38 % entre 2016 y 2023. La banda de las 30 semillas no explica
-un movimiento de ese tamaño.
+**Resultado.** El índice sube 38 % entre 2016 y 2023. Con un *bootstrap* por mes que
+incluye el error del clasificador (corregido con la precisión y el recall de arriba), el
+intervalo del 95 % del aumento va de 29 % a 47 %.
 
 **Lo que el paper NO dice.** No hay auditoría por subgrupo. No se justifica el umbral de 0,5.
 No se informa qué versión de la biblioteca se usó. Y la conclusión final del artículo dice:
@@ -116,10 +121,16 @@ de la slide 32 no dependa de tu memoria.
 | «La prensa amplificó el conflicto» | **serio, y se arregla escribiendo** | Es un salto de la medida a una afirmación causal sobre el efecto de la prensa. La medida sostiene «subió la cobertura», no «amplificó». Reformular la conclusión alcanza. |
 | El 7 % excluido | **menor, ya contestado** | Está declarado y hay evidencia de que no se correlaciona con el año ni con el diario. |
 
-**Lo que la defensa tiene que saber usar:** partición por diario y por año (no hay fuga),
-600 casos codificados con kappa reportado, banda de 30 semillas, análisis de los 32 falsos
-positivos, y validación externa contra un registro independiente. **Ese conjunto es más de lo
-que hace el 95 % de los papers**, y decirlo es una jugada legítima.
+**Lo que la defensa tiene que saber usar:** partición por diario (no hay fuga por medio),
+600 casos codificados con kappa reportado, intervalos para el F1 y para el aumento, análisis
+de los 22 falsos positivos, y validación externa contra un registro independiente. **Ese
+conjunto es más de lo que hacen la mayoría de los papers que usan estas herramientas**, y
+decirlo es una jugada legítima.
+
+**Un reparo que un revisor fino puede encontrar, y es menor:** la partición es por diario,
+no por período. Si el vocabulario del conflicto cambió entre 2016 y 2023, el modelo puede
+medir peor los años menos representados entre las 600. Se arregla mostrando precisión y
+recall por período (con 600 notas, por bienio).
 
 **La trampa para los revisores:** hay tentación de marcar como fatal la falta de auditoría por
 subgrupo. No lo es acá, y explicar por qué —*mide, no decide*— es exactamente la distinción de
@@ -144,8 +155,9 @@ re-procesadas con el formato nuevo**, que es el único test que separa el instru
 fenómeno. Si un grupo llega solo a esa propuesta, la actividad salió perfecta.
 
 **La trampa para la defensa:** el reflejo de decir «pero el modelo es del estado del arte».
-Es irrelevante y conviene dejar que lo digan: la respuesta —*«un modelo mejor encuentra el
-mismo atajo más rápido»*— es la slide 6.
+Es irrelevante y conviene dejar que lo digan: la respuesta —*«un modelo mejor puede encontrar
+el mismo atajo, y un 94 % no te dice si lo hizo»*— es la slide 6. Y acá el atajo es el propio
+instrumento: el cambio de transcripción.
 
 ### Cómo cerrar
 

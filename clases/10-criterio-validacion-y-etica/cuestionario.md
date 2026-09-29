@@ -6,13 +6,17 @@
 > es lo único que importa. Las tres finales no tienen respuesta única: se evalúan por el
 > argumento, no por la conclusión.
 >
-> Tiempo estimado: **50 minutos** para las doce. Si sólo tenés media hora, hacé la 1, la 4,
-> la 5, la 9 y la 12.
+> **Dos usos, y hay que elegir uno.**
 >
-> **Es el único cuestionario del curso que se sale de los 15 minutos**, y es a propósito: los
-> tres últimos ítems son de diseño y el doce es de una página. Para los 15 minutos de rutina en
-> el aula, usá las cinco de arriba; el resto sirve como integrador del curso o como una parte del
-> proyecto final (`recursos/GUIA-DEL-DOCENTE.md` §6). La desviación está declarada en
+> - **En el aula, 15 minutos** (como en el resto del curso): la **1, la 2, la 4 y la 5**. Son
+>   las de reconocer y leer una salida, y se corrigen en el momento.
+> - **Como integrador final, unos 50 minutos** para las doce. Es la última clase: no hay
+>   clase siguiente, así que esto no es una tarea «para la próxima». Sirve como cierre fuera
+>   del horario o como una parte del proyecto final (`recursos/GUIA-DEL-DOCENTE.md` §6). Si
+>   hay media hora, la 1, la 4, la 5, la 9 y la 12.
+>
+> Es el único cuestionario del curso que tiene la versión larga, y es a propósito: los tres
+> últimos ítems son de diseño y el doce es de una página. La desviación está declarada en
 > `PROGRAMA.md` §3.4.
 
 ---
@@ -70,17 +74,21 @@ Un clasificador de «conflictividad» sobre prensa local devuelve estos pesos:
 
 ## 5. [Leer una tabla] Una auditoría de sesgo
 
-Alguien te muestra esta tabla y te dice: *«el modelo no tiene sesgo de género: mirá, los
-puntajes por ocupación son casi todos iguales»*.
+Es el clasificador de «nota sobre política» de la clase, con la plantilla
+«[SUJETO] reclamó frente a la sede del ministerio». Alguien te muestra esta tabla y te dice:
+*«el modelo no discrimina por ocupación: enfermeras y obreras sacan exactamente lo mismo. Y
+el sesgo de género es chico y parejo»*.
 
 | sujeto | puntaje | ¿en el vocabulario del modelo? |
 |---|---|---|
-| las abogadas | 0,412 | sí |
-| los abogados | 0,357 | sí |
-| las enfermeras | 0,265 | **no** |
+| las médicas | 0,346 | sí |
+| los médicos | 0,275 | sí |
+| las enfermeras | 0,307 | **no** |
 | los enfermeros | 0,265 | **no** |
-| las obreras | 0,265 | **no** |
+| las obreras | 0,307 | **no** |
 | los obreros | 0,265 | **no** |
+
+*Dato que vas a necesitar:* en este modelo, «los» pesa −0,34 y «las» −0,14.
 
 **(a)** ¿Qué se puede concluir de esta tabla?
 **(b)** Y —más importante— **¿qué NO se puede concluir?** Escribí las dos cosas que la persona

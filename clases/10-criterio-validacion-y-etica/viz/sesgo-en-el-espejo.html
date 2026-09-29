@@ -6,8 +6,8 @@
 <title>Sesgo en el espejo — Clase 10</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA: "la misma oración, cambiando una sola palabra, saca un puntaje
-     un 34 % más alto. Y tres sujetos distintos sacan EXACTAMENTE el mismo
+     MOMENTO AHA: "la misma oración, cambiando sólo el sujeto, saca 0,07 más
+     («los médicos» → «las médicas»). Y varios sujetos distintos sacan EXACTAMENTE el mismo
      número, hasta el último decimal: no es equidad, es que el modelo no los
      conoce y lo único que está leyendo es el artículo."
 
@@ -92,7 +92,8 @@
     <p class="viz-pie">
       Modelo real: regresión logística sobre bolsa de palabras, entrenada con
       <b id="pie-n">…</b> notas de prensa reales en castellano (Spanish Fake News Corpus 2.0,
-      CC BY 4.0), noviembre 2020 – marzo 2021. Pesos medidos por
+      CC BY 4.0; dos recolecciones: enero-julio de 2018 y noviembre de 2020 a marzo de 2021).
+      Pesos medidos por
       <code>medir-clase10.py</code>.
     </p>
   </footer>
@@ -114,8 +115,10 @@ document.getElementById('pie-n').textContent = D.modelo.n_train;
    -------------------------------------------------------------------------- */
 function fichas(texto) {
   // OJO: en JavaScript \w es sólo ASCII, así que "médicos" se partiría en dos.
-  // \p{L} y \p{N} con la bandera `u` sí entienden las tildes y la ñ.
-  const t = texto.toLowerCase().match(/[\p{L}\p{N}]{2,}/gu) || [];
+  // \p{L} y \p{N} con la bandera `u` sí entienden las tildes y la ñ. El guion
+  // bajo va porque scikit-learn lo cuenta como letra (`lopezobrador_` es una
+  // ficha del modelo): así las fichas son las mismas que en Python.
+  const t = texto.toLowerCase().match(/[\p{L}\p{N}_]{2,}/gu) || [];
   return Array.from(new Set(t));
 }
 function score(texto) {
@@ -147,6 +150,8 @@ const p = Viz.plano('#lienzo', {
   // del borde interno, así que con i:18 «los adultos mayores» se salía del canvas.
   margen: { i: 54, d: 18, a: 32, b: 34 }
 });
+// Accesibilidad: el canvas es una imagen; le damos un texto que diga lo mismo.
+p.canvas.setAttribute('role', 'img');
 
 function recalcular() {
   const dim = ctl.valores.dimension;
@@ -163,16 +168,22 @@ p.alDibujar(() => {
   const dif = alto.score - bajo.score;
   // El rótulo va en el título del plano: adentro del dibujo le pisaría la
   // primera barra, que es justamente la que hay que leer.
-  p.titulo = 'puntaje de «esto es sobre política»  ·  diferencia máxima ' +
-    dif.toFixed(3) + ' (×' + (alto.score / bajo.score).toFixed(2) + ')' +
-    (marcar ? '  ·  en gris, palabras que el modelo nunca vio' : '');
+  // La diferencia va en puntos, no como cociente: un cociente entre puntajes
+  // bajos y no calibrados exagera.
+  p.titulo = 'puntaje de «es política»  ·  diferencia máxima ' +
+    dif.toFixed(3) + ' (' + Math.round(dif * 100) + ' puntos de 100)' +
+    (marcar ? '  ·  gris y (?): palabra que nunca vio' : '');
   p.fondo();
+  // Con «marcar», los desconocidos van en gris Y con "(?)": no sólo por color.
   p.barras(filas.map(f => ({
-    etiqueta: f.sujeto,
+    etiqueta: f.sujeto + ((marcar && f.fuera.length) ? ' (?)' : ''),
     valor: f.score,
     color: (marcar && f.fuera.length) ? 'verdad' : 'modelo'
   })), { horizontal: true, max: Math.max(0.5, filas[0].score * 1.2),
          formato: v => v.toFixed(3) });
+  p.canvas.setAttribute('aria-label', 'Puntaje por sujeto, de mayor a menor: ' +
+    filas.map(f => f.sujeto + ' ' + f.score.toFixed(3) +
+      (f.fuera.length ? ' (el modelo no conoce: ' + f.fuera.join(', ') + ')' : '')).join('; ') + '.');
 });
 
 function actualizar() {
@@ -221,13 +232,14 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'Para el apéndice' },
   { tipo: 'boton', texto: 'Copiar la tabla', principal: true, alClic: () => {
       const t = document.getElementById('tabla').textContent;
+      const noSePudo = () => ctl.texto('copiado', 'El navegador no dejó copiar (pasa con ' +
+        '<code>file://</code>). Seleccionala a mano de la caja de abajo.');
+      // writeText devuelve una promesa: el error llega por .catch, no por try/catch.
       try {
-        navigator.clipboard.writeText(t);
-        ctl.texto('copiado', 'Copiada. Pegala en el apéndice y contá qué hiciste.');
-      } catch (e) {
-        ctl.texto('copiado', 'El navegador no dejó copiar (pasa con <code>file://</code>). ' +
-          'Seleccionala a mano de la caja de abajo.');
-      }
+        navigator.clipboard.writeText(t)
+          .then(() => ctl.texto('copiado', 'Copiada. Pegala en el apéndice y contá qué hiciste.'))
+          .catch(noSePudo);
+      } catch (e) { noSePudo(); }
     } },
   { tipo: 'texto', id: 'copiado', html: 'La tabla de abajo ya está en markdown.' }
 ], () => actualizar());

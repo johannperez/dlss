@@ -1,218 +1,190 @@
-# Verificación adversarial — Clase 10
+# Verificación — Clase 10
 
-**Criterio: validez, sesgo, reproducibilidad y el revisor 2** · verificada el **2026-08-29**
+**Criterio: validez, sesgo, reproducibilidad y el revisor 2**
 
-> Segunda pasada, hecha con la consigna de **no creerle nada** a quien construyó la clase.
-> Todo lo que dice acá se comprobó **corriendo el código y mirando las imágenes**, no leyendo:
-> `nbconvert --execute` cronometrado cuatro veces, `nbformat.validate`, Chromium por Playwright
-> con `context.route` **abortando toda URL http(s)**, 44 capturas de pantalla miradas una por
-> una, `curl` contra cada URL, y los cinco PNG abiertos con los ojos.
+Dos pasadas: la construcción se verificó el **2026-08-29**, y el **2026-09-29** se hizo una
+segunda ronda después de una revisión externa que encontró problemas de rigor estadístico y de
+coherencia. Este archivo describe el estado **después de la segunda ronda**, y dice qué se
+comprobó de verdad y qué no.
 
 ---
 
 ## 1. Veredicto
 
-**La clase es apta para dictarse.** Estaba bien construida y bien medida. Se encontraron y se
-arreglaron **siete** problemas: **uno grave de rigor** (números inventados adentro de la propia
-clase que enseña a no inventarlos), **uno de reproducibilidad**, **uno de semántica de color**,
-**un plan de tiempos que no cerraba por 53 minutos**, **un entregable que no existía**, y dos
-menores. Lo que queda abierto está en la sección 5 y **nada de eso frena una clase**.
+**La clase es apta para dictarse.** La revisión externa encontró que la lección metodológica
+central (la «banda de ruido») comparaba mal, que el diagnóstico de los nombres propios estaba
+sobreafirmado, que ninguno de los dos «placebos» era un placebo y que la procedencia del corpus
+estaba mal fechada. Todo eso se corrigió y los números se volvieron a medir (§2). Lo que queda
+abierto está en §5; nada frena la clase.
 
-| Chequeo | Resultado |
+| Chequeo (2026-09-29) | Resultado |
 |---|---|
-| Entregables (6 obligatorios + extras) | **todos presentes**, ninguno vacío ni a medias · +1 escrito acá |
-| `nbformat.validate(notebook.ipynb)` | **válido**, 57 celdas |
-| `nbconvert --execute`, sin red | **0 errores, 0 stderr, 5 figuras** |
-| Tiempo del notebook (4 corridas) | **14,4 · 18,2 · 18,3 · 18,8 s** de punta a punta |
-| Consola del navegador (slides + 3 viz, en su ubicación real) | **0 errores, 0 `pageerror`, 0 requests fallidos** |
-| Requests externos con `route` abortando `http(s)` | **0**, en las cuatro páginas |
-| Desborde vertical de las 40 slides (medido con rectángulos reales) | **0 slides desbordadas** |
-| Reproducibilidad de `medir-clase10.py` | `datos-clase10.json`, `.js` y `pesos-clase10.js` **bit a bit idénticos** |
-| Reproducibilidad de `exportar-figuras.py` | los 5 PNG **bit a bit idénticos** en corridas sucesivas |
-| Números de las slides contra la corrida real | **todos verificados** (ver §3) |
-| Código de las slides contra el notebook | **idéntico**, las dos veces que aparece |
-| URLs de `referencias.md` | 4 marcadas VERIFICADA dan **200**; la única que no responde está marcada `[VERIFICAR URL]` |
-| Plan de tiempos | **120,0 min exactos**, slide por slide y en `notas-docente.md` |
+| `nbformat.validate(notebook.ipynb)` | **válido**, 63 celdas, guardado **sin salidas** |
+| `nbconvert --execute` en una copia, sin red | **0 errores, 0 stderr, 5 figuras**, **11-13 s** de punta a punta (una laptop; Python 3.12.13, numpy 2.5.3, scikit-learn 1.9.1, matplotlib 3.11.2) |
+| `medir-clase10.py` corrido dos veces | `datos-clase10.json`, `.js` y `pesos-clase10.js` **idénticos** entre corridas (md5), **en esta máquina y con estas versiones**. El JSON anota las versiones (clave `entorno`) |
+| `exportar-figuras.py` corrido dos veces | los 5 PNG **idénticos entre corridas en el mismo entorno**. Con otra versión de matplotlib los bytes cambian aunque el dibujo sea el mismo |
+| Assert de la viz 2 | la cuenta a mano da lo mismo que `predict_proba` (dif. máx. 3,5·10⁻⁶), y la tokenización a mano da las mismas fichas que scikit-learn en los 1471 documentos |
+| Números de slides, notas, cuestionario y viz contra la corrida | verificados uno por uno (§3) |
+| Viz en navegador | Chrome *headless*: las tres páginas cargan y se recorrieron sus estados con un script (casos 1-3 × antes/después; las 4 dimensiones con «marcar»; checklist vacío → ejemplo → modo revisor), **0 errores de JavaScript**. Capturas de pantalla de la viz 1 («después») y la viz 2 miradas a ojo |
+| Slides en navegador | capturas de las slides 4, 5, 6, 13, 15, 18, 20, 22 y 38 (las que cambiaron): sin desborde. **No** se repitió la medición automática de desborde de las 40 |
+| Bootstrap de Colab (celda 2) | no se tocó (md5 del source `4c9c6d9d…`, igual a los otros nueve notebooks) |
 
 ---
 
-## 2. Lo que estaba mal y se arregló
+## 2. Qué se arregló en la segunda ronda (2026-09-29)
 
-### Grave
+### Rigor
 
-**1. Números inventados adentro de la clase que enseña a no inventar números.**
-`viz/checklist-revisor.html` decía, al pie: *«el ejemplo precargado es la auditoría real de
-esta clase, con los números que salen de `medir-clase10.py`»*. **Cuatro de sus respuestas no
-salían de ningún lado:**
+1. **La banda de ruido comparaba mal.** Ponía la diferencia de una ablación (original contra
+   ablado, **sobre la misma partición**) al lado del **rango** del F1 suelto entre 25 semillas
+   (0,107) y concluía «un test que se mueve menos que el ruido no es un test». Pero el error de
+   una diferencia pareada no es el rango de cada número suelto, y el rango crece con la cantidad
+   de semillas. *Ahora:* la sección 5 del notebook repite cada ablación sobre las 25 particiones
+   y reporta la **diferencia pareada** con media, desvío e intervalo (error estándar con la
+   corrección de Nadeau y Bengio, 2003, porque las particiones comparten notas). Resultado:
+   sacar los 20 términos más fuertes baja el F1 −0,030 (IC −0,054 a −0,006, 22 de 25
+   particiones); los 19 nombres propios, −0,014 (IC −0,030 a +0,001, 21 de 25); los 5 primeros
+   y el primero no se distinguen de cero. Con **una** partición, los 5 primeros parecían
+   *mejorar* el F1 (+0,033). La moraleja nueva: *no interpretes una diferencia sin su error, y
+   medí el error de la comparación que hacés.* Cambió la figura 03, la slide 18, la viz 1, el
+   `TODO 2`, las notas y la ficha.
+2. **«Detector de nombres de la coyuntura mexicana» estaba sobreafirmado.** Salía de leer
+   coeficientes. *Ahora* es una hipótesis (`TODO 1`, slide 4) que el notebook **testea**:
+   reentrenado sin nombres propios, el F1 casi no cambia (0,680 → 0,667) y el control positivo
+   sube de 22 a 32 %. Los nombres explican una parte de la falla; el resto es dominio y género
+   textual.
+3. **Ninguno de los dos «placebos» era un placebo.** El barajado es un **test de invariancia**
+   y Aguasclaras (titulares de política institucional) es un **segundo control positivo fuera de
+   dominio**; el texto decía además «sesiones parlamentarias» y «otra época», y ninguna de las
+   dos cosas era cierta. *Ahora* están renombrados y hay un **placebo de verdad**: las 65 notas
+   de Deporte y Espectáculos del test, de las que marca 7 (11 %), cuatro de ellas con nombres de
+   políticos. En el JSON, las claves pasaron a `control_positivo`, `placebo`, `invariancia` y
+   `fuera_de_dominio`.
+4. **El control positivo mezclaba largo y dominio**, y los 600 fragmentos salían de los primeros
+   discursos del archivo (sobre todo Fernández). *Ahora* usa **todas** las oraciones de 60-220
+   caracteres de los 123 discursos (824, de 120 discursos) y agrega la referencia del mismo largo:
+   oraciones de las notas de política del propio test. Recall: 0,64 en notas enteras, **0,49**
+   en oraciones sueltas de sus notas, **0,22** en oraciones de discursos (antes 0,21 sobre los
+   600 primeros).
+5. **Test de permutación con pseudo-replicación.** Las 10 diferencias de género comparten el
+   mismo coeficiente del artículo (+0,204 en logit) y en 6 de los 10 pares es lo único que
+   cambia. *Ahora* la celda descompone cada diferencia en artículo + sustantivo, enumera los
+   1024 patrones de signo (p exacto 0,0020, el mínimo posible) y dice por qué ese p no agrega
+   nada.
+6. **La procedencia del corpus estaba mal fechada** («nov-2020 a mar-2021», «cinco meses de
+   pandemia», y la ficha se contradecía sola con «2018-2021»). *Ahora* dice lo que está en
+   `datos/README.md` §1.3: 971 notas de enero a julio de 2018 y 500 de noviembre de 2020 a marzo
+   de 2021. Notebook, ficha, slides, viz 2 y 3, soluciones.
+7. **Prevalencia.** El modelo entrena con `class_weight="balanced"` y el ejemplo del checklist
+   justificaba el umbral «porque nos interesa estimar prevalencia». Contando predicciones da
+   24,7 % donde hay 28,0 %. *Ahora* hay una celda que lo muestra con la corrección
+   *classify-and-count* (con la salvedad de que hacerla sobre el mismo test es circular), una
+   limitación nueva en la ficha, y el ejemplo del checklist y la slide 20 lo dicen.
+8. **Cuestionario, ítem 5.** La tabla ponía «las enfermeras» = «los enfermeros» = 0,265, contra
+   el mecanismo del artículo que enseña la clase, y la solución decía que 0,265 era la oración
+   sin sujeto (es 0,336). *Ahora* la tabla usa los puntajes reales del modelo de la clase
+   (0,346 / 0,275 / 0,307 / 0,265) y la solución descompone artículo y sustantivo.
+9. **Juicio, Paper A.** Las cuentas no cerraban (32 falsos positivos con 150 notas de test), la
+   partición decía «por diario y por año» y describía sólo por diario, y había «notas deportivas»
+   en un corpus de Política y Sociedad. *Ahora* cierran: 600 notas en cuatro rotaciones, 84
+   verdaderos positivos, 22 falsos, *accuracy* 0,91; el intervalo del F1 y del aumento es por
+   *bootstrap*; y la cuenta está escrita en el recuadro inicial para quien quiera verificarla.
+10. **`TODO 7` tenía una pista falsa** (con bolsa de palabras el barajado da siempre lo mismo;
+    no había azar suelto que encontrar). *Ahora* hay una celda con una fuente de azar suelta
+    **puesta a propósito** (el sorteo de cinco falsos positivos) para encontrarla y arreglarla.
+11. Menores: pares mínimos que no cambiaban una sola cosa (el del futbolista; el de «cambio de
+    época», ahora «sinónimo»); el par de control del `TODO 5` que cambiaba dos cosas; el cociente
+    «×1,89» (ahora diferencia en puntos); «Diez clases en cinco viñetas» (van nueve); la afirmación
+    como hecho de que un transformer aprendería el mismo atajo; «desempeño perfecto y validez
+    nula»; la reponderación del muestreo estratificado; `lopezobrador_` faltaba en la lista de
+    nombres propios de la ablación (ahora son 19); la métrica rota `proporcion_realmente_politica`
+    y las secciones sin uso `etiqueta_circular` y `fuga_por_fuente` salieron de
+    `medir-clase10.py`.
 
-| campo | lo que decía | lo que pasa de verdad |
-|---|---|---|
-| exclusiones | «se excluyeron 72 notas sin titular» | **no se excluyó ninguna**: entran las 1471 |
-| validación manual | «150 casos leídos a ciegas, estratificados» | **cero**: la codificación es heredada del corpus fuente |
-| acuerdo entre codificadores | «kappa de Cohen = 0,46 sobre 100 casos» | **no hubo doble codificación** |
-| falsos positivos | «leímos 30 … la mayoría son notas de Covid» | hay **25** en el test, el notebook imprime **20**, y de esos 20 **uno solo** es de Covid |
+### Calendario
 
-Es exactamente el pecado del que habla la clase, cometido por su entregable estrella.
-*Arreglado:* los cuatro campos dicen ahora lo que efectivamente pasó —incluido **«0 en este
-ejercicio»** para la validación manual, declarado como la limitación principal— y el pie
-explica que el ejemplo es la auditoría real **agujeros incluidos**, y que declararlos es la
-jugada correcta. El párrafo de métodos que genera la viz sigue siendo completo; ahora además
-es cierto.
+12. **«El lunes»** en la última clase: el bloque se llama ahora *en tu investigación* (slide 38,
+    notebook, notas, comentario de la viz 3) y habla de «después del curso»; la slide 34 dice «lo
+    usan en su próximo paper».
+13. **El cuestionario** declara los dos usos: 15 minutos en el aula (ítems 1, 2, 4 y 5) o
+    integrador final de unos 50 minutos. Como es la última clase, no es una tarea para la próxima.
 
-### Importante
+### Viz y accesibilidad
 
-**2. Dos definiciones del mismo experimento, con dos resultados distintos.**
-`medir-clase10.py` ablacionaba **14** nombres propios y el notebook **18**. Consecuencia
-visible en el aula: la VIZ 1 decía *«sin los 14 nombres propios · 0,677»* y el notebook, en la
-pantalla de al lado, imprimía *«los nombres propios · 18 · 0,670»* para el mismo test. Lo mismo
-con la auditoría de sesgo: `medir` tenía **18** filas (con «los empresarios» repetido en dos
-dimensiones) y el notebook **17**, y la VIZ 3 reportaba «18 sujetos».
-*Arreglado:* las dos listas de `medir-clase10.py` son ahora **idénticas a las del notebook**
-(18 nombres propios, 17 sujetos sin repetir), con un comentario en cada una diciendo por qué
-tienen que quedar iguales. Los literales `14` y `18` de las dos viz se reemplazaron por
-`D.ablacion[4].n_quitados` y `D.sesgo.filas.length`, para que **no puedan volver a divergir**.
-Se regeneraron `datos-clase10.json` y `.js`; `pesos-clase10.js` y las cinco figuras no cambian.
-
-**3. El plan de tiempos sumaba 173 minutos para una clase de 120.**
-La nota del docente lo admitía como «suma más de 120», sin decir cuánto: eran **53 minutos de
-más**, un 44 %. Un docente que leyera «más de 120» iba a preparar 130 y llegar a la mitad de la
-segunda parte con la campana sonando. Y el bloque práctico 1 decía **30 minutos** en la slide
-contra los **20** del presupuesto de `PROGRAMA.md`.
-*Arreglado:* la sección 2 de `notas-docente.md` es ahora **un plan que suma 120 exactos**, con
-los recortes ya aplicados y explicados (VIZ 1 de 8 a 5, los procedimientos 13-17 a un minuto,
-el práctico 1 a 20, el juicio a 20, la ética a 7). Los rótulos de minutos de las 40
-`<aside class="notes">` se reescribieron uno por uno para que coincidan con esa tabla —suman
-**119,7**, con dos transiciones de 20 segundos—, y la sección 5 («si vas atrasado») recosteó
-cada recorte, que ahora dan **12 minutos** de colchón real.
-
-**4. Faltaba el material del bloque práctico 2.** El juicio son 20-25 minutos de clase y **no
-había paper para repartir**: estaban las consignas, los roles y la rúbrica, pero el objeto
-físico no existía. La spec autoriza explícitamente construirlo *ad hoc* y rotularlo como
-material didáctico (§8).
-*Arreglado:* escrito **`material-el-juicio.md`**, con los dos papers que pide la spec —el A
-defendible con reparos menores, el B con un problema fatal de validez escondido en una nota al
-pie— más la clave de corrección para el docente, objeción por objeción y con su gravedad. Los
-dos son **ficticios, sin autores y sin revista**, y así lo dicen en su primera línea y en
-`referencias.md`: no citan datos reales y no se pueden citar. Los números de adentro son
-internamente coherentes, para que un grupo que los revise en serio encuentre lo que tiene que
-encontrar y no un descuido.
-
-### Menores
-
-**5. Semántica de color al revés en la slide 16.** La fila de la negación tenía su Δ en
-**verde** (`c-ok` = «correcto, aceptado») mientras el cartel de abajo explica que *la negación
-no mueva nada es el problema*. Un estudiante que mirara la tabla y no el cartel leía la
-conclusión contraria. *Arreglado:* va en `c-error`, como las otras tres; las cuatro filas son
-señales del mismo problema y el cartel ya lo dice («las dos cosas dicen lo mismo»).
-
-**6. Una figura del repo no era la que produce el notebook.** `figuras/02-terminos-influyentes.png`
-en el árbol de trabajo no coincidía con la salida de `exportar-figuras.py` (sí coincidía la
-versión de HEAD: había quedado una copia vieja encima). *Arreglado:* regenerada. Ahora las
-cinco salen bit a bit iguales en corridas sucesivas.
-
-**7. La slide 23 no entraba en la pantalla** después de agregarle la línea de prioridades
-(768 px sobre 760). *Arreglado:* la pista se plegó adentro del recuadro `.manos compacta` y se
-sacó la coletilla redundante del `TODO 6`. Verificado midiendo los rectángulos reales: **0
-slides desbordadas de 40**.
+14. Portapapeles: `navigator.clipboard.writeText` devuelve una promesa y el `try/catch` no
+    atajaba el rechazo (decía «Copiada» aunque fallara). Ahora usa `.then/.catch` (viz 2 y 3).
+15. Viz 3: lo que escribe el usuario se escapa antes de ir a `innerHTML` (probado: un
+    `<img onerror>` queda como texto). El ejemplo precargado usa las versiones exactas del JSON
+    en vez de «scikit-learn 1.x» y «Python 3.11», y el modo revisor distingue las respuestas que
+    dicen «0» / «no» como **limitación declarada** en vez de mostrar «Ningún hueco».
+16. Viz 2: el tokenizador incluye el guion bajo, como scikit-learn (`lopezobrador_`).
+17. Viz 1, caso 3: cada barra lleva su lectura; antes el formato la adivinaba por el valor.
+18. **Accesibilidad:** los dos canvas llevan `role="img"` y un `aria-label` que se actualiza con
+    lo que dibujan. Lo que antes se codificaba sólo por color ahora tiene además una marca: ★ en
+    los nombres propios (viz 1, slide 4, figura 02, con rayado), «(?)» en las palabras que el
+    modelo no conoce (viz 2, figura 05, con rayado), y línea llena/punteada en los pares mínimos
+    (figura 04).
+19. Las slides ya no cargan KaTeX (no hay fórmulas).
 
 ---
 
-## 3. Lo que se verificó y **no** se tocó
+## 3. Los números, verificados contra la corrida
 
-**Los números.** Cada cifra concreta de las slides se comparó contra la salida real:
+Todos salen de `medir-clase10.py` y del notebook, en la corrida del 2026-09-29.
 
 - Panel del gancho: `0,83 / 0,73 / 0,64 / 0,68`, piso `0,72`, ganancia `+0,11`, `1471` notas,
-  `368` de test, `1103` de train, vocabulario `6.534`. ✔ todos.
-- Slide 4: los **16** pesos de la tabla son el top-16 exacto (`presidencial +1,10` …
-  `gobernador +0,62`), y el conteo de nombres propios —**5 de 16** en la tabla, **6 de 20** en
-  el top completo, «uno de cada tres»— se contó sobre la salida. ✔
-- Control positivo: `600` fragmentos, `64` contra `21` de cada 100 (recall 0,641 y 0,208). ✔
-- Banda de ruido: `0,68` medio, desvío `0,026`, `0,626–0,733`, rango `0,107`, ablación
-  «como mucho 0,033». ✔
-- Falsos positivos de la slide 14: los cinco titulares y sus scores están en la salida. ✔
-- Pares mínimos de la slide 16: `0,800/0,759`, `0,773/0,516`, `0,546/0,392`, `0,713/0,317`. ✔
-- Slide 22: los cuatro `0,265`, y los pesos `−0,339` («los») y `−0,1355` («las»). ✔
-- Nota del docente de la slide 21: `0,346` vs `0,257` en género y `0,344` vs `0,183` en origen
-  — comprobado **en la pantalla**, moviendo el selector. ✔
+  `368` de test, `1103` de train, vocabulario `6.534`. Top 16 de la slide 4 (5 nombres propios);
+  6 de 20 en el top completo.
+- Control positivo: `824` oraciones de los 123 discursos (120 tienen alguna del largo pedido),
+  marca `0,225` → «22 %»; referencia del mismo largo `0,493` (136 oraciones); sin nombres
+  propios: F1 `0,667`, control `0,320`, oraciones propias `0,551`.
+- Ruido: F1 `0,680 ± 0,026` (25 particiones), de `0,626` a `0,733`. Ablación con una partición:
+  `+0,007 / +0,033 / +0,003 / −0,014`. Pareada (media, IC): `−0,002 [−0,015; +0,012]`,
+  `−0,010 [−0,035; +0,014]`, `−0,030 [−0,054; −0,006]`, `−0,014 [−0,030; +0,001]`; desvíos de la
+  diferencia `0,011` a `0,020`; factor de corrección `0,611`.
+- Placebo `7 de 65`; invariancia `100 %`; Aguasclaras `19 %` marcado, `48 %` con vocabulario
+  legislativo; prevalencia `28,0 %` real contra `24,7 %` contando.
+- Pares mínimos: `0,800/0,759`, `0,773/0,516`, `0,542/0,370`, `0,546/0,392`, `0,713/0,317`,
+  `0,853/0,736`. `TODO 5` precargado: `+0,122`, `+0,092`, `−0,158`.
+- Sesgo: `0,346 … 0,183` (diferencia `0,163`), los cuatro `0,265`, «las»/«los» sin sustantivo
+  `0,307`/`0,265`, pesos `−0,339` y `−0,1355`, artículo `+0,204` en logit, 6 de 10 pares sólo
+  artículo, p exacto `0,0020`. Viz 2: género `0,346`/`0,257`, origen `0,344`/`0,183`.
 
-**El código de las slides es el del notebook.** Los dos bloques `<pre><code>` (el control
-positivo de la slide 15 y el `bloque_de_reproducibilidad` de la slide 27) son literalmente las
-líneas de las celdas 30 y 49. ✔
-
-**El motor JS de la VIZ 2 coincide con el modelo de Python.** La viz reconstruye la regresión
-logística sumando pesos en el navegador; da `0,346` para «las médicas», el mismo número que
-`predict_proba` en el notebook. ✔
-
-**Las tres viz cumplen su momento aha, comprobado moviendo los controles:**
-
-| viz | qué se hizo | qué pasó |
-|---|---|---|
-| `validez-de-constructo` | los 3 casos × 2 vistas | Caso 1: 64 de cada 100 → **21** de cada 100, y las tres ablaciones caen adentro de la banda gris. Caso 2: **0 casos** en años compartidos, el arreglo no existe. Caso 3: dos foros con tono idéntico y estructuras opuestas. |
-| `sesgo-en-el-espejo` | las 4 dimensiones, el checkbox, y una plantilla escrita a mano | Con «marcar los que no conoce», 4 de 8 sujetos se pintan gris y varios comparten el número **hasta el último decimal**. La plantilla propia («marcharon contra el aumento de tarifas») recalcula todo en vivo. «los adultos mayores» ya no se corta. |
-| `checklist-revisor` | modo revisor vacío → completar → párrafo → vaciar | Vacío: **22 objeciones, 13 fatales** en rojo. Completo: `22 de 22` y el párrafo de métodos armado. El `localStorage` está envuelto en `try/catch` y hay botón *Vaciar*. |
-
-**Las cinco figuras, miradas.** Ejes rotulados, leyendas, y se entienden sin el texto de al
-lado. La 03 (ablación contra ruido) es la mejor de la clase: se ve de un vistazo que las tres
-intervenciones caen adentro de la banda.
-
-**Las URLs.** `curl` a las cinco de `referencias.md` que tienen enlace: las cuatro marcadas
-`[VERIFICADA 2026-08-29]` responden **200**; `scikit-learn.org` no responde desde este
-contenedor y está correctamente marcada `[VERIFICAR URL]`. **No hay ninguna URL inventada** y
-ninguna cita sospechosa: las diez obras existen, con autor, año, publicación y páginas.
-
-**El cuestionario.** Las 12 preguntas se contestan con lo que se dio en clase, y las soluciones
-son correctas (se rehizo la cuenta del ítem 5: `0,412 − 0,357 = 0,055` ✔). Los distractores de
-los dos *multiple choice* son **tentadores, no absurdos**: el A del ítem 1 («detecta con 91 % de
-eficacia») es la traducción que hace la literatura publicada, y el B del ítem 2 («generaliza
-bien») es *otra* validez de verdad. Cada distractor viene con la confusión que revela elegirlo,
-que es lo que sirve en el aula.
-
-**Cero red, cero CDN, todo relativo.** Ni un `https://` en un `src` o un `href`, ni un color
-hexadecimal escrito a mano, ni una ruta absoluta, en las cuatro páginas.
-
-**Los puentes.** Hacia atrás: la slide 2 retoma textualmente el cierre de la clase 9 («la
-fuente predecía la etiqueta al 96 %»). Hacia adelante —es la última clase— la 39 lo cruza al
-proyecto propio del estudiante. El `[CALLBACK DIBUJO]` está en la 36, con el mapa de las diez
-clases al lado.
-
-**El tono.** Rioplatense, con voseo, sin solemnidad. No quedaron imperativos peninsulares ni
-párrafos-muro: todas las slides largas tienen tabla, tarjetas o recuadro. Los términos en
-inglés se explican la primera vez y los siete de hoy están en `recursos/glosario.md`,
-coherentes con la slide 37.
+**El código de las slides es el del notebook:** las líneas del control positivo (slide 15) y la
+llamada a `bloque_de_reproducibilidad` (slide 27) están copiadas de las celdas correspondientes.
 
 ---
 
 ## 4. Cómo reproducir esta verificación
 
 ```bash
+# en una COPIA del repo, no en el repo
+export PYTHONDONTWRITEBYTECODE=1
 cd clases/10-criterio-validacion-y-etica
-python3 -c "import nbformat; nbformat.validate(nbformat.read('notebook.ipynb', as_version=4))"
-time PYTHONPATH=../../_shared python3 -m nbconvert --to notebook --execute \
-     --output /tmp/out.ipynb notebook.ipynb          # ~14-19 s, 0 errores, 0 stderr
-md5sum datos-clase10.json datos-clase10.js pesos-clase10.js figuras/*.png > /tmp/a.md5
-python3 medir-clase10.py && python3 exportar-figuras.py && md5sum -c /tmp/a.md5   # todo OK
+python -c "import nbformat; nbformat.validate(nbformat.read('notebook.ipynb', as_version=4))"
+python -m jupyter nbconvert --to notebook --execute --output /tmp/out.ipynb notebook.ipynb
+md5 -q datos-clase10.json datos-clase10.js pesos-clase10.js figuras/*.png > /tmp/a.md5
+python medir-clase10.py && python exportar-figuras.py
+md5 -q datos-clase10.json datos-clase10.js pesos-clase10.js figuras/*.png | diff - /tmp/a.md5
 ```
 
-Para el HTML: Chromium por Playwright (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`), abriendo
-por `file://` **desde la ubicación real de los archivos**, con
-`context.route('**/*', r => /^https?:/.test(r.request().url()) ? r.abort() : r.continue())`
-y escuchando `console`, `pageerror` y `requestfailed`. Para el desborde: recorrer las 40
-`section`, forzarles `display:block` y comparar el `bottom` real de cada hijo contra los 760 px
-de alto de la slide.
+El `diff` vacío vale **en la misma máquina y con las mismas versiones**. En otro entorno,
+compará los números impresos (y las figuras a ojo), no los bytes.
 
 ---
 
 ## 5. Lo que queda abierto
 
-| # | Qué | Para quién | Frena la clase? |
+| # | Qué | Para quién | ¿Frena la clase? |
 |---|---|---|---|
-| 1 | **El juicio dura 20 minutos, no los 25 de `PROGRAMA.md`.** Es la única desviación del presupuesto oficial, y es deliberada: el mazo entero son ~150 min y había que sacar 30 de algún lado. `notas-docente.md` §5 dice cómo devolverle los 5 minutos si el aula va holgada. | quien dé la clase | no |
-| 2 | **Nadie lo probó con estudiantes.** El reparto de 120 minutos es una estimación de diseño, no una medición. Conviene anotar los minutos reales la primera vez y ajustar la tabla. | quien dé la clase | no |
-| 3 | Las **66 marcas `[VERIFICAR URL]`** (56 de `recursos/bibliografia.md` + 10 de este `referencias.md`). `doi.org`, `arxiv.org` y los sitios de las editoriales están bloqueados acá. Las citas están completas y correctas; faltan los enlaces. **Si una obra no aparece, se saca la cita: no se le inventa un enlace.** | quien tenga red | no |
-| 4 | La **licencia de los dos corpus de discursos** sigue sin declarar (trampa 13 de la espina). Está dicho en `referencias.md` y en las notas. Si el curso se publica, hay que escribirle a los recopiladores. | el docente | no |
-| 5 | El cuestionario declara **50 minutos**; `PROGRAMA.md` §3.4 dice que los cuestionarios se resuelven en 15. La contradicción viene de la propia spec, que en su §7 pide para esta clase tres ítems de diseño y uno «de una página». Se dejó en 50 y con la lista de las cinco preguntas mínimas para media hora. **Alguien tiene que decidir cuál de los dos documentos manda.** | el equipo del curso | no |
-| 6 | Las slides cargan **KaTeX y no lo usan**: esta clase no tiene una sola fórmula. Es coherente con la regla de la casa («y a veces la fórmula no va») y con la plantilla, pero son dos `<script>` de más. | opcional | no |
-| 7 | `material-el-juicio.md` **nunca se usó en un aula**. Los dos papers son nuevos: la primera cohorte es también su prueba. Si el B resulta demasiado obvio, la clave de corrección dice qué objeción esconder. | quien dé la clase | no |
+| 1 | **El juicio dura 20 minutos, no los 25 de `PROGRAMA.md`.** Desviación deliberada; `notas-docente.md` §5 dice cómo devolverlos. | quien dé la clase | no |
+| 2 | **Nadie lo probó con estudiantes.** El reparto de 120 minutos es una estimación. En particular, el práctico 1 (secciones 1-9 en 20 minutos) es ajustado: lo realista es llegar al `TODO 5`. | quien dé la clase | no |
+| 3 | Las marcas **`[VERIFICAR URL]`** de `referencias.md` (ahora 11, con Nadeau y Bengio 2003). Las citas están completas; faltan los enlaces abiertos. | quien tenga red | no |
+| 4 | La **licencia de los dos corpus de discursos** sigue sin declarar. Dicho en `referencias.md` y en las notas. | el docente | no |
+| 5 | Fuera de esta carpeta todavía se citan los números viejos del control positivo («600 fragmentos», «21 de cada 100»): `PROGRAMA.md` (gancho de la clase 10), `recursos/glosario.md` (*shortcut learning*) y la espec de la clase 10. `PROGRAMA.md` §3.4 habla de «cinco preguntas mínimas»; el cuestionario ahora propone cuatro para los 15 minutos. | quien mantenga esos archivos | no |
+| 6 | La verificación en navegador de esta ronda fue con Chrome *headless* y un script propio, no con la batería completa de la primera pasada (Playwright con red bloqueada, 44 capturas). No se probó en Colab. | quien tenga tiempo | no |
+| 7 | `material-el-juicio.md` **nunca se usó en un aula**. | quien dé la clase | no |
+| 8 | Con otra versión de scikit-learn los números pueden moverse en el tercer decimal. Las slides citan la corrida de referencia; `notas-docente.md` §8 pide proyectar la propia. | quien dé la clase | no |
 
 ---
 
@@ -220,15 +192,15 @@ de alto de la slide.
 
 ```
 clases/10-criterio-validacion-y-etica/
-  slides.html                 40 slides · 0 errores de consola · 0 desbordes
-  notebook.ipynb              57 celdas · 0 errores · 5 figuras · 14-19 s
-  viz/validez-de-constructo.html   3 casos × 2 vistas
+  slides.html                 40 slides
+  notebook.ipynb              63 celdas · 0 errores · 5 figuras · ~12 s · sin salidas
+  viz/validez-de-constructo.html   3 casos × 2 vistas (caso 1: control positivo + ablación pareada)
   viz/sesgo-en-el-espejo.html      4 dimensiones + plantilla editable + tabla markdown
-  viz/checklist-revisor.html       22 preguntas · 13 fatales · párrafo de métodos
-  notas-docente.md            plan de 120 min exactos + qué recortar
-  cuestionario.md · cuestionario-soluciones.md      12 ítems
-  referencias.md              10 lecturas · 4 URLs verificadas
-  material-el-juicio.md       NUEVO — los dos papers del práctico 2 (ficticios, rotulados)
+  viz/checklist-revisor.html       22 preguntas · 13 fatales · limitaciones declaradas
+  notas-docente.md            plan de 120 min + qué recortar
+  cuestionario.md · cuestionario-soluciones.md      12 ítems (15 min: 1, 2, 4, 5)
+  referencias.md              11 lecturas · 4 URLs verificadas
+  material-el-juicio.md       los dos papers del práctico 2 (ficticios, rotulados)
   medir-clase10.py            de acá sale cada número de las slides y las viz
   exportar-figuras.py         corre el notebook y guarda sus 5 figuras
   datos-clase10.json · datos-clase10.js · pesos-clase10.js

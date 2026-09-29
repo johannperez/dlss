@@ -11,12 +11,13 @@
      sobre los datos reales del curso, y son los mismos que produce el
      notebook. Si cambiás el notebook, volvé a correr el script y actualizá
      las slides: un número inventado en un curso sobre no inventar números
-     es el peor error posible.
+     es el peor error posible. Son deterministas en la misma máquina y con
+     las mismas versiones de las librerías (datos-clase10.json las anota);
+     con otras versiones pueden cambiar un poco.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reset.css">
 <link rel="stylesheet" href="../../_shared/vendor/reveal/dist/reveal.css">
-<link rel="stylesheet" href="../../_shared/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="../../_shared/css/curso.css">
 <style>
   .reveal .numeron { font-family: var(--f-mono); font-size: 2.6em; font-weight: 700;
@@ -74,7 +75,7 @@
 <section>
   <span class="marca">callback</span>
   <h2>Dónde quedamos</h2>
-  <p class="bajada">Diez clases en cinco viñetas.</p>
+  <p class="bajada">Nueve clases en cinco viñetas.</p>
   <ul>
     <li>Clases 1-4: una función es una <strong>máquina con perillas</strong>, y girarlas
         sola cuesta abajo es todo el aprendizaje automático.</li>
@@ -124,22 +125,27 @@
   <p class="bajada">Los términos con más peso, leídos directamente de los coeficientes.</p>
   <table class="compacta">
     <tr><th>peso</th><th>término</th><th>peso</th><th>término</th><th>peso</th><th>término</th><th>peso</th><th>término</th></tr>
-    <tr><td>+1,10</td><td>presidencial</td><td class="c-error">+0,74</td><td class="c-error">lópez</td><td>+0,69</td><td>federal</td><td class="c-error">+0,66</td><td class="c-error">morena</td></tr>
-    <tr><td class="c-error">+0,92</td><td class="c-error">pri</td><td class="c-error">+0,73</td><td class="c-error">meade</td><td>+0,67</td><td>país</td><td>+0,65</td><td>ejecutivo</td></tr>
-    <tr><td>+0,86</td><td>caso</td><td>+0,70</td><td>políticos</td><td class="c-error">+0,67</td><td class="c-error">amlo</td><td>+0,64</td><td>candidato</td></tr>
+    <tr><td>+1,10</td><td>presidencial</td><td class="c-error">+0,74</td><td class="c-error">★ lópez</td><td>+0,69</td><td>federal</td><td class="c-error">+0,66</td><td class="c-error">★ morena</td></tr>
+    <tr><td class="c-error">+0,92</td><td class="c-error">★ pri</td><td class="c-error">+0,73</td><td class="c-error">★ meade</td><td>+0,67</td><td>país</td><td>+0,65</td><td>ejecutivo</td></tr>
+    <tr><td>+0,86</td><td>caso</td><td>+0,70</td><td>políticos</td><td class="c-error">+0,67</td><td class="c-error">★ amlo</td><td>+0,64</td><td>candidato</td></tr>
     <tr><td>+0,84</td><td>gobierno</td><td>+0,70</td><td>presidente</td><td>+0,67</td><td>va</td><td>+0,62</td><td>gobernador</td></tr>
   </table>
   <div class="ojo compacta">
-    En <span class="c-error">rojo</span>: <strong>nombres propios</strong> de la política
-    mexicana de 2018-2021. <strong>Cinco de los dieciséis</strong> que ves acá, y
-    <strong>seis de los veinte</strong> del top completo. Uno de cada tres.
+    En <span class="c-error">rojo y con ★</span>: <strong>nombres propios</strong> de la política
+    mexicana alrededor de la elección de 2018. <strong>Cinco de los dieciséis</strong> que ves
+    acá, y <strong>seis de los veinte</strong> del top completo. Uno de cada tres.
   </div>
-  <p>Este no es un detector de «política». Es un detector de
-    <strong>¿aparecen nombres de la coyuntura mexicana reciente?</strong></p>
+  <p>Un tercio del top son nombres de una coyuntura: <strong>sospechoso</strong>. La hipótesis
+    incómoda: ¿esto detecta política, o detecta <strong>«aparecen nombres de la coyuntura
+    mexicana»</strong>? <em>Todavía es una hipótesis: la vamos a testear.</em></p>
   <aside class="notes">
     2 min. Leé los términos en voz alta, despacio. Que el aula escuche «pri, lópez, meade,
     amlo, morena». Preguntá: «¿esto es una señal del concepto o es una guía telefónica?».
-    No des vos la conclusión: dejá que la digan.
+    No des vos la conclusión: dejá que la digan. Y marcá que es una <b>hipótesis</b>: los
+    otros catorce del top 20 son vocabulario político genérico. En el notebook (§7) se testea
+    reentrenando sin los nombres, y el resultado es mejor lección que la sospecha: el control
+    positivo sube de 22 a 32 %. Los nombres explican una parte; el resto es dominio y género
+    textual.
   </aside>
 </section>
 
@@ -147,8 +153,8 @@
 <section>
   <span class="marca">el segundo pliegue</span>
   <h3>Y ahora el golpe</h3>
-  <p>Agarramos <strong>600 fragmentos de discursos presidenciales argentinos</strong>
-     (2015-2024, reales) y se los damos al mismo modelo, sin tocarle nada.
+  <p>Agarramos <strong>824 oraciones de discursos presidenciales argentinos</strong>
+     (2015-2024, reales) y se las damos al mismo modelo, sin tocarle nada.
      Son, por definición, <strong>100 % política</strong>.</p>
   <div class="comparacion contra">
     <div>
@@ -157,15 +163,19 @@
     </div>
     <div>
       <h4>En un corpus 100 % político</h4>
-      <p><span class="numeron">21</span> de cada 100. <em>Tendría que dar 100.</em></p>
+      <p><span class="numeron">22</span> de cada 100. <em>Tendría que dar 100.</em></p>
     </div>
   </div>
   <div class="aha compacta">
     El modelo no cambió ni una coma. Cambió <strong>dónde lo medimos</strong>.
+    <em>(Y no es sólo que las oraciones son cortas: en oraciones del mismo largo de sus
+    propias notas encuentra 49 de cada 100.)</em>
   </div>
   <aside class="notes">
     1 min. Este es el momento de la clase. Dejá tres segundos de silencio después de mostrar
-    el 21. Si alguien dice «pero eso es porque es otro país», tenés razón y ese ES el hallazgo:
+    el 22. Si alguien objeta que se entrenó con notas enteras y acá le damos oraciones
+    sueltas, tiene razón y está medido: en oraciones sueltas de sus propias notas de política
+    encuentra 49 de cada 100. La comparación justa es 49 contra 22. Si alguien dice «pero eso es porque es otro país», tenés razón y ese ES el hallazgo:
     el modelo mide vocabulario de una coyuntura, y por eso no sirve para comparar corpus.
   </aside>
 </section>
@@ -179,14 +189,17 @@
     <strong>etiqueta sustantiva que le colgamos encima</strong>: la frase «esto mide contenido
     político» que escribimos al lado del número.
   </div>
-  <p>Y por eso <strong>no se arregla con más datos ni con un modelo mejor</strong>. Un
-     transformer entrenado sobre el mismo corpus con las mismas etiquetas aprendería el mismo
-     atajo, más rápido y con un F1 más alto.</p>
+  <p>Y por eso <strong>no se arregla sólo con más datos ni con un modelo mejor</strong>. Un
+     transformer entrenado sobre el mismo corpus con las mismas etiquetas <em>puede</em>
+     aprender el mismo atajo, y un F1 más alto no te dice si lo hizo: eso sólo lo dice
+     medirlo donde lo vas a usar.</p>
   <p class="c-acento"><strong>Este es el error que vamos a atacar hoy.</strong></p>
   <aside class="notes">
     1 min. Insistí con esto porque es contraintuitivo: la reacción natural del aula es
-    «entonces hay que usar un modelo mejor». No. El problema no está en el modelo, está en
-    la inferencia. Un modelo mejor lo empeora, porque encuentra el atajo más rápido.
+    «entonces hay que usar un modelo mejor». No alcanza. El problema no está en el modelo,
+    está en la inferencia. Un modelo preentrenado puede transferir mejor (trae conocimiento de
+    afuera del corpus) o puede encontrar el mismo atajo; lo que no cambia es que el F1 en el
+    propio test no distingue entre las dos cosas.
   </aside>
 </section>
 
@@ -208,7 +221,8 @@
       <p class="c-error"><em>Pregunta abierta, respuesta argumentativa.</em></p>
     </div>
   </div>
-  <p>Un modelo puede tener <strong>desempeño perfecto y validez nula</strong>. Acabamos de ver uno.</p>
+  <p>Un modelo puede tener <strong>buen desempeño y validez muy baja</strong>. Acabamos de ver uno:
+    desempeño aceptable en su test, y 22 de cada 100 fuera de su corpus.</p>
   <aside class="notes">
     2 min. La frase que hay que dejar clavada: «la métrica te dice que el modelo reproduce
     tus etiquetas. No te dice nada sobre si tus etiquetas miden tu concepto». Repetila dos veces.
@@ -352,7 +366,9 @@
       Sin esto, tu F1 mide acuerdo con quien etiquetó el corpus, no validez.</p></div>
   </div>
   <div class="ss compacta">Es la parte cara y es la que hace investigación. Nadie publicaría
-    un análisis de contenido sin haber leído nada.</div>
+    un análisis de contenido sin haber leído nada. <em>Un detalle:</em> si muestreás
+    estratificado, después <strong>reponderás cada estrato por su tamaño en el corpus</strong>;
+    si no, el recall y la prevalencia que calcules salen sesgados.</div>
   <aside class="notes">
     1 min. Preguntá: «¿cuántas horas de codificación pueden pagar en su proyecto?». La
     respuesta suele ser «ninguna», y ahí conviene decir que 1,7 horas no es «ninguna»:
@@ -402,19 +418,21 @@
     </div>
   </div>
   <pre><code class="language-python" data-trim>
-# el control positivo de hoy, tal cual está en el notebook (sección 7)
+# el control positivo de hoy: líneas copiadas tal cual del notebook (sección 7)
 marcados = modelo.predict(vec.transform(fragmentos))
-print(f"{len(fragmentos)} fragmentos de discursos presidenciales argentinos.")
-print(f"Son 100 % política: el modelo TENDRÍA que marcar el 100 %.")
-print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
+print(f"{len(fragmentos)} fragmentos sacados de {len(discursos)} discursos presidenciales argentinos.")
+print("Son 100 % política: el modelo TENDRÍA que marcar el 100 %.")
+print(f"Marcó el {marcados.mean() * 100:.0f} %.\n")          # -> Marcó el 22 %.
 </code></pre>
   <div class="ss compacta">El control positivo casi nunca aparece en un paper, y casi siempre
     es el que más duele. Por eso vale la pena hacerlo <strong>antes</strong> de escribir.</div>
   <aside class="notes">
-    1 min. El código es el mismo que corre en el notebook, sección 7. Aclarar que el placebo
-    barato de todos —barajar las palabras— con una bolsa de palabras da 100 % de predicciones
-    idénticas por construcción, y que ese mismo test corrido sobre un transformer sí es
-    informativo. Es el puente con la clase 7.
+    1 min. El código es el mismo que corre en el notebook, sección 7. El placebo de hoy son
+    las notas de Deporte y Espectáculos del test: marca 7 de 65, cuatro de ellas con
+    nombres de políticos adentro («peña» dos veces, «anaya», «amlo»). Aclarar que barajar las palabras <b>no</b> es un placebo sino un test de
+    invariancia (el fenómeno sigue en el texto): con una bolsa de palabras da 100 % de
+    predicciones idénticas por construcción, y ese mismo test corrido sobre un transformer sí
+    es informativo. Es el puente con la clase 7.
   </aside>
 </section>
 
@@ -428,10 +446,10 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
     <tr><td>negación · «aprobó» → «no aprobó»</td><td>0,800</td><td>0,759</td><td class="c-error">−0,04</td></tr>
     <tr><td>cambio de país · Morena → Frente Amplio</td><td>0,773</td><td>0,516</td><td class="c-error">−0,26</td></tr>
     <tr><td>cambio de agente · ministro → cantante</td><td>0,546</td><td>0,392</td><td class="c-error">−0,15</td></tr>
-    <tr><td><strong>mismo tema, otras palabras</strong></td><td>0,713</td><td>0,317</td><td class="c-error">−0,40</td></tr>
+    <tr><td><strong>paráfrasis · mismo tema, otras palabras</strong></td><td>0,713</td><td>0,317</td><td class="c-error">−0,40</td></tr>
   </table>
   <div class="ojo compacta">
-    La <strong>negación no mueve nada</strong> (es una bolsa de palabras: no lee, cuenta).
+    La <strong>negación casi no mueve nada</strong> (es una bolsa de palabras: no lee, cuenta).
     Y la misma noticia contada con <strong>otras palabras</strong> se cae del otro lado del
     umbral. Las dos cosas dicen lo mismo: mide vocabulario, no tema.
   </div>
@@ -471,23 +489,29 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
   <span class="marca">antes de todo lo anterior</span>
   <h3>Cuánto se mueve tu número <em>sin hacer nada</em></h3>
   <p class="bajada">Repetimos todo <strong>25 veces</strong> cambiando una sola cosa: la
-     semilla de la partición. Mismo corpus, mismo modelo, mismo código.</p>
-  <div class="panel-metricas">
-    <div><span class="numeron c-modelo">0,68</span><span class="et">F1 medio</span></div>
-    <div><span class="numeron c-val">0,026</span><span class="et">desvío</span></div>
-    <div><span class="numeron chico c-error">0,63–0,73</span><span class="et">del peor al mejor</span></div>
-    <div><span class="numeron c-error">0,107</span><span class="et">el rango: tu ruido</span></div>
-  </div>
+     semilla de la partición. El F1 del modelo: <strong>0,68 ± 0,026</strong> (de 0,63 a 0,73).</p>
+  <table class="compacta">
+    <tr><th>qué le sacamos al corpus</th><th>con UNA partición</th><th>25 particiones, diferencia pareada</th><th>¿se distingue de cero?</th></tr>
+    <tr><td>los 5 términos más fuertes</td><td class="c-error">+0,033 <em>(¡«mejora»!)</em></td><td>−0,010 · IC [−0,035; +0,014]</td><td>no</td></tr>
+    <tr><td>los 19 nombres propios</td><td>−0,014</td><td>−0,014 · IC [−0,030; +0,001] · bajó en 21 de 25</td><td>casi: chico y consistente</td></tr>
+    <tr><td>los 20 términos más fuertes</td><td>+0,003</td><td>−0,030 · IC [−0,054; −0,006] · bajó en 22 de 25</td><td class="c-ok">sí</td></tr>
+  </table>
   <div class="aha compacta">
-    Y el chiste malo: <strong>la ablación</strong> —el test que recomienda toda la literatura—
-    movió el F1 como mucho <strong>0,033</strong>. <em>Menos de un tercio del ruido.</em>
+    La trampa es comparar la ablación con el <strong>rango</strong> del F1 (0,107) y decir
+    «todo es ruido». Pero original y ablación se evalúan sobre <strong>la misma</strong>
+    partición: el error que importa es el <strong>de la diferencia</strong>, y es más chico:
+    desvío de 0,011 a 0,020, contra 0,026 del F1 suelto.
   </div>
-  <p class="c-acento"><strong>Un test que se mueve menos que el ruido no es un test.</strong></p>
+  <p class="c-acento"><strong>No interpretes una diferencia sin su error. Y medí el error de la
+    comparación que hacés.</strong></p>
   <aside class="notes">
     2 min, y es probablemente la slide más útil de la clase para su trabajo diario. Es
-    estadística que ya saben —no se interpreta una diferencia sin su error— aplicada a un
-    lugar donde nadie la aplica. Preguntá: «¿cuántos papers vieron que reporten un F1 con
-    intervalo?». Silencio. Ese silencio es el punto.
+    estadística que ya saben —no se interpreta una diferencia sin su error, y un diseño
+    pareado se analiza pareado— aplicada a un lugar donde nadie la aplica. Leé la primera
+    fila: con una sola partición, habríamos publicado que sacarle al modelo sus cinco mejores
+    palabras lo <i>mejora</i>. El intervalo usa la corrección de Nadeau y Bengio (2003) porque
+    las 25 particiones comparten notas. Preguntá: «¿cuántos papers vieron que reporten un F1
+    con intervalo?». Silencio. Ese silencio es el punto.
   </aside>
 </section>
 
@@ -528,13 +552,16 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
   <div class="ojo compacta">
     <strong>«El sesgo se arregla balanceando los datos» es falso dos veces:</strong> no toca
     el del mundo, no toca el introducido, y encima puede distorsionar la estimación de
-    prevalencia, que muchas veces era justo lo que querías medir.
+    prevalencia, que muchas veces era justo lo que querías medir. <em>El modelo de hoy entrena
+    balanceado: contando sus predicciones, da 24,7 % de política donde hay 28,0 %.</em>
   </div>
   <aside class="notes">
     3 min. La analogía que funciona: un termómetro mal calibrado y un país que realmente hace
     calor son dos problemas distintos, y confundirlos produce tanto negación («es sólo el
     reflejo de la realidad») como magia («arreglemos el modelo y arreglamos el mundo»).
-    Pedí un ejemplo de cada tipo del campo de ellos.
+    Pedí un ejemplo de cada tipo del campo de ellos. Si alguien quiere estimar proporciones
+    con un clasificador: la corrección se llama <i>classify-and-count</i> ajustado y necesita
+    recall y tasa de falsos positivos medidos en una muestra validada (notebook §9).
   </aside>
 </section>
 
@@ -576,8 +603,9 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
   </div>
   <div class="ojo compacta">
     Y al revés: buena parte del «efecto de género» de esa viz sale del <strong>artículo</strong>
-    («los» pesa −0,34; «las» −0,14), no del sustantivo. Reportarlo sin decirlo sería
-    técnicamente cierto y sustantivamente engañoso.
+    («los» pesa −0,34; «las» −0,14), no del sustantivo: en 6 de los 10 pares del notebook, <strong>todo</strong>
+    sale del artículo. Reportarlo sin decirlo sería técnicamente cierto y sustantivamente
+    engañoso.
   </div>
   <aside class="notes">
     1 min. Esta slide es la que distingue una auditoría hecha con criterio de una hecha por
@@ -608,10 +636,13 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
       ¿cambia según el uso?</li>
   </ol>
   <aside class="notes">
-    1 min de consignas y 20 de notebook. Recorré las mesas. La consigna que más cuesta es el TODO 5: van a escribir pares
-    que cambian dos cosas a la vez. Corregilo en el momento, es el corazón del diseño
-    experimental. Anotá en el pizarrón dos o tres pares buenos que veas para leerlos después
-    de la pausa. A los 15 minutos avisá que quedan 5.
+    1 min de consignas y 20 de notebook. Recorré las mesas. Siendo realistas, en 20 minutos
+    la mayoría llega al TODO 5 y no más: está bien. El TODO 6 se retoma al volver de la pausa,
+    en la slide 25, que pregunta exactamente eso. La consigna que más cuesta es el TODO 5: van
+    a escribir pares que cambian dos cosas a la vez (el par precargado de «mañana» → «tarde»
+    sirve de ejemplo de uno que cambia una sola y aun así falla). Corregilo en el momento, es
+    el corazón del diseño experimental. Anotá en el pizarrón dos o tres pares buenos que veas
+    para leerlos después de la pausa. A los 15 minutos avisá que quedan 5.
   </aside>
 </section>
 
@@ -683,7 +714,8 @@ print(f"Marcó el {marcados.mean() * 100:.0f} %.")          # -> Marcó el 21 %.
   <pre><code class="language-python" data-trim>
 print(bloque_de_reproducibilidad(
     SEMILLA, modelo=modelo,
-    datos_descriptos="Spanish Fake News Corpus 2.0 (CC BY 4.0), prensa nov-2020 a mar-2021",
+    datos_descriptos=("Spanish Fake News Corpus 2.0 (CC BY 4.0): 971 notas recolectadas "
+                      "en ene-jul 2018 + 500 en nov-2020 a mar-2021"),
     n_casos=len(notas), textos=documentos))
 # -> fecha, semilla, versiones, hash del corpus, hash de los pesos, n de parámetros
 </code></pre>
@@ -694,8 +726,11 @@ print(bloque_de_reproducibilidad(
   <aside class="notes">
     3 min. La función está en la sección 10 del notebook y es literalmente para copiar y pegar
     en sus proyectos. Mencioná el TODO 7 —correr el notebook entero de nuevo y comparar
-    números— porque casi siempre encuentra una fuente de aleatoriedad suelta, y esa
-    experiencia enseña más que esta slide.
+    números—: en este notebook todas las fuentes de azar están fijadas salvo una, puesta a
+    propósito en la celda del TODO 7 para que la encuentren. En sus propios proyectos casi
+    siempre aparece alguna suelta, y esa experiencia enseña más que esta slide. Aclarar
+    también qué <i>no</i> garantiza la semilla: en otra máquina o con otra versión de las
+    librerías los números pueden cambiar un poco; por eso el bloque anota las versiones.
   </aside>
 </section>
 
@@ -878,7 +913,7 @@ print(bloque_de_reproducibilidad(
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> apretá <em>modo revisor</em> con el formulario vacío y
     mirá las objeciones. Después <em>completar con el ejemplo de hoy</em> y mirá el párrafo de
-    métodos armándose solo. <strong>Esto se lo llevan y lo usan el lunes.</strong></p>
+    métodos armándose solo. <strong>Esto se lo llevan y lo usan en su próximo paper.</strong></p>
   <aside class="notes">
     3 min. Completá dos o tres campos en vivo, en el proyector, para que vean el párrafo
     cambiando. La demostración fuerte es la inversa: mostrá el formulario vacío en modo
@@ -961,26 +996,28 @@ print(bloque_de_reproducibilidad(
 
 <!-- ======================= 38 · QUÉ TE LLEVÁS ======================= -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué te llevás</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué te llevás a tu investigación</h2>
   <ol class="lista-numerada">
     <li><strong>Desempeño no es validez.</strong> La métrica dice que el modelo reproduce tus
       etiquetas. No dice nada sobre si tus etiquetas miden tu concepto.</li>
-    <li><strong>La validez se demuestra con intervenciones, no con métricas.</strong> Y antes
-      de cualquier intervención, medí tu banda de ruido.</li>
+    <li><strong>La validez se demuestra con intervenciones, no con métricas.</strong> Y ninguna
+      diferencia se interpreta sin su error: el de la comparación que hacés.</li>
     <li><strong>El instrumento se reporta.</strong> Ficha del modelo, semilla, versiones,
       auditoría por subgrupo, y para qué <em>no</em> hay que usarlo.</li>
   </ol>
   <div class="manos">
-    <strong>El lunes.</strong> Agarrá el último análisis que hiciste con un modelo —tuyo o de
-    otro— y correle dos cosas: <strong>el control positivo</strong> (aplicalo donde el
+    <strong>En tu investigación, después del curso.</strong> Agarrá el último análisis que
+    hiciste con un modelo —tuyo o de otro— y correle dos cosas: <strong>el control positivo</strong> (aplicalo donde el
     fenómeno tiene que estar) y <strong>tres pares mínimos</strong> escritos a mano.
     Veinte minutos. Si sobrevive, tenés un párrafo nuevo de métodos. Si no sobrevive,
     te enteraste vos antes que el revisor 2.
   </div>
   <aside class="notes">
-    2 min. Sólo tres ideas: si decís siete, no se llevan ninguna. El bloque del lunes es
-    deliberadamente chiquito y cronometrado (veinte minutos) porque una tarea grande no se hace.
+    2 min. Sólo tres ideas: si decís siete, no se llevan ninguna. El bloque <i>en tu
+    investigación</i> es deliberadamente chiquito y cronometrado (veinte minutos) porque una
+    tarea grande no se hace. Es la última clase: no hay «para la próxima», así que
+    presentalo como lo primero que hacen con su propio análisis cuando se vayan.
   </aside>
 </section>
 
@@ -1031,32 +1068,8 @@ print(bloque_de_reproducibilidad(
 <script src="../../_shared/vendor/reveal/plugin/highlight/highlight.js"></script>
 <script src="../../_shared/vendor/reveal/plugin/zoom/zoom.js"></script>
 <script src="../../_shared/vendor/reveal/plugin/search/search.js"></script>
-<script src="../../_shared/vendor/katex/katex.min.js"></script>
-<script src="../../_shared/vendor/katex/auto-render.min.js"></script>
 <script src="../../_shared/js/viz.js"></script>
 <script>
-  const MateLocal = () => ({
-    id: 'mate-local',
-    init: (deck) => {
-      const pintar = () => {
-        if (window.renderMathInElement) {
-          renderMathInElement(deck.getSlidesElement(), {
-            delimiters: [
-              { left: '$$', right: '$$', display: true },
-              { left: '$',  right: '$',  display: false },
-              { left: '\\[', right: '\\]', display: true },
-              { left: '\\(', right: '\\)', display: false }
-            ],
-            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            throwOnError: false
-          });
-          deck.layout();
-        }
-      };
-      deck.isReady() ? pintar() : deck.on('ready', pintar);
-    }
-  });
-
   Reveal.initialize({
     hash: true,
     slideNumber: 'c/t',
@@ -1071,7 +1084,7 @@ print(bloque_de_reproducibilidad(
     transition: 'fade',
     transitionSpeed: 'fast',
     backgroundTransition: 'none',
-    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch, MateLocal]
+    plugins: [RevealNotes, RevealHighlight, RevealZoom, RevealSearch]
   });
 </script>
 </body>

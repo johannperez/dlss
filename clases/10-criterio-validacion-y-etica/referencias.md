@@ -100,6 +100,14 @@ Learning*. Political Analysis 29(1), 19-42.** `[VERIFICAR URL]`
 > empírica** a la pregunta «¿cuántos casos hay que etiquetar a mano?», que es la que más se
 > hace en esta clase y la que menos respuesta tiene. Andá directo a esa sección.
 
+**11. Nadeau, C. & Bengio, Y. (2003). *Inference for the Generalization Error*. Machine
+Learning 52(3), 239-281.** `[VERIFICAR URL]`
+> De acá sale la corrección que usa la sección 5 del notebook para el intervalo de la
+> diferencia pareada: cuando repetís una comparación sobre particiones al azar del mismo
+> corpus, las repeticiones comparten datos y el error estándar ingenuo es optimista. El paper
+> es técnico; lo que hace falta es la fórmula (varianza × (1/J + n_test/n_train)) y la idea de
+> por qué. **Para cuando tengas que defender una diferencia chica entre dos modelos.**
+
 ---
 
 ## Herramientas y material del propio curso
@@ -113,7 +121,8 @@ Gómez-Adorno, H., Posadas-Durán, J. P., Bel-Enguix, G. & Porto-Capetillo, C. (
 > Leé el README del repositorio: la descripción de cómo se recolectó y se etiquetó es
 > justamente la información que la clase te enseñó a pedir. Y después mirá `datos/README.md`
 > §1.3, donde están medidas las trampas del corpus: la fuente que predice la etiqueta al
-> 96 %, las mayúsculas, el largo. **Es el mejor ejercicio de lectura crítica de datos del
+> 96 %, las mayúsculas, el largo, y que son **dos recolecciones de dos épocas** pegadas
+> (enero-julio de 2018 y noviembre de 2020 a marzo de 2021). **Es el mejor ejercicio de lectura crítica de datos del
 > curso, porque los dos textos hablan del mismo corpus con distinto nivel de sospecha.**
 
 **Los discursos presidenciales del control positivo.**
@@ -136,7 +145,8 @@ Recopilación de J. M. Diéguez, discursos de Casa Rosada 2015-2024:
 **`medir-clase10.py`** y **`exportar-figuras.py`** — en esta misma carpeta.
 > Todos los números de las slides y de las visualizaciones salen del primero, y las cinco
 > figuras salen del segundo, que **corre el notebook** en vez de copiarle el código. Los dos
-> tardan menos de un minuto. **Es el modelo de lo que tu propio proyecto debería tener**: un archivo que
+> tardan menos de un minuto, y son deterministas en la misma máquina y con las mismas
+> versiones de las librerías (el JSON anota con cuáles se midió). **Es el modelo de lo que tu propio proyecto debería tener**: un archivo que
 > reproduce cada número que afirmás, y que se puede correr de nuevo para comprobarlo. Abrilo
 > aunque no vayas a modificarlo.
 
@@ -151,7 +161,7 @@ paquete: `https://pypi.org/project/scikit-learn/` `[VERIFICADA 2026-08-29]`
 ## Y una cosa que no es una lectura
 
 **Hacé un proyecto chico con tus datos.** Uno que puedas terminar en un mes, con su semilla,
-su ficha del modelo y su párrafo de métodos completo. Va a enseñarte más que los diez títulos
+su ficha del modelo y su párrafo de métodos completo. Va a enseñarte más que los once títulos
 de arriba juntos, porque las decisiones difíciles de esta clase —qué es un atajo, cuántos
 casos leer, qué reportar— sólo aparecen cuando el corpus es tuyo y la pregunta te importa.
 

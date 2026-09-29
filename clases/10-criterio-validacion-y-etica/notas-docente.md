@@ -13,12 +13,16 @@
 1. Mostramos un clasificador que **anda**: accuracy 0,83, F1 0,68, le gana al piso por 0,11.
 2. Preguntamos al aula si tiene objeciones. No las tiene. **Esto se publica.**
 3. Miramos qué usa: **seis de los veinte** términos que más pesan son **nombres propios
-   mexicanos de 2018-2021**. Uno de cada tres.
-4. Se lo aplicamos a discursos presidenciales argentinos, que son 100 % política: encuentra el **21 %**.
+   de la política mexicana alrededor de 2018**. Uno de cada tres. Es una **hipótesis**, no
+   un veredicto: el notebook la testea después (sin nombres, el control positivo sube de 22
+   a 32 %: explican una parte, no todo).
+4. Se lo aplicamos a oraciones de discursos presidenciales argentinos, que son 100 % política:
+   encuentra el **22 %** (contra 49 % en oraciones del mismo largo de su propio corpus).
 5. Y decimos la frase incómoda: **el modelo no falló**. Falló la etiqueta que le colgamos.
 6. Nombramos la distinción: **desempeño** (¿acierta?) contra **validez** (¿mide lo que digo?).
 7. Y devolvemos el terreno: validez de constructo es de ellos, tiene 70 años, y acá tienen ventaja.
-8. Damos los cinco procedimientos, más el que nadie hace: **medir la banda de ruido primero**.
+8. Damos los cinco procedimientos, más el que nadie hace: **medir el error de la comparación**
+   (la diferencia pareada entre particiones, no el rango del F1 suelto).
 9. Auditamos sesgo con un procedimiento, no con una opinión, y aprendemos que **ceguera no es equidad**.
 10. Cerramos con lo accionable: reproducibilidad, ética con casos, el juicio, cuándo **no** usar
     esto, y el checklist que se llevan.
@@ -36,10 +40,10 @@ tocás uno, tocá el otro.
 | Min | Bloque | Slides | Qué pasa |
 |---|---|---|---|
 | **0-10** | **Gancho** | 1-6 | Portada (1), el puente desde la clase 9 (2), el panel de métricas y *«¿alguien tiene una objeción?»* (3), los dos pliegues (4-5), «el modelo no falló» (6). |
-| **10-30** | **Validez** | 7-18 | Desempeño ≠ validez (7), ustedes tienen ventaja (8), el abismo (9), **VIZ 1, 5 min** (10), contenido y externa (11), los cinco procedimientos (12), uno por uno (13-17), **la banda de ruido** (18). |
+| **10-30** | **Validez** | 7-18 | Desempeño ≠ validez (7), ustedes tienen ventaja (8), el abismo (9), **VIZ 1, 5 min** (10), contenido y externa (11), los cinco procedimientos (12), uno por uno (13-17), **el error de la comparación** (18). |
 | **30-38** | **Sesgo** | 19-22 | Los tres sesgos (20), **VIZ 2, 4 min** (21), ceguera no es equidad (22). |
 | **38-39** | Consignas del práctico 1 | 23 | |
-| **39-59** | **MANOS 1 · la auditoría** | — | Notebook, secciones 1 a 9, de a dos. **20 minutos.** |
+| **39-59** | **MANOS 1 · la auditoría** | — | Notebook, secciones 1 a 9, de a dos. **20 minutos.** Siendo realistas, la mayoría llega al `TODO 5`; el `TODO 6` se retoma en la slide 25. |
 | **59-69** | **PAUSA** | 24 | **No negociable.** |
 | **69-71** | El sesgo como hallazgo | 25 | Antídoto contra la sobrecorrección. |
 | **71-76** | Reproducibilidad | 26-28 | El checklist (27) y los modelos cerrados (28). |
@@ -50,7 +54,7 @@ tocás uno, tocá el otro.
 | **111-113** | Las seis objeciones | 35 | La versión que se memoriza. |
 | **113-115** | El mapa del curso | 36 | Las diez clases, una frase cada una. |
 | **115-116** | Glosario | 37 | Rápido: señalá dos términos y seguí. |
-| **116-118** | Qué te llevás | 38 | Tres ideas y el bloque del lunes. |
+| **116-118** | Qué te llevás | 38 | Tres ideas y el bloque *en tu investigación*. |
 | **118-119** | Adónde seguir | 39 | |
 | **119-120** | Cierre | 40 | La frase sola en la pantalla. |
 
@@ -73,11 +77,11 @@ tocás uno, tocá el otro.
 | Momento | La pregunta | Qué hacer con lo que digan |
 |---|---|---|
 | Slide 3 | **«¿Alguien tiene una objeción? Esto se publica.»** | Van a preguntar por el piso, por la partición, por el n. Todo está contestado. Ese es el punto: **con ese panel adelante, un revisor razonable lo aprueba.** No pases de slide hasta que alguien diga «se ve bien». |
-| Slide 4 | «¿Esto es una señal del concepto o es una guía telefónica?» | No des vos la conclusión. Esperá. Alguien la dice. |
+| Slide 4 | «¿Esto es una señal del concepto o es una guía telefónica?» | No des vos la conclusión. Esperá. Alguien la dice. Y después marcá que es una **hipótesis**: 14 de los 20 términos son vocabulario político genérico, y el notebook la testea (§7). |
 | Slide 9 | «¿Cómo demostrarían que una escala de anomia mide anomia?» | Lo que contesten **son** los cinco procedimientos que vienen. Anotalos en el pizarrón y después mostrá la coincidencia: es el momento en que se dan cuenta de que ya sabían. |
 | VIZ 1, caso 2 | «¿Cómo lo arreglarían?» | Van a proponer cosas razonables (partir por año, entrenar en un período). Mostrá que ninguna funciona con esos datos. **Que el arreglo no exista es la lección.** |
 | Slide 14 | Leé los cinco falsos positivos y preguntá caso por caso, a mano alzada: «¿esto es política?» | Se van a partir en el titular de Biden y en el de las abuelas. Ahí decís: «su F1 está midiendo el desacuerdo entre ustedes y quien codificó el corpus». |
-| Slide 18 | «¿Cuántos papers vieron que reporten un F1 con intervalo?» | Silencio. El silencio es el argumento. |
+| Slide 18 | «¿Cuántos papers vieron que reporten un F1 con intervalo?» | Silencio. El silencio es el argumento. Después leé la primera fila de la tabla: con una partición, sacar los cinco mejores términos «mejora» el F1; con 25 particiones pareadas, no se distingue de cero. |
 | Slide 20 | «Denme un ejemplo de cada uno de los tres sesgos, de su campo.» | El del mundo es fácil, el introducido es el que cuesta. Si nadie lo encuentra, dales el umbral. |
 | Slide 22 | «Si les muestro una tabla donde todos los grupos sacan el mismo puntaje, ¿qué concluyen?» | La respuesta ingenua es «no hay sesgo». La correcta es «fijate si el modelo conoce esas palabras». |
 | Slide 29 | Una mano a favor y una en contra por caso. | El desacuerdo real es la demostración de que la ética no es un trámite. |
@@ -93,9 +97,11 @@ etiquetas miden tu concepto».* Repetila dos veces en la clase, con diez minutos
 
 **2. «Entonces hay que usar un modelo mejor.»**
 Aparece siempre después del gancho, y es la reacción natural. Respuesta:
-*un transformer entrenado sobre el mismo corpus con las mismas etiquetas aprendería el mismo
-atajo, más rápido y con un F1 más alto.* **Un modelo mejor empeora este problema**, porque
-encuentra el atajo antes. Es contraintuitivo y hay que decirlo despacio.
+*un transformer entrenado sobre el mismo corpus con las mismas etiquetas puede aprender el
+mismo atajo, y un F1 más alto no te dice si lo hizo.* No lo afirmes como un hecho: un modelo
+preentrenado trae conocimiento de afuera del corpus y **podría** transferir mejor a los
+discursos argentinos. Lo que no cambia es que el F1 en el propio test no distingue entre las
+dos cosas; sólo el control positivo lo hace. Es contraintuitivo y hay que decirlo despacio.
 
 **3. «El modelo es objetivo porque es matemático.»**
 Enumerá las cinco decisiones humanas, con los dedos: qué datos, qué etiquetas, qué función de
@@ -185,13 +191,16 @@ que se fue de tiempo, sin tocar nada de la lista de abajo.
 - **El clasificador como escala de actitudes.** Nadie publicaría una escala sin reportar su
   alfa; nadie debería publicar un clasificador sin su matriz de confusión sobre una muestra
   validada. Devuelve el problema a un terreno que ellos manejan.
-- **«La guía telefónica».** Para los nombres propios del top 20. Se entiende al toque.
+- **«La guía telefónica».** Para los nombres propios del top 20. Se entiende al toque. Usala
+  como pregunta, no como veredicto: el notebook muestra que los nombres explican sólo una
+  parte de la falla, y esa corrección de la primera lectura es parte de la lección.
 - **«Es una bolsa de palabras: no lee, cuenta.»** Explica de una vez la negación que no mueve
   el puntaje y el barajado que da predicciones idénticas.
 - **«Ausencia no es neutralidad.»** Para la slide 22. Es la frase que más se repite después,
   según la experiencia.
-- El chiste malo de la slide 18 («y ahora el chiste malo») funciona porque es verdad: el test
-  que recomienda toda la literatura se mueve menos que el ruido. Decilo con cara de póker.
+- **La primera fila de la slide 18.** Con una sola partición, sacarle al modelo sus cinco
+  términos más fuertes lo «mejora» (+0,033). Con 25 particiones y la diferencia pareada, no se
+  distingue de cero. Decilo con cara de póker: es exactamente el hallazgo que se publica.
 
 ---
 
@@ -212,7 +221,9 @@ No hay un número universal y quien te lo dé te está vendiendo algo. El rango 
 prevalencia no muy baja. Con 50 podés detectar un desastre, no medir. Con prevalencia del 5 %
 necesitás muchos más **positivos**, y por eso se muestrea estratificado por la predicción del
 modelo y no al azar puro. Y hay una respuesta empírica en la literatura: Barberá et al. (2021)
-lo miden. Lo importante es reportar el número, sea cual sea.
+lo miden. Lo importante es reportar el número, sea cual sea. Y si muestreaste estratificado,
+**reponderá cada estrato por su tamaño en el corpus** antes de calcular recall o prevalencia:
+si no, salen sesgados.
 
 **«Todo esto es carísimo. En mi proyecto no hay presupuesto para nada de esto.»**
 Entonces la conclusión correcta puede ser **no usar el modelo**, y eso es un resultado
@@ -254,16 +265,22 @@ publicable y a veces un hallazgo.
   archivo, y evita que la mitad del aula se distraiga con la pantalla.
 - **La VIZ 3 guarda en `localStorage`.** Si vas a proyectarla en la máquina del aula, apretá
   *Vaciar* antes de empezar: si no, aparece lo que escribió el docente anterior.
-- **El notebook corre entero en menos de 20 segundos** en CPU y sin red (medido con
-  `nbconvert --execute`, cuatro corridas: **entre 14 y 19 s** de punta a punta según cuán
-  cargada esté la máquina; el bloque más lento son las 25 particiones de la sección 4, que el
-  propio notebook cronometra en **4,2 s**). No hace falta GPU ni Colab pago.
+- **El notebook corre entero en menos de un minuto** en CPU y sin red (medido con
+  `nbconvert --execute` el 2026-09-29: **unos 13 s** de punta a punta en una laptop; el bloque
+  más lento son las 100 ablaciones pareadas de la sección 5, que el notebook cronometra en
+  **unos 6-7 s**, y las 25 particiones de la sección 4 tardan **1,5 s**). En Colab puede
+  tardar el doble. No hace falta GPU ni Colab pago.
   Si el wifi del aula falla, el notebook anda igual: todos los datos salen de `datos/muestras/`.
+- **Los números son deterministas en la misma máquina y con las mismas versiones de las
+  librerías.** Con otra versión de scikit-learn o numpy pueden cambiar un poco (el tercer
+  decimal). `datos-clase10.json` anota con qué versiones se midió (clave `entorno`). Si vas a
+  proyectar el notebook, corrélo antes en tu máquina y proyectá **tu** corrida; si algún número
+  no coincide con las slides, decilo en voz alta: es el `TODO 7` en vivo.
 - Los números de las slides salen de `medir-clase10.py`, y las figuras de `figuras/` las
   produce `exportar-figuras.py` **corriendo el notebook** (no copiando su código). Si tocás el
   notebook, corré los dos y actualizá las slides. Un número inventado en un curso sobre no
   inventar números es el peor error posible.
-- **Dos listas viven duplicadas a propósito y tienen que quedar iguales:** los 18 nombres
+- **Dos listas viven duplicadas a propósito y tienen que quedar iguales:** los 19 nombres
   propios de la ablación y los 17 sujetos de la auditoría de sesgo están escritos tanto en
   `notebook.ipynb` como en `medir-clase10.py`. Si cambiás una, cambiá la otra: dos definiciones
   del mismo experimento son exactamente el error que denuncia la slide 27.
@@ -271,6 +288,17 @@ publicable y a veces un hallazgo.
   Los campos «cuántos casos leíste a mano» y «acuerdo entre codificadores» dicen que no lo
   hicimos, porque no lo hicimos. Si alguien pregunta por qué el ejemplo no está «completo»,
   esa es la respuesta y es la clase entera en una línea.
-- Si el aula pregunta por los datos: el corpus de prensa es **real** y CC BY 4.0; los discursos
-  presidenciales son **reales** y de dominio público sin licencia declarada; Aguasclaras es
-  **sintético** y hay que decirlo cada vez que aparece.
+- Si el aula pregunta por los datos: el corpus de prensa es **real** y CC BY 4.0, y junta dos
+  recolecciones (971 notas de enero a julio de 2018 y 500 de noviembre de 2020 a marzo de
+  2021; `datos/README.md` §1.3); los discursos presidenciales son **reales** y de dominio
+  público sin licencia declarada; Aguasclaras es **sintético** y hay que decirlo cada vez que
+  aparece.
+- **Qué es cada test de la sección 7 del notebook, para no confundirlos en voz alta:** los
+  discursos argentinos son el **control positivo**; las notas de Deporte y Espectáculos del
+  test son el **placebo** (marca 7 de 65; cuatro de esas siete nombran a un político); barajar las
+  palabras es un **test de invariancia**, no un placebo; y Aguasclaras, cuyos titulares son
+  casi todos de política institucional, funciona como **segundo control positivo fuera de
+  dominio** (marca 19 %).
+- **El `TODO 7` tiene una fuente de azar suelta puesta a propósito** (la celda del sorteo de
+  cinco falsos positivos). Es la única del notebook; el resto está fijado. No la «arregles»
+  antes de la clase.

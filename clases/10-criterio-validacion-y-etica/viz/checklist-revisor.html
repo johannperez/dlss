@@ -12,7 +12,7 @@
      descubrirlo hoy que en la revisión."
 
      Es el entregable practico del curso: se completa, se copia el parrafo de
-     metodos, y se usa el lunes.
+     metodos, y se usa en tu proximo proyecto.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -55,6 +55,7 @@
   .salida li.grave b   { color: var(--c-error); }
   .salida li.menor b { color: var(--c-val); }
   .falta { color: var(--c-error); font-weight: 700; }
+  .salida li.declarada b { color: var(--c-parametro); }
 </style>
 </head>
 <body class="curso">
@@ -89,7 +90,8 @@
     <p class="viz-pie">
       El ejemplo precargado es la auditoría <b>que efectivamente hicimos hoy</b>: los números
       salen de <code>medir-clase10.py</code> y del notebook, y donde no hicimos algo —la muestra
-      leída a mano, la doble codificación, la validación externa— <b>dice que no lo hicimos</b>.
+      leída a mano, la doble codificación, la validación externa— <b>dice que no lo hicimos</b>
+      (y el modo revisor lo marca como limitación declarada, no como hueco).
       Está así a propósito: es el párrafo de métodos de este análisis, agujeros incluidos, y
       declararlos es la jugada correcta. Lo que escribas se guarda en tu navegador (y sólo ahí):
       podés cerrar la pestaña y volver.
@@ -113,13 +115,13 @@ const n2 = v => v.toFixed(2);
 const SECCIONES = [
 { id: 'datos', titulo: 'Datos', campos: [
   { id: 'fuente', et: '¿De dónde salen los textos?', pista: 'quién los recolectó, cuándo, con qué método',
-    ej: 'Spanish Fake News Corpus 2.0 (Gómez-Adorno et al., 2021), prensa en castellano recolectada entre noviembre de 2020 y marzo de 2021, CC BY 4.0', fatal: true,
+    ej: 'Spanish Fake News Corpus 2.0 (Gómez-Adorno et al., 2021), CC BY 4.0: prensa en castellano de dos recolecciones, 971 notas de enero a julio de 2018 y 500 de noviembre de 2020 a marzo de 2021', fatal: true,
     revisor: 'No queda claro de dónde provienen los textos ni quién los recolectó. Sin la procedencia no se puede evaluar a qué población se generaliza.' },
   { id: 'n', et: '¿Cuántos casos, y cuántos en cada partición?', pista: 'los números exactos',
     ej: '1471 notas en total; 1103 de entrenamiento y 368 de test',
     revisor: 'Faltan los tamaños exactos de las particiones. Con los n a la vista se puede juzgar la precisión de las métricas reportadas.' },
   { id: 'poblacion', et: '¿Qué población y qué período cubre?', pista: 'y cuál NO',
-    ej: 'prensa digital de México, España, Argentina, Colombia y Chile; cinco meses de pandemia. No cubre otros países ni otros años.', fatal: true,
+    ej: 'prensa digital de México, España, Argentina, Colombia y Chile, en dos ventanas: enero-julio de 2018 (año de elección en México) y noviembre de 2020 a marzo de 2021 (pandemia; las 192 notas de Covid-19 son todas de ahí). No cubre otros países ni otros años.', fatal: true,
     revisor: 'El artículo generaliza más allá del período y la región efectivamente cubiertos. Convendría acotar las afirmaciones o mostrar validación fuera de la ventana.' },
   { id: 'exclusiones', et: '¿Qué casos se excluyeron y por qué?', pista: 'los faltantes casi nunca faltan al azar',
     ej: 'ninguna: entran las 1471 notas del corpus. Del cuerpo de cada nota usamos los primeros 600 caracteres, que es un recorte de preprocesamiento y no una exclusión de casos.',
@@ -137,15 +139,15 @@ const SECCIONES = [
     ej: 'la nota está codificada con el tema «Política» en el corpus fuente; esa codificación la hizo el equipo original, no nosotros', fatal: true,
     revisor: 'Falta la definición operativa: la regla concreta que separa un caso positivo de uno negativo. Distintas reglas producen conclusiones distintas.' },
   { id: 'validadas', et: '¿Cuántos casos leíste y etiquetaste a mano?', pista: 'un número; si es cero, decilo',
-    ej: '0 en este ejercicio: heredamos la codificación de tema del corpus fuente y no leímos una muestra a ciegas. Es la limitación principal del análisis y la declaramos como tal.', fatal: true,
+    ej: '0 en este ejercicio: heredamos la codificación de tema del corpus fuente y no leímos una muestra a ciegas. Es la limitación principal del análisis y la declaramos como tal.', fatal: true, limitacion: true,
     revisor: 'No se reporta validación manual. Una métrica contra etiquetas heredadas mide acuerdo con esas etiquetas, no validez de la medida.' },
   { id: 'acuerdo', et: '¿Cuánto coinciden dos codificadores?', pista: 'kappa, alfa, o el acuerdo crudo',
-    ej: 'no lo sabemos: la codificación la hizo un solo equipo (el que armó el corpus) y no hay doble codificación. Sin ese número no conocemos el techo realista del F1.',
+    ej: 'no lo sabemos: la codificación la hizo un solo equipo (el que armó el corpus) y no hay doble codificación. Sin ese número no conocemos el techo realista del F1.', limitacion: true,
     revisor: 'No se informa acuerdo entre codificadores. Ese número es el techo realista del modelo: sin él no se puede interpretar un F1 alto.' }
 ]},
 { id: 'modelo', titulo: 'Modelo', campos: [
   { id: 'arquitectura', et: '¿Qué modelo, en qué versión exacta?', pista: 'nombre, versión y revisión — un modelo sin versión es un libro sin edición',
-    ej: 'regresión logística sobre bolsa de palabras binaria (scikit-learn 1.x, class_weight="balanced")', fatal: true,
+    ej: 'regresión logística sobre bolsa de palabras binaria (scikit-learn ' + D.entorno.sklearn + ', class_weight="balanced")', fatal: true,
     revisor: 'No se identifica el modelo con su versión o revisión exacta. Con modelos que cambian sin aviso, el resultado no es reproducible.' },
   { id: 'piso', et: '¿Cuál es el piso de comparación?', pista: 'la clase mayoritaria, un diccionario, una regresión simple',
     ej: 'decir siempre «no es política» da accuracy ' + n2(D.modelo.piso) + '; el modelo da ' + n2(M.accuracy), fatal: true,
@@ -154,7 +156,7 @@ const SECCIONES = [
     ej: 'partición estratificada al azar 75/25, semilla 1983. Para la tarea de veracidad además partimos por medio, porque la fuente predice la etiqueta.', fatal: true,
     revisor: 'La partición al azar sobre datos agrupados (mismo medio, mismo autor, mismo período) infla las métricas. Convendría reportar también una partición por grupo.' },
   { id: 'umbral', et: '¿Dónde cortaste, y por qué ahí?', pista: 'el 0,5 por defecto también es una decisión',
-    ej: '0,5 por defecto, porque nos interesa estimar prevalencia y no priorizar ninguno de los dos errores',
+    ej: '0,5 por defecto. No lo usamos para estimar prevalencia: con class_weight="balanced", contar predicciones da ' + (D.prevalencia_por_conteo.contando_predicciones * 100).toFixed(1).replace('.', ',') + ' % donde hay ' + (D.prevalencia_por_conteo.real_en_test * 100).toFixed(1).replace('.', ',') + ' %; para estimar proporciones corregiríamos el conteo con recall y tasa de falsos positivos medidos en una muestra validada',
     revisor: 'El umbral de decisión no está justificado. Elegirlo es una decisión de investigación: define qué error se prefiere pagar.' }
 ]},
 { id: 'evaluacion', titulo: 'Evaluación', campos: [
@@ -165,10 +167,10 @@ const SECCIONES = [
     ej: 'leímos los 20 falsos positivos de mayor puntaje (de 25 en el test): la mayoría no son errores del modelo sino desacuerdos con la codificación original — elecciones, protestas y subsidios codificados como Sociedad, Internacional o Economía.',
     revisor: 'No hay análisis cualitativo de errores. Leer treinta falsos positivos suele revelar si el problema es del modelo o de la definición de la categoría.' },
   { id: 'placebo', et: '¿Hiciste un test de placebo o casos límite?', pista: 'aplicarlo donde el fenómeno no debería estar; o pares mínimos',
-    ej: 'aplicamos el clasificador a ' + D.placebo.casarosada.n + ' fragmentos de discursos presidenciales argentinos, que son 100 % política: marcó el ' + Math.round(D.placebo.casarosada.proporcion_marcada * 100) + ' %. Además, 8 pares mínimos escritos a mano.', fatal: true,
+    ej: 'control positivo: ' + D.control_positivo.n + ' oraciones de discursos presidenciales argentinos, que son 100 % política; marcó el ' + Math.round(D.control_positivo.proporcion_marcada * 100) + ' % (contra ' + Math.round(D.control_positivo.referencia_mismo_largo.recall * 100) + ' % en oraciones del mismo largo de su corpus). Placebo: marcó ' + D.placebo.marcadas + ' de ' + D.placebo.n + ' notas de Deporte y Espectáculos. Además, 8 pares mínimos escritos a mano', fatal: true,
     revisor: 'No hay evidencia de validez más allá de la métrica en el test. Un test de placebo o un conjunto de pares mínimos mostraría qué está usando el modelo.' },
   { id: 'externa', et: '¿Contrastaste con una medida independiente?', pista: 'encuesta, otra codificación, un evento conocido',
-    ej: 'no: no hay una medida externa disponible para este corpus, y lo declaramos como limitación',
+    ej: 'no: no hay una medida externa disponible para este corpus, y lo declaramos como limitación', limitacion: true,
     revisor: 'No hay validación externa ni una explicación de por qué no es posible. Contrastar con una medida independiente es lo que convierte un puntaje en una medición.' }
 ]},
 { id: 'repro', titulo: 'Reproducibilidad y ética', campos: [
@@ -176,7 +178,7 @@ const SECCIONES = [
     ej: '1983, fijada en random, numpy y torch', fatal: true,
     revisor: 'No se informa la semilla. Sin ella, ni los propios autores pueden reproducir exactamente los números que publican.' },
   { id: 'versiones', et: '¿Versiones exactas de las bibliotecas?', pista: 'la salida de pip freeze va al apéndice',
-    ej: 'Python 3.11, numpy, scikit-learn y torch con las versiones listadas en el apéndice B', fatal: true,
+    ej: 'Python ' + D.entorno.python + ', numpy ' + D.entorno.numpy + ', scikit-learn ' + D.entorno.sklearn + '; la salida completa de pip freeze va en el apéndice B', fatal: true,
     revisor: 'Faltan las versiones de las bibliotecas. El comportamiento de varias funciones cambia entre versiones menores.' },
   { id: 'codigo', et: '¿Dónde está el código?', pista: 'y ojo: código en un repositorio no es lo mismo que reproducible',
     ej: 'repositorio público con los notebooks, los datos derivados y el script de medición',
@@ -238,10 +240,21 @@ for (const s of SECCIONES) {
 
 /* ---------- el párrafo de métodos ---------- */
 function falta(id) { return '<span class="falta">[FALTA: ' + id + ']</span>'; }
+// Lo que escribe el usuario va a parar a innerHTML: hay que escaparlo, o un «<»
+// rompe el párrafo (y un <img onerror=…> se ejecutaría).
+function esc(t) {
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 // Sacamos el punto final si el usuario lo escribió: la plantilla ya pone el suyo,
 // y "…de 2021.." con dos puntos queda feo en el borrador que se va a copiar.
 function v(id) { return (estado[id] || '').trim().replace(/\.+$/, ''); }
-function o(id) { return v(id) || falta(id); }
+function o(id) { return v(id) ? esc(v(id)) : falta(id); }
+// Una respuesta que dice "0", "no" o "ninguno" no es un hueco: es una limitación
+// declarada. Está bien declararla, pero el revisor la va a discutir igual.
+function declarada(c) {
+  return c.limitacion && /^(0\b|no\b|ning[uú]n|nada\b)/i.test(v(c.id));
+}
 
 function parrafo() {
   return (
@@ -260,13 +273,30 @@ o('uso') + '.'
   );
 }
 
+function listaDeclaradas(dec) {
+  if (!dec.length) return '';
+  let h = '<p>Además, <b>' + dec.length + '</b> respuestas dicen que eso <b>no se hizo</b>. ' +
+    'Declararlo es la jugada correcta, pero no lo convierte en hecho: el revisor lo va a ' +
+    'discutir igual' + (dec.some(c => c.fatal) ? ', y alguna es de las que hunden un paper' : '') +
+    '.</p><ol>';
+  for (const c of dec) {
+    h += '<li class="declarada' + (c.fatal ? ' grave' : '') + '"><b>[' + c.seccion +
+      (c.fatal ? ' · fatal, declarada' : ' · declarada') + ']</b> ' + c.revisor + '</li>';
+  }
+  return h + '</ol>';
+}
+
 function comentarios() {
   const vacios = TODOS.filter(c => !v(c.id));
   const graves = vacios.filter(c => c.fatal);
   const menores = vacios.filter(c => !c.fatal);
+  const dec = TODOS.filter(declarada);
   if (!vacios.length) {
-    return '<p><b>Ningún hueco.</b> Un revisor con este apéndice adelante va a discutir tus ' +
-      'conclusiones, que es lo que querés que discuta, y no tu prolijidad.</p>';
+    return (dec.length
+      ? '<p><b>Ningún hueco sin contestar.</b> Todo está escrito.</p>'
+      : '<p><b>Ningún hueco.</b> Un revisor con este apéndice adelante va a discutir tus ' +
+        'conclusiones, que es lo que querés que discuta, y no tu prolijidad.</p>') +
+      listaDeclaradas(dec);
   }
   let h = '<p>El revisor 2 escribiría <b>' + vacios.length + '</b> comentarios. ' +
     (graves.length ? '<b class="falta">' + graves.length + ' de ellos son fatales</b>: ' +
@@ -278,7 +308,7 @@ function comentarios() {
   for (const c of menores) {
     h += '<li class="menor"><b>[' + c.seccion + ' · menor]</b> ' + c.revisor + '</li>';
   }
-  return h + '</ol>';
+  return h + '</ol>' + listaDeclaradas(dec);
 }
 
 function refrescar() {
@@ -299,7 +329,9 @@ function refrescar() {
     ? 'Te faltan <b class="falta">' + fatalesVacios + '</b> respuestas de las que hunden un paper. ' +
       'Están marcadas en rojo.'
     : (llenos === TODOS.length
-        ? 'Completo. Copiá el párrafo y pegalo en tu sección de métodos.'
+        ? (TODOS.some(c => c.fatal && declarada(c))
+            ? 'Completo, pero alguna respuesta fatal dice que no se hizo: mirá el modo revisor.'
+            : 'Completo. Copiá el párrafo y pegalo en tu sección de métodos.')
         : 'Ninguna de las fatales está vacía. Lo que falta se arregla escribiendo.'));
 
   const salida = document.getElementById('salida');
@@ -332,14 +364,17 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'Acciones' },
   { tipo: 'boton', texto: 'Copiar el párrafo', principal: true, alClic: () => {
       const n = document.getElementById('parrafo');
-      const t = n ? n.innerText : parrafo();
+      // Sin el nodo (modo revisor) armamos el texto plano: parrafo() trae HTML.
+      let t = n ? n.innerText : '';
+      if (!n) { const tmp = document.createElement('div'); tmp.innerHTML = parrafo(); t = tmp.textContent; }
+      const noSePudo = () => ctl.texto('aviso', 'El navegador no dejó copiar (pasa con ' +
+        '<code>file://</code>). Seleccioná el texto de abajo a mano.');
+      // writeText devuelve una promesa: el error llega por .catch, no por try/catch.
       try {
-        navigator.clipboard.writeText(t);
-        ctl.texto('aviso', 'Copiado. Los <b>[FALTA: …]</b> quedan a propósito: son tu lista de tareas.');
-      } catch (e) {
-        ctl.texto('aviso', 'El navegador no dejó copiar (pasa con <code>file://</code>). ' +
-          'Seleccioná el texto de abajo a mano.');
-      }
+        navigator.clipboard.writeText(t)
+          .then(() => ctl.texto('aviso', 'Copiado. Los <b>[FALTA: …]</b> quedan a propósito: son tu lista de tareas.'))
+          .catch(noSePudo);
+      } catch (e) { noSePudo(); }
     } },
   { tipo: 'boton', texto: 'Completar con el ejemplo de hoy', alClic: EJEMPLO },
   { tipo: 'boton', texto: 'Vaciar', alClic: VACIAR },
