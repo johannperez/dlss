@@ -12,8 +12,16 @@ material tiene que abrir con file://).
 Si cambiás un número del notebook, volvé a correr esto. Si no, las slides y el
 notebook empiezan a contar cosas distintas, que es exactamente lo que este curso
 le pide a los demás que no haga.
+
+Reproducibilidad: el resultado es determinista EN LA MISMA MÁQUINA Y CON LAS
+MISMAS VERSIONES de las librerías (semilla fija). Con otra versión de torch o de
+numpy los números cambian un poco (en el tercer o cuarto decimal; justo el par
+64/256 rampas es de los más sensibles). Por eso el archivo que sale guarda las
+versiones con que se generó (`versiones`), y las slides leen de acá en vez de
+tener números escritos a mano.
 """
 import json
+import platform
 import numpy as np
 import torch
 import torch.nn as nn
@@ -49,7 +57,9 @@ def entrenar(xt, yt, h, epocas=3000, lr=0.01, semilla=1983, xv=None, yv=None):
     return m, lt, lv
 
 
-out = {"anios": anios.tolist(), "seguridad": [round(v, 4) for v in seg.tolist()],
+out = {"versiones": {"python": platform.python_version(), "torch": torch.__version__,
+                     "numpy": np.__version__},
+       "anios": anios.tolist(), "seguridad": [round(v, 4) for v in seg.tolist()],
        "grilla": [round(v, 3) for v in grilla.tolist()]}
 
 # --- la mejor recta posible (clase 1) ---------------------------------------
@@ -65,7 +75,9 @@ a_ojo, b_ojo = 0.02, 0.22
 out["ojo"] = {"a": a_ojo, "b": b_ojo,
               "mse": round(float(np.mean((a_ojo * (anios - 2001) / 10 + b_ojo - seg) ** 2)), 5)}
 
-# --- las capacidades (4, 16, 64) --------------------------------------------
+# --- las capacidades (4, 16, 64; y 256 sin dibujo) -------------------------
+# Es el TODO 2 del notebook. La slide 19 dibuja las tres primeras y menciona el
+# número de 256 (lo lee de `cap256`, no está escrito a mano en el HTML).
 out["capacidades"] = []
 for h in [4, 16, 64]:
     m, lt, _ = entrenar(X, Y, h)
@@ -74,6 +86,9 @@ for h in [4, 16, 64]:
     out["capacidades"].append({"h": h, "perillas": utils.contar_parametros(m),
                                "mse": round(lt[-1], 5),
                                "curva": [round(float(v), 4) for v in curva]})
+m256, lt256, _ = entrenar(X, Y, 256)
+out["cap256"] = {"h": 256, "perillas": utils.contar_parametros(m256),
+                 "mse": round(lt256[-1], 5)}
 
 # --- el calco: 200 rampas sobre 31 años, con 5 años apartados ---------------
 apartados = [1987, 1995, 2003, 2010, 2017]   # cinco años repartidos parejo
@@ -128,6 +143,36 @@ out["particion"] = {
     "test": sorted(anios[idx_te].astype(int).tolist()),
 }
 
+# --- el TODO 4: 256 rampas sobre 15 casos (para las notas de la slide 30) ----
+_, lt4, lv4 = entrenar(X[idx_tr][:15], Y[idx_tr][:15], 256, epocas=1500,
+                       xv=X[idx_va], yv=Y[idx_va])
+out["todo4"] = {"train": round(lt4[-1], 5), "val": round(lv4[-1], 5),
+                "veces": round(lv4[-1] / lt4[-1], 1), "mejor": int(np.argmin(lv4)) + 1}
+
+
+# --- la sección 6: al azar contra por tiempo (slide 35) ---------------------
+def entrenar_y_testear(i_tr, i_va, i_te, h=16):
+    """Lo mismo que la función del notebook: early stopping y test UNA vez."""
+    _, _, lv_ = entrenar(X[i_tr], Y[i_tr], h, epocas=1500, xv=X[i_va], yv=Y[i_va])
+    frenar = int(np.argmin(lv_)) + 1
+    m_, _, _ = entrenar(X[i_tr], Y[i_tr], h, epocas=frenar)
+    with torch.no_grad():
+        test = float(((m_(X[i_te]) - Y[i_te]) ** 2).mean())
+        base = float(((Y[i_te] - Y[i_tr].mean()) ** 2).mean())
+    return m_, test, base
+
+
+m_azar, test_azar, base_azar = entrenar_y_testear(idx_tr, idx_va, idx_te)
+tr_t, va_t, te_t = datos.particion_temporal(anios, 2008, 2014)
+_, test_tiempo, base_tiempo = entrenar_y_testear(tr_t, va_t, te_t)
+i05 = int(np.where(anios == 2005)[0][0])
+with torch.no_grad():
+    pred05 = float(m_azar(X[i05:i05 + 1]).item())
+out["fuga"] = {"test_azar": round(test_azar, 5), "base_azar": round(base_azar, 5),
+               "test_tiempo": round(test_tiempo, 5), "base_tiempo": round(base_tiempo, 5),
+               "veces": round(test_tiempo / test_azar, 1),
+               "pred_2005": round(pred05, 4), "real_2005": round(float(seg[i05]), 4)}
+
 ruta = pathlib.Path(__file__).resolve().parent / "datos-figuras.js"
 ruta.write_text(
     "/* GENERADO por medir-figuras.py — no lo edites a mano.\n"
@@ -143,6 +188,10 @@ print("calco: train", out["calco"]["mse_train"], "en los 5 apartados",
       out["calco"]["mse_apartados"], "| sana:", out["sana"]["mse_train"],
       out["sana"]["mse_apartados"])
 print("apartados", out["calco"]["apartados"])
+print("  h 256 perillas", out["cap256"]["perillas"], "mse", out["cap256"]["mse"])
 print("tijera mejor", out["tijera"]["mejor"], out["tijera"]["mejor_val"],
       "final train", out["tijera"]["train"][-1], "val", out["tijera"]["val"][-1])
+print("todo4", out["todo4"])
+print("fuga", out["fuga"])
+print("versiones", out["versiones"])
 print("test años", out["particion"]["test"])

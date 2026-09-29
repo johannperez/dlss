@@ -11,8 +11,11 @@
      el fenómeno: está aprendiendo la muestra."
 
      Segundo aha, igual de importante: la curva AZUL (loss de entrenamiento)
-     BAJA SIEMPRE. O sea que el número que tenés a mano no te sirve para decidir.
-     El que decide es el naranja, y el naranja sólo existe si guardaste datos.
+     no para de bajar. Acá no sube nunca de verdad porque cada modelo contiene al
+     anterior (codos anidados, ver §2) y se resuelve exacto; con una red entrenada
+     un número fijo de épocas puede dar algún saltito para arriba, pero no sube de
+     forma sistemática. O sea que el número que tenés a mano no te sirve para
+     decidir. El que decide es el naranja, y el naranja sólo existe si guardaste datos.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -47,7 +50,7 @@
     <h1>Dibujar o calcar</h1>
     <p>Un fenómeno con forma (la línea gris), unas mediciones con ruido (los puntos oscuros) y
        un modelo al que le podés dar más o menos libertad. Subí <strong>la capacidad</strong> despacio
-       y mirá <em>las dos curvas de abajo</em>: no la azul, que siempre te va a decir que sí.</p>
+       y mirá <em>las dos curvas de abajo</em>: no la azul, que casi siempre te va a decir que sí.</p>
   </header>
 
   <div>
@@ -61,7 +64,8 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Arrancá subiendo la capacidad despacio y mirá las dos curvas
-      de abajo: la azul <em>siempre</em> baja; la naranja baja, toca fondo y empieza a subir.
+      de abajo: la azul (línea llena) no para de bajar; la naranja (punteada) baja, toca fondo
+      y empieza a subir.
       Después poné la capacidad en <b>60</b> y apretá <b>«otra muestra»</b> cinco veces seguidas:
       la curva salta como loca —cada vez dibuja otra cosa— y <em>siempre</em> pasa por todos los
       puntos. Las curvas fantasma que quedan atrás son las cinco figuras distintas que el mismo
@@ -73,6 +77,10 @@
       <span class="chip sintetico">sintético</span> País ficticio, proceso generador conocido
       y escrito en este archivo: por eso —y sólo por eso— podemos dibujar la verdad en gris.
       Con datos reales esa línea no existe, y ahí está todo el problema.
+      El modelo es la red de rampas de la clase 2 con <b>los codos clavados</b> en lugares
+      fijos: sólo se ajustan las alturas de las K rampas y una recta de base (K+2 números,
+      los que cuenta «números ajustados»). Una red entrenada movería también los codos:
+      3K+1 perillas, todavía más libertad.
     </p>
   </footer>
 
@@ -105,19 +113,36 @@ function muestrear(n, ruido, semilla) {
 }
 
 /* ===========================================================================
-   2. EL MODELO: una suma de rampas (la red de la clase 2, resuelta de una)
-   Capacidad K = cuántas rampas. Los parámetros son K+2 (las K alturas, más la
-   recta de base). Se resuelven por mínimos cuadrados con un pelín de
-   regularización para que la cuenta no explote; el resultado es el mismo que
-   daría entrenar con descenso mucho rato.
+   2. EL MODELO: una suma de rampas (la red de la clase 2, con los codos clavados)
+   Capacidad K = cuántas rampas. Los codos NO se entrenan: están fijos. Lo que se
+   ajusta son K+2 números (las K alturas, más la recta de base), por mínimos
+   cuadrados con un pelín de regularización para que la cuenta no explote. Una
+   red de verdad movería también los codos (3K+1 perillas): esta es una versión
+   más rígida, y aun así calca.
+
+   Los codos están ANIDADOS: el modelo con K+1 rampas tiene los mismos K codos
+   que el de K, más uno nuevo (orden de van der Corput: 1/2, 1/4, 3/4, 1/8, …).
+   Así cada modelo contiene al anterior y la loss de entrenamiento no puede
+   subir al agregar capacidad (salvo en el quinto decimal, por la regularización).
+   Antes los codos eran j/(K+1): no estaban anidados y la curva azul subía y
+   bajaba de un K al siguiente, cosa que la clase no quiere enseñar con esta viz.
    =========================================================================== */
+function codo(j) {             // el j-ésimo codo de van der Corput en base 2
+  let v = 0, den = 1;
+  while (j > 0) { den *= 2; v += (j % 2) / den; j = Math.floor(j / 2); }
+  return v;
+}
 function base(t, K) {
   const f = [1, t];
-  // cada rampa se escala por (K+1) para que todas las piezas midan más o menos
-  // lo mismo. Si no, con muchas rampas las últimas quedan tan chiquitas que la
-  // cuenta las apaga sola y el sobreajuste no aparece: sería hacer trampa a
-  // favor de la moraleja.
-  for (let j = 1; j <= K; j++) f.push((K + 1) * Math.max(0, t - j / (K + 1)));
+  // cada rampa se escala por la inversa de la separación de su "nivel" (2, 4,
+  // 8, …) para que todas las piezas midan más o menos lo mismo. Si no, las
+  // rampas de los niveles finos quedan tan chiquitas que la regularización las
+  // apaga sola y el sobreajuste no aparece: sería hacer trampa a favor de la
+  // moraleja. La escala depende de la rampa, no de K: así el anidado se respeta.
+  for (let j = 1; j <= K; j++) {
+    const escala = Math.pow(2, Math.floor(Math.log2(j)) + 1);
+    f.push(escala * Math.max(0, t - codo(j)));
+  }
   return f;
 }
 
@@ -256,7 +281,7 @@ P.tooltip(w => 'año ' + Math.round(w.x) + '\nmodelo ' +
 const C = Viz.plano('#curvas', {
   xmin: 0, xmax: CAP_MAX + 1, ymin: 0, ymax: 0.05, alto: 162,
   ejeX: 'capacidad (cuántas rampas tiene el modelo)', ejeY: 'loss (error²)',
-  titulo: 'la azul siempre baja; la naranja es la que decide'
+  titulo: 'la azul no para de bajar; la naranja (punteada) es la que decide'
 });
 
 C.alDibujar(() => {
@@ -278,14 +303,14 @@ C.alDibujar(() => {
   C.segmento(K, 0, K, tope, { color: 'acento', grosor: 2, opacidad: .55 });
 
   C.linea(sweepTrain.map((v, i) => ({ x: i + 1, y: v })), { color: 'modelo', grosor: 2.8 });
-  C.linea(sweepVal.map((v, i) => ({ x: i + 1, y: v })), { color: 'val', grosor: 2.8 });
+  C.linea(sweepVal.map((v, i) => ({ x: i + 1, y: v })), { color: 'val', grosor: 2.8, punteada: [7, 4] });
 
   C.punto(K, sweepTrain[K - 1], { color: 'modelo', r: 5 });
   C.punto(K, sweepVal[K - 1], { color: 'val', r: 5 });
 
   C.leyenda([
     { color: 'modelo', texto: 'sobre lo que vio (train)', forma: 'linea' },
-    { color: 'val', texto: 'sobre lo que no vio (validación)', forma: 'linea' }
+    { color: 'val', texto: 'sobre lo que no vio (validación)', forma: 'linea', punteada: true }
   ], { pos: 'ad' });
   if (seSalen) {
     C.textoPx(C.L + 8, C.B - 8, '↑ ' + seSalen + ' punto' + (seSalen > 1 ? 's' : '') +
@@ -337,14 +362,28 @@ function actualizarLectura() {
       '<span class="nu" style="color:var(--c-val)">' + Viz.num(lv, 4) + '</span></div>' +
     '<div><span class="et">la brecha entre las dos</span>' +
       '<span class="nu" style="color:var(--c-' + col + ')">' + Viz.num(brecha, 4) + '</span></div>' +
-    '<div><span class="et">perillas / casos</span>' +
+    '<div title="Los codos están clavados: se ajustan las K alturas y una recta de base. ' +
+      'Una red con los codos libres tendría 3K+1 perillas."><span class="et">números ajustados / casos</span>' +
       '<span class="nu">' + (K + 2) + ' / ' + entrenamiento.length + '</span></div>' +
     '</div>' +
     '<span class="semaforo" style="background:var(--c-' + col + ')"></span><b>' +
     veredicto + '</b> — ' + diag;
 }
 
-function redibujar() { P.redibujar(); C.redibujar(); actualizarLectura(); }
+function redibujar() {
+  P.redibujar(); C.redibujar(); actualizarLectura();
+  // para quien no ve el dibujo: lo mismo, en palabras
+  const K = capActual(), mejor = mejorCap();
+  P.canvas.setAttribute('aria-label', 'Datos sintéticos de ' + entrenamiento.length +
+    ' casos, la verdad (línea gris punteada) y la curva que dibuja el modelo con ' + K +
+    ' rampas' + (fantasmas.length ? ', con ' + fantasmas.length +
+    ' curvas de muestras anteriores atrás' : '') + '.');
+  C.canvas.setAttribute('aria-label', 'Loss contra capacidad, de 1 a ' + CAP_MAX +
+    ' rampas. Con ' + K + ' rampas: entrenamiento ' + Viz.num(sweepTrain[K - 1], 4) +
+    ', validación ' + Viz.num(sweepVal[K - 1], 4) + '. La validación es mínima con ' +
+    mejor + ' rampas.');
+}
+for (const pl of [P, C]) pl.canvas.setAttribute('role', 'img');
 
 /* ===========================================================================
    7. CONTROLES

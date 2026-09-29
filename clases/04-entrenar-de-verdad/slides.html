@@ -153,8 +153,8 @@
     Después la frase, textual: <b>"el modelo A no aprendió nada. Se aprendió los datos de
     memoria."</b><br>
     Si alguien pregunta si los números son reales: son un ejemplo construido con los órdenes de
-    magnitud que se ven en la práctica (el corpus de prensa de la clase 9 da exactamente esta
-    forma cuando dejás la fuente adentro). Decilo así, sin inflarlo.
+    magnitud que se ven en la práctica (el corpus de prensa de la clase 9 da una forma parecida
+    cuando dejás la fuente adentro). Decilo así, sin inflarlo.
   </aside>
 </section>
 
@@ -320,8 +320,8 @@ for epoca in range(4000):
     </div>
     <div class="ojo">
       <strong>Esta es la línea que todos se olvidan. Todos. Yo también.</strong>
-      Si no está, los gradientes de esta vuelta se <em>suman</em> a los de la anterior,
-      los pasos salen enormes y el modelo se va a cualquier lado.
+      Si no está, los gradientes de esta vuelta se <em>suman</em> a los de la anterior:
+      una inercia sin freno. El modelo se pasa de largo, oscila, y a veces diverge.
       Es el error #1 de PyTorch y es un rito de iniciación.
     </div>
   </div>
@@ -329,7 +329,8 @@ for epoca in range(4000):
     <b>24-25 min.</b> Contá tu propia versión de haberte olvidado <code>zero_grad</code>.
     Que se rían. El objetivo es que cuando les pase —y les va a pasar— se acuerden de esta
     slide en vez de creer que son unos inútiles.<br>
-    Anticipá el ejercicio opcional del notebook: sacarla a propósito para ver el desastre.
+    Anticipá el ejercicio opcional del notebook (la celda después del TODO 3): sacarla a
+    propósito y ver la loss ir y venir sin asentarse.
   </aside>
 </section>
 
@@ -366,9 +367,9 @@ for epoca in range(4000):
       <p>Recién <em>acá</em> se mueven las perillas. Un pasito, cuesta abajo.</p>
     </div>
     <div class="intuicion compacta">
-      Este es el paso de la clase 3, el de la pelota bajando el valle. El tamaño del pasito es
-      el <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span>,
-      y ya saben qué pasa si es enorme.
+      Este es el paso de la clase 3, el de la pelota bajando el valle: la pendiente multiplicada
+      por el <span class="glosario"><span class="en">learning rate</span><span class="es">tasa de aprendizaje</span></span>.
+      Y ya saben qué pasa si ese número es enorme.
     </div>
   </div>
   <aside class="notes">
@@ -392,9 +393,9 @@ for epoca in range(4000):
     </tbody>
   </table>
   <div class="intuicion compacta">
-    Lo único que un tensor tiene de más que una tabla común es que <strong>se acuerda de las
-    cuentas que le hicieron</strong>. Por eso <code>backward()</code> puede recorrerlas para
-    atrás. Esa es la razón entera de que exista PyTorch.
+    Lo que un tensor tiene de más que una tabla común es que, si se lo pedís
+    (<code>requires_grad</code>), <strong>se acuerda de las cuentas que le hicieron</strong>.
+    Por eso <code>backward()</code> puede recorrerlas para atrás. Esa es la razón de ser de PyTorch.
   </div>
   <aside class="notes">
     <b>28-29 min.</b> Si alguien viene de R o de Stata: "es tu data frame, sin nombres de
@@ -420,8 +421,8 @@ for epoca in range(4000):
   </div>
   <aside class="notes">
     <b>29-30 min.</b> Con el ejemplo numérico alcanza: <b>no lo hagan memorizar</b>.
-    Decí que en este curso, hasta la clase 8, batch y epoch van a ser lo mismo, y que cuando
-    deje de serlo lo vas a avisar.
+    Decí que hoy batch y epoch son lo mismo (36 casos, un solo lote), y que deja de ser así en
+    la clase 5, cuando entren miles de imágenes de a lotes de 32.
   </aside>
 </section>
 
@@ -436,7 +437,7 @@ for epoca in range(4000):
     <li>Tensores y <code>autograd</code>: comprobá que <code>backward()</code> da lo mismo que
       la resta de la clase 3. <b>TODO 1</b>.</li>
     <li>Comprobá que <code>nn.Sequential</code> es <em>exactamente</em> la red que escribiste
-      a mano en la clase 2. El notebook tiene el <code>assert</code>.</li>
+      a mano en la clase 2. El notebook tiene el chequeo que da ✓.</li>
     <li>Corré el loop de cinco líneas sobre los datos de la clase 1 y mirá qué dibuja.</li>
     <li><b>TODO 2</b>: 4, 16, 64, 256 rampas. Anotá las cuatro losses. <b>Apostá antes cuál gana.</b></li>
   </ol>
@@ -446,8 +447,10 @@ for epoca in range(4000):
     las celdas desordenadas. La respuesta es siempre la misma: reiniciar el kernel y correr
     todo de arriba.<br>
     <b>A los cinco minutos del final</b>, pedí en voz alta los números del TODO 2 y anotalos en
-    el pizarrón: 4 → 0.0119, 16 → 0.0090, 64 → 0.0058, 256 → 0.0051. Esos cuatro números son
-    el gancho de la segunda mitad. <b>No los comentes todavía.</b>
+    el pizarrón. Con torch 2.14 dan 4 → 0.0119, 16 → 0.0090, 64 → 0.0061, 256 → 0.0063; con
+    otra versión cambian en el último decimal, y el par 64/256 es el más sensible (256 puede
+    salir un poco arriba o un poco abajo de 64). Anotá <b>los que salgan en el aula</b>. Esos
+    cuatro números son el gancho de la segunda mitad. <b>No los comentes todavía.</b>
   </aside>
 </section>
 
@@ -488,12 +491,15 @@ for epoca in range(4000):
 <section>
   <h2>¿Y si le pongo más neuronas?</h2>
   <div class="viz-frame" style="padding:6px" id="caja-capacidades"></div>
-  <p class="viz-pie">Los tres primeros números del <b>TODO 2</b> que acaban de correr ustedes
-     (con 256 rampas da <b id="n-256">0.00509</b>). Mejora. Mejora. Mejora.</p>
+  <p class="viz-pie">Los tres primeros números del <b>TODO 2</b> que acaban de correr ustedes:
+     baja, baja, baja. Con 256 rampas da <b id="n-256">—</b><span id="n-256-lectura"></span>.</p>
   <p class="enorme fragment">¿Entonces le pongo 4000?</p>
   <aside class="notes">
     <b>63-65 min.</b> Leé los tres números en voz alta y con entusiasmo genuino, como si la
-    conclusión fuera obvia: "más capacidad, mejor ajuste. Siempre".<br>
+    conclusión fuera obvia: "más capacidad, mejor ajuste".<br>
+    Si alguien señala que 256 no mejoró sobre 64, mejor: es verdad, y lo cobrás en la slide 24
+    (la loss de entrenamiento <i>tiende</i> a bajar, con algún saltito; lo que no hace es subir
+    de forma sistemática).<br>
     Después mostrá el fragmento y <b>hacé la pregunta con cara de vendedor</b>. Alguien del
     fondo va a decir "no". Preguntale <b>por qué</b> y no lo corrijas: la respuesta que dé
     —cualquiera— es la que vas a usar en las próximas tres slides.
@@ -516,8 +522,9 @@ for epoca in range(4000):
     <b>65-69 min.</b> Primero mostrá sólo la curva y decí: "loss de entrenamiento prácticamente
     cero. Perfecto. Pasa por todos los puntos." Dejá que se vea lo fea que es la curva entre
     punto y punto.<br>
-    Después leé los tres números: <b>casi cero sobre lo que vio, nueve veces peor sobre lo que
-    no vio, y la red chiquita —que ajusta mucho peor— le gana</b> en los años nuevos.<br>
+    Después leé los tres números: <b>casi cero sobre lo que vio, más de diez veces peor sobre
+    lo que no vio, y la red chiquita —que ajusta mucho peor— le gana</b> en los años nuevos.
+    (El cociente exacto depende de la versión de torch: con 2.14 da 13 veces.)<br>
     La frase del día: <b>"dibujar es capturar la forma; calcar es copiar cada manchita del
     original, incluidas las que son suciedad del papel"</b>. La suciedad del papel es el error
     de medición de tu muestra. Y no está en la próxima muestra.
@@ -547,8 +554,8 @@ for epoca in range(4000):
   </div>
   <p class="viz-pie"><b>Prometido en la clase 2, cumplido.</b> El botón «32 rampas» dejaba la
      curva pasando por los 36 puntos de la serie de inflación con un desajuste de
-     <b>0.000014</b> — cien veces menos que la mejor recta (0.001496). Dijimos "guardá esa
-     imagen, en la clase 4 va a tener nombre". El nombre es
+     <b>0.0000076</b> — unas doscientas veces menos que la mejor recta (0.001561). Dijimos
+     "guardá esa imagen, en la clase 4 va a tener nombre". El nombre es
      <span class="glosario"><span class="en">overfitting</span><span class="es">sobreajuste</span></span>.</p>
   <aside class="notes">
     <b>69-71 min.</b> Si tenés pizarrón: dibujá una cara sonriente rápida y al lado una mancha
@@ -556,8 +563,9 @@ for epoca in range(4000):
     modelo la copia. Para el modelo, la mancha y la boca son exactamente lo mismo."<br>
     <b>Cobrá la promesa de la clase 2 en voz alta</b> y con los números, no con la imagen: la
     serie de la clase 2 está suavizada, así que con 32 rampas la curva se ve <i>prolija</i>, no
-    grotesca. Lo que impresiona es el par <b>96 perillas para 36 datos</b> con desajuste
-    0.000014. Si alguien todavía tiene abierta la viz de la clase 2, pedile que apriete el botón.
+    grotesca. Lo que impresiona es el par <b>97 perillas para 36 datos</b> (3 por rampa, más el
+    sesgo final) con desajuste 0.0000076. Si alguien todavía tiene abierta la viz de la clase 2,
+    pedile que apriete el botón.
   </aside>
 </section>
 
@@ -573,9 +581,10 @@ for epoca in range(4000):
     <li>La teoría <strong>ad hoc</strong> que explica todos los casos que ya viste y ninguno nuevo.</li>
   </ul>
   <div class="ss">
-    Dicho en su vocabulario: el sobreajuste es <strong>validez interna perfecta con validez
-    externa nula</strong>. No es un problema nuevo del deep learning. Es su problema de
-    siempre, con más parámetros y más rápido.
+    Dicho en su vocabulario: el sobreajuste es <strong>ajuste perfecto dentro de la muestra y
+    capacidad predictiva nula fuera de ella</strong>: no replica ni en otra muestra de la misma
+    población. No es un problema nuevo del deep learning. Es su problema de siempre, con más
+    parámetros y más rápido.
   </div>
   <aside class="notes">
     <b>71-73 min.</b> Esta slide es la que hace que la clase les pertenezca. <b>Preguntá al
@@ -583,15 +592,18 @@ for epoca in range(4000):
     (el índice construido con la misma muestra en la que después se valida, la tipología que
     sale de los mismos casos que después clasifica).<br>
     Si el aula es de antropología o historia: "un modelo interpretativo que sólo funciona con
-    los casos con los que lo construiste".
+    los casos con los que lo construiste".<br>
+    Ojo con traducirlo a <i>validez interna contra externa</i>: para esta audiencia esas palabras
+    son identificación causal y generalizar a otras poblaciones. El sobreajuste falla antes,
+    en otra muestra de la <b>misma</b> población. Si alguien lo dice así, sumá esa precisión.
   </aside>
 </section>
 
 <!-- ============================ 23. LA ÚNICA DEFENSA ============================ -->
 <section>
-  <h2>La única defensa</h2>
-  <p class="bajada">Guardar datos que el modelo no vea. No hay otra.
-     No existe un test estadístico que te salve de esto.</p>
+  <h2>La defensa: datos que el modelo no vio</h2>
+  <p class="bajada">Ninguna medida calculada con los mismos datos del entrenamiento te lo muestra.
+     AIC, BIC y la <b>validación cruzada</b> buscan lo mismo: cómo te iría con datos nuevos.</p>
   <div class="torta">
     <div class="t">entrenamiento<small>60 %</small></div>
     <div class="v">validación<small>20 %</small></div>
@@ -614,7 +626,11 @@ for epoca in range(4000):
     <b>73-76 min.</b> La analogía que esta audiencia entiende de una: <b>el test es el
     preregistro del aprendizaje automático</b>. Lo apartás antes de mirar, y no lo tocás.<br>
     Pregunta frecuente acá: "¿por qué tres y no dos?". Contestá con la slide siguiente, no
-    ahora: se entiende mejor después de ver early stopping.
+    ahora: se entiende mejor después de ver early stopping.<br>
+    Si alguien con formación estadística dice "para eso está el AIC": tiene razón a medias. AIC,
+    BIC y el R² ajustado corrigen el ajuste para <i>estimar</i> el error fuera de la muestra; la
+    <b>validación cruzada</b> lo estima rotando qué parte apartás y promediando, y con 36 casos
+    es la herramienta honesta. Todas persiguen la pregunta de esta slide.
   </aside>
 </section>
 
@@ -623,15 +639,17 @@ for epoca in range(4000):
   <h2>Si le doy más y más capacidad al modelo, ¿qué le pasa a la loss <u>de entrenamiento</u>?</h2>
   <div class="opciones">
     <div><b>A</b> baja hasta un punto y después sube</div>
-    <div><b>B</b> baja siempre</div>
-    <div><b>C</b> se queda igual a partir de cierto punto</div>
+    <div><b>B</b> tiende a bajar, hasta quedar cerca de cero</div>
+    <div><b>C</b> no cambia: la capacidad no tiene que ver con ella</div>
   </div>
   <aside class="notes">
     <b>76-78 min.</b> <b>Votación a mano alzada, obligatoria.</b> Sin esta apuesta, la viz que
     viene es un dibujito lindo.<br>
     Suele ganar A, porque la gente ya intuye que "algo malo pasa" y lo proyecta sobre la curva
-    equivocada. La respuesta es <b>B</b>: la de entrenamiento baja siempre. La que sube es la
-    otra, y la otra <b>sólo existe si guardaste datos</b>. Ahí está todo.<br>
+    equivocada. La respuesta es <b>B</b>: la de entrenamiento tiende a bajar (con algún saltito,
+    como el 64 → 256 del TODO 2 si les salió, porque se entrena un número fijo de épocas), pero
+    no sube de forma sistemática. La que sube es la otra, y la otra <b>sólo existe si guardaste
+    datos</b>. Ahí está todo.<br>
     No des la respuesta: pasá a la viz y que la vean.
   </aside>
 </section>
@@ -643,13 +661,15 @@ for epoca in range(4000):
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/sobreajuste.html" title="dibujar o calcar" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> la <span class="c-modelo">azul</span> baja siempre.
-     La <span class="c-val">naranja</span> baja, toca fondo y empieza a subir.
+  <p class="viz-pie"><b>Qué mirar:</b> la <span class="c-modelo">azul</span> (llena) no para de bajar.
+     La <span class="c-val">naranja</span> (punteada) baja, toca fondo y empieza a subir.
      <b>Ese punto</b> es donde el modelo dejó de aprender y empezó a memorizar.</p>
   <aside class="notes">
     <b>78-84 min.</b> Subí la capacidad <b>despacio</b>, de 3 en 3, narrando: "…sigue bajando la
     azul… sigue bajando… la naranja tocó fondo… ahí. Justo ahí."<br>
-    Después el número: <b>62 perillas para 25 casos</b>. Que lo digan en voz alta.<br>
+    Después el número: <b>62 números ajustados para 25 casos</b>. Que lo digan en voz alta. Y
+    eso que la viz es una red con los <b>codos clavados</b>: sólo ajusta las alturas y una recta
+    de base. Con los codos libres, 60 rampas serían 181 perillas.<br>
     Y el remate, que es la mejor demostración de varianza que existe: capacidad 60 y apretá
     <b>«otra muestra» cinco veces</b>. Los fantasmas se acumulan. "Mismo fenómeno, mismo
     modelo, cinco figuras distintas. No está aprendiendo el fenómeno: está aprendiendo la
@@ -669,7 +689,7 @@ for epoca in range(4000):
   <p class="viz-pie">La validación tocó fondo en la <b>época 42</b> y después empeoró durante
      <b>1458 épocas más</b>. Todo ese rato el modelo siguió "mejorando"… sobre lo que ya conocía.</p>
   <aside class="notes">
-    <b>84-87 min.</b> "Esta figura se llama la tijera y la van a ver mil veces. Es un
+    <b>84-86 min.</b> "Esta figura se llama la tijera y la van a ver mil veces. Es un
     diagnóstico, como una radiografía."<br>
     Recorrela con el dedo: bajan juntas (aprende la forma) → la naranja toca fondo → se abre la
     brecha (aprende el ruido). <b>La brecha sombreada es, literalmente, lo que aprendió y no le
@@ -697,7 +717,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     montones y no dos.</strong>
   </div>
   <aside class="notes">
-    <b>87-89 min.</b> Acá cerrás la pregunta que quedó abierta en la slide de la torta.<br>
+    <b>86-88 min.</b> Acá cerrás la pregunta que quedó abierta en la slide de la torta.<br>
     La versión corta y memorable: <b>"validación es para decidir. Test es para reportar. Si
     decidiste con un número, ese número ya no te sirve para reportar."</b><br>
     Paralelo directo: es la misma razón por la que no se puede formular la hipótesis después de
@@ -713,10 +733,10 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     <iframe src="viz/sobreajuste.html" title="capacidad contra cantidad de datos" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> dejá la capacidad en <b>60</b> y subí «cuántos casos
-     tenés» hasta <b>300</b>. La tijera se <b>cierra sola</b>. Con 25 casos, 62 perillas eran un
-     escándalo; con 300, son razonables.</p>
+     tenés» hasta <b>300</b>. La tijera se <b>cierra sola</b>. Con 25 casos, 62 números ajustados
+     eran un escándalo; con 300, son razonables.</p>
   <aside class="notes">
-    <b>89-91 min.</b> Es la misma viz de recién, mirada por el otro lado. Hacelo en vivo:
+    <b>88-90 min.</b> Es la misma viz de recién, mirada por el otro lado. Hacelo en vivo:
     capacidad 60, y arrastrá el slider de casos.<br>
     La frase: <b>"capacidad y datos son las dos caras de la misma moneda. No preguntes '¿cuántas
     neuronas?'; preguntá '¿cuántas neuronas para cuántos casos?'"</b><br>
@@ -741,7 +761,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     datos. No las vamos a usar hoy. Sepan que existen y qué problema atacan.
   </div>
   <aside class="notes">
-    <b>91-93 min.</b> Una línea cada una y seguí. <b>Si vas atrasado, esta slide se saltea
+    <b>90-91 min.</b> Una línea cada una y seguí. <b>Si vas atrasado, esta slide se saltea
     entera</b> — es la primera que se recorta.<br>
     Si alguien pregunta cuál usar: "la que tengas más barata. Y antes que las tres,
     conseguí más datos o hacé el modelo más chico".
@@ -753,7 +773,8 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2</h2>
   <div class="manos">
-    <code>notebook.ipynb</code>, secciones <strong>5 a 7</strong>. Veinticinco minutos, de a dos.
+    <code>notebook.ipynb</code>, secciones <strong>5 a 7</strong>. Doce minutos, de a dos; lo que
+    no entre, antes de la clase 5.
   </div>
   <ol>
     <li>Partición 60/20/20 <strong>a mano</strong>, con índices. Mirá qué años cayeron dónde.</li>
@@ -765,12 +786,14 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <div class="ojo compacta">La hipótesis va escrita en la celda de markdown <em>antes</em>.
     Si la escribís después, ya sabés cómo se llama eso.</div>
   <aside class="notes">
-    <b>93-118 min.</b> Insistí con la hipótesis previa: es <b>media clase 10</b> metida acá
+    <b>91-103 min.</b> Insistí con la hipótesis previa: es <b>media clase 10</b> metida acá
     de contrabando.<br>
     Pasá por las mesas y buscá a quien le haya dado <b>distinto</b> de lo que esperaba: esos son
     los que van a hablar en la puesta en común.<br>
-    <b>A los 15 minutos</b>, cortá dos minutos y pedí resultados del TODO 4 en voz alta: la
-    brecha típica es de 50 veces. Que se escuche.
+    <b>A los 8 minutos</b>, cortá uno y pedí resultados del TODO 4 en voz alta: la loss de
+    validación queda unas quince veces más alta que la de entrenamiento (14,6 con torch 2.14).
+    Que se escuche.<br>
+    Lo que no entre (el experimento de a dos, sección 7) se termina antes de la clase 5.
   </aside>
 </section>
 
@@ -785,7 +808,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     <li>¿Y ahora qué creés que estaba mal: tu hipótesis o tu intuición sobre el modelo?</li>
   </ul>
   <aside class="notes">
-    <b>105-108 min.</b> (Si el práctico se estiró, este bloque se hace igual: se recorta el
+    <b>103-105 min.</b> (Si el práctico se estiró, este bloque se hace igual: se recorta el
     práctico, no la puesta en común.)<br>
     Dos o tres personas, no más. Buscá el caso donde alguien subió los datos y la brecha se
     cerró: es la confirmación de la slide 28.<br>
@@ -808,7 +831,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     Lo apartás antes de mirar nada, y esa es toda su función.
   </div>
   <aside class="notes">
-    <b>108-110 min.</b> Pregunta que siempre aparece: "¿y si me dio mal el test?".<br>
+    <b>105-107 min.</b> Pregunta que siempre aparece: "¿y si me dio mal el test?".<br>
     Respuesta honesta: <b>lo reportás</b>. Y si querés seguir probando, necesitás datos nuevos,
     o decís explícitamente en el paper cuántas configuraciones probaste. Las dos cosas son
     aceptables; esconderlo no.<br>
@@ -844,7 +867,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     y es el error avanzado que van a cometer igual. Anótenlo.
   </div>
   <aside class="notes">
-    <b>110-112 min.</b> La pregunta operativa, la que hay que llevarse escrita:
+    <b>107-108 min.</b> La pregunta operativa, la que hay que llevarse escrita:
     <b>"tu modelo, al predecir un caso del test, ¿está usando información que en la vida real
     no habría tenido todavía?"</b><br>
     Si el aula tiene gente de encuestas de panel, de análisis de discurso parlamentario o de
@@ -859,15 +882,19 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/particion.html" title="cómo partir los datos" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> prendé «agrupar por grupo». Al azar, las filas salen
-     de tres colores; por grupo, se apagan todos los anillos rojos.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> prendé «agrupar por presidente o diario». Al azar, las
+     filas salen de tres colores; por grupo, se apagan todos los anillos rojos.</p>
   <aside class="notes">
-    <b>112-115 min.</b> Hacelo en vivo, en este orden: (1) al azar, sin agrupar — parece un
+    <b>108-111 min.</b> Hacelo en vivo, en este orden: (1) al azar, sin agrupar — parece un
     lindo mosaico; (2) prendé «agrupar» — aparecen las filas mezcladas y los anillos;
     (3) pasá a «por grupo» — se apagan todos.<br>
-    Mostrá también el <b>precio</b>: con partición por grupo el test queda con 2 o 4 casos.
+    Mostrá también el <b>precio</b>: con partición por grupo el test queda con 4 casos en el
+    sorteo por defecto (según el sorteo, entre 2 y 10; nunca vacío).
     "No hay almuerzo gratis. Con datos de panel chicos, una partición honesta te deja un test
-    ridículo — y eso también es un resultado que hay que reportar."
+    ridículo — y eso también es un resultado que hay que reportar."<br>
+    Si alguien pasa a «por tiempo» con 60/20/20 y ve el cartel naranja: el corte por porcentaje
+    cae justo entre 2005 y 2006. El notebook corta por año (hasta 2007 / 2008-2013 / 2014-2019)
+    y ahí los gemelos quedan juntos. Dónde cortás también es una decisión.
   </aside>
 </section>
 
@@ -880,23 +907,25 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     <li>No son 36 casos independientes: son <strong>7 presidentes</strong>.
       Menem dio 10 discursos; Cristina Fernández, 8.</li>
     <li class="fragment"><strong>2005 y 2006 son el mismo discurso, palabra por palabra.</strong>
-      Mismo <code>md5sum</code>. Es un error de la recopilación y está documentado.</li>
+      Mismo <code>md5sum</code> (en las muestras, sin las líneas <code>#</code>). Es un error de la
+      recopilación y está documentado.</li>
     <li class="fragment">Con nuestra partición al azar: <strong>2005 cayó en test y 2006 en
-      entrenamiento.</strong> El modelo estudió uno y "predijo" el otro.</li>
+      entrenamiento.</strong> La red sólo ve el año: el gemelo de al lado le regala el valor.
+      Un modelo que leyera el texto lo acertaría de memoria.</li>
   </ul>
   <div class="cifras-fila fragment">
-    <div><span class="et">test con partición al azar (con fuga)</span><span class="nu c-error">0.0142</span></div>
-    <div><span class="et">test con partición por tiempo (honesta)</span><span class="nu c-ok">0.0319</span></div>
-    <div><span class="et">el baseline tonto en la partición honesta</span><span class="nu">0.0255</span></div>
+    <div><span class="et">test con partición al azar (con fuga)</span><span class="nu c-error" id="f-azar">0.0142</span></div>
+    <div><span class="et">test con partición por tiempo (honesta)</span><span class="nu c-ok" id="f-tiempo">0.0319</span></div>
+    <div><span class="et">el baseline tonto en la partición honesta</span><span class="nu" id="f-base">0.0255</span></div>
   </div>
   <div class="ojo compacta fragment">
-    La partición al azar da un número <strong>2,2 veces mejor</strong>, y con la honesta la red
-    <strong>no le gana al baseline</strong> (0.0319 contra 0.0255): con 36 casos, ese es el
+    La partición al azar da un número <strong><span id="f-veces">2,2</span> veces mejor</strong>, y con la honesta la red
+    <strong>no le gana al baseline</strong> (<span id="f-tiempo2">0.0319</span> contra <span id="f-base2">0.0255</span>): con 36 casos, ese es el
     resultado. <span style="font-size:.9em">Lo seguro no es <em>cuánto</em> infla la fuga —los
     dos test no son el mismo conjunto—, es <strong>que no hay manera de saberlo</strong>.</span>
   </div>
   <aside class="notes">
-    <b>115-118 min.</b> Esta es la mejor escena de la clase. <b>No la apures.</b><br>
+    <b>111-114 min.</b> Esta es la mejor escena de la clase. <b>No la apures.</b><br>
     Revelá de a un fragmento. Después del segundo, esperá: alguien siempre dice "pero entonces…".
     Dejalo terminar la frase.<br>
     El cierre, sin dramatismo: "no inventamos esto para la clase. Está en el corpus que usamos
@@ -908,15 +937,20 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     red al azar queda en 1,07 y la honesta en 1,25. La fuga garantiza la <b>dirección</b>, no
     el tamaño: el 0.0142 está inflado y <b>no hay manera de medir cuánto</b>. Esa
     imposibilidad es el problema, no el número. (Está impreso en la sección 6 del notebook.)<br>
+    <b>Si alguien pregunta "¿pero cómo 'reconoce' 2005 si sólo ve el año?"</b>: no lo reconoce.
+    La red interpola entre años vecinos y 2006, en entrenamiento, tiene exactamente el mismo
+    valor. Predice 0.137 contra 0.1645 reales: cerca, no perfecto. En el notebook, un "modelo"
+    que mira el perfil de temas del discurso copia al vecino más parecido, que es 2006, y
+    acierta con error cero. Eso sería la fuga con un modelo de texto (clase 9).<br>
     Y el <b>baseline</b>: "de cada paper que lean, pregunten cuál era el modelo tonto. Si no
     está, no saben si el resultado es bueno."
   </aside>
 </section>
 
-<!-- ============================ 36. EL LUNES ============================ -->
+<!-- ======================= 36. EN TU INVESTIGACIÓN ======================= -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué te llevás para el lunes</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué te llevás a tu investigación</h2>
   <p class="bajada">Tomá el último dataset con el que trabajaste y contestá <strong>por
      escrito</strong>, antes de tocar un modelo:</p>
   <ol>
@@ -930,8 +964,9 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     Preguntalo. Es una pregunta de revisor perfectamente educada y casi nadie la hace.
   </div>
   <aside class="notes">
-    <b>118-119 min.</b> Pedí que escriban las tres preguntas <b>ahora</b>, en el cuaderno,
-    treinta segundos. Lo que no se escribe en clase no se hace el lunes.
+    <b>114-116 min.</b> Pedí que escriban las tres preguntas <b>ahora</b>, en el cuaderno,
+    un minuto. Lo que no se escribe en clase no se hace después. Son las mismas de la
+    pregunta 13 del cuestionario: que las traigan contestadas a la clase 5.
   </aside>
 </section>
 
@@ -940,7 +975,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista dos">
     <li><b>training loop</b><span>el ciclo de entrenamiento — las cinco líneas que se repiten</span></li>
-    <li><b>tensor</b><span>una tabla de números que se acuerda de las cuentas que le hicieron</span></li>
+    <li><b>tensor</b><span>una tabla de números que, si se lo pedís, se acuerda de las cuentas</span></li>
     <li><b>autograd</b><span>la maquinaria que calcula todas las pendientes sola</span></li>
     <li><b>backpropagation</b><span>retropropagación — todas las pendientes de una sola pasada</span></li>
     <li><b>epoch</b><span>época — una pasada completa por todos tus datos</span></li>
@@ -952,7 +987,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     <li><b>baseline</b><span>línea de base — el modelo tonto contra el que hay que ganar</span></li>
   </ul>
   <aside class="notes">
-    <b>119 min.</b> No la leas entera: es para la foto. Decí sólo: "los términos van a
+    <b>116-117 min.</b> No la leas entera: es para la foto. Decí sólo: "los términos van a
     <code>recursos/glosario.md</code> con la clase donde aparecieron; ahí está el curso entero".<br>
     Si te sobran treinta segundos, preguntá cuál les costó más. Casi siempre es
     <i>validación vs test</i>.
@@ -965,14 +1000,15 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
   <ol>
     <li><strong>Entrenar son cinco líneas</strong> que se repiten: predecir, comparar, borrar,
       anotar, mover. <code>backward()</code> anota; <code>step()</code> mueve. No son lo mismo.</li>
-    <li><strong>La loss de entrenamiento siempre baja con más capacidad</strong>, así que no
-      sirve para decidir nada. Decide la loss sobre datos que el modelo no vio.</li>
+    <li><strong>La loss de entrenamiento tiende a bajar con más capacidad</strong> (no sube de
+      forma sistemática), así que no sirve para decidir nada. Decide la loss sobre datos que el
+      modelo no vio.</li>
     <li><strong>Partir al azar sólo vale si tus casos son independientes.</strong>
       Con panel, con series o con el mismo hablante repetido, partir al azar es hacerse trampa
       sin darse cuenta. Y el test se mira una sola vez.</li>
   </ol>
   <aside class="notes">
-    <b>119 min.</b> Tres, no cuatro. Si te acordás de una cuarta, va al glosario, no acá.<br>
+    <b>117-118 min.</b> Tres, no cuatro. Si te acordás de una cuarta, va al glosario, no acá.<br>
     Decilas mirando al aula, no a la pantalla.
   </aside>
 </section>
@@ -997,7 +1033,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
     tipos de datos distintos.
   </div>
   <aside class="notes">
-    <b>119-120 min.</b> Decilo con todas las letras: <b>"ya vieron el mecanismo completo. De
+    <b>118-119 min.</b> Decilo con todas las letras: <b>"ya vieron el mecanismo completo. De
     acá en adelante no hay ninguna idea más grande que esta; hay adaptaciones."</b><br>
     A esta altura del curso mucha gente cree que le falta lo importante. No le falta.
     Decírselo cambia cómo entran a la clase 5.
@@ -1014,7 +1050,7 @@ if loss_val &lt; mejor_loss:                                  # ¿mejoró?
      porque una arquitectura es, en realidad, <strong>una teoría sobre cómo está hecho el
      mundo</strong>.</p>
   <aside class="notes">
-    <b>120 min.</b> La pregunta que se llevan abierta, y que se contesta la clase que viene:
+    <b>119-120 min.</b> La pregunta que se llevan abierta, y que se contesta la clase que viene:
     <b>"¿por qué una foto no es una lista larga de números?"</b> Pediles que la piensen en el
     colectivo.
   </aside>
@@ -1085,6 +1121,8 @@ const enGrilla = curva => D.grilla.map((x, i) => ({ x: x, y: curva[i] }));
 const fmt = (v, d) => Viz.num(v, d === undefined ? 4 : d);
 
 function texto(id, t) { const n = document.getElementById(id); if (n) n.textContent = t; }
+// Cada figura dice en palabras lo que dibuja, para quien no la ve.
+function describir(p, t) { p.canvas.setAttribute('role', 'img'); p.canvas.setAttribute('aria-label', t); }
 
 /* --- slide 6: el ciclo de cinco estaciones -------------------------------- */
 (function () {
@@ -1136,6 +1174,8 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
     p.texto(0, -0.20, 'y de nuevo…', { color: 'tinta3', tam: 14, alinear: 'center' });
   });
   p.redibujar();
+  describir(p, 'El ciclo de entrenamiento en círculo: 1 predecir, modelo(x); 2 comparar, ' +
+    'criterio; 3 borrar, zero_grad; 4 anotar, backward; 5 mover, step; y de nuevo.');
 })();
 
 /* --- slide 18: el reencuentro --------------------------------------------- */
@@ -1166,6 +1206,9 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
     ], { pos: 'ai' });
   });
   p.redibujar();
+  describir(p, 'Los 36 discursos, de 1984 a 2019, con tres ajustes: uno a ojo (loss ' +
+    fmt(D.ojo.mse) + '), la mejor recta (loss ' + fmt(D.recta.mse) + ') y la red de 16 rampas ' +
+    'entrenada hoy (loss ' + fmt(D.reencuentro.mse) + ').');
   texto('n-ojo', fmt(D.ojo.mse));
   texto('n-recta', fmt(D.recta.mse));
   texto('n-red', fmt(D.reencuentro.mse));
@@ -1191,7 +1234,16 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
                 { color: 'error', tam: 14, peso: '700', alinear: 'right', caja: true });
     });
     p.redibujar();
+    describir(p, 'Red de ' + c.h + ' rampas (' + c.perillas + ' perillas) ajustada a los 36 ' +
+      'discursos: loss de entrenamiento ' + fmt(c.mse, 5) + '.');
   });
+  // El número de 256 rampas sale de la misma corrida (no está escrito a mano) y
+  // la lectura también: con épocas fijas, 256 puede quedar un poco arriba de 64.
+  const c64 = D.capacidades[D.capacidades.length - 1].mse, c256 = D.cap256.mse;
+  texto('n-256', fmt(c256, 5));
+  texto('n-256-lectura', c256 < 0.95 * c64 ? ': sigue bajando'
+    : (c256 > 1.05 * c64 ? ': un poco más que con 64 (con épocas fijas no siempre llega al fondo)'
+                          : ': casi lo mismo que con 64'));
 })();
 
 /* --- slide 20: el calco ---------------------------------------------------- */
@@ -1221,6 +1273,10 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
     ], { pos: 'ai' });
   });
   p.redibujar();
+  describir(p, 'El calco: una red de ' + D.calco.h + ' rampas pasa por los 31 años que vio y ' +
+    'erra los 5 apartados (' + apart.map(a => a.anio).join(', ') + '). Loss sobre los que vio ' +
+    fmt(D.calco.mse_train, 5) + ', sobre los apartados ' + fmt(D.calco.mse_apartados, 5) +
+    '; la red de 16 rampas, sobre esos 5, ' + fmt(D.sana.mse_apartados, 5) + '.');
   texto('c-h', String(D.calco.h));
   texto('c-perillas', String(D.calco.perillas));
   texto('c-train', fmt(D.calco.mse_train, 5));
@@ -1246,7 +1302,7 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
     p.poligono(banda, { color: 'error', opacidad: .12, relleno: undefined });
     p.segmento(T.mejor, 0, T.mejor, tope, { color: 'ok', grosor: 2, punteada: [6, 5] });
     p.linea(T.epocas.map((e, i) => ({ x: e, y: T.train[i] })), { color: 'modelo', grosor: 3 });
-    p.linea(T.epocas.map((e, i) => ({ x: e, y: T.val[i] })), { color: 'val', grosor: 3 });
+    p.linea(T.epocas.map((e, i) => ({ x: e, y: T.val[i] })), { color: 'val', grosor: 3, punteada: [9, 5] });
     p.punto(T.mejor, T.mejor_val, { color: 'ok', r: 7 });
     p.texto(T.mejor + 40, tope * 0.93, 'acá había que parar (época ' + T.mejor + ')',
             { color: 'ok', tam: 14, peso: '700', caja: true });
@@ -1257,10 +1313,25 @@ function texto(id, t) { const n = document.getElementById(id); if (n) n.textCont
             { color: 'error', tam: 13, peso: '700', alinear: 'center' });
     p.leyenda([
       { color: 'modelo', texto: 'entrenamiento (lo que vio)', forma: 'linea' },
-      { color: 'val', texto: 'validación (lo que NUNCA vio)', forma: 'linea' }
+      { color: 'val', texto: 'validación (lo que NUNCA vio)', forma: 'linea', punteada: true }
     ], { pos: 'ad' });
   });
   p.redibujar();
+  describir(p, 'La tijera: loss de entrenamiento (línea llena) y de validación (punteada) ' +
+    'durante 1500 épocas. La validación toca su mínimo, ' + fmt(T.mejor_val, 5) +
+    ', en la época ' + T.mejor + ' y después sube hasta ' + fmt(T.val[T.val.length - 1], 4) +
+    ', mientras la de entrenamiento sigue bajando hasta ' + fmt(T.train[T.train.length - 1], 4) + '.');
+})();
+
+/* --- slide 35: al azar contra por tiempo ---------------------------------- */
+(function () {
+  const F = D.fuga;
+  texto('f-azar', fmt(F.test_azar));
+  texto('f-tiempo', fmt(F.test_tiempo));
+  texto('f-tiempo2', fmt(F.test_tiempo));
+  texto('f-base', fmt(F.base_tiempo));
+  texto('f-base2', fmt(F.base_tiempo));
+  texto('f-veces', String(F.veces).replace('.', ','));
 })();
 </script>
 </body>

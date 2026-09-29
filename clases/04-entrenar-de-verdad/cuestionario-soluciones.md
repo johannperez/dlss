@@ -42,18 +42,23 @@ modelo sigue mejorando sobre los datos que ya vio (la azul baja) pero **empeora*
 no vio (la naranja sube): todo lo que aprende después es ruido específico de esa muestra.
 
 *Errores típicos:* señalar el final (época 1500) — está mirando la azul, que es exactamente
-lo que la clase pide no hacer. O señalar dónde las dos curvas se cruzan/separan (~época 60):
+lo que la clase pide no hacer. O señalar dónde las dos curvas se separan (~época 50):
 está cerca y el razonamiento es bueno, dalo por válido si lo justifica, pero marcá que el
 criterio operativo es el **mínimo de la naranja**, no el punto de separación.
 
 **b.** La franja es **la parte de lo que el modelo aprendió que no le sirve para nada**: el
-ruido de esa muestra particular. En términos de investigación, es la distancia entre validez
-interna y validez externa.
+ruido de esa muestra particular. En términos de investigación, es la distancia entre el ajuste
+dentro de la muestra y la capacidad predictiva fuera de ella: lo que no replicaría ni en otra
+muestra de la misma población. *(Si alguien lo llama «validez interna contra externa», no lo
+des por malo, pero marcá el matiz: esas palabras hablan de identificación causal y de
+generalizar a otras poblaciones; el sobreajuste falla antes, en la misma población.)*
 
 **c.** Que bajó la loss **de entrenamiento**, que es el único número que ese colega está
 mirando y el único que no sirve para decidir nada. Sobre datos nuevos el modelo pasó de
-**0.0133** (época 42) a **0.0225** (época 1500): **empeoró**, y casi el doble. Que la azul baje no es una noticia; la azul siempre
-baja.
+**0.0133** (época 42) a **0.0225** (época 1500): **empeoró**, casi 70 % más. Y casi toda
+la bajada que festeja (de 0.36 a ~0.02) pasa en las primeras quince épocas, fuera del
+recorte del eje. Que la azul baje con más épocas no es una noticia: es lo que hace casi
+siempre.
 
 *Este ítem es el que mejor separa a quien entendió de quien memorizó.* Quien contesta "bajó
 un montón, está bien" no leyó el eje de colores.
@@ -74,8 +79,10 @@ completo):
 
 - **La validación es más fácil que el entrenamiento** por casualidad o por construcción: cayó
   un conjunto de casos menos ruidosos, o menos diverso, o de un período más estable. Con
-  muestras chicas pasa todo el tiempo. *(En el notebook de esta clase pasa exactamente eso:
-  la red de 16 rampas da 0.0094 en entrenamiento y 0.0050 en los cinco años apartados.)*
+  muestras chicas pasa todo el tiempo. *(En la slide 20 de esta clase pasa algo así: la red
+  de 16 rampas da 0.0094 en entrenamiento y 0.0047 en los cinco años apartados. La loss de
+  entrenamiento no es «alta», pero la de validación queda más baja, por cuáles cinco años
+  tocaron.)*
 - **Hay fuga o contaminación**: casos duplicados, o el mismo grupo de los dos lados, o —el
   caso más silencioso— el preprocesamiento (normalizar, imputar, seleccionar variables) se
   hizo **sobre todos los datos juntos antes de partir**, así que la validación ya influyó en
@@ -112,7 +119,7 @@ después lo hace desconfiar de todos los modelos grandes por las razones equivoc
 |---|---|---|
 | **A** ("se agranda") | Suena a que "más datos, más difícil". | Invierte la relación capacidad/datos. Volvé a la **slide 28** y hacé la demostración en vivo con el slider. |
 | **C** ("no cambia") | Piensa el sobreajuste como propiedad del modelo. | Es la misma confusión que el distractor A del ítem 1. |
-| **D** ("desaparece del todo") | Exagera la respuesta correcta. | Falso: siempre queda algo de brecha (y siempre queda el error irreducible del ruido). Con suficientes datos se vuelve chica, no cero. |
+| **D** ("desaparece del todo") | Exagera la respuesta correcta. | Falso: con suficientes datos la brecha se vuelve chica, no cero. (El ruido de medición no explica la brecha: pone un piso a las **dos** curvas por igual.) |
 
 ---
 
@@ -140,17 +147,19 @@ se mueve nunca. Si alguien lo ordenó así, es un error valioso: hacelo correr.
 
 **a.** Falta `optimizador.zero_grad()`.
 
-**b.** La curva de loss baja al principio y después **se vuelve errática**: sube, salta, o se
-va directamente a `nan`. En modelos chicos a veces "anda" y da un resultado peor sin avisar,
-que es lo peligroso.
+**b.** La curva de loss baja al principio y después **no se asienta**: oscila, sube y baja,
+y a veces diverge (se va a `nan`). En el notebook, con los datos de la clase y `lr=0.15`,
+oscila entre ~0.02 y ~0.06 sin irse al infinito (es la celda opcional después del TODO 3).
+En modelos chicos a veces "anda" y da un resultado peor sin avisar, que es lo peligroso.
 
 **c.** Porque PyTorch **acumula** gradientes: los de esta vuelta se suman a los de todas las
-anteriores. Después de 100 épocas el paso que da `step()` es enorme y en la dirección de una
-mezcla de gradientes viejos.
+anteriores. Cada `step()` empuja con esa suma de pendientes viejas, como una inercia sin
+freno: el modelo se pasa de largo, vuelve y se vuelve a pasar.
 
 *Nota para quien corrige:* si alguien dice "el modelo no aprende", es parcialmente correcto
-pero no describe el síntoma. Pedile que lo corra: la experiencia de ver la curva volverse loca
-vale más que la explicación.
+pero no describe el síntoma. Si dice "los pasos crecen sin límite", también es parcial: con
+estos datos oscila más de lo que explota. Pedile que corra la celda opcional: ver la curva
+ir y venir vale más que la explicación.
 
 ---
 
@@ -163,8 +172,8 @@ no una vez por época.)
 
 **Error frecuente en b:** contestar 15 (una actualización por época). Revela que sigue pensando
 que "entrenar una época" es un solo paso. Es exactamente la confusión que la slide 15 quiere
-evitar, y por eso conviene que en el aula quede clarísimo que en **este** curso 1 época = 1
-iteración sólo porque los datos entran en un solo lote.
+evitar, y por eso conviene que en el aula quede clarísimo que en **esta** clase 1 época = 1
+iteración sólo porque los datos entran en un solo lote (desde la clase 5 ya no).
 
 ---
 
@@ -185,7 +194,8 @@ insuficiente; pedí que digan **qué aprendería** el modelo. La versión concre
 **c. No.** El modelo es el mismo; lo que cambió es que ahora **estás midiendo bien**. El número
 alto anterior era una ilusión creada por la partición. Esta pregunta separa a quien entendió
 la lógica de quien cree que el objetivo es maximizar un número. Si alguien contesta "sí,
-empeoró", volvé con él a la slide 35: el test al azar daba 2,2 veces mejor y era mentira.
+empeoró", volvé con él a la slide 35: el test al azar daba 2,2 veces mejor, y era un número
+inflado por la fuga (cuánto, no se puede saber).
 
 ---
 
@@ -193,7 +203,9 @@ empeoró", volvé con él a la slide 35: el test al azar daba 2,2 veces mejor y 
 
 **a. Partición temporal**: por ejemplo entrenar con 2010-2019, validar con 2020-2021, testear
 con 2022-2023. Los bloques son **contiguos y en orden**. En `ssdl`:
-`datos.particion_temporal(meses, corte_val, corte_test)`.
+`datos.particion_temporal(meses, corte_val, corte_test)`, con `meses` **numérico y
+ordenable** (por ejemplo `2010 + (mes - 1) / 12`, o un índice de 0 a 167) y los cortes en la
+misma escala: con textos como `"ene-2010"` la comparación `<` no ordena por fecha.
 
 **b.** Contesta *"¿este modelo sirve para predecir el mes que viene, con la información que
 tengo hasta hoy?"*. **No** contesta *"¿qué explica la conflictividad?"* ni *"¿esto vale para

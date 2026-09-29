@@ -141,5 +141,12 @@ está medido sobre los datos reales; lo elegido a dedo son los dos parámetros. 
 no para citarse.
 
 Los números del resto de la clase —el reencuentro, las tres capacidades, el calco, la tijera y
-la comparación de particiones— **sí** salen de una corrida real y reproducible: los genera
+la comparación de particiones— **sí** salen de una corrida real: los genera
 `medir-figuras.py` con la semilla 1983, y son los mismos que produce `notebook.ipynb`.
+Son deterministas **en la misma máquina y con las mismas versiones de las librerías**; con
+otra versión de torch o de numpy cambian un poco (en el tercer o cuarto decimal). Las
+versiones con que se generaron quedan anotadas en `datos-figuras.js` (`versiones`).
+
+Un número de la slide 21 viene de otra clase: el desajuste de 32 rampas sobre la serie de
+inflación suavizada (0.0000076, contra 0.001561 de la mejor recta) lo midió la clase 2. Si
+la clase 2 lo cambia, hay que cambiarlo acá.

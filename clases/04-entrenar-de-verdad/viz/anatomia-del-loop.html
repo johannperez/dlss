@@ -150,9 +150,9 @@ const CODIGO = [
 const NOTAS = [
   'Con las perillas de <b>ahora</b> el modelo dibujó su recta y sacó los ocho números que predice. Todavía no sabe si están bien.',
   'Los ocho errores, al cuadrado, promediados: eso es la <b>loss</b>. Un solo número para "qué tan mal la estoy dibujando".',
-  'Se borran los gradientes de la vuelta anterior. Si te olvidás esta línea se <b>suman</b> a los nuevos y el modelo se va a cualquier lado.',
+  'Se borran los gradientes de la vuelta anterior. Si te olvidás esta línea se <b>suman</b> a los nuevos: una inercia sin freno, el modelo se pasa de largo, oscila y a veces diverge.',
   'Acá se anotó para dónde habría que moverse. <b>Mirá las perillas: siguen exactamente iguales.</b> Anotar no es caminar.',
-  'Ahora sí. Cada perilla se movió un pasito en contra de su gradiente. Los gradientes siguen ahí, ya viejos: la vuelta que viene se borran.'
+  'Ahora sí. Cada perilla se movió en contra de su gradiente: el paso es <b>learning rate × pendiente</b>. Los gradientes siguen ahí, ya viejos: la vuelta que viene se borran.'
 ];
 
 /* ===========================================================================
@@ -244,15 +244,36 @@ const cl = Viz.plano('#curva-loss', {
   xmin: 0, xmax: 20, ymin: 0, ymax: 0.07, alto: 152,
   ejeX: 'vuelta (epoch)', ejeY: 'loss', titulo: 'qué tan mal, vuelta a vuelta'
 });
+// Con un learning rate grande (más de ~0.68 con estos datos) la loss sube en vez
+// de bajar. El eje vertical arranca en [0, 0.07]; si la loss se sale, el eje se
+// agranda para que la subida se VEA (antes se iba del gráfico sin aviso) y un
+// cartel lo dice en palabras.
+const TOPE_LOSS = 0.07;
+function divergio() {
+  return historia.some(h => !isFinite(h.loss)) ||
+         (historia.length > 1 && historia[historia.length - 1].loss > historia[0].loss);
+}
+function ajustarEjeLoss() {
+  const finitos = historia.map(h => h.loss).filter(isFinite);
+  const maximo = finitos.length ? Math.max.apply(null, finitos) : 0;
+  const ymax = maximo > TOPE_LOSS ? 1.15 * maximo : TOPE_LOSS;
+  cl.limites(0, Math.max(20, iteracion + 5), 0, ymax);
+}
 cl.alDibujar(() => {
   cl.fondo(); cl.grilla(); cl.ejes({ formatoX: v => String(Math.round(v)) });
-  if (historia.length) {
-    cl.linea(historia.map(h => ({ x: h.it, y: h.loss })), { color: 'error', grosor: 2.5 });
-    cl.puntos(historia.slice(-1).map(h => ({ x: h.it, y: h.loss })), { color: 'error', r: 4 });
+  const finitos = historia.filter(h => isFinite(h.loss));
+  if (finitos.length) {
+    cl.linea(finitos.map(h => ({ x: h.it, y: h.loss })), { color: 'error', grosor: 2.5 });
+    cl.puntos(finitos.slice(-1).map(h => ({ x: h.it, y: h.loss })), { color: 'error', r: 4 });
   }
   cl.texto(cl.xmax * 0.98, cl.ymax * 0.93,
-           perdida === null ? 'sin medir todavía' : 'loss = ' + Viz.num(perdida, 5),
+           perdida === null ? 'sin medir todavía'
+             : (isFinite(perdida) ? 'loss = ' + Viz.num(perdida, 5) : 'loss = infinito'),
            { color: 'error', tam: 12, peso: '700', alinear: 'right', caja: true });
+  if (divergio()) {
+    cl.texto(cl.xmax * 0.98, cl.ymax * 0.72, '¡la loss sube! el paso es demasiado largo',
+             { color: 'error', tam: 11, peso: '700', alinear: 'right', caja: true });
+  }
 });
 
 /* ===========================================================================
@@ -330,7 +351,7 @@ function unaEstacion() {
     perdida = calcularPerdida(pred);
     resaltar.perdida = true;
     historia.push({ it: iteracion, loss: perdida });
-    if (iteracion + 1 > cl.xmax) cl.limites(0, Math.max(20, iteracion + 5), 0, cl.ymax);
+    ajustarEjeLoss();
   } else if (estacion === 2) {                // BORRAR
     ga = null; gb = null;
   } else if (estacion === 3) {                // ANOTAR
@@ -359,13 +380,25 @@ function reiniciar() {
   a = A0; b = B0; pred = null; perdida = null; ga = null; gb = null;
   estacion = -1; iteracion = 0; historia = [];
   limpiarResaltados();
-  cl.limites(0, 20, 0, 0.07);
+  cl.limites(0, 20, 0, TOPE_LOSS);
   dibujarTodo();
 }
 
 function dibujarTodo() {
   dia.redibujar(); aj.redibujar(); cl.redibujar();
   pintarNumeros(); pintarCodigo();
+  // lo mismo que muestran los dibujos, en palabras (para lectores de pantalla)
+  dia.canvas.setAttribute('aria-label', 'El ciclo de cinco estaciones: predecir, comparar, ' +
+    'borrar, anotar, mover. ' + (estacion < 0 ? 'Todavía no arrancó.'
+      : 'Acaba de correr la estación ' + (estacion + 1) + ', ' + ESTACIONES[estacion].nom +
+        '. Vuelta ' + iteracion + '.'));
+  aj.canvas.setAttribute('aria-label', 'Los ocho datos y la recta de ahora: sube ' +
+    Viz.num(a, 3) + ' por década y vale ' + Viz.num(b, 3) + ' en 2001.');
+  cl.canvas.setAttribute('aria-label', historia.length
+    ? 'La loss vuelta a vuelta: ' + historia.length + ' mediciones, la última ' +
+      (isFinite(perdida) ? Viz.num(perdida, 5) : 'infinita') +
+      (divergio() ? '. La loss está subiendo: el paso es demasiado largo.' : '.')
+    : 'La curva de loss, todavía vacía.');
   const conv = perdida === null ? '—' : Viz.num(perdida, 5);
   ctl.texto('lectura',
     'Vuelta <b>' + iteracion + '</b> · loss <b>' + conv + '</b><br>' +
@@ -384,13 +417,15 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'boton', texto: 'Una vuelta entera', alClic: () => unaVuelta() },
   { tipo: 'boton', texto: 'Correr 50 vueltas', alClic: () => correrMuchas(50) },
   { tipo: 'boton', texto: 'Volver al principio', alClic: () => reiniciar() },
-  { tipo: 'titulo', texto: 'El tamaño del paso' },
-  { tipo: 'slider', id: 'lr', etiqueta: 'qué tan largo es el paso',
-    sub: 'learning rate — de la clase 3', min: 0.01, max: 1.2, escala: 'log',
+  { tipo: 'titulo', texto: 'El learning rate' },
+  { tipo: 'slider', id: 'lr', etiqueta: 'learning rate',
+    sub: 'el número que multiplica a la pendiente (clase 3); arriba de ~0.68 la loss sube',
+    min: 0.01, max: 1.2, escala: 'log',
     valor: 0.3, formato: v => v.toFixed(3), color: 'parametro' },
   { tipo: 'texto', id: 'lectura', html: '' }
 ], () => { dia.redibujar(); });
 
+for (const pl of [dia, aj, cl]) pl.canvas.setAttribute('role', 'img');
 reiniciar();
 Viz.botonTema();
 </script>

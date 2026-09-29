@@ -35,6 +35,13 @@
     color: var(--papel); font-weight: 600; overflow: hidden; cursor: default;
   }
   .caso .sub { font-size: 8px; opacity: .85; font-weight: 400; }
+  /* El montón no se dice sólo con el color: cada cuadradito lleva además su
+     letra (E = entrenamiento, V = validación, T = test) en la esquina. */
+  .caso::before {
+    content: attr(data-m); position: absolute; bottom: 0; left: 2px;
+    font-size: 7.5px; font-weight: 800; opacity: .9;
+  }
+  .leyenda-part .letra { font-family: var(--f-mono); font-weight: 800; }
   .caso.fuga { outline: 3px solid var(--c-error); outline-offset: -1px; }
   .caso.fuga::after {
     content: "!"; position: absolute; top: -1px; right: 2px;
@@ -69,9 +76,11 @@
   <header>
     <h1>Cómo partir los datos (y cómo hacerse trampa sin querer)</h1>
     <p>Cada cuadradito es un caso. Los colores dicen a qué montón fue a parar.
+       La letra de la esquina dice lo mismo que el color (<b>E</b>ntrenamiento,
+       <b>V</b>alidación, <b>T</b>est).
        Cambiá <strong>una sola cosa</strong> —la estrategia de partición— y mirá cuántos
-       anillos rojos aparecen y desaparecen. Los anillos rojos son casos del test que
-       el modelo, de alguna manera, ya vio.</p>
+       anillos rojos aparecen y desaparecen. Los anillos rojos (con un «!») son casos del
+       test que el modelo, de alguna manera, ya vio.</p>
   </header>
 
   <div>
@@ -79,7 +88,7 @@
       <div class="leyenda-part" id="leyenda"></div>
       <div id="casos"></div>
     </div>
-    <div class="viz-frame" id="veredicto" style="padding:.6rem .75rem; margin-top:.5rem"></div>
+    <div class="viz-frame" id="veredicto" aria-live="polite" style="padding:.6rem .75rem; margin-top:.5rem"></div>
   </div>
 
   <div class="panel" id="panel"></div>
@@ -87,10 +96,10 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Con los discursos y la estrategia <b>al azar</b>, prendé
-      «agrupar por presidente»: vas a ver filas con los tres colores mezclados. Eso quiere
+      «agrupar por presidente o diario»: vas a ver filas con los tres colores mezclados. Eso quiere
       decir que el modelo estudió los discursos de Menem y después lo evaluamos con
-      <em>otro</em> discurso de Menem: no está prediciendo, está reconociendo un estilo
-      que ya vio. Y hay algo peor: <b>2005 y 2006 son el mismo discurso</b>, palabra por
+      <em>otro</em> discurso de Menem: un modelo que lea el texto no está prediciendo, está
+      reconociendo un estilo que ya vio. Y hay algo peor: <b>2005 y 2006 son el mismo discurso</b>, palabra por
       palabra, en el corpus original. Al azar, esa copia cae de los dos lados. Pasá a
       <b>por grupo</b>: se apagan todos los anillos.
     </div>
@@ -194,6 +203,19 @@ function partir(casos, estrategia, pTrain, pVal, semilla) {
       deGrupo[g] = acum < cTrain ? 'train' : (acum < cVal ? 'val' : 'test');
       acum += cuantos;
     }
+    // Con pocos grupos grandes, los porcentajes pueden dejar el test (o la
+    // validación) sin NINGÚN grupo: con 7 presidentes pasaba en uno de cada
+    // cuatro sorteos. Un test vacío no es un test, así que el último grupo del
+    // sorteo va siempre a test y, si hace falta, el anteúltimo a validación.
+    const hay = m => grupos.some(g => deGrupo[g] === m);
+    if (grupos.length >= 3) {
+      if (!hay('test')) deGrupo[grupos[grupos.length - 1]] = 'test';
+      if (!hay('val')) {
+        for (let k = grupos.length - 2; k >= 0; k--) {
+          if (deGrupo[grupos[k]] === 'train') { deGrupo[grupos[k]] = 'val'; break; }
+        }
+      }
+    }
     casos.forEach(c => { destino[c.id] = deGrupo[c.grupo]; });
   }
   return destino;
@@ -222,6 +244,7 @@ function diagnosticar(casos, destino) {
    4. DIBUJAR
    =========================================================================== */
 const COLOR = { train: 'modelo', val: 'val', test: 'ok' };
+const LETRA = { train: 'E', val: 'V', test: 'T' };
 const NOMBRE = { train: 'entrenamiento (mueve las perillas)',
                  val: 'validación (decide cuántas perillas)',
                  test: 'test (el número que reportás, una vez)' };
@@ -236,7 +259,8 @@ function celdaHTML(c, destino, diag) {
   const titulo = c.rotulo + ' · ' + c.grupo + ' · ' +
     ({ train: 'entrenamiento', val: 'validación', test: 'test' })[destino[c.id]] +
     (c.gemelo !== null ? ' · tiene un gemelo idéntico' : '');
-  return '<div class="' + clase + '" style="background:' + col + '" title="' + titulo + '">' +
+  return '<div class="' + clase + '" data-m="' + LETRA[destino[c.id]] + '" style="background:' +
+         col + '" title="' + titulo + '">' +
          '<span>' + c.rotulo + '</span>' +
          (c.sub ? '<span class="sub">' + c.sub + '</span>' : '') + '</div>';
 }
@@ -254,9 +278,10 @@ function pintar() {
   for (const k of ['train', 'val', 'test']) {
     const cuantos = destino.filter(d => d === k).length;
     leyenda += '<span><i style="background:' + Viz.color(COLOR[k]) + '"></i>' +
+               '<span class="letra">' + LETRA[k] + '</span> · ' +
                NOMBRE[k] + ' — <b>' + cuantos + '</b></span>';
   }
-  leyenda += '<span style="color:var(--c-error)">anillo rojo = fuga · ' +
+  leyenda += '<span style="color:var(--c-error)">anillo rojo con «!» = fuga · ' +
              '<b>=</b> marca los casos duplicados</span>';
   Viz.nodo('#leyenda').innerHTML = leyenda;
 
@@ -296,7 +321,12 @@ function pintar() {
   const gemelosCruzados = diag.paresPartidos > 0;
   const gemeloEnTest = diag.fugaGemelo.some(id => destino[id] === 'test');
   let v;
-  if (nFuga === 0 && !gemelosCruzados) {
+  if (nTest === 0) {
+    // (con la partición por grupo ya no pasa, pero los sliders permiten llegar)
+    v = '<span class="grande" style="color:var(--c-error)">⚠ Tu test está vacío.</span>' +
+        'Con estos porcentajes no quedó ningún caso para el test: no hay número que reportar. ' +
+        'Bajá «para entrenar» o «para validar».';
+  } else if (nFuga === 0 && !gemelosCruzados) {
     v = '<span class="grande" style="color:var(--c-ok)">✓ Sin fugas: tu test es un test de verdad.</span>' +
         'Ningún caso del test comparte ' + conj.nombreGrupo + ' con el entrenamiento, ' +
         'y no hay duplicados cruzando la partición. El número que salga de acá se puede reportar.';
@@ -328,7 +358,7 @@ function pintar() {
                            ' (esta vez cae entre entrenamiento y validación, así que ' +
                            'ensucia la decisión, no el número final)') + '. ';
     }
-    v += '<br>Tu modelo va a "acertar" esos casos porque los reconoce, no porque los prediga. ' +
+    v += '<br>Tu modelo va a "acertar" esos casos porque ya vio su gemelo (o un vecino casi igual), no porque los prediga. ' +
          'El número que reportes va a estar inflado y no vas a poder saber cuánto.';
   }
   v += '<div class="quepregunta">' +
@@ -337,7 +367,15 @@ function pintar() {
            'Preguntate si lo son: casi nunca lo son.'
          : ctl.valores.estrategia === 'tiempo'
            ? 'Partir <b>por tiempo</b> contesta: <i>¿sirve para el año que viene?</i> ' +
-             'Es la partición honesta cuando tu pregunta es predictiva.'
+             'Es la partición honesta cuando tu pregunta es predictiva.' +
+             (ctl.valores.conjunto === 'discursos'
+               ? ' <br>Ojo: acá el corte sale de los porcentajes. Con 60/20/20 cae justo ' +
+                 'entre 2005 y 2006, y los gemelos quedan partidos entre entrenamiento y ' +
+                 'validación. El notebook corta por año (entrenamiento hasta 2007, validación ' +
+                 '2008-2013, test 2014-2019) y ahí los dos quedan en entrenamiento. Subí ' +
+                 '«para entrenar» a 65 % y mirá cómo se va el aviso: dónde cortás también es ' +
+                 'una decisión.'
+               : '')
            : 'Partir <b>por grupo</b> contesta: <i>¿sirve para un ' + conj.nombreGrupo +
              ' que no vi nunca?</i> Fijate el precio: el test se queda con ' + nTest +
              ' casos.') + '</div>';
@@ -367,7 +405,7 @@ const ctl = Viz.controles('#panel', [
     } },
 
   { tipo: 'titulo', texto: 'Cómo se ve' },
-  { tipo: 'checkbox', id: 'agrupar', etiqueta: 'agrupar por grupo', valor: false }
+  { tipo: 'checkbox', id: 'agrupar', etiqueta: 'agrupar por presidente o diario', valor: false }
 ], () => pintar());
 
 // La semilla del curso es 1983, pero acá va 2019 A PROPÓSITO: con 1983 el sorteo

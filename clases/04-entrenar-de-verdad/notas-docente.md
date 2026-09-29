@@ -12,8 +12,8 @@
 3. Se conectan las tres clases anteriores en un mecanismo: **el ciclo de cinco estaciones**.
 4. Se desarma la confusión número uno con la viz: **`backward` anota, `step` mueve**.
 5. Practican. Escriben el loop, comprueban que `nn.Sequential` no esconde nada, y suben
-   la capacidad hasta ver que la loss **siempre** mejora.
-6. Pausa. Vuelven con la trampa servida en bandeja: "mejora, mejora, mejora, ¿le pongo 4000?".
+   la capacidad hasta ver que la loss de entrenamiento **tiende** a bajar (con algún saltito).
+6. Pausa. Vuelven con la trampa servida en bandeja: "baja, baja, baja, ¿le pongo 4000?".
 7. **El calco**: 200 rampas que pasan por todos los puntos y erran los cinco que no vieron.
 8. La única defensa: apartar datos. Train / validación / test, y la **tijera**.
 9. **La escena**: en nuestros propios datos, 2005 y 2006 son el mismo discurso, la partición
@@ -46,18 +46,19 @@ cada manchita del original, incluidas las que son suciedad del papel.*
 | **71-73** | 22 | Ya conocen esto | Pedís ejemplos de su disciplina. |
 | **73-78** | 23-24 | Partición + apuesta | La torta, y la votación antes de la viz. |
 | **78-84** | 25 | **VIZ sobreajuste** | Capacidad despacio, y «otra muestra» cinco veces. |
-| **84-89** | 26-27 | La tijera y early stopping | La radiografía y la consecuencia. |
-| **89-93** | 28-29 | Más datos / otras defensas | La 29 es lo primero que se recorta. |
-| **93-105** | 30 | **Práctico 2** (primera parte) | Partición, tijera, TODO 4. |
-| **105-108** | 31 | Puesta en común | Dos o tres personas, las que se equivocaron. |
-| **108-112** | 32-33 | Regla de oro y fuga | El test una vez; partir al azar cuándo no. |
-| **112-118** | 34-35 | **VIZ partición + 2005/2006** | **La mejor escena de la clase. No la apures.** |
-| **118-120** | 36-40 | Cierre | El lunes, glosario, tres ideas, módulo, puente. |
+| **84-88** | 26-27 | La tijera y early stopping | La radiografía y la consecuencia. |
+| **88-91** | 28-29 | Más datos / otras defensas | La 29 va en un minuto, y es lo primero que se recorta. |
+| **91-103** | 30 | **Práctico 2** | Partición, tijera, TODO 4. |
+| **103-105** | 31 | Puesta en común | Dos personas, las que se equivocaron. |
+| **105-108** | 32-33 | Regla de oro y fuga | El test una vez; partir al azar cuándo no. |
+| **108-114** | 34-35 | **VIZ partición + 2005/2006** | **La mejor escena de la clase. No la apures.** |
+| **114-120** | 36-40 | Cierre | En tu investigación (escriben las tres preguntas), glosario, tres ideas, módulo, puente. |
 
-> El práctico 2 tiene 25 minutos en el papel (93-118) pero el plan de arriba le da 12 y
-> mueve el resto al cierre. Es a propósito: **la escena de 2005/2006 no se puede recortar**,
-> y la parte del experimento libre del notebook se puede terminar en casa. Si tu grupo es
-> rápido, dale al práctico hasta el minuto 105 y hacé el cierre en diez.
+> El práctico 2 tiene 12 minutos. Es a propósito: **la escena de 2005/2006 no se puede
+> recortar** y el cierre necesita sus seis minutos (antes tenía dos, y la slide 38 se leía a
+> las corridas). El experimento de a dos (sección 7 del notebook, unos diez minutos) se
+> termina antes de la clase 5. Si tu grupo es rápido, dale al práctico hasta el minuto 105
+> y achicá la puesta en común.
 
 ---
 
@@ -116,6 +117,7 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 |---|---|---|
 | **`backward` mueve las perillas** | "Ah, entonces ahí se entrena" | Viz de anatomía, parando en ANOTAR: los gradientes aparecen y las perillas **no cambian**. Treinta segundos, en vivo. |
 | **Más capacidad siempre es mejor** | Es la intuición por defecto, reforzada por el marketing de los modelos grandes | Viz de sobreajuste + «otra muestra» ×5. Y **el matiz honesto** (ver arriba). |
+| **"La loss de entrenamiento baja siempre, es una ley"** | Aparece al revés en el TODO 2, si 256 da un poco más que 64 | *Tiende* a bajar: con un número fijo de épocas el entrenamiento no siempre llega al fondo. No sube de forma sistemática, y por eso no avisa nada. (En la viz de sobreajuste la azul no sube porque cada modelo contiene al anterior y se resuelve exacto.) |
 | **Olvidarse `zero_grad()`** | La loss hace cosas raras y no saben por qué | Anticipado en la slide 11. Contá tu propia vez. Es un rito de iniciación, no un fracaso. |
 | **Confundir epoch con iteración** | "Entrené 1000 iteraciones" queriendo decir epochs | Slide 15 con el ejemplo numérico. Hoy son lo mismo (36 casos, un solo lote) y lo decís. |
 | **"La validación mide qué tan bueno es el modelo"** | Reportan el número de validación como resultado | *"Validación es para **decidir**. Test es para **reportar**. Si decidiste con un número, ese número ya no te sirve para reportar."* |
@@ -123,7 +125,7 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 | **Partir al azar datos temporales o de panel** | El más frecuente y el más difícil de ver | Viz de partición + los 36 discursos. La pregunta operativa: *"al predecir un caso del test, ¿el modelo usa información que en la vida real no habría tenido todavía?"* |
 | **"El modelo entendió"** | Atribución de comprensión cuando ajusta bien | La curva de 200 rampas: ajuste perfecto y erra los cinco años nuevos. La evidencia visual alcanza. |
 | **"¿Cuántos epochs hay que hacer?"** | Buscan una regla | *"Hasta que la validación deje de mejorar. La respuesta la da el gráfico, no una tabla."* |
-| **Pánico ante `nn.Sequential`** | "Apareció magia nueva" | La celda del notebook con la red escrita a mano al lado y el `assert` que da verde. Corré esa celda vos, en la pantalla grande, si hace falta. |
+| **Pánico ante `nn.Sequential`** | "Apareció magia nueva" | La celda del notebook con la red escrita a mano al lado y el chequeo que da ✓. Corré esa celda vos, en la pantalla grande, si hace falta. |
 | **"Mi n es 40, entonces no puedo hacer nada"** | Desánimo, y es legítimo | Sí podés: podés hacer un modelo chico, partir honestamente y **reportar que no le ganás al baseline**. Eso es buen trabajo. Lo que no podés es entrenar un modelo grande y publicar el número de entrenamiento. |
 
 ---
@@ -133,13 +135,14 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 **Se recorta, en este orden:**
 
 1. **Slide 29** (las otras defensas: regularización, dropout, augmentation). Entera. Se
-   menciona en una frase: *"hay tres técnicas más para lo mismo, están en el notebook"*.
+   menciona en una frase: *"hay tres técnicas más para lo mismo; están en las referencias
+   (Goodfellow et al., capítulo 7)"*. El notebook no las usa.
 2. **Slides 9-13** (una línea de PyTorch por slide). Se hacen de corrido sobre la slide 8,
    señalando con el dedo. Ahorra cuatro minutos.
 3. **Slide 14** (tensores). Una frase: *"un tensor es una tabla de números, nada más"*.
 4. **Slide 31** (puesta en común) baja de tres personas a una.
-5. El **experimento libre** del práctico 2 pasa a tarea para casa. El notebook ya está
-   preparado para eso.
+5. El **experimento libre** del práctico 2 se termina antes de la clase 5. El notebook ya
+   está preparado para eso.
 
 **NUNCA se recorta:**
 
@@ -155,8 +158,9 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 
 - Abrí la viz de sobreajuste y **dejala en manos del aula**: que alguien venga a mover los
   sliders y explique en voz alta qué está mirando. Cinco minutos bien gastados.
-- Sacá `zero_grad()` del loop **en vivo** y corré. La loss hace cosas ridículas. Aprender el
-  bug produciéndolo vale más que la slide 11.
+- Corré **en vivo** la celda opcional sin `zero_grad()` (después del TODO 3). La loss no se
+  asienta: oscila entre ~0.02 y ~0.06, se pasa de largo y vuelve. Aprender el bug
+  produciéndolo vale más que la slide 11.
 - Poné la viz de partición en «120 titulares» + «por tiempo» y preguntá por qué siguen
   quedando fugas de grupo. (Respuesta: cada diario publica todos los años, así que partir por
   tiempo no separa diarios. Hay problemas que necesitan **las dos** particiones a la vez.)
@@ -169,7 +173,7 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 - **El calco con la mancha de café.** Dibujá una carita en el pizarrón, ponele una mancha al
   lado, y pedí que la calquen. *"¿Copian la mancha? No. El modelo sí. Para el modelo, la
   mancha y la boca son exactamente lo mismo."*
-- **`zero_grad`.** *"Esta es la línea que todos se olvidan. Yo me la olvidé la semana pasada."*
+- **`zero_grad`.** *"Esta es la línea que todos se olvidan. Yo también me la olvido, todavía."*
   Contá tu propia versión. Que se rían ahora es que no se frustren después.
 - **El ciclo aburrido.** *"Sí, es aburridísimo: millones de veces lo mismo. Por eso lo hace
   una computadora y no ustedes."*
@@ -177,8 +181,11 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
   Usala tal cual: *"el conjunto de test es el preregistro del aprendizaje automático"*.
 - **El codificador malacostumbrado.** *"Todos conocemos a alguien que se entrenó con el corpus
   piloto y quedó convencido de que cuando dice «compañeros» es peronismo."*
-- **Validez interna y externa.** *"El sobreajuste es validez interna perfecta con validez
-  externa nula."* Después de esa frase, media clase entiende el resto sola.
+- **Dentro y fuera de la muestra.** *"El sobreajuste es ajuste perfecto dentro de la muestra
+  y capacidad predictiva nula fuera de ella: no replica ni en otra muestra de la misma
+  población."* Después de esa frase, media clase entiende el resto sola. **No** lo digas como
+  "validez interna contra externa": para esta audiencia esas palabras son identificación causal
+  y generalizar a otras poblaciones, y alguien lo va a objetar con razón.
 - **La escala.** Cuando alguien diga "pero GPT tiene millones de parámetros":
   *"y millones de textos. Vos tenés 36 discursos. Es la relación, no el número."*
 
@@ -235,7 +242,13 @@ a los demás, y sería incoherente no aplicárnoslo.
 - [ ] Abrí `slides.html` y probá que las tres vizes embebidas cargan (no hay internet en el aula).
 - [ ] Abrí `viz/anatomia-del-loop.html` **suelta** en otra pestaña: la vas a proyectar más grande.
 - [ ] Corré el notebook entero una vez, con tu máquina, para que el kernel esté caliente y
-      sepas cuánto tarda ahí (acá tarda ~30 s).
+      sepas cuánto tarda ahí (acá tardó entre 5 y 30 s según la máquina).
+- [ ] **Compará tus números con los de las slides.** Las slides leen `datos-figuras.js`, que
+      se generó con torch 2.14 (las versiones quedan anotadas en ese archivo). Todo es
+      determinista en la misma máquina y con las mismas versiones; con otras, los números
+      cambian un poco, sobre todo el par 64/256 del TODO 2 y el calco de la slide 20. Si los
+      tuyos no coinciden, proyectá los tuyos y decilo en voz alta: es un anticipo de la
+      clase 10. Si querés que las slides muestren tu corrida, corré `medir-figuras.py`.
 - [ ] Tené a mano la foto o la captura del **ajuste a ojo de la clase 1**, si la guardaste.
       La slide 18 la reproduce, pero la de ellos es mejor.
 - [ ] Pizarrón o papelógrafo para anotar los votos de la slide 2 y los números del TODO 2.

@@ -39,29 +39,33 @@ Este es el gráfico que salió del notebook: 16 rampas, 22 casos de entrenamient
 
 ```
  loss
-0.055 ┤ ╷
-      │ │╷
-0.045 ┤ │╵╷
-      │ ╵ ╵╷        (naranja: validación)
-0.035 ┤    ╵╷
-      │     ╵╷ ╷
-0.025 ┤      ╵╷╵╲___╭─────────────────────────────────────────
-      │       ╵╲   ╰╯
-0.015 ┤        ╲▼____
-      │         ╲    ‾‾‾───────────────────────────────────────
-0.005 ┤          ╲___________________________  (azul: entrenamiento)
-      └──┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬──
-         0   150  300  450  600  750  900 1050 1200 1350 1500
-                                épocas
+0.035 ┤ o          (o = validación, naranja; · = entrenamiento, azul)
+      │
+0.030 ┤
+      │
+0.025 ┤ ·
+      │    ooo                                   oooooooooooooooooooo
+0.020 ┤   o   ooooooooooooooooooooooooooooooooooo
+      │
+0.015 ┤
+      │  ▼
+0.010 ┤  ·····
+      │       ······················
+0.005 ┤                             ································
+      └┬───────────┬───────────┬───────────┬───────────┬───────────┬
+       0          300         600         900         1200        1500
+                                 épocas
        ▼ = el punto más bajo de la naranja: época 42, loss 0.0133
+       Eje recortado arriba: en la época 1 las dos curvas arrancan mucho más
+       alto (0.36 la azul, 0.18 la naranja) y entran al gráfico hacia la época 15.
 ```
 
 **a.** ¿En qué época habría que haber parado el entrenamiento? ¿Por qué esa y no otra?
 
 **b.** ¿Qué representa, en términos sustantivos, la franja que se abre entre la curva azul y
-la naranja a partir de la época 100?
+la naranja a partir de la época 50?
 
-**c.** Un colega mira este gráfico y dice: *"la loss bajó de 0.055 a 0.005, el modelo aprendió
+**c.** Un colega mira este gráfico y dice: *"la loss bajó de 0.36 a 0.006, el modelo aprendió
 un montón"*. ¿Qué le contestás?
 
 ---

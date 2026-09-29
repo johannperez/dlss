@@ -10,6 +10,82 @@ corpus, y **mirando los PNG con los ojos** (48 capturas de slides, 14 de las viz
 
 ---
 
+## 0. Tercera pasada (2026-09-29): los arreglos de la revisión
+
+La revisión de septiembre de 2026 encontró afirmaciones que este mismo informe daba por
+buenas y no lo eran. Se corrigieron en el material y **también acá**: las secciones 1 a 6
+quedan como registro de la segunda pasada, con las correcciones marcadas **[corregido]**.
+
+**Qué se cambió, en una línea cada cosa:**
+
+- «La loss de entrenamiento **siempre** baja con más capacidad» → **tiende** a bajar (no sube
+  de forma sistemática). Medido: con torch 2.14 el TODO 2 da 64 → 0.00612 y 256 → 0.00628. El
+  notebook ahora lee los números y dice «baja / casi igual / SUBE» en vez de imprimir «Mejora.
+  Mejora. Mejora.»; la slide 24 cambió las opciones (B = «tiende a bajar, hasta quedar cerca
+  de cero»); la slide 38, el cierre del notebook y las notas, igual.
+- `viz/sobreajuste.html`: los codos ahora están **anidados** (van der Corput), así que cada
+  modelo contiene al anterior. Antes (codos en j/(K+1)) la curva azul subía 25 veces entre K=1
+  y 60, con saltos de hasta 0.0012; ahora sube a lo sumo en el quinto decimal (2·10⁻⁵, por la
+  regularización). La cifra «perillas / casos» (K+2) pasó a «números ajustados / casos», con
+  la aclaración de que es una red con los codos clavados (con codos libres serían 3K+1). La
+  curva naranja va punteada (antes sólo el color la distinguía).
+- `viz/particion.html`: la partición por grupo dejaba el **test vacío** en 51 de 200 sorteos y
+  lo declaraba «un test de verdad». Ahora el último grupo del sorteo va siempre a test (y el
+  anteúltimo a validación si hace falta): en 500 sorteos el test tiene 2, 4, 6, 8 o 10
+  discursos, nunca 0. Hay además un cartel para test vacío (se llega con los sliders), una
+  letra E/V/T en cada cuadradito (el montón no se dice sólo con color), el checkbox se llama
+  «agrupar por presidente o diario», y «por tiempo» explica por qué con 60/20/20 los gemelos
+  quedan partidos y en el notebook (corte 2008/2014) no.
+- `viz/anatomia-del-loop.html`: el eje de la loss se agranda cuando la loss sube (con lr arriba
+  de ~0.68, el umbral 2/λ_máx de estos 8 puntos) y un cartel lo dice; el slider se llama
+  «learning rate», «el número que multiplica a la pendiente».
+- La escena de la fuga (sección 6) estaba contada como si el modelo leyera el texto. Sólo ve
+  el año. Ahora el notebook lo dice, mide la predicción para 2005 (0.137 contra 0.1645 real,
+  error² 0.0008: cerca, no perfecto) y agrega una celda con un «vecino más parecido» por perfil
+  de temas, que encuentra a 2006 a distancia 0 y acierta con error cero: la fuga con un modelo
+  de texto.
+- Validez interna/externa → «ajuste perfecto dentro de la muestra y capacidad predictiva nula
+  fuera de ella» (slide 22, notas, soluciones 3b). «No existe un test estadístico» → AIC, BIC y
+  validación cruzada nombrados (slide 23, notebook §5).
+- Autograd: «misma cuenta» → «mismo resultado, otra cuenta» (la resta mide, la regla de la
+  cadena calcula). Adam: adapta el paso de cada perilla, igual necesita lr; se sacó el «90 %».
+  Tensor: se acuerda de las cuentas «si se lo pedís». Sin `zero_grad`: oscila, no «pasos
+  enormes»; hay una celda opcional nueva que lo muestra.
+- `medir-figuras.py` calcula también 256 rampas (`cap256`), el TODO 4 y la sección 6 (`fuga`),
+  y guarda las versiones (`versiones`). Las slides 19 y 35 leen esos números en vez de tenerlos
+  escritos a mano (el 0.00509 de 256 estaba fijo en el HTML).
+- Accesibilidad: los 7 canvas de las slides y los 5 de las viz tienen `role="img"` y un
+  `aria-label` que dice en palabras lo que dibujan (en las viz se actualiza con los controles).
+- Calendario: «[EL LUNES]» → «en tu investigación»; las tres preguntas del cierre y la pregunta
+  13 del cuestionario tienen el mismo plazo (la clase 5). Los tiempos se rehicieron: el cierre
+  tenía 2 minutos y ahora tiene 6 (114-120); el práctico 2 tiene 12 y el experimento de a dos
+  se termina antes de la clase 5.
+- Cuestionario: el gráfico ASCII del ítem 3 se rehízo con los datos de la corrida (el ▼ cae en
+  la época 42, el recorte del eje está declarado y la frase del colega usa 0.36 → 0.006).
+  Soluciones: 6D (el ruido no explica la brecha), 8b-c (oscila), 4-IV (la cita es de la slide
+  20, no del notebook), 11a (`meses` numérico).
+- Números de otras clases: el pie de la slide 21 usa los de la clase 2 después del arreglo del
+  borde de la media móvil (32 rampas 0.0000076 contra 0.001561 de la recta; 97 perillas, 3 por
+  rampa más el sesgo final).
+
+**Qué se verificó en esta pasada, y cómo:**
+
+| Chequeo | Resultado |
+|---|---|
+| `nbconvert --execute` sobre una copia del repo | **0 errores**, 51 celdas, 7 figuras, ~7 s en la máquina de la revisión (Python 3.12.13, torch 2.14.0, numpy 2.5.3) |
+| Notebook guardado | sin salidas, `execution_count` nulo; la celda de bootstrap no se tocó |
+| `medir-figuras.py` | regenerado con torch 2.14.0; coincide con lo que imprime el notebook en esa misma máquina |
+| Slides en Chrome headless (1280×760, todos los fragmentos abiertos) | 0 errores de JS; ninguna slide pasa de 745 px de contenido (las más altas, 25, 28 y 34, con iframe); los 7 canvas con `aria-label` |
+| Las 3 viz en Chrome headless, manejadas por script | 0 errores de JS; anatomía con lr 0.3 converge a a=0.0775, b=0.1970, MSE 0.00884; con lr 1.0 el eje sube y aparece el cartel; sobreajuste y partición dan los números de la tabla de arriba |
+| Lógica de las viz en node (sobreajuste, partición) | ver los números de arriba |
+| Re-verificación independiente (otra copia del repo, mismas versiones) | notebook: 0 errores, mismos números impresos; `medir-figuras.py` reproduce `datos-figuras.js` idéntico; sobreajuste: 13 subidas de la azul, la mayor de 2·10⁻⁵, mejor K = 8; partición por grupo en 500 sorteos: test de 2, 4, 6, 8 o 10 discursos (24/8/4 con la semilla 2019). La tijera de `datos-figuras.js` guarda una época de cada cinco: su último punto es la 1496 (val 0.02239), no la 1500 que imprime el notebook (0.02247) |
+
+**Lo que NO se verificó en esta pasada:** el tema oscuro, la ventana angosta, el notebook en
+Colab, las URLs de `referencias.md` y una recorrida visual completa de las 40 slides (se
+miraron dos capturas: la 20 y la 24).
+
+---
+
 ## 1. Veredicto
 
 **Apta para dictarse.** Se encontraron **11 problemas** y se arreglaron **11**.
@@ -20,7 +96,7 @@ que trata justamente de no mentir con números, pesan más que en cualquier otra
 | Chequeo | Resultado |
 |---|---|
 | Los 6 entregables + extras | **11 archivos**, ninguno vacío ni a medias |
-| `nbconvert --execute` | **0 errores**, 46 celdas, 6 figuras |
+| `nbconvert --execute` | **0 errores**, 46 celdas, 6 figuras (hoy: 51 celdas, 7 figuras, ver §0) |
 | Tiempo del notebook (mediana de 3 corridas, CPU) | **28,9 s** (28,6 / 28,9 / 29,5) |
 | `nbformat.validate` | válido |
 | ¿El notebook necesita red? | **No.** `ssdl.datos` lee sólo `datos/muestras/`, nunca `datos/cache/`. Verificado leyendo `datos.py`: las 36 observaciones salen del CSV versionado |
@@ -30,8 +106,8 @@ que trata justamente de no mentir con números, pesan más que en cualquier otra
 | Tema oscuro, las 3 viz | 0 errores, legible |
 | Proyector 1280×720 y ventana angosta 1024×640 | bien en las dos |
 | Código de las slides = código del notebook | **idéntico** (7 bloques comparados uno por uno) |
-| Números de las slides = corrida real | **todos**, ver §3 |
-| `medir-figuras.py` reproducible | vuelve a escribir un `datos-figuras.js` **byte por byte idéntico** |
+| Números de las slides = corrida real | **todos**, ver §3 — **[corregido]** en la misma versión de torch; con otra, el TODO 2 y el calco cambiaban (ver §3) |
+| `medir-figuras.py` reproducible | ~~vuelve a escribir un `datos-figuras.js` byte por byte idéntico~~ **[corregido]**: determinista en la misma máquina y con las mismas versiones. Con torch 2.14 cambiaron el 64 del TODO 2 (0.00584 → 0.00612), el calco (0.000805 → 0.000613; 0.00753 → 0.00807) y la red sana (0.00496 → 0.00472). Ahora el archivo guarda las versiones |
 | URLs de `referencias.md` | 2 responden (200) y están marcadas `[VERIFICADA]`; 5 no responden y están marcadas `[VERIFICAR URL]`. Ninguna cita inventada |
 | Presupuesto de tiempo | 0-120, continuo, sin huecos ni solapes |
 
@@ -111,10 +187,10 @@ de `clases/02-componer-funciones/viz/rampas.html` se cobra en la clase 4, y la c
 cerró prometiéndolo por escrito («guardá esa imagen, en la clase 4 va a tener nombre»).
 En las 40 slides no aparecía por ningún lado.
 *Arreglado:* pie nuevo en la **slide 21**, con los números que midió el equipo de la clase 2
-(32 rampas → MSE **0.000014** sobre 36 puntos, contra 0.001496 de la mejor recta) y el cierre
+(32 rampas → MSE **0.0000076** sobre 36 puntos, contra 0.001561 de la mejor recta) y el cierre
 «el nombre es *overfitting*». En las notas del docente va además el aviso que dejó ese equipo
 en su propia verificación: **la serie de la clase 2 está suavizada, así que la imagen de 32
-rampas se ve prolija, no grotesca — hay que cobrarla con los números (96 perillas para 36
+rampas se ve prolija, no grotesca — hay que cobrarla con los números (97 perillas para 36
 datos), no con la foto.**
 
 **8. La semántica de color rota en la slide 18.**
@@ -161,11 +237,12 @@ de `nbconvert --execute` sobre `notebook.ipynb` y de `medir-figuras.py`, las dos
 | slide 18 · nb §4 | mejor recta MSE **0.0146** | 0.01455 | ✅ |
 | slide 18 · nb §4 | red de 16 rampas **0.0100** | 0.00996 | ✅ |
 | slide 18 | «a ojo» **0.0195** | 0.01946 · **parámetros elegidos a mano** (declarado) | ⚠→✅ |
-| slide 19 · nb TODO 2 | 4/16/64/256 → **0.01193 / 0.00900 / 0.00584 / 0.00509** | idénticos | ✅ |
+| slide 19 · nb TODO 2 | 4/16/64/256 → **0.01193 / 0.00900 / 0.00584 / 0.00509** | idénticos **[corregido]**: con torch 2.14, 0.01193 / 0.00899 / 0.00612 / **0.00628** (256 no mejora a 64). Hoy la slide lee `cap256` y el notebook no afirma «mejora» | ⚠→✅ |
 | slide 19 | perillas 13 / 49 / 193 | idénticos | ✅ |
-| slide 20 | calco: **601** perillas, train **0.00081**, en los 5 apartados **0.00753** | 601 · 0.000805 · 0.00753 | ✅ |
-| slide 20 | la red de 16 rampas en esos 5: **0.00496** | 0.00496 | ✅ |
-| slide 20 (notas) | «nueve veces peor» | 0.00753 / 0.00081 = **9,3×** | ✅ |
+| slide 20 | calco: **601** perillas, train **0.00081**, en los 5 apartados **0.00753** | 601 · 0.000805 · 0.00753 **[corregido]**: con torch 2.14, 0.000613 · 0.00807 (lo lee la slide) | ✅ |
+| slide 20 | la red de 16 rampas en esos 5: **0.00496** | 0.00496 **[corregido]**: con torch 2.14, 0.00472 | ✅ |
+| slide 20 (notas) | «nueve veces peor» | 0.00753 / 0.00081 = **9,3×** **[corregido]**: con torch 2.14, 13×; las notas dicen «más de diez veces» | ⚠→✅ |
+| slide 30 (notas) · nb TODO 4 | ~~«la brecha típica es de 50 veces»~~ **[corregido]** | 0.04665 / 0.00319 = **14,6×**, fondo en la época 34 | ✅ |
 | slide 26 · nb §5 | tijera: mejor época **42**, después **1458** épocas peor | 42 y 1458 | ✅ |
 | slide 35 · nb §6 | test al azar **0.0142** · honesto **0.0319** · baseline **0.0255** | 0.01423 · 0.03194 · 0.02551 | ✅ |
 | slide 35 · nb §6 | **2,2 veces mejor** | 0.03194/0.01423 = 2,24 | ✅ (con el matiz del §2.3) |
@@ -174,14 +251,19 @@ de `nbconvert --execute` sobre `notebook.ipynb` y de `medir-figuras.py`, las dos
 | nb §6 | fuga al azar: **4 presidentes** cruzados, **1** texto idéntico | idéntico | ✅ |
 | viz anatomía | converge a **a = 0.0775, b = 0.1970** | óptimo exacto de mínimos cuadrados sobre esos 8 puntos: **0.077507 / 0.197017**, MSE 0.008844 (la viz muestra 0.00884) | ✅ |
 | viz anatomía | los 8 valores de la serie | coinciden con `serie_menciones('seguridad')` año por año | ✅ |
-| viz sobreajuste | capacidad 60, 5 muestras: train **0.0002**, val **0.0324**, **×3,56** | idéntico, apretando el botón 5 veces | ✅ |
-| viz sobreajuste | capacidad 60 + 300 casos: la tijera se cierra | 0.0059 / 0.0080, brecha 0.0021, «en el punto justo» | ✅ |
+| viz sobreajuste | capacidad 60, 5 muestras: train **0.0002**, val **0.0324**, **×3,56** | idéntico, apretando el botón 5 veces **[corregido]**: con los codos anidados, 0.0002 / 0.0250, ×2,85. Por defecto (n=25): el mejor es K=8, y K=60 da 0.0003 / 0.0157, ×1,43 | ✅ |
+| viz sobreajuste | capacidad 60 + 300 casos: la tijera se cierra | 0.0059 / 0.0080, brecha 0.0021, «en el punto justo» **[corregido]**: con codos anidados, 0.0061 / 0.0088 (×1,08), «en el punto justo» | ✅ |
 | viz partición | 7 de 7 del test con fuga, 6 presidentes | idéntico (con la semilla nueva) | ✅ |
+| viz partición | por grupo | **[nuevo]** antes: test de 0 casos en 51 de 200 sorteos. Ahora: 4 casos por defecto, entre 2 y 10 en 500 sorteos, nunca 0 | ✅ |
+| nb §6 (nuevo) | predicción para 2005 con la partición al azar | 0.1366 contra 0.1645 (error² 0.0008); el vecino por perfil de temas es 2006, distancia 0 | ✅ |
 | gancho slides 2-3 | 99 / 61 vs 84 / 82 | **construido, y declarado** en `referencias.md` y en las notas | ⚠ declarado |
-| slide 21 (nuevo) | 32 rampas → 0.000014 vs recta 0.001496 | tomado de la verificación de la **clase 2**, no re-medido acá | ⚠ ver §5 |
+| slide 21 (nuevo) | 32 rampas → 0.000014 vs recta 0.001496 | tomado de la verificación de la **clase 2**, no re-medido acá **[corregido]**: después del arreglo del borde de la media móvil, 0.0000076 contra 0.001561 (números que midió el equipo de fundaciones para la clase 2) | ⚠ ver §5 |
 
 **Reproducibilidad.** Se corrió `medir-figuras.py` de nuevo y `datos-figuras.js` volvió
 idéntico byte por byte. El notebook se corrió cuatro veces y dio los mismos números las cuatro.
+**[corregido]** Eso vale en la misma máquina y con las mismas versiones. En la revisión de
+2026-09, con torch 2.14, varios números cambiaron (ver arriba). Ahora `datos-figuras.js`
+guarda las versiones, y las notas del docente dicen qué hacer si no coinciden.
 
 ---
 
@@ -198,7 +280,9 @@ idéntico byte por byte. El notebook se corrió cuatro veces y dio los mismos n�
 - **El motor de sobreajuste no hace trampa a favor de la moraleja.** Resuelve por mínimos
   cuadrados una base de K rampas con un poco de ridge, y escala las rampas por (K+1)
   justamente para que la regularización no apague sola las capacidades altas. Está comentado
-  en el archivo. La curva de train baja monótonamente con la capacidad, que es el punto.
+  en el archivo. ~~La curva de train baja monótonamente con la capacidad, que es el punto.~~
+  **[corregido]** No bajaba monótonamente: con los codos en j/(K+1) los modelos no estaban
+  anidados y la azul subía 25 veces entre K=1 y 60. Ahora los codos están anidados (ver §0).
 - **El notebook reporta un resultado que no le conviene** — con 36 casos la red no le gana a
   predecir el promedio — y lo explica en vez de maquillarlo. Es lo correcto y es coherente con
   lo que la clase le pide a los demás.
@@ -224,10 +308,10 @@ idéntico byte por byte. El notebook se corrió cuatro veces y dio los mismos n�
 | 1 | **Subir a `_shared/css/curso.css` la regla `box-sizing: border-box`** (por lo menos para `.viz-frame` y `.panel`, idealmente global). El bug del §2.1 **afecta a las diez clases**: cualquier viz con `.viz-frame` + padding embebida en una slide pisa su panel. Acá está parcheado localmente en las 3 viz para no pisar a los equipos que trabajan en paralelo. | quien cierre la base |
 | 2 | **`.reveal pre code` no tiene `display: block`** en `curso.css` ni en el reveal vendoreado. Un `<code>` con padding vertical pinta su fondo encima de las líneas vecinas. Confirmado leyendo el CSS. Está parcheado en el `<style>` local de esta clase (lo dejó el equipo constructor y lo verifiqué); conviene subirlo también. | quien cierre la base |
 | 3 | **Las 5 URLs `[VERIFICAR URL]` siguen sin verificar.** Se probó `curl` de nuevo contra las siete: sólo responden las dos de `raw.githubusercontent.com`, que están marcadas `[VERIFICADA]` con el código 200. `doi.org`, `pytorch.org`, `hastie.su.domains`, `deeplearningbook.org` y `github.com` (HTML) devuelven 403 en el túnel del proxy. Las obras existen y están bien citadas; falta abrir los enlaces. | quien tenga red |
-| 4 | **El número de la clase 2 en la slide 21 (0.000014) no lo medí yo**: lo tomé de `clases/02-componer-funciones/VERIFICACION.md`, que lo declara medido por barrido. Si la clase 2 cambia esa viz, hay que actualizar el pie de la slide 21 de acá. | equipos 2 y 4 |
+| 4 | **El número de la clase 2 en la slide 21 no lo medí yo.** Hoy dice 0.0000076 contra 0.001561 (los valores después del arreglo del borde de la media móvil) y 97 perillas (3K+1). Si la clase 2 cambia esa viz o cuenta las perillas de otra manera, hay que actualizar el pie y las notas de la slide 21. | equipos 2 y 4 |
 | 5 | **Coordinación con la clase 9.** Las cifras del gancho (A 99/61 vs B 84/82) están construidas y pensadas para cobrarse en la clase 9 con el corpus de prensa real (donde la fuente predice la etiqueta al 96 %). Si la 9 mide otros órdenes de magnitud, hay que ajustar la nota final de `referencias.md`. | equipo 9 |
 | 6 | **Licencia del corpus de discursos.** No declara ninguna (trampa 13 de la espina). Anotado en `referencias.md`. Si el curso se publica, hay que escribirle a Lucas Ariel. | el docente |
-| 7 | **El cierre está apretado: 5 slides (36-40) en 2 minutos** según el plan de `notas-docente.md`. El plan lo asume a propósito (prefiere no recortar la escena de 2005/2006) y ofrece la salida —«si tu grupo es rápido, dale al práctico hasta el 105 y hacé el cierre en diez»—, pero en la práctica la slide 38 («las tres cosas de hoy») se va a leer a las corridas. Si hay que recortar algo, la 29 («las otras defensas») ya está marcada como lo primero que cae. | el docente |
+| 7 | ~~El cierre está apretado: 5 slides (36-40) en 2 minutos.~~ **[corregido]** El plan nuevo le da 6 minutos (114-120): el práctico 2 quedó en 12 minutos (91-103), la puesta en común en 2 y la slide 29 en uno. | el docente |
 | 8 | **Nadie corrió el notebook en Colab.** Acá tarda **28,9 s** en CPU (mediana de tres). En la CPU de Colab debería ser parecido, pero es una expectativa, no una medición. | el primero que lo dicte |
 
 ---
@@ -239,8 +323,11 @@ cd /home/user/dlss
 python3 -m nbconvert --to notebook --execute --output /tmp/o.ipynb \
         clases/04-entrenar-de-verdad/notebook.ipynb
 PYTHONPATH=_shared python3 clases/04-entrenar-de-verdad/medir-figuras.py
-git diff --stat clases/04-entrenar-de-verdad/datos-figuras.js   # tiene que dar vacío
+git diff --stat clases/04-entrenar-de-verdad/datos-figuras.js   # vacío sólo con las mismas
+                                                               # versiones (ver "versiones")
 md5sum datos/cache/discursos-apertura/200[56]-*.txt             # los dos hashes iguales
+for f in datos/muestras/discursos-apertura/200[56]-*.txt; do    # en las muestras, sin las
+  grep -v '^#' "$f" | md5sum; done                              # cabeceras: 89b4c032… los dos
 ```
 
 Para el HTML: Chromium por Playwright (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`),
