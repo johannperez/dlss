@@ -105,6 +105,12 @@
     Casi siempre sale «se nota que no dice nada concreto».
     <b>ESCRIBÍ ESA FRASE EN EL PIZARRÓN.</b> La vas a cobrar en el minuto 45: es el
     hallazgo entero de la primera mitad de la clase.
+    <br><br>
+    Honestidad para la revelación (slide 18): buena parte de este párrafo <b>está en el
+    corpus casi tal cual</b> —la cita de los intendentes aparece 124 veces, «Y aca esta el
+    punto: esa frase resume el debate de hoy», 5—, porque Aguasclaras sale de plantillas
+    escritas por una persona. Lo escribió la máquina, sí, pero recombinando pedazos que
+    memorizó. Decilo cuando lo reveles: la memorización también es contenido de esta clase.
     (4 minutos con la discusión.)
   </aside>
 </section>
@@ -114,7 +120,8 @@
   <h2>Lo escribió esto</h2>
   <div class="tarjetas">
     <div><h4><span class="numerito">1.541.056</span></h4>perillas. Un millón y medio.
-      GPT-4 tiene, según las estimaciones públicas, unas cien mil veces más.</div>
+      De GPT-4, OpenAI no publicó el número: las estimaciones no oficiales dan entre
+      cien mil y un millón de veces más.</div>
     <div><h4><span class="numerito">4 a 7 min</span></h4>de entrenamiento.
       En una CPU con cuatro hilos. Sin GPU, sin nube, sin plata.</div>
     <div><h4><span class="numerito">1,1 MB</span></h4>de corpus: debates parlamentarios
@@ -173,7 +180,7 @@
       aprender.</li>
   </ul>
   <div class="aha compacta">
-    En la clase 1 dibujábamos una recta con <b>2</b> perillas sobre 40 puntos. Hoy
+    En la clase 1 dibujábamos una recta con <b>2</b> perillas sobre 36 puntos. Hoy
     dibujamos, en cada posición del texto, <b>una distribución de probabilidad sobre todas
     las fichas posibles</b>, con un millón y medio de perillas.
     <b>Es la misma máquina.</b>
@@ -314,7 +321,8 @@
     sobre una imagen. Hoy dibujamos <i>esto</i>: una distribución de probabilidad, en
     cada una de las posiciones del texto. Es la misma máquina de dibujar.»
     <br><br>
-    Los números son reales, salen de la corrida del notebook.
+    Los números son reales: salen de la corrida del curso (<code>entrenar-mini-gpt.py</code>,
+    el mismo modelo del notebook). En otra máquina pueden cambiar en los decimales.
     (1,5 minutos.)
   </aside>
 </section>
@@ -358,7 +366,7 @@
   </div>
   <div class="ojo compacta">
     <b>Tarda entre 4 y 7 minutos en CPU.</b> Los mismos 1200 pasos se cronometraron
-    cinco veces en la misma máquina de 4 hilos y dieron <b>243, 267, 297, 360 y 432 s</b>:
+    seis veces en la misma máquina de 4 hilos y dieron <b>243, 267, 280, 297, 360 y 432 s</b>:
     la CPU se comparte con todo lo que tengas abierto —el navegador con las viz, sin ir
     más lejos— y por eso el número casi se duplica. <b>Contá con siete minutos.</b>
     Con GPU el notebook sube a 3000 pasos solo. Si te dio CPU, está perfecto: la clase
@@ -376,6 +384,12 @@
     <br><br>
     Volvé al proyector con tu propia corrida en el paso 50, el 400 y el 800, y leé las
     muestras en voz alta. Es teatro y hay que actuarlo.
+    <br><br>
+    <b>Ojo: las muestras de las slides 14 a 18 son de la corrida del curso.</b> En la misma
+    máquina y con las mismas versiones salen idénticas; en otra (otra CPU, otra versión de
+    torch, GPU) van a ser otras. Por eso conviene proyectar <b>tu</b> corrida. Si alguien
+    pregunta por qué su texto es distinto con la misma semilla, es un regalo: «misma semilla,
+    otra máquina, otro texto» es la clase 10.
     (20 minutos.)
   </aside>
 </section>
@@ -399,7 +413,7 @@
 
 <!-- ======================= 14-18. LAS MUESTRAS ======================= -->
 <section>
-  <span class="paso-etiq">paso 0</span>
+  <span class="paso-etiq">paso 0 · corrida del curso</span>
   <h3>Antes de entrenar: ruido puro</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>xoé8y,2A6OF.cN2JG—"=BRi6CpVHJO,BHV4
 ZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,jqñ6O(OéO=a;=N—:—,V9,l6Hi3cY6.BslbtnLR4nT(c1;b4iQq IéSTenaCéoFydV—iOt(;1KxDA=IfdHD8vPNDLtluEn8;c2Yt;ebVK::27a0,yc7r Ji4</div>
@@ -408,16 +422,19 @@ ZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,
   <aside class="notes">
     Mostralo rápido. Lo importante es el contraste con las tres slides siguientes.
     Decí el número: 4,23 es prácticamente log(71) = 4,26, o sea «no tengo ni idea».
+    <br><br>
+    Estas cinco muestras son de la corrida del curso. Las de cada estudiante van a ser
+    parecidas, no idénticas, si su máquina o su versión de torch es otra.
     (30 segundos.)
   </aside>
 </section>
 
 <section>
-  <span class="paso-etiq">paso 50</span>
+  <span class="paso-etiq">paso 50 · corrida del curso</span>
   <h3>Aprendió que existen los espacios</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>da0 ta. de de a dereto r do a lictentr eleben gren po lalo la die Labirenlecolo ue de r es lo cosetesio e soncis con endode en enacio r icalie larer cta sioracida nuantr prtue die deontiaren dir e varicir des men da ue Varo el lesay ude din era Ntrielassa har</div>
   <p>Todavía no hay palabras, pero ya hay <b>palabras del largo correcto</b>, y aparecen
-    «de», «la», «el». <span class="numerito">loss = 2,34</span> — ya empató al bigrama.</p>
+    «de», «la», «el». <span class="numerito">loss = 2,34</span> — ya está cerca del bigrama (2,24).</p>
   <aside class="notes">
     Cincuenta pasos. Doce segundos de CPU. Ya sabe el ritmo del castellano escrito.
     Preguntá: «¿qué aprendió acá que no tenía en el paso 0?». Sale «los espacios».
@@ -426,7 +443,7 @@ ZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,
 </section>
 
 <section>
-  <span class="paso-etiq">paso 400</span>
+  <span class="paso-etiq">paso 400 · corrida del curso</span>
   <h3>Ahora hay palabras. Nadie le dio un diccionario</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>pior sin interme presental interior que dice el dictamen y lo que dice el articulado del Mes nosumeros del menos de enurstencia de primemeneranto reluctia habera desde Preransidad de Cerrriteries grentes iendentes general.
 Diputada Analialiarislles.</div>
@@ -446,7 +463,7 @@ Diputada Analialiarislles.</div>
 </section>
 
 <section>
-  <span class="paso-etiq">paso 800</span>
+  <span class="paso-etiq">paso 800 · corrida del curso</span>
   <h3>Y ahí está el género discursivo</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>so discutir los medios sin discutir el objetivo. Es cuanto tengo para decir. Muchas gracias.
 
@@ -456,8 +473,8 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
   <div class="ojo compacta">
     Fórmulas de cortesía, cierre de intervención, fórmula de secretaría, encabezado de
     orador con bloque y provincia. <b>Aprendió el género discursivo.</b>
-    Y de paso se inventó una diputada: <b>Nélida Falcón no existe</b> en el padrón.
-    Nadie lo notó. Volvemos a esto en veinte minutos.
+    Y de paso, en esta corrida, se inventó una diputada: <b>Nélida Falcón no existe</b>
+    en el padrón. Nadie lo notó. Volvemos a esto en veinte minutos.
   </div>
   <aside class="notes">
     <b>La slide más importante de la primera mitad.</b> Acá cobrás la apuesta del
@@ -467,18 +484,31 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
     <br><br>
     Y NO te saltees lo de Nélida Falcón. Preguntá: «¿alguien lo había notado?».
     Nadie. Ése es el gancho del bloque de la alucinación.
+    <br><br>
+    <b>Si en tu corrida no aparece</b> (depende de la máquina y de la versión de torch):
+    la celda del entrenamiento lista los nombres que <b>tu</b> modelo inventó en sus
+    muestras, y la sección 9 del notebook mide la invención sobre 60 sorteos (en la
+    corrida de verificación, 8 de 57 nombres no existían). Usá eso: es más sólido que
+    una muestra suelta.
     (3 minutos.)
   </aside>
 </section>
 
 <section>
-  <span class="paso-etiq">paso 1200 · final</span>
+  <span class="paso-etiq">paso 1200 · final · corrida del curso</span>
   <h3>Entre cuatro y siete minutos de CPU</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: "la transferencia de la competencia sin la transferencia de los recursos convierte una politica publica en un problema municipal". Y aca esta el punto: esa frase resume el</div>
-  <p><b>Es el párrafo del principio de la clase.</b>
+  <p><b>Es el párrafo del principio de la clase.</b> Y no lo inventó: la cita está
+    <b>tal cual</b> en el corpus, 124 veces. <b>Lo memorizó.</b>
     <span class="numerito">loss 4,23 → 0,19</span></p>
   <aside class="notes">
     Cerrá el círculo: es literalmente el texto del gancho. Que lo vean.
+    <br><br>
+    Y la vuelta de tuerca, que es contenido: el modelo (6,4 MB) pesa <b>más</b> que el
+    corpus (1,1 MB), así que le sobra lugar para memorizar, y memorizó las plantillas del
+    generador. En los LLM grandes la cuenta da al revés (el texto supera por lejos a los
+    pesos), pero igual memorizan tal cual lo que vieron repetido muchas veces. El notebook
+    (sección 12) mide cuánto de la muestra final está calcado del corpus.
     (1 minuto.)
   </aside>
 </section>
@@ -529,8 +559,8 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
   <h2>1 · Por qué <span class="c-error">alucina</span></h2>
   <div class="intuicion">
     La salida es <b>siempre</b> una distribución de probabilidad sobre la próxima ficha.
-    Siempre. No hay ningún estado en el que el modelo produzca «no sé»: «no sé» tendría
-    que ser una ficha más, y no lo es.
+    Siempre. Y adentro no hay nada que <b>detecte</b> que no sabe: si un asistente te dice
+    «no sé», eso también es una continuación que aprendió, no una verificación.
   </div>
   <p>Entonces, cuando le preguntás por algo que no está en el corpus, <b>no puede no
     contestar</b>. Contesta lo plausible.</p>
@@ -543,6 +573,10 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
     texto plausible, y eso es lo único que hace <em>siempre</em>: también cuando acierta.</p>
   <aside class="notes">
     Decí la frase de «no miente» despacio. Es la que se llevan.
+    <br><br>
+    Si alguien dice «pero ChatGPT a veces dice que no sabe»: sí, lo entrenaron para
+    decirlo más seguido. Pero lo dice porque es una continuación plausible, no porque
+    chequeó algo: por eso puede decirlo cuando sí sabe, y no decirlo cuando inventa.
     <br><br>
     Ojo con la confusión típica: «alucina porque le faltan datos». No: alucina
     <b>por diseño</b>. Con más datos alucina menos seguido, no cualitativamente distinto.
@@ -570,6 +604,13 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
     <br><br>
     Después el prompt de la ley inventada (le pone título, tema y año) y el de la cita
     (formato impecable, provincia que no existe). Ese último es letal con esta audiencia.
+    <br><br>
+    <b>Decí con precisión qué se ve:</b> en los tres casos falsos, la entidad falsa la
+    pusimos <b>nosotros</b> en el prompt. El modelo no la rechaza: <b>acepta la premisa
+    falsa</b> y la completa. Y la «cita» no la inventa: es una frase que está tal cual en el
+    corpus, recitada de memoria (por eso da 100 %) y pegada a una provincia que no existe.
+    La fabricación espontánea —que invente un nombre solo— es la de Nélida Falcón, y el
+    notebook la mide sobre 60 sorteos.
     (4 minutos.)
   </aside>
 </section>
@@ -580,19 +621,21 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
   <div class="comparacion contra">
     <div><h4>El modelo sabe cosas</h4>
       <p>De los <b>60</b> diputados que existen en el padrón, le acierta el bloque a
-        <span class="numerito">54</span>. No es que no sepa nada: sabe bastante.</p></div>
+        <span class="numerito">54</span> (en la corrida del curso). No es que no sepa
+        nada: sabe bastante.</p></div>
     <div><h4>Y no podés saber cuál es cuál</h4>
       <p>Mirando la salida, <b>no hay ninguna señal</b> que separe los 54 que sabe de los
         6 que erra, ni de las diputadas que se inventa enteras.</p></div>
   </div>
   <div class="aha">
     Si no puedo distinguirlas mirando, entonces <b>no puedo usar la seguridad del modelo
-    como señal de verdad. Nunca.</b> Ni la suya, ni la de un modelo cien mil veces más
-    grande.
+    como señal de verdad.</b> Ni la suya, ni la de un modelo muchísimo más grande.
   </div>
   <aside class="notes">
     Esta slide ataja la sobrecorrección («entonces no sirve para nada»). El modelo sabe
     cosas. El problema es epistemológico, no de capacidad: <b>no hay señal observable</b>.
+    (54 es el número de la corrida del curso; en otra máquina puede dar otro, por ejemplo
+    48. La lectura es la misma.)
     <br><br>
     Analogía que funciona: el informante que nunca dice «no sé». Completa, redondea, arma
     una historia coherente. No miente por maldad. Las técnicas de manejo son las mismas:
@@ -625,8 +668,8 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
     El error a desarmar: «entiende mejor la instrucción». No. Le cambiaste el
     condicionante a la distribución.
     <br><br>
-    La caja de abajo es el <code>[EL LUNES]</code> adelantado, y conviene sembrarla acá
-    para poder cobrarla en el cierre.
+    La caja de abajo es el <code>[EN TU INVESTIGACIÓN]</code> adelantado, y conviene
+    sembrarla acá para poder cobrarla en el cierre.
     <br><br>
     Si preguntan «¿y si le digo que no invente?»: probalo en vivo con la celda del
     notebook. Baja la tasa, no saca el mecanismo.
@@ -667,20 +710,28 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   <div class="viz-frame" data-alto="grande" style="height:600px">
     <iframe src="viz/ventana-de-contexto.html" title="la ventana de contexto" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> el texto gris. Mientras el pedacito resaltado siga
-    en color, la respuesta aguanta; en cuanto se pone gris y tachado, se cae. Y la curva
-    de abajo no es un caso elegido a dedo: es la medición ventana por ventana sobre
-    30 pasajes reales del corpus (24 en el segundo caso, el de la pista lejos).</p>
+  <p class="viz-pie"><b>Qué mirar:</b> el texto gris. A medida que el apellido resaltado
+    entra en la ventana, la respuesta mejora; cuando se tacha, se cae. Y la curva de abajo
+    no es un caso elegido a dedo: es la medición ventana por ventana sobre 30 pasajes
+    reales del corpus (24 en el segundo caso, el de la pista lejos), con dos líneas de
+    base: el azar y contestar siempre el bloque más frecuente.</p>
   <aside class="notes">
     Movés el slider vos, despacio, de 128 hacia abajo, y mirás el cartel rojo aparecer.
     Después dejás que lo toquen.
     <br><br>
+    Lo que hay que decir con precisión: la curva de la pista cerca <b>sube de a poco</b>
+    (cada letra del apellido que entra es información); el corte duro es del <b>dato</b>,
+    no de la curva. Y en el caso lejos, la curva no sólo es plana: <b>no le gana a
+    contestar siempre el bloque más frecuente</b> (6 contra 8 de 24 en la corrida del
+    curso). El modelo no usa esa pista.
+    <br><br>
     <b>La frase:</b> «esto es, exactamente, por qué tu prompt larguísimo se olvidó de la
     primera instrucción».
     <br><br>
-    El panel de la derecha traduce a práctica: poné lo importante <b>al final</b>.
+    El panel de la derecha traduce a práctica: lo importante va <b>al principio o al
+    final</b>, nunca en el medio; con un documento largo, la pregunta al final.
     Aclaración honesta: en modelos grandes el fenómeno es más sutil (<i>lost in the
-    middle</i>) pero de la misma naturaleza.
+    middle</i>, Liu et al. 2023: la curva es en U) pero de la misma familia.
     (3 minutos.)
   </aside>
 </section>
@@ -796,18 +847,25 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   <h2>5 · Por qué <span class="c-error">cuenta mal las letras</span></h2>
   <div class="intuicion">
     Un modelo grande no ve letras: ve <b>fichas de sub-palabra</b>. «ferrocarril» no es
-    una fila de once letras — son tres o cuatro números.
+    una fila de once letras — son tres o cuatro números (seis, con el tokenizador chiquito
+    del curso).
   </div>
-  <p>Preguntarle cuántas erres tiene es pedirle que cuente algo que
-    <b>no está en su representación</b>. Cuando acierta es porque vio la respuesta escrita
-    muchas veces, no porque contó.</p>
+  <p>Para contar las erres tiene que saber <b>de qué letras está hecha cada ficha</b>, y
+    eso no está a la vista: lo aprendió aparte. Los modelos grandes lo aprenden bastante
+    (deletrean bien) y con razonamiento paso a paso o una herramienta cuentan mucho
+    mejor. <b>No es imposible: es frágil.</b> Por eso, verificá.</p>
   <div class="aha compacta">
     <b>Prometido en la clase 6, cumplido.</b> Aquel panel del tokenizador que preguntaba
     cuántas erres tenía la palabra y se iba sin contestar: acá está la respuesta.
   </div>
   <aside class="notes">
     Analogía: «es como preguntarle a alguien que sólo escuchó una palabra cómo se
-    escribe».
+    escribe». Puede saberlo —lo aprendió aparte—, pero es más fácil equivocarse.
+    <br><br>
+    Ojo con el absoluto: la audiencia va a probar ChatGPT esa misma noche y muchas veces
+    va a contar bien las erres de «ferrocarril» (los modelos con razonamiento lo hacen
+    bien). El mensaje no es «no puede»: es «le cuesta más de lo que parece, y falla sin
+    avisar».
     <br><br>
     Y la honestidad obligatoria: <b>nuestro mini-GPT es de caracteres</b>, así que él sí
     ve las letras y no sufre <i>este</i> problema (sufre otro: nunca vio a nadie contar).
@@ -831,7 +889,8 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     Si vas bien de tiempo, abrí al lado <code>viz/tokenizador.html</code> de la clase 6:
     el guiño «prometido en la clase 6, cumplido» funciona mejor con las dos abiertas.
     <br><br>
-    Y aprovechá para el dato del lunes: el castellano se parte en más fichas que el
+    Y aprovechá para un dato que les sirve en su investigación: el castellano se parte
+    en más fichas que el
     inglés. Consecuencia concreta: más costo por texto, ventana efectiva más chica, peor
     desempeño. Es una buena nota al pie para un paper.
     <br><br>
@@ -898,8 +957,8 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     la que siempre se come el reloj. Elegí dos o tres pares y que cuenten qué rompieron
     y por qué se rompió.
     <br><br>
-    Si vas muy atrasado: bajá a 15 minutos y salteá el desafío. Pero avisales que se lo
-    lleven de tarea.
+    Si vas muy atrasado: bajá a 15 minutos y salteá el desafío. Queda como opcional,
+    antes de la clase 9, y no más de media hora.
     (25 minutos.)
   </aside>
 </section>
@@ -920,16 +979,19 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   </div>
   <div class="aha compacta">
     <b>El 2 y el 3 son los que lo convierten de autocompletador en asistente.</b>
-    Y son también los que introducen otras cosas: la amabilidad, la verborragia y
-    <b>la adulación</b> salen de ahí. Son una decisión de producto, no una propiedad del
-    lenguaje.
+    Y traen otras cosas: la amabilidad y la verborragia salen de ahí, y <b>la adulación</b>
+    —que ya asoma sin ellos— sale muy reforzada. Son decisiones de producto, no
+    propiedades del lenguaje.
   </div>
   <aside class="notes">
     Dos líneas cada una, sin entrar en PPO ni en modelos de recompensa.
     <br><br>
     Lo de la adulación es el dato que más les sorprende y el que más les sirve: explica
-    por qué el modelo les da la razón cuando insisten. Es un comportamiento
-    <b>entrenado</b>, no emergente.
+    por qué el modelo les da la razón cuando insisten. Con precisión: ya aparece en
+    modelos sin RLHF y crece con la escala (Perez et al. 2022), y el RLHF la refuerza
+    mucho, porque las personas tienden a preferir que les den la razón (Sharma et al.
+    2023). No es «entrenada y no emergente»: es las dos cosas, y el entrenamiento la
+    empuja.
     (4 minutos.)
   </aside>
 </section>
@@ -938,23 +1000,26 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
 <section>
   <h2>Y qué <span class="c-error">no</span> cambia con la escala</h2>
   <ul>
-    <li>Sigue sin haber casillero para <b>«no sé»</b>.</li>
-    <li>Sigue habiendo <b>tokenización</b>: sigue sin ver letras.</li>
+    <li>Sigue sin haber nada adentro que <b>detecte «no sé»</b>.</li>
+    <li>Sigue habiendo <b>tokenización</b>: las letras no están a la vista.</li>
     <li>Sigue habiendo una <b>ventana finita</b>.</li>
     <li>Sigue siendo un <b>sorteo</b>.</li>
     <li>Sigue sin haber un <b>mecanismo de verdad</b> adentro.</li>
   </ul>
   <div class="aha">
-    Los modelos de 2030 van a ser muchísimo mejores que los de hoy y van a seguir
-    teniendo <b>todas</b> estas propiedades. <b>La escala mejora la calidad; no cambia la
-    naturaleza.</b>
+    Los modelos que vengan van a ser muchísimo mejores, y van a <b>compensar</b> varias
+    de estas cosas (con herramientas, con razonamiento paso a paso, con ventanas enormes).
+    Pero mientras predigan la próxima ficha, el mecanismo es éste. <b>La escala mejora la
+    calidad; no cambia la naturaleza.</b>
   </div>
   <aside class="notes">
     <b>La slide más importante de la clase.</b> Si sólo te quedan tres minutos, ésta y el
-    [EL LUNES]. Todo lo demás es prescindible antes que esto.
+    [EN TU INVESTIGACIÓN]. Todo lo demás es prescindible antes que esto.
     <br><br>
-    Preguntá: <b>«si mañana los modelos son diez veces más grandes, ¿cuál de estas cosas
-    se arregla?»</b> Ninguna. Dejá que lo digan ellos.
+    Preguntá: <b>«si los modelos fueran diez veces más grandes, ¿cuál de estas cosas
+    desaparece?»</b> Ninguna desaparece; varias se disimulan mejor. Dejá que lo digan
+    ellos. Y no lo vendas como profecía: el punto es que la escala sola no cambia el
+    mecanismo.
     (3 minutos.)
   </aside>
 </section>
@@ -964,15 +1029,15 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   <h3>La tabla de traducción, entera</h3>
   <table class="traduccion">
     <tr><th>Pieza del mini-GPT que entrenaste</th><th>Comportamiento de ChatGPT que explica</th></tr>
-    <tr><td>La salida es <b>siempre</b> una distribución</td><td>Alucina; nunca dice «no sé»; suena igual de seguro cuando acierta que cuando inventa</td></tr>
+    <tr><td>La salida es <b>siempre</b> una distribución</td><td>Alucina; nada adentro detecta que no sabe; suena igual de seguro cuando acierta que cuando inventa</td></tr>
     <tr><td>Condicionada por el texto previo</td><td>El prompt cambia todo; el rol asignado cambia el registro; el prompt es un instrumento</td></tr>
     <tr><td>Ventana de atención finita</td><td>Se olvida del principio; ignora instrucciones lejanas; repetí lo importante al final</td></tr>
     <tr><td>Costo cuadrático de attention</td><td>Por qué hay un límite de ventana y por qué un prompt largo cuesta más</td></tr>
     <tr><td>Hay un sorteo (temperatura)</td><td>Respuestas distintas al mismo prompt; T=0 repetitivo; T alta delirante; sin semilla no hay reproducibilidad</td></tr>
-    <tr><td>Trabaja con fichas, no con letras</td><td>Cuenta mal las letras; falla con rimas y aritmética; peor en idiomas poco representados</td></tr>
+    <tr><td>Trabaja con fichas, no con letras</td><td>Le cuesta contar letras, rimar y hacer cuentas (se compensa en parte, no del todo); peor en idiomas poco representados</td></tr>
     <tr><td>No hay estado de creencias</td><td>Se contradice; si arrancó mal sigue por ahí; se lo puede «convencer»</td></tr>
     <tr><td>Entrenado para texto plausible</td><td>Referencias bibliográficas con formato perfecto y datos inventados</td></tr>
-    <tr><td>Instruction tuning + RLHF encima</td><td>Responde consignas; es amable; a veces adula y te da la razón</td></tr>
+    <tr><td>Instruction tuning + RLHF encima</td><td>Responde consignas; es amable; a veces adula y te da la razón (el RLHF lo refuerza)</td></tr>
     <tr><td>Aprendió del corpus</td><td>Reproduce los sesgos del corpus; sabe de lo que abunda y poco de lo que no</td></tr>
   </table>
   <aside class="notes">
@@ -991,10 +1056,10 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     <li><b>cross-entropy</b><span>entropía cruzada — qué probabilidad le diste a la respuesta que vino</span></li>
     <li><b>temperature</b><span>temperatura — cuánto se arriesga al sortear la próxima ficha</span></li>
     <li><b>context window</b><span>ventana de contexto — cuántas fichas puede mirar hacia atrás; afuera, nada existe</span></li>
-    <li><b>hallucination</b><span>alucinación — fabricar una entidad con total confianza, porque es lo plausible</span></li>
+    <li><b>hallucination</b><span>alucinación — fabricar (o aceptar) una entidad falsa con total confianza, porque es lo plausible</span></li>
     <li><b>autoregressive</b><span>autorregresivo — genera de a una ficha, y cada una condiciona a la siguiente</span></li>
     <li><b>instruction tuning</b><span>ajuste por instrucciones — lo que lo convierte de autocompletador en asistente</span></li>
-    <li><b>RLHF</b><span>ajuste con preferencias humanas — de acá sale también la adulación</span></li>
+    <li><b>RLHF</b><span>ajuste con preferencias humanas — también refuerza la adulación</span></li>
   </ul>
   <aside class="notes">
     Rápido. Están todos en <code>recursos/glosario.md</code> con la clase donde
@@ -1010,7 +1075,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   <div class="tarjetas">
     <div><h4>1</h4>Un LLM <b>dibuja la probabilidad de la próxima ficha</b>, y nada más.
       Es la misma máquina de la clase 1 con un millón y medio de perillas.</div>
-    <div><h4>2</h4><b>No hay casillero para «no sé».</b> Suena igual de seguro cuando
+    <div><h4>2</h4><b>Nada adentro detecta que no sabe.</b> Suena igual de seguro cuando
       acierta que cuando fabrica. La confianza de un LLM no es evidencia de nada.</div>
     <div><h4>3</h4><b>El prompt es tu instrumento de medición.</b> Si produjo un dato de
       tu investigación, va en el apéndice con modelo, versión, fecha y temperatura.</div>
@@ -1023,10 +1088,10 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   </aside>
 </section>
 
-<!-- ======================= 40. EL LUNES ======================= -->
+<!-- ======================= 40. EN TU INVESTIGACIÓN ======================= -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>El lunes, en tu investigación</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>En tu investigación: para qué sí y para qué no</h2>
   <div class="comparacion contra">
     <div>
       <h4>Para qué SÍ</h4>
@@ -1071,7 +1136,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     adaptarlo a tu problema. Y después, la pregunta que hace la diferencia entre tu paper
     y un blog post: <b>¿cómo sabés que está bien?</b></p>
   <aside class="notes">
-    Cerrá con el costo: nuestro modelo son seis minutos de CPU; reproducir GPT-2 son horas
+    Cerrá con el costo: nuestro modelo son entre cuatro y siete minutos de CPU; reproducir GPT-2 son horas
     de GPU y decenas de miles de millones de fichas. Ése es el argumento del transfer
     learning, y es cuantitativo.
     <br><br>
@@ -1158,6 +1223,10 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
              formato: v => (v * 100).toFixed(0) + '%' });
     });
     p.redibujar();
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', 'Probabilidad de la próxima ficha después de «' +
+      pr.texto + '»: ' + top.slice(0, 6).map(d => rot(d.ficha) + ' ' +
+      (d.prob * 100).toFixed(0) + '%').join(', ') + '.');
 
     const nombres = { P: 'Partido de la Unión Nacional', V: 'Vecinos y Vecinas',
                       M: 'Movimiento Popular Ribereño', F: 'Frente Cívico',
@@ -1206,10 +1275,14 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
               { color: 'verdad', tam: 11, dy: -8, caja: true });
     });
     p.redibujar();
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', 'La pérdida menos logaritmo de p: si le diste 90% ' +
+      'a la correcta, 0,11; si le diste 10%, 2,30; si le diste 1%, 4,61. Se dispara ' +
+      'cerca de cero. Línea de referencia: log 71 = 4,26.');
   })();
 
   /* ================================================================
-     Slide 18 — la curva de loss real del entrenamiento
+     Slide 19 — la curva de loss real del entrenamiento
      ================================================================ */
   (function () {
     const h = D.historial;
@@ -1228,7 +1301,9 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
               'el bigrama tonto: ' + Viz.num(D.meta.loss_bigrama_val, 2),
               { color: 'verdad', tam: 11, dy: -8, caja: true });
       p.linea(h.map(d => ({ x: d.paso, y: d.train })), { color: 'modelo', grosor: 3 });
-      p.linea(h.map(d => ({ x: d.paso, y: d.val })), { color: 'val', grosor: 3 });
+      // val punteada: train y val no se distinguen sólo por el color
+      p.linea(h.map(d => ({ x: d.paso, y: d.val })),
+              { color: 'val', grosor: 3, punteada: [8, 5] });
       D.muestras.forEach(m => {
         const punto = h.reduce((a, b) =>
           Math.abs(b.paso - m.paso) < Math.abs(a.paso - m.paso) ? b : a, h[0]);
@@ -1236,11 +1311,16 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
       });
       p.leyenda([
         { color: 'modelo', texto: 'lo que vio (train)', forma: 'linea' },
-        { color: 'val', texto: 'lo que NO vio (val)', forma: 'linea' },
+        { color: 'val', texto: 'lo que NO vio (val, punteada)', forma: 'linea', punteada: true },
         { color: 'parametro', texto: 'las muestras que leímos' }
       ], { pos: 'ad' });
     });
     p.redibujar();
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', 'Curva de loss del entrenamiento de la corrida ' +
+      'del curso, ' + D.meta.pasos + ' pasos: train y validación bajan juntas de ' +
+      coma(D.meta.loss_inicial) + ' a ' + coma(D.meta.loss_final_val) +
+      '; el bigrama se queda en ' + coma(D.meta.loss_bigrama_val) + '.');
 
     Viz.controles('#panel-loss', [
       { tipo: 'titulo', texto: 'Los números' },
@@ -1258,7 +1338,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   })();
 
   /* ================================================================
-     Slide 26 — el costo cuadrático de attention
+     Slide 27 — el costo cuadrático de attention
      ================================================================ */
   (function () {
     const p = Viz.plano('#caja-n2', {
@@ -1285,6 +1365,10 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
       ], { pos: 'ai' });
     });
     p.redibujar();
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', 'Costo de attention según el largo del prompt: ' +
+      'con 1000 fichas 1 vez, con 2000 fichas 4 veces, con 4000 fichas 16 veces. Si ' +
+      'creciera en línea recta, con 4000 serían 4 veces.');
   })();
 </script>
 </body>

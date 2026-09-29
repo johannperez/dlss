@@ -6,9 +6,10 @@ un grupo de treinta hay ocho que eligen el mismo distractor, no es distracción,
 explicación que no funcionó, y ya sabés cuál.
 
 > **Todos los números de este archivo están medidos**, no estimados. Salen de correr
-> `clases/08-mini-gpt-y-los-llm/entrenar-mini-gpt.py` en el contenedor de construcción.
-> Los del ítem 6 salen de una corrida aparte del mismo modelo sobre los primeros 25 KB
-> del corpus; está documentada en `notas-docente.md` §9.
+> `clases/08-mini-gpt-y-los-llm/entrenar-mini-gpt.py` en el contenedor de construcción
+> (la *corrida del curso*). En otra máquina u otra versión de torch cambian un poco;
+> `notas-docente.md` §9 tiene la comparación. Los del ítem 6 salen de una corrida aparte
+> del mismo modelo sobre los primeros 25 KB del corpus, documentada en el mismo lugar.
 
 ---
 
@@ -19,7 +20,7 @@ explicación que no funcionó, y ya sabés cuál.
 | distractor | por qué es tentador | qué confusión revela |
 |---|---|---|
 | **A** (aprender definiciones de un diccionario) | Es el modelo mental por defecto de «la computadora entiende palabras»: que adentro hay significados guardados. | Creen que el significado está **almacenado**. Se desarma volviendo a la clase 6: el significado que el modelo maneja sale de **la compañía** (con qué otras palabras aparece) y del contexto. No hay definiciones adentro. Se paga en el ítem 2: si creés que adentro hay un diccionario, no podés entender por qué alucina. |
-| **C** (comprimir el corpus para recuperarlo) | Es media verdad, y de las peligrosas: entrenar **sí** es una forma de compresión. | El problema es el «para recuperarlo». Es compresión **con pérdida**, y sin índice: no hay manera de consultar ni de recuperar el original. La demostración de tres segundos: el corpus pesa 1,1 MB, el modelo 6,2 MB, y en la clase 9 aparecen modelos entrenados con terabytes que pesan gigabytes. **No entra.** Lo que se perdió es exactamente lo que después se inventa. |
+| **C** (comprimir el corpus para recuperarlo) | Es media verdad, y de las peligrosas: entrenar **sí** se parece a comprimir, y el modelo **sí** puede recitar pedazos del corpus. | El problema es el «para recuperarlo»: ése no es el objetivo, aunque a veces pase. En nuestro mini-GPT, de hecho, el modelo (6,4 MB) pesa **más** que el corpus (1,1 MB) y memorizó las plantillas: por eso el párrafo del gancho sale casi textual. En un LLM grande la cuenta da al revés (el texto supera por lejos a los pesos) y no entra entero; aun así memoriza tal cual lo que se repite mucho. Lo demás queda mezclado, sin índice, y lo que no quedó se completa con lo plausible. |
 | **D** (clasificar oraciones por tema) | Es la tarea de ML que esta audiencia ya conoce (clases 4 y 9), así que es la plantilla que tienen a mano. | Confunden **modelo de lenguaje** con **clasificador**. Vale la pena señalar la diferencia económica: el clasificador necesita etiquetas humanas, el modelo de lenguaje no necesita ninguna. Ésa asimetría es por qué existen los LLM. |
 
 **Bandera roja:** si más de un tercio elige A, la segunda mitad de la clase no se entendió.
@@ -30,7 +31,11 @@ Volvé a la slide 21 («por qué alucina») antes de seguir con la clase 9.
 ## 2. Por qué alucina
 
 **Correcta: C** — *la salida es siempre una distribución, no hay verificador de verdad y
-no existe la opción «no sé».*
+nada adentro detecta que no sabe.*
+
+> Ojo con leer la C como «nunca dice "no sé"». Los asistentes con post-entrenamiento lo
+> dicen, y bastante. Pero ese «no sé» también es una continuación aprendida, no una
+> verificación: por eso lo pueden decir cuando sí saben, y no decirlo cuando inventan.
 
 | distractor | por qué es tentador | qué confusión revela |
 |---|---|---|
@@ -61,26 +66,31 @@ Empeora: la **variedad** — se vuelve monótono, repite, y en tareas creativas 
 
 ## 4. El prompt de 10.000 palabras
 
-**a)** Las instrucciones del principio **quedan fuera de la ventana** y directamente no se
-le pasan al modelo. No las ve.
+**a)** Depende de la herramienta, y conviene saber cuál usás:
+- por **API**, lo más común es que la llamada **devuelva un error** por pasarse del límite;
+- en una **interfaz de chat**, lo común es que **recorte el principio sin avisarte** (o que
+  resuma lo viejo). Es el caso peligroso: las instrucciones del principio quedan **fuera
+  de la ventana** y directamente no se le pasan al modelo. No las ve.
 
-**b)** **No «se olvidó»**: nunca las tuvo. La diferencia importa y no es una sutileza
-semántica. «Olvidarse» supone que estuvieron adentro y se degradaron — que es lo que hacía
+**b)** En el caso del recorte, **no «se olvidó»**: nunca las tuvo. La diferencia importa y
+no es una sutileza semántica. «Olvidarse» supone que estuvieron adentro y se degradaron — que es lo que hacía
 la RNN de la clase 6. El transformer tiene un **corte duro**: lo que quedó afuera no está
 borroso, no está.
 
 **c)** Tres mitigaciones aceptables, en orden de calidad:
-1. **Poner las instrucciones al final**, pegadas a los datos.
+1. **Que todo entre en la ventana**, con las instrucciones pegadas a los datos: al
+   principio y, si son largas, repetidas al final.
 2. **Procesar por lotes**: repetir las instrucciones en cada tanda de 20 titulares en vez
    de mandar los 200 juntos. Es lo que hay que hacer de verdad.
 3. **Repetir** lo más importante al principio y al final.
 
 > **Media respuesta que hay que corregir:** «uso un modelo con ventana más grande».
-> Sirve, pero no resuelve: en modelos grandes existe el *lost in the middle* — lo que
-> queda en el medio de un contexto largo se atiende peor aunque esté adentro. Y eso lo
-> vieron medido: el caso «lejos» de `viz/ventana-de-contexto.html` tiene la curva **plana
-> aun con la pista adentro de la ventana**. Ventana más grande no es lo mismo que
-> atención efectiva.
+> Sirve, pero no resuelve: en modelos grandes existe el *lost in the middle* (Liu et al.
+> 2023) — rinden mejor con el dato al **principio o al final** de un contexto largo, y peor
+> cuando queda en el medio, aunque esté adentro. Y algo de la misma familia lo vieron
+> medido: el caso «lejos» de `viz/ventana-de-contexto.html` tiene la curva **plana aun con
+> la pista adentro de la ventana**, sin ganarle a contestar siempre el bloque más
+> frecuente. Ventana más grande no es lo mismo que atención efectiva.
 
 ---
 
@@ -112,12 +122,15 @@ al sortear.
 ## 6. La curva de loss con tijera
 
 **a)** **Sobreajuste** (*overfitting*): está **calcando** el corpus en vez de aprender la
-forma. La señal de libro de la clase 4: la loss de train sigue bajando (0,56 → 0,10)
-mientras la de validación **toca fondo y empieza a subir** (0,70 en el paso 900 → 0,79 en
-el 1200).
+forma. La señal principal es **la brecha**: la loss de train baja hasta 0,10 mientras la
+de validación se queda en 0,7-0,8, siete u ocho veces más. En esta corrida, además, la
+validación toca fondo en el paso 900 (0,70) y sube a 0,79 en el 1200; pero desde el paso
+~400 está plana dentro del ruido (±0,1), así que ese «sube» es la parte menos robusta.
 
-**b)** Alrededor del **paso 900**, donde la validación toca su mínimo. Eso es exactamente
-lo que hace la **parada temprana** (`ent.ParadaTemprana`, clase 4).
+**b)** En cualquier punto **entre el 400 y el 900**, donde la validación deja de bajar. Si
+contestan «900» (el mínimo de la tabla), está bien; si contestan «500 o 700, donde deja de
+mejorar», también. Eso es lo que hace la **parada temprana** (`ent.ParadaTemprana`,
+clase 4).
 
 **c)** Cualquiera de estas, y conviene que nombren dos de familias distintas:
 - **Más datos.** Es la causa directa acá: 22.500 fichas de train para 1.541.056 perillas.
@@ -137,8 +150,9 @@ por qué la clase 4 va antes que ésta.
 >
 > **Y una honestidad que conviene tener a mano por si alguien lo reproduce:** con 25 KB
 > el conjunto de validación son 2.500 fichas y la loss medida sobre él tiene un ruido de
-> ±0,1. La **forma** (tijera clarísima) sale siempre; el paso exacto del mínimo se mueve
-> entre el 700 y el 900 según la corrida. Si alguien contesta «700» en vez de «900»,
+> ±0,1. La **brecha** sale siempre; el paso exacto del mínimo se mueve entre el 700 y el
+> 1000 según la corrida (en la revisión, con otra versión de torch: train 0,101, mínimo de
+> val 0,70 en el paso 1000 y 0,78 al final). Si alguien contesta «700» en vez de «900»,
 > **está bien igual**: lo que la pregunta mide es que sepa mirar dónde la validación deja
 > de bajar, no que acierte un número. Está anotado en `notas-docente.md` §9.
 >
@@ -151,19 +165,22 @@ por qué la clase 4 va antes que ésta.
 ## 7. Por qué cuenta mal las letras
 
 **Lo que tiene que aparecer:** el modelo no ve letras, ve **fichas** (*tokens*) de
-sub-palabra. «ferrocarril» no son once letras: son tres o cuatro números. Contar las erres
-es contar algo que **no está en su representación**. Es como pedirle a alguien que sólo
-escuchó una palabra que te diga cómo se escribe.
+sub-palabra. «ferrocarril» no son once letras: son tres o cuatro números (seis con el
+tokenizador chiquito del curso). Para contar las erres tiene que saber **de qué letras está
+hecha cada ficha**, y eso no está a la vista en su representación: lo tuvo que aprender
+aparte. Es como pedirle a alguien que sólo escuchó una palabra que te diga cómo se
+escribe: puede saberlo, pero es más fácil equivocarse.
 
-**Segunda parte — por qué a veces acierta:** porque **vio la respuesta escrita** muchas
-veces en el corpus (las palabras muy frecuentes, o los casos que aparecen en tutoriales y
-foros), o porque la palabra es **una sola ficha frecuente** y su respuesta quedó
-memorizada junto a ella. Acierta **por recuperación, no por conteo** — y eso explica por
-qué acierta con «arroz» y falla con una palabra rara de la misma longitud.
+**Segunda parte — por qué a veces acierta:** porque **aprendió de qué letras están hechas
+las fichas** (los modelos grandes deletrean bien) o **vio la respuesta escrita** muchas
+veces; y porque, si razona paso a paso (deletrea y después cuenta) o usa una herramienta,
+cuenta bastante bien. Los modelos de 2024-25 con razonamiento aciertan las erres de
+«strawberry». La respuesta buena no es «no puede»: es **«le cuesta más de lo que parece y
+falla sin avisar; por eso se verifica»**.
 
 | respuesta parcial frecuente | qué le falta |
 |---|---|
-| «porque es un modelo de lenguaje, no una calculadora» | Es verdad y no explica nada. Preguntá: *¿por qué no puede simplemente contar?* Ahí aparece la tokenización o no aparece. |
+| «porque es un modelo de lenguaje, no una calculadora» | Es verdad y no explica nada. Preguntá: *¿por qué le cuesta simplemente contar?* Ahí aparece la tokenización o no aparece. |
 | «porque no sabe contar» | Circular. Un modelo de caracteres tampoco sabe contar, pero por otro motivo. Repreguntá: *¿qué es lo que el modelo tiene delante cuando le hacés la pregunta?* |
 
 > **Honestidad obligatoria en esta pregunta.** El mini-GPT de la clase es **de
@@ -216,9 +233,9 @@ sigue en un texto lleno de preguntas. Es el punto de la slide 35 y sorprende a t
 mundo.
 
 **c)** Dos propiedades que ChatGPT sigue teniendo igual (cualquiera de la tabla de
-traducción): la salida es siempre una distribución sin casillero de «no sé»; hay un sorteo
-al elegir la ficha; la ventana es finita; trabaja con fichas y no con letras; no hay un
-estado de creencias que se sostenga.
+traducción): la salida es siempre una distribución, sin nada adentro que detecte que no
+sabe; hay un sorteo al elegir la ficha; la ventana es finita; trabaja con fichas y no con
+letras; no hay un estado de creencias que se sostenga.
 
 > **Bandera roja al revés:** si alguien contesta que la diferencia principal es la escala
 > y que con escala aparece el resto, mostrale que GPT-3 base (175 mil millones de
@@ -236,7 +253,7 @@ estado de creencias que se sostenga.
 2. **Escribir el prompt en un archivo y no tocarlo más.** El prompt *es* el libro de
    códigos operacionalizado. Va en el apéndice, literal.
 3. **Temperatura 0** y semilla fija, si el proveedor la ofrece.
-4. **Codificar a mano una muestra al azar** de al menos 100-200 titulares, sin mirar lo
+4. **Codificar a mano una muestra al azar** de al menos 200 titulares, sin mirar lo
    que dijo el modelo. Si podés, que dos personas codifiquen un subconjunto y reportás el
    acuerdo entre humanos: **ése es tu techo realista**, no el 100%.
 5. **Comparar el modelo contra esa muestra** y reportar **precisión, recall, F1 y matriz

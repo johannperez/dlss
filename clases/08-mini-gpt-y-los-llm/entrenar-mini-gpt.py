@@ -17,9 +17,24 @@ en una viz. Todo lo que muestran `temperatura.html`, `ventana-de-contexto.html`,
 misma semilla. Si tocas uno, tocas el otro: si no, el aula ve dos modelos
 distintos y se rompe la coherencia del material.
 
+**Sobre la reproducibilidad (leelo antes de citar un numero).** Con la misma
+maquina y las mismas versiones de python/torch, el script y el notebook dan
+los mismos numeros y las mismas muestras. Con otra CPU u otra version de torch,
+los pesos cambian en las ultimas cifras y el sorteo se va por otro camino: las
+losses quedan parecidas, pero las muestras de los pasos intermedios, los
+aciertos de bloque o la curva de la ventana cambian (en la revision, con torch
+2.14 en ARM: 48/60 en vez de 54/60, y sin «Nelida Falcon» en el paso 800). Por
+eso el paquete registra las versiones en `meta`, y por eso las slides dicen
+«en la corrida del curso».
+
 Uso:
     PYTHONPATH=_shared python3 clases/08-mini-gpt-y-los-llm/entrenar-mini-gpt.py
     ... --pasos 100        (corrida corta, solo para probar que anda)
+    ... --solo-anotar      (NO entrena ni usa el modelo: recalcula sobre el
+                            datos-mini-gpt.json existente solo los campos que
+                            dependen del corpus y del padron —casos de la
+                            ventana, linea de base mayoritaria, pista, nombres
+                            inventados en las muestras, textos de las viz—)
 
 Salidas (en esta misma carpeta):
     datos-mini-gpt.js     lo que leen las cuatro viz
@@ -27,6 +42,7 @@ Salidas (en esta misma carpeta):
 """
 
 import argparse
+import collections
 import json
 import os
 import pathlib
@@ -35,6 +51,7 @@ import re
 import sys
 import time
 
+import numpy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -169,7 +186,11 @@ class MiniGPT(nn.Module):
                 siguiente = logits.argmax(dim=-1, keepdim=True)
             else:
                 probs = torch.softmax(logits / temperatura, dim=-1)
-                siguiente = torch.multinomial(probs, num_samples=1, generator=gen)
+                # El sorteo se hace en CPU, con un generador de CPU. En GPU, pasarle
+                # a multinomial un generador de CPU sobre un tensor de GPU da
+                # RuntimeError; asi anda en los dos lados (identico al notebook).
+                siguiente = torch.multinomial(probs.cpu(), num_samples=1,
+                                              generator=gen).to(idx.device)
             idx = torch.cat([idx, siguiente], dim=1)
         return idx
 
@@ -286,6 +307,126 @@ def prob_de_la_continuacion(modelo, tok, contexto, objetivo):
 
 
 # =============================================================================
+# 4 bis. Lo que depende SOLO del corpus y del padron (no del modelo)
+# =============================================================================
+#
+# Estas funciones no tocan el modelo: por eso `--solo-anotar` las puede volver a
+# correr sobre un datos-mini-gpt.json ya exportado sin re-entrenar (y sin cambiar
+# ni una cifra de lo que salio del modelo).
+
+PATRON_ENCABEZADO = re.compile(
+    r"Diputad[oa] ([A-Z][a-z]+ [A-Z][a-z]+) \(([A-Z]{3}) — ([^)]+)\)\.")
+PATRON_NOMBRE = re.compile(r"Diputad[oa] ([A-Z][a-z]+ [A-Z][a-z]+) \(")
+
+# Los textos que muestra viz/ventana-de-contexto.html para cada caso.
+TEXTOS_VENTANA = {
+    "cerca": {
+        "pregunta": "¿de qué bloque es este diputado?",
+        "titulo": "La pista está CERCA: el apellido, justo antes de la pregunta",
+        "pista": "el apellido del diputado",
+        "explicacion":
+            "El modelo aprendió que el nombre de cada diputado predice su bloque, "
+            "y casi siempre le alcanza con el apellido. Achicá la ventana: mientras "
+            "el apellido entero está adentro, contesta bien; cuando empieza a perder "
+            "letras del apellido, empieza a fallar. La curva sube de a poco, a medida "
+            "que entra más del apellido: el corte duro es del dato, no de la curva.",
+    },
+    "lejos": {
+        "pregunta": "¿de qué bloque es quien viene hablando?",
+        "titulo": "La pista está LEJOS: el encabezado, entre 40 y 120 fichas atrás",
+        "pista": "el bloque, en el encabezado del turno",
+        "explicacion":
+            "Acá el dato está en el encabezado del turno, mucho más atrás. Ojo con "
+            "esta curva: es plana, y nunca le gana a contestar siempre el bloque más "
+            "frecuente. Aunque la pista esté ADENTRO de la ventana, este modelo no la "
+            "usa: su horizonte efectivo es más corto que su ventana.",
+    },
+}
+
+# Los titulos de los cuatro casos de viz/por-que-alucina.html. En los tres
+# "falsos" la entidad falsa la ponemos NOSOTROS en el prompt: lo que se ve es
+# que el modelo acepta una premisa falsa y la completa, no que la fabrique.
+TITULOS_ALUCINACION = {
+    "existe": "Un diputado que SÍ está en el padrón",
+    "no-existe": "Una diputada que NO existe (el nombre lo pusimos nosotros)",
+    "ley": "Una ley que no existe (el número lo pusimos nosotros)",
+    "cita": "Una provincia que no existe (la pusimos nosotros)",
+}
+
+
+def casos_de_ventana(texto, verdad):
+    """Los pasajes REALES del corpus que usa la viz de la ventana.
+
+    cerca: el encabezado "Diputada Fulana Tal (" cortado justo antes de la sigla.
+           La pista es el APELLIDO (con el apellido solo, el modelo ya contesta;
+           medir contra el nombre completo hacia aparecer un cartel de "perdiste
+           la pista" con el modelo contestando bien).
+    lejos: "El bloque del ..." dicho 40-120 fichas despues del encabezado.
+    """
+    nombre_partido = {pp["sigla"]: pp["nombre"] for pp in verdad["partidos"]}
+    vistos, cerca = set(), []
+    for mm in PATRON_ENCABEZADO.finditer(texto):
+        if mm.group(1) in vistos or mm.start() < 300:
+            continue
+        vistos.add(mm.group(1))
+        corte = mm.start(2)                       # justo despues del "("
+        apellido = mm.group(1).split(" ")[1]
+        inicio_apellido = mm.start(1) + mm.group(1).index(" ") + 1
+        cerca.append({"texto": texto[mm.start() - 150:corte],
+                      "objetivo": mm.group(2), "nombre": mm.group(1),
+                      "apellido": apellido,
+                      "dist": corte - inicio_apellido,
+                      "dist_nombre": corte - mm.start(1)})
+    cerca = cerca[:30]
+
+    lejos = []
+    for mm in PATRON_ENCABEZADO.finditer(texto):
+        fin_enc = mm.end()
+        b = texto.find("El bloque del ", fin_enc, fin_enc + 600)
+        sig = texto.find("Diputad", fin_enc)
+        if b > 0 and (sig < 0 or b < sig):
+            corte = b + len("El bloque del ")
+            d = corte - mm.start(2)
+            if 40 <= d <= 120:
+                lejos.append({"texto": texto[mm.start():corte],
+                              "objetivo": nombre_partido[mm.group(2)],
+                              "nombre": mm.group(1), "sigla": mm.group(2),
+                              "dist": d})
+    lejos = lejos[:24]
+    return {"cerca": cerca, "lejos": lejos}
+
+
+def tramo_de_la_pista(cid, c):
+    """Dónde está la pista adentro del texto del ejemplo: [desde, hasta)."""
+    t = c["texto"]
+    if cid == "cerca":
+        a = t.rindex(c["apellido"])
+        return a, a + len(c["apellido"])
+    return t.index("("), t.index(")") + 1
+
+
+def linea_de_base_mayoritaria(grupo, largo_obj):
+    """Contestar SIEMPRE la respuesta mas frecuente (clase 4: el baseline tonto)."""
+    cuenta = collections.Counter(c["objetivo"][:largo_obj] for c in grupo)
+    prefijo, aciertos = cuenta.most_common(1)[0]
+    respuesta = next(c["objetivo"] for c in grupo if c["objetivo"][:largo_obj] == prefijo)
+    return {"respuesta": respuesta, "aciertos": aciertos, "n": len(grupo)}
+
+
+def nombres_inventados(txt, reales):
+    """Los nombres de encabezado ("Diputada Fulana Tal (") que NO estan en el padron."""
+    return sorted({m.group(1) for m in PATRON_NOMBRE.finditer(txt)} - set(reales))
+
+
+def versiones():
+    return {"python": platform.python_version(), "torch": torch.__version__,
+            "numpy": numpy.__version__,
+            "plataforma": f"{platform.system()} {platform.machine()}",
+            "cpu": platform.processor() or platform.machine(),
+            "hilos_cpu": torch.get_num_threads()}
+
+
+# =============================================================================
 # 5. Main
 # =============================================================================
 
@@ -295,8 +436,15 @@ def main():
     ap.add_argument("--solo-exportar", action="store_true",
                     help="no entrena: levanta el checkpoint guardado y rehace "
                          "los paquetes de las viz")
+    ap.add_argument("--solo-anotar", action="store_true",
+                    help="no entrena ni usa el modelo: recalcula sobre el "
+                         "datos-mini-gpt.json existente los campos que dependen "
+                         "solo del corpus y del padron")
     args = ap.parse_args()
     CHECK = SALIDA / "mini-gpt.pt"     # gitignoreado (*.pt): es un artefacto local
+
+    if args.solo_anotar:
+        return anotar()
 
     utils.fijar_semilla(SEMILLA)
     gen = torch.Generator().manual_seed(SEMILLA)
@@ -324,11 +472,17 @@ def main():
     prompt_teatro = "Señor presidente, "
     muestras, historial = [], []
 
+    reales = [d["nombre"] for d in verdad["diputados"]]
+
     def muestra(paso):
         t = generar_texto(modelo, tok, prompt_teatro, 260, 0.8, SEMILLA + paso)
-        muestras.append({"paso": paso, "prompt": prompt_teatro, "texto": t})
+        inv = nombres_inventados(t, reales)
+        muestras.append({"paso": paso, "prompt": prompt_teatro, "texto": t,
+                         "nombres_inventados": inv})
         print(f"\n--- muestra en el paso {paso} " + "-" * 40)
         print(prompt_teatro + t.replace("\n", " ⏎ "))
+        if inv:
+            print(f"    (nombres que NO estan en el padron: {', '.join(inv)})")
         print("-" * 60)
 
     hitos = {0, 50, 150, 400, 800, args.pasos}
@@ -428,66 +582,21 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
     # ESTA SECCION SE REESCRIBIO DESPUES DE MEDIR. La version original iba a
     # mostrar que el modelo pierde el bloque de quien habla cuando el encabezado
     # se cae de la ventana. Se midio y NO PASA: el modelo nunca aprendio esa
-    # dependencia larga (acierta al nivel del azar con la ventana entera).
-    # Publicar esa viz habria sido inventar un resultado. Lo que si aprendio es
-    # la dependencia CORTA —el nombre del diputado predice su bloque— y ahi el
-    # corte se ve perfecto. Exportamos las dos: la que funciona muestra el corte
-    # duro de la ventana, y la que no funciona muestra que estar adentro de la
-    # ventana no alcanza (el "lost in the middle" de los modelos grandes, en
-    # chiquito). Las dos son mediciones reales sobre 30 y 24 casos del corpus.
+    # dependencia larga (con la ventana entera no le gana a contestar siempre el
+    # bloque mas frecuente). Publicar esa viz habria sido inventar un resultado.
+    # Lo que si aprendio es la dependencia CORTA —el apellido del diputado
+    # predice su bloque—. Exportamos las dos: la que funciona muestra como la
+    # respuesta mejora a medida que entra el apellido, y la que no funciona
+    # muestra que estar adentro de la ventana no alcanza. Las dos son mediciones
+    # reales sobre 30 y 24 casos del corpus, con dos lineas de base: el azar
+    # (1 de 6) y contestar siempre la respuesta mas frecuente.
     #
-    patron_enc = re.compile(
-        r"Diputad[oa] ([A-Z][a-z]+ [A-Z][a-z]+) \(([A-Z]{3}) — ([^)]+)\)\.")
-    NOMBRE_PARTIDO = {pp["sigla"]: pp["nombre"] for pp in verdad["partidos"]}
+    casos = casos_de_ventana(texto, verdad)
     ventanas = list(range(4, CTX + 1, 4))
 
-    # --- caso A: la pista CERCA (el nombre, a ~16 fichas del corte) -----------
-    vistos, cerca = set(), []
-    for mm in patron_enc.finditer(texto):
-        if mm.group(1) in vistos or mm.start() < 300:
-            continue
-        vistos.add(mm.group(1))
-        corte = mm.start(2)                       # justo despues del "("
-        cerca.append({"texto": texto[mm.start() - 150:corte],
-                      "objetivo": mm.group(2), "nombre": mm.group(1),
-                      "dist": corte - mm.start(1)})
-    cerca = cerca[:30]
-
-    # --- caso B: la pista LEJOS (el encabezado, a 40-120 fichas) --------------
-    lejos = []
-    for mm in patron_enc.finditer(texto):
-        fin_enc = mm.end()
-        b = texto.find("El bloque del ", fin_enc, fin_enc + 600)
-        sig = texto.find("Diputad", fin_enc)
-        if b > 0 and (sig < 0 or b < sig):
-            corte = b + len("El bloque del ")
-            d = corte - mm.start(2)
-            if 40 <= d <= 120:
-                lejos.append({"texto": texto[mm.start():corte],
-                              "objetivo": NOMBRE_PARTIDO[mm.group(2)],
-                              "nombre": mm.group(1), "sigla": mm.group(2),
-                              "dist": d})
-    lejos = lejos[:24]
-
     casos_ventana = []
-    for cid, grupo, largo_obj, pregunta, titulo, explicacion, tramo_de in [
-        ("cerca", cerca, 3,
-         "¿de qué bloque es este diputado?",
-         "La pista está CERCA: el nombre, a unas 16 fichas",
-         "El modelo aprendió que el nombre de cada diputado predice su bloque. "
-         "La pista es el nombre completo. Achicá la ventana hasta que el nombre "
-         "de pila quede afuera y mirá qué pasa.",
-         lambda c: (c["texto"].rindex(c["nombre"]),
-                    c["texto"].rindex(c["nombre"]) + len(c["nombre"]))),
-        ("lejos", lejos, 10,
-         "¿de qué bloque es quien viene hablando?",
-         "La pista está LEJOS: el encabezado, a unas 70 fichas",
-         "Acá el dato está en el encabezado del turno, mucho más atrás. "
-         "Ojo con esta curva: es plana. Aunque la pista esté ADENTRO de la "
-         "ventana, este modelo no la usa. Su horizonte efectivo es más corto "
-         "que su ventana.",
-         lambda c: (c["texto"].index("("), c["texto"].index(")") + 1)),
-    ]:
+    for cid, largo_obj in [("cerca", 3), ("lejos", 10)]:
+        grupo = casos[cid]
         curva, ok_por_k = [], {}
         for k in ventanas:
             recortes = [c["texto"][-k:] for c in grupo]
@@ -498,8 +607,10 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
             curva.append({"ventana": k, "aciertos": sum(ok), "n": len(grupo),
                           "con_pista": dentro})
             ok_por_k[k] = ok
+        mayor = linea_de_base_mayoritaria(grupo, largo_obj)
         print(f"  [{cid}] pista a ~{sorted(c['dist'] for c in grupo)[len(grupo)//2]} "
-              f"fichas · {len(grupo)} casos reales del corpus")
+              f"fichas · {len(grupo)} casos reales del corpus · contestar siempre "
+              f"«{mayor['respuesta']}» da {mayor['aciertos']}/{mayor['n']}")
         for c in curva:
             if c["ventana"] in (4, 8, 12, 16, 24, 32, 64, 128):
                 print(f"     ventana {c['ventana']:3d}: {c['aciertos']:2d}/{c['n']} "
@@ -531,15 +642,16 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
                 "prob_correcta": p_obj,
                 "acierta": cont.startswith(c["objetivo"][:largo_obj]),
             })
-        a, b = tramo_de(c)
+        a, b = tramo_de_la_pista(cid, c)
         casos_ventana.append({
-            "id": cid, "pregunta": pregunta, "titulo": titulo,
-            "explicacion": explicacion,
+            "id": cid, **TEXTOS_VENTANA[cid],
             "ejemplo": {"texto": c["texto"], "objetivo": c["objetivo"],
                         "nombre": c["nombre"], "distancia_pista": c["dist"],
                         "tramo_pista": [a, b], "flipea": bool(cand),
                         "barrido": barrido},
             "curva": curva, "n_casos": len(grupo),
+            "distancia_mediana": sorted(x["dist"] for x in grupo)[len(grupo) // 2],
+            "mayoritaria": mayor,
         })
     ventana_pack = {"casos": casos_ventana, "contexto_maximo": CTX,
                     "azar": round(1 / len(verdad["partidos"]), 3)}
@@ -575,20 +687,20 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
     reales = {d["nombre"] for d in verdad["diputados"]}
     casos_aluc = [
         {"id": "existe",
-         "titulo": "Un diputado que SÍ está en el padrón",
+         "titulo": TITULOS_ALUCINACION["existe"],
          "prompt": f"{elegido['tratamiento'].capitalize()} {elegido['nombre']} (",
          "verdad": f"{elegido['partido']} — {elegido['provincia']}",
          "existe": True},
         {"id": "no-existe",
-         "titulo": "Una diputada que NO existe (nos la inventamos nosotros)",
+         "titulo": TITULOS_ALUCINACION["no-existe"],
          "prompt": "Diputada Marisol Bengoechea (",
          "verdad": None, "existe": False},
         {"id": "ley",
-         "titulo": "Una ley que no está en el padrón",
+         "titulo": TITULOS_ALUCINACION["ley"],
          "prompt": "Cuando discutimos la Ley 7841 de ",
          "verdad": None, "existe": False},
         {"id": "cita",
-         "titulo": "Una cita atribuida a una provincia que no existe",
+         "titulo": TITULOS_ALUCINACION["cita"],
          "prompt": ("Los intendentes de Puerto Bermejo nos mandaron una nota. "
                     "Dice, textual: \""),
          "verdad": None, "existe": False},
@@ -599,8 +711,17 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
         _, caso["confianza"] = prob_de_la_continuacion(
             modelo, tok, caso["prompt"], caso["generado"][:18])
         print(f"  [{caso['id']}] {caso['prompt']}«{caso['generado'][:62]}»")
+
+    # Y la fabricacion ESPONTANEA, que es otra cosa: en los tres casos de arriba
+    # la entidad falsa la pusimos nosotros en el prompt. Aca el modelo arranca
+    # solo un encabezado de turno y medimos cuantos nombres que escribe no estan
+    # en el padron. Es una proporcion sobre muchos sorteos, no un caso elegido.
+    fabricacion = medir_fabricacion(modelo, tok, reales)
+    print(f"  fabricacion espontanea: {fabricacion['inventados']} de "
+          f"{fabricacion['con_nombre']} encabezados nombran a alguien que no existe")
     aluc_pack = {
         "casos": casos_aluc,
+        "fabricacion": fabricacion,
         "aciertos_partido": aciertos_partido,
         "aciertos_provincia": aciertos_prov,
         "total_diputados": len(verdad["diputados"]),
@@ -647,6 +768,7 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
             "hilos_cpu": torch.get_num_threads(),
             "cpu": platform.processor() or platform.machine(),
             "torch": torch.__version__,
+            "versiones": versiones(),
             "loss_inicial": historial[0]["val"],
             "loss_final_train": historial[-1]["train"],
             "loss_final_val": historial[-1]["val"],
@@ -663,6 +785,45 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
         "contar": contar_pack,
     }
 
+    escribir(paquete)
+
+    print("\n" + "=" * 74)
+    print(f"escrito: {SALIDA/'datos-mini-gpt.js'}")
+    print(f"escrito: {SALIDA/'datos-mini-gpt.json'}")
+    print(f"NUMERO PARA LAS SLIDES: {n_par:,} perillas · "
+          f"{segundos/60:.1f} min de CPU ({torch.get_num_threads()} hilos) · "
+          f"loss val {historial[0]['val']:.2f} -> {historial[-1]['val']:.2f}")
+    print("=" * 74)
+
+
+ARRANQUE_FABRICACION = ("Se va a votar en general. Los que esten por la afirmativa, "
+                        "sirvanse indicarlo.\nDiputad")
+
+
+@torch.no_grad()
+def medir_fabricacion(modelo, tok, reales, n=60, semilla=SEMILLA, temperatura=0.8):
+    """¿Cuantos nombres inventa el modelo SOLO, sin que se los demos en el prompt?
+
+    Arranca `n` veces un encabezado de turno ("...\nDiputad") y deja que el
+    modelo escriba el nombre. Todos los sorteos salen de un solo generador con
+    semilla fija. Identico a la celda de la seccion 9 del notebook.
+    """
+    idx = torch.tensor([tok.codificar(ARRANQUE_FABRICACION)] * n)
+    g = torch.Generator().manual_seed(semilla)
+    salida = modelo.generar(idx, 40, temperatura, g)
+    largo = idx.shape[1]
+    nombres = []
+    for fila in salida:
+        m = PATRON_NOMBRE.match("Diputad" + tok.decodificar(fila[largo:].tolist()))
+        nombres.append(m.group(1) if m else None)
+    con_nombre = [x for x in nombres if x]
+    inventados = [x for x in con_nombre if x not in set(reales)]
+    return {"arranque": ARRANQUE_FABRICACION, "n": n, "temperatura": temperatura,
+            "con_nombre": len(con_nombre), "inventados": len(inventados),
+            "nombres_inventados": sorted(set(inventados))}
+
+
+def escribir(paquete):
     (SALIDA / "datos-mini-gpt.json").write_text(
         json.dumps(paquete, ensure_ascii=False, indent=1), encoding="utf-8")
     (SALIDA / "datos-mini-gpt.js").write_text(
@@ -673,13 +834,64 @@ def exportar(modelo, tok, texto, verdad, historial, muestras, segundos,
         "if (typeof window !== 'undefined') window.DATOS_MINIGPT = DATOS_MINIGPT;\n",
         encoding="utf-8")
 
-    print("\n" + "=" * 74)
-    print(f"escrito: {SALIDA/'datos-mini-gpt.js'}")
-    print(f"escrito: {SALIDA/'datos-mini-gpt.json'}")
-    print(f"NUMERO PARA LAS SLIDES: {n_par:,} perillas · "
-          f"{segundos/60:.1f} min de CPU ({torch.get_num_threads()} hilos) · "
-          f"loss val {historial[0]['val']:.2f} -> {historial[-1]['val']:.2f}")
-    print("=" * 74)
+
+def anotar():
+    """Recalcula sobre el datos-mini-gpt.json EXISTENTE lo que no depende del modelo.
+
+    No entrena, no carga pesos, no genera texto: ninguna cifra que haya salido
+    del modelo cambia. Sirve para agregar a una corrida ya publicada campos que
+    se derivan del corpus y del padron (la pista de la ventana, la linea de base
+    mayoritaria, los nombres inventados en las muestras, los textos de las viz)
+    sin re-entrenar, que en otra maquina daria otras muestras.
+    """
+    ruta = SALIDA / "datos-mini-gpt.json"
+    paquete = json.loads(ruta.read_text(encoding="utf-8"))
+    texto = datos.debates_aguasclaras()
+    verdad = datos.verdad_aguasclaras()
+    reales = [d["nombre"] for d in verdad["diputados"]]
+    casos = casos_de_ventana(texto, verdad)
+
+    for caso in paquete["ventana"]["casos"]:
+        cid = caso["id"]
+        grupo = casos[cid]
+        largo_obj = 3 if cid == "cerca" else 10
+        ej = caso["ejemplo"]
+        # Chequeo de coherencia: los casos que recalculamos tienen que ser los
+        # MISMOS sobre los que se midio el modelo. Si no, no anotamos nada.
+        c = next((x for x in grupo if x["nombre"] == ej["nombre"]
+                  and x["texto"] == ej["texto"]), None)
+        if c is None or len(grupo) != caso["n_casos"]:
+            raise SystemExit(f"[{cid}] los casos del corpus no coinciden con los "
+                             "del paquete: no anoto nada (¿cambio el corpus?).")
+        caso.update(TEXTOS_VENTANA[cid])
+        a, b = tramo_de_la_pista(cid, c)
+        ej["tramo_pista"] = [a, b]
+        ej["distancia_pista"] = c["dist"]
+        for punto in caso["curva"]:
+            punto["con_pista"] = sum(1 for x in grupo if x["dist"] <= punto["ventana"])
+        caso["distancia_mediana"] = sorted(x["dist"] for x in grupo)[len(grupo) // 2]
+        caso["mayoritaria"] = linea_de_base_mayoritaria(grupo, largo_obj)
+        print(f"  [{cid}] pista: {caso['pista']} (mediana {caso['distancia_mediana']} "
+              f"fichas) · contestar siempre «{caso['mayoritaria']['respuesta']}» da "
+              f"{caso['mayoritaria']['aciertos']}/{caso['mayoritaria']['n']}")
+
+    for caso in paquete["alucinacion"]["casos"]:
+        caso["titulo"] = TITULOS_ALUCINACION[caso["id"]]
+    for m in paquete["muestras"]:
+        m["nombres_inventados"] = nombres_inventados(m["texto"], reales)
+        if m["nombres_inventados"]:
+            print(f"  muestra del paso {m['paso']}: {', '.join(m['nombres_inventados'])}"
+                  " no esta(n) en el padron")
+
+    paquete["meta"]["anotado"] = {
+        "por": "entrenar-mini-gpt.py --solo-anotar",
+        "que": "campos derivados del corpus y del padron; ninguna cifra del modelo "
+               "cambio. La corrida del modelo es la de meta.torch y meta.cpu.",
+        "versiones_al_anotar": {"python": platform.python_version(),
+                                "torch": torch.__version__},
+    }
+    escribir(paquete)
+    print(f"anotado: {ruta}")
 
 
 if __name__ == "__main__":

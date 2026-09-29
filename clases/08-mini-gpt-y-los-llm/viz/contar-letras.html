@@ -6,9 +6,12 @@
 <title>Por qué cuenta mal las letras — Clase 8</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA: "Le estoy pidiendo que cuente algo que no puede ver. Para el
-     modelo, «ferrocarril» no es una fila de once letras: son tres o cuatro
-     números. La R no está en ningún lado."
+     MOMENTO AHA: "Le estoy pidiendo que cuente algo que no tiene a la vista.
+     Para el modelo, «ferrocarril» no es una fila de once letras: son unos pocos
+     números (seis con este tokenizador chiquito; tres o cuatro con el de GPT).
+     Para contar las R tiene que haber aprendido APARTE de qué letras está hecha
+     cada ficha." No es imposible (los modelos grandes deletrean bien, y con
+     razonamiento paso a paso o herramientas cuentan bastante bien): es frágil.
 
      COSECHA DE LA SIEMBRA DE LA CLASE 6: esta viz usa EL MISMO tokenizador BPE
      entrenado en `medir-embeddings.py` para `viz/tokenizador.html` de la clase 6,
@@ -44,7 +47,9 @@
     background: var(--papel);
   }
   .letra.marcada { background: var(--c-error-suave); border-color: var(--c-error);
-                   color: var(--c-error); font-weight: 700; }
+                   color: var(--c-error); font-weight: 700;
+                   text-decoration: underline; text-underline-offset: 3px;
+                   border-width: 2px; }
   .ficha {
     text-align: center; border-radius: 6px; padding: .2em .42em .12em;
     border: 1px solid transparent;
@@ -62,6 +67,7 @@
   .cumplido h4 { margin: 0 0 .3em; font-size: .74rem; letter-spacing: .1em;
                  text-transform: uppercase; color: var(--c-ok); }
   .cumplido p { margin: 0; font-size: .9rem; }
+  .minigpt { font-family: var(--f-mono); font-size: .8rem; }
 
   /* --- embebida en la slide: el iframe mide ~560 px de alto, así que apretamos
      el panel para que los controles entren en lo que se ve sin scrollear. ---- */
@@ -90,7 +96,7 @@
     </div>
 
     <div class="fila">
-      <h3>2 &middot; Como la ve un modelo de verdad: fichas de sub-palabra, con sus números</h3>
+      <h3>2 &middot; Como la ve un tokenizador de sub-palabras (el chiquito de la clase 6): fichas, con sus números</h3>
       <div class="caja" id="modelo"></div>
       <p class="conteo" id="conteo-modelo"></p>
     </div>
@@ -106,9 +112,12 @@
       <h4>Prometido en la clase 6, cumplido</h4>
       <p>En <code>viz/tokenizador.html</code> de la clase 6 este mismo panel te
          preguntaba cuántas erres tenía la palabra y se iba sin contestar.
-         Acá está la respuesta: <b>el modelo no puede contarlas porque nunca las
-         vio por separado</b>. Es el mismo tokenizador, entrenado sobre el mismo
-         corpus de discursos reales.</p>
+         Acá está la respuesta: <b>las letras no están a la vista en lo que el
+         modelo recibe</b>. Para contarlas tiene que haber aprendido aparte de qué
+         letras está hecha cada ficha: los modelos grandes lo aprenden bastante
+         (deletrean bien), pero es frágil, y por eso fallan en algo que para vos es
+         trivial. Es el mismo tokenizador, entrenado sobre el mismo corpus de
+         discursos reales.</p>
     </div>
   </div>
 
@@ -120,9 +129,11 @@
       adentro de una sola ficha. Ahora escribí <b>irresponsabilidad</b>: varias
       fichas, y ninguna coincide con una unidad de significado. La pregunta
       «¿cuántas R tiene?» es, para el modelo, una pregunta sobre algo
-      <em>que no está en su representación</em>. Cuando acierta es porque vio la
-      respuesta escrita muchas veces, no porque contó. Lo mismo pasa con las rimas,
-      los anagramas y la aritmética.
+      <em>que no está a la vista en su representación</em>: tiene que saber de qué
+      letras está hecha cada ficha, y eso lo aprendió aparte (o no). Los modelos grandes
+      lo compensan bastante —deletrean bien, y con razonamiento paso a paso o una
+      herramienta cuentan mucho mejor—, pero sigue siendo frágil. Lo mismo pasa con las
+      rimas, los anagramas y la aritmética. <b>No es imposible: es frágil. Verificá.</b>
     </div>
     <p class="viz-pie">
       Tokenizador BPE entrenado sobre el corpus real de <b>discursos de apertura de
@@ -135,6 +146,7 @@
 </div>
 
 <script src="../../06-texto-secuencias-embeddings/datos-texto.js"></script>
+<script src="../datos-mini-gpt.js"></script>
 <script src="../../../_shared/js/viz.js"></script>
 <script>
 /* --- 1. el tokenizador de la clase 6, tal cual ------------------------------ */
@@ -200,9 +212,11 @@ function pintar() {
     t.className = 't';
     t.textContent = limpio === '' ? '.' : limpio;
     if (f.endsWith('</w>')) {
+      // la marca de "fin de palabra" (</w>) — no es un salto de renglón
       const s = document.createElement('span');
       s.className = 'fin';
-      s.textContent = '⏎';
+      s.textContent = '▸';
+      s.title = 'fin de palabra';
       t.appendChild(s);
     }
     d.appendChild(t);
@@ -216,16 +230,17 @@ function pintar() {
   document.getElementById('conteo-modelo').innerHTML =
     '<b>' + piezas.length + '</b> ficha' + (piezas.length === 1 ? '' : 's') +
     '. Para el modelo, esta palabra <b>es</b> esta lista: <b>[' + ids.join(', ') +
-    ']</b>. Son números: no tienen letras adentro.';
+    ']</b>. Son números: las letras no están a la vista. (▸ marca el fin de palabra.)';
 
   ctl.texto('lectura',
     'Vos ves <b>' + pal.length + '</b> letras. El modelo ve <b>' + piezas.length +
     '</b> ficha' + (piezas.length === 1 ? '' : 's') + '. ' +
     (piezas.length <= 1
-      ? 'Es <b>una sola ficha</b>: para contestar tendría que haber memorizado la ' +
-        'respuesta, porque adentro de un número no hay letras.'
-      : 'Para contestar tendría que abrir cada ficha y mirar de qué letras está ' +
-        'hecha, y eso es exactamente lo que su representación no le permite.'));
+      ? 'Es <b>una sola ficha</b>: para contestar tiene que haber aprendido aparte ' +
+        'de qué letras está hecha, porque en el número no se ven.'
+      : 'Para contestar tiene que saber de qué letras está hecha cada ficha, algo ' +
+        'que no está a la vista y que tuvo que aprender aparte. Los modelos grandes ' +
+        'lo aprenden bastante, pero es frágil.') + respuestaMiniGPT(pal));
 
   p.redibujar();
 }
@@ -248,7 +263,27 @@ p.alDibujar(function () {
     { etiqueta: 'la respuesta correcta', valor: cuantas, color: 'ok' }
   ], { horizontal: false, max: Math.max(pal.length, 1),
        formato: function (v) { return String(Math.round(v)); } });
+  p.canvas.setAttribute('role', 'img');
+  p.canvas.setAttribute('aria-label', '«' + pal + '»: ' + pal.length + ' letras, ' +
+    piezas.length + ' fichas, y la ' + L.toUpperCase() + ' aparece ' + cuantas +
+    (cuantas === 1 ? ' vez.' : ' veces.'));
 });
+
+/* --- 4 bis. lo que contesta NUESTRO mini-GPT (de caracteres) ----------------- */
+function respuestaMiniGPT(pal) {
+  const D = window.DATOS_MINIGPT;
+  if (!D || !D.contar || letraBuscada() !== 'r') return '';
+  const x = D.contar.find(function (c) { return c.palabra === pal; });
+  if (!x) return '';
+  return '<br><br><b>Y el mini-GPT de hoy</b>, que sí ve las letras: le preguntamos ' +
+    '«¿cuántas letras R tiene la palabra ' + pal + '? Respuesta: tiene » y siguió con ' +
+    '<span class="minigpt">«' + escaparHTML(x.respuesta_modelo.slice(0, 30)) + '…»</span>. ' +
+    'Nunca vio a nadie contar nada en el corpus: contesta con una fórmula de sesión. ' +
+    '(Tiene ' + x.erres_de_verdad + '.)';
+}
+function escaparHTML(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 /* --- 5. el panel ------------------------------------------------------------- */
 const EJEMPLOS = ['ferrocarril', 'arroz', 'carro', 'irresponsabilidad',

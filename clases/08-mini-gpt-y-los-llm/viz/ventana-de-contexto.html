@@ -7,16 +7,20 @@
 
 <!-- ==========================================================================
      MOMENTO AHA: "Eso que está gris, para el modelo NO EXISTE. No es que le
-     preste poca atención: no está. Y en el momento exacto en que el dato clave
-     entra en la ventana, la respuesta se arregla de golpe."
+     preste poca atención: no está. Y a medida que el dato clave (el apellido)
+     entra en la ventana, la respuesta mejora." El corte duro es del DATO; la
+     curva sube de a poco, porque cada letra del apellido que entra es
+     información.
 
      SEGUNDO AHA, el incómodo: con la pista lejos, la curva es PLANA aunque la
-     pista esté adentro de la ventana. Estar adentro no alcanza. Es el
+     pista esté adentro de la ventana, y nunca le gana a contestar siempre el
+     bloque más frecuente. Estar adentro no alcanza. Es de la familia del
      "lost in the middle" de los modelos grandes, en chiquito.
 
      TODO LO QUE SE MUESTRA ES MEDIDO. Para cada tamaño de ventana se le volvió
      a preguntar al modelo sobre 30 (caso cerca) y 24 (caso lejos) pasajes
-     REALES del corpus, y se guardó la proporción de aciertos.
+     REALES del corpus, y se guardó la proporción de aciertos. Las dos líneas de
+     base (el azar y la respuesta más frecuente) salen de los mismos pasajes.
      Ver `entrenar-mini-gpt.py`, sección 2 del exportador — ahí está anotado por
      qué esta viz se rehízo después de medir.
      ========================================================================== -->
@@ -35,6 +39,7 @@
     background: var(--c-acento-suave); color: var(--c-acento); font-weight: 700;
     border-radius: 4px; padding: 0 .15em;
   }
+  .texto-ventana .pista-dentro { text-decoration: underline; text-underline-offset: 3px; }
   .texto-ventana .pista-fuera {
     color: var(--tinta-3); opacity: .3; text-decoration: line-through;
   }
@@ -53,6 +58,7 @@
   }
   .respuesta .txt.bien { color: var(--c-ok); background: var(--c-ok-suave); }
   .respuesta .txt.mal  { color: var(--c-error); background: var(--c-error-suave); }
+  .respuesta .marca { font-weight: 700; }
   .cartel[hidden] { display: none; }
   .cartel { margin-top: .55rem; }
 
@@ -69,7 +75,7 @@
   <header>
     <h1>La ventana de contexto</h1>
     <p>El modelo sólo puede mirar las últimas N fichas. Vos achicás esa ventana y ves,
-       ficha por ficha, en qué momento exacto deja de poder contestar.
+       ficha por ficha, cómo cambia lo que puede contestar.
        <em>Antes de mover nada, apostá: ¿con qué tamaño de ventana se va a romper?</em></p>
   </header>
 
@@ -78,13 +84,10 @@
     <div class="respuesta">
       <span class="et">el modelo contesta</span>
       <span class="txt" id="respuesta"></span>
+      <span class="marca" id="marca"></span>
       <span class="et" id="esperado"></span>
     </div>
-    <div class="ojo compacta cartel" id="cartel" hidden>
-      <strong>Acabás de perder la información que hacía falta.</strong>
-      El dato que contesta la pregunta quedó <em>fuera</em> de la ventana. El modelo no
-      lo tiene degradado ni borroso: no lo tiene.
-    </div>
+    <div class="ojo compacta cartel" id="cartel" hidden></div>
     <div class="viz-frame" style="padding:10px; margin-top:.7rem">
       <div id="lienzo"></div>
     </div>
@@ -95,18 +98,22 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Con la pista <b>cerca</b>: arrancá con la ventana en 4 y
-      andá agrandándola. Mientras el nombre esté tachado, el modelo tira cualquier cosa;
-      en cuanto entra en la ventana, la curva pega un salto. <b>No hay degradación suave:
-      hay un corte.</b>
+      andá agrandándola. Mientras el apellido esté tachado, el modelo contesta lo que
+      contestaría sin mirar; a medida que entran sus letras, la curva sube, y con el
+      apellido entero adentro acierta casi siempre. <b>El corte duro es del dato: la
+      letra que quedó afuera no está borrosa, no está.</b> La curva sube de a poco porque
+      cada letra que entra es información.
       <br><br>
-      Ahora cambiá a la pista <b>lejos</b>, y mirá la curva otra vez. <b>Es plana.</b>
-      Aunque la pista esté adentro de la ventana, este modelo no la usa: su horizonte
-      efectivo es más corto que su ventana. En los modelos grandes el fenómeno es más
-      sutil, pero es de la misma naturaleza y tiene nombre — <em>lost in the middle</em>:
-      lo que queda en el medio de un contexto largo se atiende peor que lo que queda en
-      las puntas. (Ojo con la diferencia: allá el modelo <em>podría</em> usar el dato y
-      lo usa peor; acá directamente nunca aprendió esa dependencia larga.) Por eso, en un
-      prompt largo, <b>lo importante va al final</b>.
+      Ahora cambiá a la pista <b>lejos</b>, y mirá la curva otra vez. <b>Es plana</b>, y
+      nunca le gana a la línea de «contestar siempre el bloque más frecuente». Aunque la
+      pista esté adentro de la ventana, este modelo no la usa: su horizonte efectivo es
+      más corto que su ventana. En los modelos grandes el fenómeno es más sutil, pero es
+      de la misma familia y tiene nombre — <em>lost in the middle</em>: rinden mejor con
+      el dato al principio o al final del contexto, y peor en el medio. (Ojo con la
+      diferencia: allá el modelo <em>podría</em> usar el dato y lo usa peor; acá
+      directamente nunca aprendió esa dependencia larga.) Por eso, en un prompt largo,
+      <b>lo importante va al principio o al final, nunca en el medio</b>; con un documento
+      largo, la pregunta va al final.
     </div>
     <p class="viz-pie">
       Medición real sobre pasajes del corpus <b>Aguasclaras</b> con el mini-GPT de la
@@ -177,11 +184,20 @@ p.alDibujar(() => {
   p.ejes({ formatoX: v => String(Math.round(v)),
            formatoY: v => (v * 100).toFixed(0) + '%' });
 
-  // el piso del azar: seis bloques posibles
+  // dos líneas de base que no miran nada: el azar (seis bloques posibles) y
+  // contestar SIEMPRE la respuesta más frecuente de estos mismos pasajes (clase 4)
   p.segmento(0, AZAR, CTX_MAX + 4, AZAR,
              { color: 'verdad', grosor: 2, punteada: [7, 5] });
-  p.texto(6, AZAR, 'tirar a la suerte entre los 6 bloques',
-          { color: 'verdad', tam: 11, dy: -8, alinear: 'left', caja: true });
+  p.texto(6, AZAR, 'azar: 1 de 6',
+          { color: 'verdad', tam: 11, dy: 14, alinear: 'left', caja: true });
+  const MAY = c.mayoritaria.aciertos / c.mayoritaria.n;
+  p.segmento(0, MAY, CTX_MAX + 4, MAY,
+             { color: 'error', grosor: 2, punteada: [2, 4] });
+  const resp = c.mayoritaria.respuesta;
+  // el rótulo va a la izquierda, arriba de la línea (a la derecha lo tapa la leyenda)
+  p.texto(34, MAY, 'siempre «' + (resp.length > 12 ? resp.slice(0, 12) + '…' : resp) +
+          '»: ' + c.mayoritaria.aciertos + '/' + c.mayoritaria.n,
+          { color: 'error', tam: 11, dy: -8, alinear: 'left', caja: true });
 
   // en cuántos de los casos la pista entra en la ventana
   p.linea(c.curva.map(d => ({ x: d.ventana, y: d.con_pista / d.n })),
@@ -197,10 +213,21 @@ p.alDibujar(() => {
   p.punto(act.ventana, act.aciertos / act.n, { color: 'parametro', r: 8, halo: true });
 
   p.leyenda([
-    { color: 'modelo', texto: 'acierta el bloque', forma: 'linea' },
-    { color: 'acento', texto: 'la pista está adentro', forma: 'linea', punteada: true },
+    { color: 'modelo', texto: 'acierta el bloque (línea gruesa)', forma: 'linea' },
+    { color: 'acento', texto: 'la pista entera está adentro', forma: 'linea', punteada: true },
+    { color: 'error', texto: 'contestar siempre lo más frecuente', forma: 'linea', punteada: true },
     { color: 'verdad', texto: 'el azar', forma: 'linea', punteada: true }
-  ], { pos: 'bd' });
+  ], { pos: c.id === 'lejos' ? 'ai' : 'bd' });   // donde no tape la curva
+
+  // para lectores de pantalla: el canvas dice en palabras lo que dibuja
+  p.canvas.setAttribute('role', 'img');
+  p.canvas.setAttribute('aria-label',
+    'Proporción de aciertos según el tamaño de la ventana, caso ' + c.id + '. ' +
+    'Con ventana ' + act.ventana + ': ' + act.aciertos + ' de ' + act.n + ' aciertos; ' +
+    'la pista entera está adentro en ' + act.con_pista + ' de ' + act.n + '. ' +
+    'Líneas de base: azar ' + Math.round(AZAR * act.n) + ' de ' + act.n +
+    ', contestar siempre «' + c.mayoritaria.respuesta + '» ' + c.mayoritaria.aciertos +
+    ' de ' + c.mayoritaria.n + '.');
 });
 
 /* --- el panel ---------------------------------------------------------------- */
@@ -220,13 +247,15 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'Dónde está la pista' },
   { tipo: 'botones', id: 'caso', etiqueta: 'el caso', valor: '0',
     opciones: CASOS.map((c, i) => ({ valor: String(i),
-      texto: c.id === 'cerca' ? 'cerca (≈16 fichas)' : 'lejos (≈70 fichas)' })) },
+      texto: (c.id === 'cerca' ? 'cerca: el apellido' : 'lejos: el encabezado') +
+             ' (≈' + c.distancia_mediana + ' fichas)' })) },
   { tipo: 'texto', id: 'explica', html: '' },
   { tipo: 'titulo', texto: 'Y esto para qué te sirve' },
   { tipo: 'texto', id: 'practica', html:
-    'En un prompt largo, poné las instrucciones importantes <b>al final</b>. ' +
-    'Y si son muy importantes, <b>repetilas</b>. No es superstición: es lo que ' +
-    'estás viendo acá.' }
+    'En un prompt largo, lo importante va <b>al principio o al final</b>, nunca en ' +
+    'el medio; con un documento largo, la pregunta va <b>al final</b>. Y si algo es ' +
+    'muy importante, <b>repetilo</b>. No es superstición: es lo que estás viendo acá ' +
+    '(y lo que midieron Liu et al. en modelos grandes).' }
 ], () => { iCaso = +ctl.valores.caso; actualizar(); });
 
 function actualizar() {
@@ -238,9 +267,37 @@ function actualizar() {
   const caja = document.getElementById('respuesta');
   caja.textContent = '«' + b.continuacion.slice(0, 26).replace(/\n/g, ' ⏎ ') + '»';
   caja.className = 'txt ' + (b.acierta ? 'bien' : 'mal');
+  // el acierto no se dice sólo con color: también con signo y palabra
+  const marca = document.getElementById('marca');
+  marca.textContent = b.acierta ? '✓ acierta' : '✗ erra';
+  marca.className = 'marca ' + (b.acierta ? 'c-ok' : 'c-error');
   document.getElementById('esperado').textContent =
     'lo correcto sería «' + e.objetivo.slice(0, 26) + '»';
-  document.getElementById('cartel').hidden = pistaAdentro;
+
+  // El cartel dice lo que de verdad pasa: la pista afuera no siempre implica error
+  // (a veces acierta con un pedazo del apellido, o a ciegas con su bloque más
+  // probable), y la pista adentro no siempre implica acierto.
+  const cartel = document.getElementById('cartel');
+  let aviso = '';
+  if (!pistaAdentro && !b.acierta) {
+    aviso = '<strong>Acabás de perder la información que hacía falta.</strong> ' +
+      (c.id === 'cerca' ? 'Una parte del apellido' : 'El encabezado') + ' quedó ' +
+      '<em>fuera</em> de la ventana. El modelo no lo tiene degradado ni borroso: no lo ' +
+      'tiene. Y contesta igual, con la misma soltura.';
+  } else if (!pistaAdentro && b.acierta) {
+    aviso = '<strong>La pista quedó afuera, y aun así acertó.</strong> ' +
+      (c.id === 'cerca'
+        ? 'Con el pedazo del apellido que todavía entra le alcanzó. Por eso la curva ' +
+          'sube de a poco y no de golpe.'
+        : 'No por mirar la pista: contestó su bloque más probable «a ciegas» y ' +
+          'coincidió. Un acierto así no es información; por eso miramos la curva ' +
+          'sobre ' + c.n_casos + ' casos.');
+  } else if (pistaAdentro && !b.acierta) {
+    aviso = '<strong>La pista está adentro, y aun así erró.</strong> Estar en la ' +
+      'ventana no alcanza: el modelo tiene que haber aprendido a usar ese dato.';
+  }
+  cartel.innerHTML = aviso;
+  cartel.hidden = !aviso;
 
   const punto = c.curva.reduce((a, x) =>
     Math.abs(x.ventana - k) < Math.abs(a.ventana - k) ? x : a, c.curva[0]);
@@ -255,10 +312,13 @@ function actualizar() {
         '<em>plausible</em> en ese lugar del texto: no tiene con qué saberlo. ') +
     'Con una ventana de <b>' + punto.ventana + '</b> fichas acierta <b>' +
     punto.aciertos + ' de ' + punto.n + '</b> casos (' + (acc * 100).toFixed(0) + '%), ' +
-    'contra un ' + (AZAR * 100).toFixed(0) + '% de tirar a la suerte.' +
+    'contra un ' + (AZAR * 100).toFixed(0) + '% de tirar a la suerte y <b>' +
+    c.mayoritaria.aciertos + ' de ' + c.mayoritaria.n + '</b> de contestar siempre «' +
+    escapar(c.mayoritaria.respuesta) + '».' +
     (c.id === 'lejos'
       ? '<br><br><b>Y acá está lo incómodo:</b> la curva no sube ni cuando la pista ' +
-        'entra. Estar adentro de la ventana <em>no alcanza</em>.' +
+        'entra, y no le gana a contestar siempre lo más frecuente. Estar adentro de la ' +
+        'ventana <em>no alcanza</em>.' +
         (b.acierta
           ? ' (Este ejemplo es <em>uno de los ' + punto.aciertos + ' que sí aciertan</em>. ' +
             'Por eso miramos la curva sobre ' + punto.n + ' casos y no un caso suelto: ' +

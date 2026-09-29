@@ -107,10 +107,21 @@ Human Feedback* (InstructGPT). NeurIPS.** `[VERIFICAR URL]`
 > El paper que explica la slide 35: **cómo se pasa de autocompletador a asistente.**
 > Leé la sección de método (las tres etapas: supervisado, modelo de recompensa, PPO) y
 > saltate los detalles de RL. Lo que importa para vos es entender que hay una etapa
-> donde **humanos contratados ordenan respuestas por preferencia**, y que la amabilidad,
-> la verborragia y la adulación del modelo salen de ahí — o sea, son una decisión de
-> producto, no una propiedad del lenguaje.
+> donde **humanos contratados ordenan respuestas por preferencia**, y que la amabilidad
+> y la verborragia del modelo salen de ahí — o sea, son una decisión de producto, no una
+> propiedad del lenguaje. (La adulación no es el tema de este paper: para eso, la 7 bis.)
 > Media hora leyendo el método.
+
+**7 bis. Sharma, M. et al. (2023). *Towards Understanding Sycophancy in Language
+Models*. ICLR 2024.** `[VERIFICAR URL]` · y **Perez, E. et al. (2022). *Discovering
+Language Model Behaviors with Model-Written Evaluations*.** `[VERIFICAR URL]`
+> **La fuente de lo que dice la slide 35 sobre la adulación.** Perez et al. muestran que
+> la tendencia a darle la razón al usuario ya aparece en modelos sin ajuste con
+> preferencias y **crece con la escala**; Sharma et al., que el ajuste con preferencias
+> humanas la **refuerza**, porque las personas tienden a preferir las respuestas que les
+> dan la razón. O sea: no es «entrenada y no emergente»; es las dos cosas, y el
+> entrenamiento la empuja. Leé la introducción y los gráficos de Sharma et al.
+> Media hora.
 
 **8. Liu, N. F., Lin, K., Hewitt, J., Paranjape, A., Bevilacqua, M., Petroni, F. &
 Liang, P. (2023). *Lost in the Middle: How Language Models Use Long Contexts*. TACL.**
@@ -118,8 +129,9 @@ Liang, P. (2023). *Lost in the Middle: How Language Models Use Long Contexts*. T
 > El sustento empírico del panel práctico de `viz/ventana-de-contexto.html`. Muestra que
 > en los modelos grandes el problema no es sólo la ventana finita: **la información que
 > queda en el medio de un contexto largo se usa peor que la de las puntas**, incluso
-> estando adentro. La recomendación práctica de la viz («poné lo importante al final»)
-> sale de acá.
+> estando adentro. La curva es una **U**: rinden mejor con el dato al principio **o** al
+> final. La recomendación práctica de la viz («lo importante al principio o al final,
+> nunca en el medio; con un documento largo, la pregunta al final») sale de acá.
 > Diez páginas y los gráficos se entienden solos.
 
 **9. Barrie, C., Palmer, A. & Spirling, A. (2024). *Replication for Language Models:
@@ -141,6 +153,16 @@ Problems, Principles, and Best Practice for Political Science*.** `[VERIFICAR UR
 > escalar; `train.py` tiene todo lo que nosotros salteamos (checkpoints, acumulación de
 > gradientes, learning rate schedule, entrenamiento en varias GPU). **Mirá primero
 > cuánto de `model.py` ya entendés**: es más de lo que esperás.
+
+**10 bis. Carlini, N. et al. (2021). *Extracting Training Data from Large Language
+Models*. USENIX Security Symposium.** `[VERIFICAR URL]`
+> **La fuente de la sección 12 del notebook.** Nuestro mini-GPT pesa más que su corpus y
+> memoriza las plantillas; un LLM grande no puede guardar todo su texto de entrenamiento,
+> pero este paper muestra que igual **recita tal cual** pedazos que vio repetidos (nombres,
+> direcciones, fragmentos de código) sacados de GPT-2. Para investigar importa por dos
+> lados: privacidad de los datos, y que una «cita» del modelo puede ser real y estar
+> pegada donde no va. Leé la introducción y la sección de resultados.
+> Cuarenta minutos.
 
 **11. Karpathy, A. — `build-nanogpt` (reproducir GPT-2 desde cero).**
 `https://raw.githubusercontent.com/karpathy/build-nanogpt/master/train_gpt2.py`
@@ -167,7 +189,7 @@ Problems, Principles, and Best Practice for Political Science*.** `[VERIFICAR UR
 
 - **Grimmer, J., Roberts, M. & Stewart, B. (2022). *Text as Data*. Princeton UP.**
   `[VERIFICAR URL]` — El marco general del módulo. Para esta clase, el capítulo de
-  validación es el que arma el `[EL LUNES]`.
+  validación es el que arma el `[EN TU INVESTIGACIÓN]`.
 - **Bajtín, M. (1979). *El problema de los géneros discursivos*.** `[VERIFICAR URL]` —
   Si tenés en el aula gente de análisis del discurso, la analogía del género discursivo
   (el modelo aprende la forma del debate antes que cualquier contenido) les cierra al

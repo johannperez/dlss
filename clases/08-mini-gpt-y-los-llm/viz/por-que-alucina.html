@@ -8,7 +8,13 @@
 <!-- ==========================================================================
      MOMENTO AHA: "Cuando acierta y cuando inventa, el modelo está IGUAL de
      seguro. Si no puedo distinguirlas mirando la salida, entonces la seguridad
-     del modelo no me sirve como señal de verdad. Nunca."
+     del modelo no me sirve como señal de verdad."
+
+     OJO CON LO QUE SE MUESTRA: en los tres casos falsos, la entidad falsa la
+     ponemos NOSOTROS en el prompt. Lo que se ve es que el modelo ACEPTA UNA
+     PREMISA FALSA y la completa (y en la "cita", recita de memoria una frase
+     del corpus). La fabricación espontánea (que invente un nombre solo) se mide
+     aparte, en la sección 9 del notebook, sobre 60 sorteos.
 
      Esto sólo se puede hacer con Aguasclaras: como el corpus lo generamos
      nosotros, tenemos el padrón de la verdad al lado y se puede verificar en
@@ -31,14 +37,19 @@
     white-space: pre-wrap; word-break: break-word;
   }
   .generacion .prompt { color: var(--c-acento); font-weight: 700; }
+  /* lo inventado y lo confirmado no se distinguen sólo por el color: lo
+     inventado va con subrayado ondulado, lo confirmado con subrayado recto */
   .generacion .inventado {
     background: var(--c-error-suave); color: var(--c-error); font-weight: 700;
     border-radius: 4px; padding: 0 .15em;
+    text-decoration: underline wavy; text-underline-offset: 3px;
   }
   .generacion .confirmado {
     background: var(--c-ok-suave); color: var(--c-ok); font-weight: 700;
     border-radius: 4px; padding: 0 .15em;
+    text-decoration: underline solid; text-underline-offset: 3px;
   }
+  .claves { font-size: .76rem; color: var(--tinta-3); margin: .35rem 0 0; }
   .generacion .resto { color: var(--tinta-2); }
 
   .padron {
@@ -75,13 +86,15 @@
        verdad</b>: la lista completa de diputados, partidos y leyes que existen en
        Aguasclaras, porque el corpus lo generamos nosotros. Probá los cuatro prompts
        y fijate si podés distinguir, <em>mirando sólo la salida</em>, cuándo el
-       modelo está diciendo algo verdadero y cuándo se lo inventó.</p>
+       modelo está diciendo algo verdadero y cuándo está completando algo falso.</p>
   </header>
 
   <div>
     <div class="dos-col">
       <div>
         <div class="generacion" id="generacion"></div>
+        <p class="claves">subrayado recto: está en el padrón · subrayado ondulado:
+          no está (o no se puede chequear)</p>
         <div class="viz-frame" style="padding:10px; margin-top:.6rem">
           <div id="lienzo"></div>
         </div>
@@ -108,9 +121,16 @@
       <em>«qué tan segura estaba la primera ficha»</em>: en los dos casos hay una barra
       que se lleva casi todo. Y mirá el de <em>«qué tan seguro estuvo en cada caso»</em>:
       <b>las cuatro barras miden más o menos lo mismo</b>. El modelo
-      está igual de seguro cuando dice la verdad que cuando fabrica una diputada que
-      no existe. No hay ninguna señal en la salida que las separe: por eso la
+      está igual de seguro cuando dice la verdad que cuando completa sobre una diputada
+      que no existe. No hay ninguna señal en la salida que las separe: por eso la
       confianza de un LLM <b>no</b> es evidencia de nada.
+      <br><br>
+      Y fijate qué pasa en los tres casos falsos: la entidad falsa la pusimos
+      <em>nosotros</em> en el prompt, y el modelo <b>no rechaza la premisa</b>: la
+      completa como si existiera. Eso tiene nombre (aceptar premisas falsas) y es tan
+      peligroso como inventar: si tu pregunta trae un supuesto falso, la respuesta lo
+      hereda. La fabricación espontánea —que invente un nombre sin que se lo den— la
+      medís en la sección 9 del notebook.
     </div>
     <p class="viz-pie">
       Corrida real del mini-GPT de la clase (1.541.056 parámetros) sobre el corpus
@@ -182,9 +202,10 @@ function chequear(c) {
     return {
       entidad: nombre, esta: false, bien: false,
       texto: '<b>' + escapar(nombre) + '</b> no figura entre los <b>' +
-             A.total_diputados + '</b> diputados del padrón. No existe. ' +
-             'Todo lo que el modelo escriba sobre ella es invención — y fijate ' +
-             'que lo escribe con el mismo formato impecable que el caso anterior.',
+             A.total_diputados + '</b> diputados del padrón. No existe: el nombre ' +
+             'lo pusimos <em>nosotros</em> en el prompt. El modelo no rechaza la ' +
+             'premisa: le asigna bloque y provincia con el mismo formato impecable ' +
+             'que al caso anterior. Todo lo que escribe sobre ella es invención.',
       largo: 18
     };
   }
@@ -193,18 +214,22 @@ function chequear(c) {
     return {
       entidad: 'Ley ' + (m ? m[1] : '?'), esta: false, bien: false,
       texto: 'En el padrón hay <b>' + A.padron.leyes.length + '</b> leyes y la ' +
-             '<b>Ley ' + (m ? m[1] : '?') + '</b> no es ninguna de ellas. El modelo ' +
-             'igual le pone título, tema y año: aprendió la <em>forma</em> de una ' +
-             'ley, que es lo más regular que hay en el corpus.',
+             '<b>Ley ' + (m ? m[1] : '?') + '</b> no es ninguna de ellas: el número ' +
+             'lo pusimos nosotros. El modelo acepta la premisa y le pone título, tema ' +
+             'y año: aprendió la <em>forma</em> de una ley, que es lo más regular que ' +
+             'hay en el corpus.',
       largo: 24
     };
   }
   return {
     entidad: 'una cita textual', esta: false, bien: false,
-    texto: 'Una cita no se puede chequear contra ningún padrón, y ese es justamente ' +
-           'el problema. El <b>formato</b> de una cita es lo más predecible que hay ' +
-           'en un texto; el <b>contenido</b>, lo menos. Por eso los LLMs producen ' +
-           'referencias bibliográficas con formato perfecto y datos inventados.',
+    texto: '<b>Puerto Bermejo</b> no está entre las ' + A.padron.provincias.length +
+           ' provincias: la pusimos nosotros. Y la «cita» que completa no la ' +
+           'inventó: es una frase que aparece <b>tal cual</b> muchísimas veces en el ' +
+           'corpus, y la <b>recita de memoria</b> (por eso la seguridad da casi 100%). ' +
+           'Lo falso es a quién se la atribuye. Así se arman las referencias ' +
+           'bibliográficas con formato perfecto y datos equivocados: pedazos ' +
+           'verdaderos, pegados donde no van.',
     largo: 30
   };
 }
@@ -270,10 +295,19 @@ const p = Viz.plano('#lienzo', {
 p.alDibujar(() => {
   p.fondo();
   const c = caso();
+  const bien = chequear(c).bien;
   p.barras(c.distribucion.map((d, i) => ({
-    etiqueta: rotulo(d.ficha), valor: d.prob,
-    color: i === 0 ? (chequear(c).bien ? 'ok' : 'error') : 'acento'
+    // la primera barra dice con signo, no sólo con color, si terminó bien o mal
+    etiqueta: rotulo(d.ficha) + (i === 0 ? (bien ? ' ✓' : ' ✗') : ''), valor: d.prob,
+    color: i === 0 ? (bien ? 'ok' : 'error') : 'acento'
   })), { horizontal: true, max: 1, formato: v => (v * 100).toFixed(1) + '%' });
+  const d0 = c.distribucion[0];
+  p.canvas.setAttribute('role', 'img');
+  p.canvas.setAttribute('aria-label',
+    'Las ' + c.distribucion.length + ' fichas más probables para arrancar la respuesta. ' +
+    'La primera, ' + rotulo(d0.ficha) + ', se lleva el ' + (d0.prob * 100).toFixed(1) +
+    '% de la probabilidad' + (bien ? '; y la respuesta está en el padrón.' :
+                              '; y la respuesta no está (o no toda) en el padrón.'));
 });
 
 /* --- la comparación: los cuatro casos, uno al lado del otro ------------------ */
@@ -287,10 +321,15 @@ p2.alDibujar(() => {
   p2.barras(CASOS.map((c, i) => ({
     etiqueta: (c.id === 'existe' ? 'existe ✓' :
                c.id === 'no-existe' ? 'inventada' :
-               c.id === 'ley' ? 'ley falsa' : 'cita falsa'),
+               c.id === 'ley' ? 'ley falsa' : 'provincia falsa'),
     valor: seguridad(c),
     color: i === iCaso ? 'parametro' : (c.id === 'existe' ? 'ok' : 'error')
   })), { horizontal: false, max: 1, formato: v => (v * 100).toFixed(0) + '%' });
+  p2.canvas.setAttribute('role', 'img');
+  p2.canvas.setAttribute('aria-label', 'Seguridad del modelo en cada caso: ' +
+    CASOS.map(c => (c.id === 'existe' ? 'existe' : c.id === 'no-existe' ? 'diputada inventada'
+      : c.id === 'ley' ? 'ley falsa' : 'provincia falsa') + ' ' +
+      (seguridad(c) * 100).toFixed(0) + '%').join(', ') + '. Son parecidas.');
 });
 
 /* --- el panel ---------------------------------------------------------------- */
@@ -304,9 +343,15 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'texto', id: 'padron-stat', html:
     'De los <b>' + A.total_diputados + '</b> diputados que existen de verdad, el ' +
     'modelo le acierta el bloque a <b>' + A.aciertos_partido + '</b> y la provincia ' +
-    'a <b>' + A.aciertos_provincia + '</b>. O sea: <b>sabe cosas</b>. El problema no ' +
+    'a <b>' + A.aciertos_provincia + '</b> (en la corrida del curso; en otra máquina ' +
+    'el número puede cambiar un poco). O sea: <b>sabe cosas</b>. El problema no ' +
     'es que no sepa nada — es que no hay manera de saber, mirando la salida, si ' +
-    'este caso es uno de los que sabe.' }
+    'este caso es uno de los que sabe.' +
+    (A.fabricacion
+      ? '<br><br>Y cuando arranca solo un encabezado de turno, <b>' +
+        A.fabricacion.inventados + ' de ' + A.fabricacion.con_nombre + '</b> nombres ' +
+        'que escribe no están en el padrón: fabrica sin que se lo pidan.'
+      : '') }
 ], () => { iCaso = +ctl.valores.caso; actualizar(); });
 
 function actualizar() {
@@ -314,7 +359,10 @@ function actualizar() {
   pintarGeneracion();
   ctl.medidor('seg', s, (s * 100).toFixed(0) + '%');
   const veredicto = c.id !== 'existe'
-    ? 'Acá <b class="c-error">inventó</b>.'
+    ? (c.id === 'cita'
+       ? 'Acá <b class="c-error">recitó</b> una frase del corpus y la pegó a una ' +
+         'provincia que no existe.'
+       : 'Acá <b class="c-error">aceptó una premisa falsa</b> y la completó.')
     : (chk.bien ? 'Acá <b class="c-ok">acertó</b>.'
                 : (chk.okPartido
                    ? 'Acá acertó <b class="c-ok">una mitad</b> e inventó ' +

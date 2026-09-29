@@ -25,8 +25,8 @@
   dejaría de hacerlo.
 - **B)** Porque hay un error en el código de generación que todavía no se resolvió.
 - **C)** Porque su salida es **siempre** una distribución de probabilidad sobre la
-  próxima ficha, no tiene un mecanismo que verifique verdad, y no existe la opción
-  «no sé»: entonces produce la continuación más plausible, exista o no.
+  próxima ficha, no tiene un mecanismo que verifique verdad, y nada adentro detecta que
+  no sabe: entonces produce la continuación más plausible, exista o no.
 - **D)** Porque la temperatura está demasiado alta y sortea opciones improbables.
 
 ---
@@ -47,7 +47,8 @@ Escribiste un prompt de 10.000 palabras: al principio pusiste las instrucciones 
 codificación (tu libro de códigos) y al final pegaste los 200 titulares a clasificar.
 La ventana de contexto del modelo es de 4.000 fichas.
 
-**a)** ¿Qué pasa con las instrucciones del principio?
+**a)** ¿Qué pasa con las instrucciones del principio? (Puede depender de la
+herramienta: pensá qué opciones hay.)
 **b)** ¿El modelo «se olvidó» de ellas? Explicá con precisión qué pasó.
 **c)** ¿Cómo lo mitigarías, sin cambiar de modelo?
 

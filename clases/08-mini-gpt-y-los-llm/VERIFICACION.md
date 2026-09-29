@@ -1,6 +1,93 @@
 # Verificación adversarial — Clase 8
 
-**Un mini-GPT propio, y la traducción a ChatGPT** · verificado el **2026-08-29**
+**Un mini-GPT propio, y la traducción a ChatGPT** · verificado el **2026-08-29** ·
+segunda revisión el **2026-09-29** (§0)
+
+---
+
+## 0. Segunda revisión (2026-09-29): qué se cambió y qué se comprobó
+
+Una revisión externa encontró problemas que la primera verificación no vio. Se
+arreglaron; lo que sigue dice qué, y **cómo se comprobó cada cosa** (y qué no).
+
+**Dónde se corrió.** Todo en una copia del repo fuera del repo, en una Mac con
+procesador ARM (macOS, 4 hilos), **python 3.12.13, torch 2.14.0, numpy 2.5.3**. No es la
+máquina de la corrida del curso (torch 2.13, x86): por eso varios números de acá difieren
+de los de las slides, y eso es parte de lo que se documenta.
+
+| Chequeo | Resultado |
+|---|---|
+| `nbconvert --execute`, notebook entero (51 celdas, 24 de código), CPU | **0 errores** · 1 min 54 s en total; entrenamiento 1 min 41 s (84 ms/paso) |
+| Ruta con GPU (antes: `RuntimeError` en `multinomial` con un generador de CPU) | **arreglada** (el sorteo se hace en CPU) · probada **simulando la GPU con MPS**: notebook entero, 60 pasos, **0 errores**. En una T4 real **no se probó** |
+| `entrenar-mini-gpt.py` completo, en la copia | **ok** · en la misma máquina da **los mismos números y las mismas muestras que el notebook** (48/60, ventana 5/15/22/26/27/24, fabricación 8 de 57) |
+| `entrenar-mini-gpt.py --solo-anotar` sobre el `datos-mini-gpt.json` del repo | **ok** · agrega sólo campos que dependen del corpus y del padrón; **ninguna cifra del modelo cambió** (verificado con `diff`) |
+| Las 4 viz y las slides en Chrome headless (por CDP, capturando excepciones y errores de consola) | **0 errores** · controles ejercitados por programa: slider de la ventana en 4/8/12/16/24/128 en los dos casos, los 4 prompts de la alucinación, 3 palabras en contar-letras, temperatura 1,5; capturas de la ventana (los dos casos), la alucinación y las slides 18, 19 y 36 |
+| Celda de bootstrap (índice 2) | **no se tocó** · md5 del source `4c9c6d9d…` |
+| Notebook guardado sin salidas | **sí** (outputs vacíos, `execution_count` null) |
+
+**No se comprobó en esta revisión:** tema oscuro, ancho de 760 px, una GPU T4 real, ni
+las 41 slides una por una (se miraron las que cambiaron de contenido visual).
+
+### Lo que se arregló
+
+1. **Ruta GPU rota** (notebook celdas 18, 22, 28; `entrenar-mini-gpt.py`): el sorteo se
+   hace en CPU. Los hitos de las muestras son los mismos con y sin GPU (0/50/150/400/800/1200).
+2. **Reproducibilidad prometida de más.** Donde decía «carácter por carácter» / «exactamente»
+   ahora dice: idéntico **en la misma máquina y con las mismas versiones**; en otra, parecido.
+   Las slides 14-18 dicen «corrida del curso». `notas-docente.md` §9 tiene la tabla de
+   cuánto cambia (en esta máquina: 48/60 en vez de 54/60, la curva de la ventana
+   5/15/22/26/27/24 en vez de 7/14/24/27/28/28, sin «Nelida Falcon»). El JSON registra
+   versiones (`meta.versiones` en las corridas nuevas; la del curso tiene `meta.torch` y
+   `meta.cpu`).
+3. **Chequeo del momento «Nelida Falcon»:** la celda del entrenamiento lista los nombres
+   que inventó *tu* modelo, y la sección 9 mide la **fabricación espontánea** sobre 60
+   encabezados (en esta máquina: 8 de 57 nombres no existen). El script calcula lo mismo
+   (`alucinacion.fabricacion`) en las corridas nuevas; la corrida del curso no lo tiene.
+4. **«No hay lugar donde guardar el corpus» estaba al revés.** El modelo (6,4 MB) pesa
+   más que el corpus (1,1 MB) y memorizó las plantillas. La sección 12 lo mide (en esta
+   máquina, 5 de 6 pedazos de 40 caracteres de la muestra final están tal cual en el
+   corpus) y lo contrasta con los LLM grandes (Carlini et al. 2021, agregado a
+   `referencias.md`). Slides 2 y 18, notas §5-6 y solución 1 corregidas.
+5. **Absolutos sobre ChatGPT:** «no hay casillero para "no sé"», «incontestable», «ninguna
+   unidad que sume», «entrenada, no emergente», «los modelos de 2030…» → reformulados
+   (nada adentro *detecta* que no sabe; contar letras es frágil, no imposible; la adulación
+   asoma sin RLHF y el RLHF la refuerza —Perez et al. 2022, Sharma et al. 2023—; la escala
+   compensa pero no cambia el mecanismo). GPT-4: «OpenAI no publicó el número».
+6. **Viz de la ventana:** línea de base mayoritaria (cerca: siempre «FCA» 7/30; lejos:
+   siempre PUN 8/24, **más** que los 6/24 del modelo), la pista del caso cerca es el
+   **apellido** (con el nombre completo, el cartel aparecía con el modelo acertando), el
+   cartel dice lo que pasa en los cuatro casos (afuera/adentro × acierta/erra), y la curva
+   «sube de a poco» en vez de «corte». *Lost in the middle* como curva en U (principio o
+   final). Los campos nuevos salen de `--solo-anotar`, no de editar el JSON a mano.
+7. **TODO 4 venía resuelto** y demostraba lo contrario. Ahora arranca con el encabezado
+   adentro, el estudiante tiene que alargar el relleno, y el prompt termina con el
+   apellido solo («Diputado Falcon (»: hay 4 Falcon). En esta máquina el modelo contesta
+   «FCA — Sierra Mansa» adentro y afuera: no usa el encabezado.
+8. **Alucinación:** se separa *aceptar una premisa falsa* (los tres casos falsos: la
+   entidad la pone el prompt; la «cita» se recita de memoria, está 124 veces en el corpus)
+   de *fabricar* (medido aparte). El caso «existe» del notebook usa el mismo criterio que
+   el script (bloque **y** provincia), y la celda de los 60 muestra un caso de media verdad.
+9. **Menores:** log 71 como «punto de partida», no «piso»; «ya empató al bigrama» →
+   «ya está cerca»; seis cronometrajes (no cinco) en todos lados; 6,4 MB en disco; 36
+   puntos (no 40); «ferrocarril» son 6 fichas con el tokenizador del curso; muestra
+   validada de **al menos 200** casos en notebook, notas y soluciones; soluciones 4
+   (error de API o recorte), 6 (la brecha como señal robusta, 400-900) y 7; comentarios
+   JS de slides renumerados (19, 27); `revisar()` del TODO 3 ahora chequea algo; el
+   ejemplo de la sección 8 no se rompe si ningún caso cumple el criterio.
+10. **`[EL LUNES]` → `[EN TU INVESTIGACIÓN]`** en slides (marca y título de la 40,
+    asides), notebook, notas y referencias; el desafío que no se termina pasa a
+    «opcional, antes de la clase 9».
+11. **Accesibilidad:** `role="img"` y `aria-label` que describen el dato en los 4 canvas
+    de las slides y en los de las 4 viz; lo que antes se decía sólo con color ahora tiene
+    también signo o trazo (✓/✗ junto a la respuesta y en la primera barra, subrayado recto
+    u ondulado para confirmado/inventado, val punteada en la curva de loss, trazos
+    distintos para cada línea de base). En contar-letras, el fin de palabra es «▸» (antes
+    «⏎», que en otra viz significa salto de renglón) y la fila 2 dice «tokenizador de
+    sub-palabras (el chiquito de la clase 6)», con la respuesta del mini-GPT a
+    «¿cuántas R?».
+
+Lo que sigue (§1 a §6) es la verificación original del 2026-08-29, con notas donde una
+afirmación resultó exagerada.
 
 > Todo lo que dice acá se comprobó **corriendo el código y mirando las imágenes**, no
 > leyendo los archivos: `nbconvert --execute` cuatro veces de punta a punta, Chromium
@@ -22,7 +109,7 @@ justamente, por qué el modelo cuenta mal las letras.
 |---|---|
 | `nbformat` valida el `.ipynb` | **sí** · 49 celdas (23 de código) |
 | `nbconvert --execute`, notebook entero | **4 corridas, EXIT=0, cero errores** en las 49 celdas · la última, después de todos los arreglos |
-| Reproducibilidad del modelo | **al cuarto decimal** entre corridas: train 0,1852 · val 0,1858 |
+| Reproducibilidad del modelo | **al cuarto decimal** entre corridas **en la misma máquina y con las mismas versiones**: train 0,1852 · val 0,1858. *(Nota 2026-09: en otra máquina, no; ver §0.)* |
 | Corre sin red | **sí** · el corpus sale de `datos/muestras/`, `torch.cuda.is_available()` es `False` |
 | Consola del navegador (41 slides + 4 viz, claro y oscuro) | **0 errores** |
 | Requests externas (todo `http(s)` abortado) | **0**, incluidas las viz embebidas en las slides |
@@ -46,7 +133,9 @@ proyecta la slide 18 diciendo *«es el párrafo del principio de la clase»* y e
 del estudiante hay otro párrafo. Es el momento más lindo de la clase y estaba desincronizado.
 *Arreglado:* `muestra(paso)` usa `1983 + paso`, con el comentario que explica por qué.
 **Verificado:** las **seis** muestras coinciden ahora carácter por carácter con
-`datos-mini-gpt.json` y con las slides 14-18.
+`datos-mini-gpt.json` y con las slides 14-18 **en el contenedor de construcción**. *(Nota
+2026-09: con otra versión de torch u otra CPU, las de los pasos 150, 400 y 800 son otras;
+ver §0.)*
 
 **2. La ventana de ejemplo de la slide 7 no era la del notebook.**
 La slide muestra `«S» → «e»`, `«Se» → «ñ»`, … sobre «Señor pr». El notebook arrancaba en
@@ -193,7 +282,9 @@ Además se ejercitaron **todos** los controles de las cuatro viz por programa (1
 - **ventana de contexto** — 28/30 con ventana 128, **14/30 con ventana 8**, con el nombre
   tachado en gris y el cartel rojo. Y el segundo caso, con la curva plana (6/24) **aun con
   la pista adentro**: es una medición, no una promesa, y contradice el plan original de la
-  viz. Está contado en `notas-docente` §9 bis y vale la clase.
+  viz. Está contado en `notas-docente` §9 bis y vale la clase. *(Nota 2026-09: faltaba la
+  línea de base mayoritaria —8/24 en el caso lejos, más que el modelo— y el cartel
+  aparecía con el modelo acertando; corregido, ver §0.)*
 - **por qué alucina** — las cuatro seguridades (94 % acertando, 92 % inventando una
   diputada, 97 % una ley falsa, 100 % una cita falsa) con el padrón al lado. No hay
   ninguna señal observable que separe acertar de fabricar.
@@ -213,18 +304,18 @@ Ninguno se aceptó por estar escrito. Cada uno se volvió a sacar de la fuente q
 | vocabulario **71** · log 71 = **4,26** | slide 11 y notebook | `len(tok)` y `math.log` | ✓ |
 | loss inicial **4,23** | slides 14, 18, 19 | corrida real: train 4,23 · val 4,23 | ✓ |
 | loss del bigrama **2,24** | slides 8, 19 | corrida real: **2,242** | ✓ |
-| loss final **0,19** (train 0,185 · val 0,186) | slides 18, 19 | 4 corridas, idéntico al 4.º decimal | ✓ |
-| **54 de 60** aciertos de bloque | slide 23, viz, notas | recontado sobre `padron_detalle` **y** en la corrida | ✓ |
+| loss final **0,19** (train 0,185 · val 0,186) | slides 18, 19 | 4 corridas en la misma máquina, idéntico al 4.º decimal (en otra: 0,183 · 0,184) | ✓ |
+| **54 de 60** aciertos de bloque | slide 23, viz, notas | recontado sobre `padron_detalle` **y** en la corrida (en otra máquina: 48) | ✓ |
 | **33 de 60** de provincia | viz | recontado sobre `padron_detalle` | ✓ |
 | 7/30 · 14/30 · 24/30 · 28/30 (ventana) | viz y slide 26 | reproducido por el notebook, mismos valores | ✓ |
-| 6/24 con la pista lejos | viz | del paquete exportado (no re-entrenado) | ✓ |
+| 6/24 con la pista lejos | viz | del paquete exportado (no re-entrenado); la línea de base mayoritaria da 8/24 | ✓ |
 | 0,891/0,095/0,007/0,003/0,001 (T=1,0) | cuestionario ítem 5 | softmax recalculado sobre las 71 logits | ✓ |
 | 0,586/0,180/0,045/0,027/0,017 (T=1,9) | cuestionario ítem 5 | ídem | ✓ |
 | «ferrocarril» = **4** erres, 6 fichas | notebook y viz | `[184, 6, 133, 36, 54, 240]` | ✓ |
 | Nélida Falcón **no existe** | slide 17 | no está entre los 60 (sí «Raúl Falcón», «Nélida Villalba») | ✓ |
 | Puerto Bermejo, Ley 7841: no existen | viz | contra las 10 provincias y las 14 leyes | ✓ |
 | P·V·M·F·B·U = iniciales de los 6 bloques | slide 10 | PUN, VVA, MPR, FCA, BST, UAP | ✓ |
-| corpus **1,1 MB**, checkpoint **6,2 MB** | slides y notebook | 1.098.206 caracteres · 6,4 MB en disco | ✓ |
+| corpus **1,1 MB**, checkpoint **6,4 MB** en disco | slides y notebook | 1.098.206 caracteres · 6,2 MB son los pesos, el resto máscaras y vocabulario | ✓ |
 | 7 URLs `[VERIFICADA 2026-08-29]` | `referencias.md` | `curl`: **200** las 7 | ✓ |
 | **6** (no 7) diputados con el bloque errado | notas §7 | 60 − 54 | corregido |
 | 30 pasajes (24 en el 2.º caso) | slide 26 | `datos-mini-gpt.json` | corregido |
@@ -240,7 +331,8 @@ autor cambiado.** No se sacó ninguna.
 
 ## 5. Lo que queda abierto
 
-1. **El tiempo en GPU T4 sigue sin medir.** Este contenedor no tiene GPU
+1. **El tiempo en GPU T4 sigue sin medir** (y la ruta con GPU, que estaba rota, sólo se
+   probó simulada con MPS; ver §0). Este contenedor no tiene GPU
    (`torch.cuda.is_available()` → `False`, no hay `nvidia-smi`). El notebook y
    `notas-docente.md` §9 lo dicen y le piden el número a quien dé la clase en Colab.
    **No se inventó ninguno**, que es lo mínimo en la clase que enseña a no inventar.

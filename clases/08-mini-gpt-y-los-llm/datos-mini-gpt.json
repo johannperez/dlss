@@ -94,7 +94,15 @@
   "loss_final_train": 0.1852,
   "loss_final_val": 0.1858,
   "loss_bigrama_val": 2.2418,
-  "generado_por": "clases/08-mini-gpt-y-los-llm/entrenar-mini-gpt.py"
+  "generado_por": "clases/08-mini-gpt-y-los-llm/entrenar-mini-gpt.py",
+  "anotado": {
+   "por": "entrenar-mini-gpt.py --solo-anotar",
+   "que": "campos derivados del corpus y del padron; ninguna cifra del modelo cambio. La corrida del modelo es la de meta.torch y meta.cpu.",
+   "versiones_al_anotar": {
+    "python": "3.12.13",
+    "torch": "2.14.0"
+   }
+  }
  },
  "historial": [
   {
@@ -227,32 +235,40 @@
   {
    "paso": 0,
    "prompt": "Señor presidente, ",
-   "texto": "xoé8y,2A6OF.cN2JG—\"=BRi6CpVHJO,BHV4\nZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,jqñ6O(OéO=a;=N—:—,V9,l6Hi3cY6.BslbtnLR4nT(c1;b4iQq IéSTenaCéoFydV—iOt(;1KxDA=IfdHD8vPNDLtluEn8;c2Yt;ebVK::27a0,yc7r Ji4\nRsl p9H;1H1xET6=A4o OV1.iTb,ld"
+   "texto": "xoé8y,2A6OF.cN2JG—\"=BRi6CpVHJO,BHV4\nZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,jqñ6O(OéO=a;=N—:—,V9,l6Hi3cY6.BslbtnLR4nT(c1;b4iQq IéSTenaCéoFydV—iOt(;1KxDA=IfdHD8vPNDLtluEn8;c2Yt;ebVK::27a0,yc7r Ji4\nRsl p9H;1H1xET6=A4o OV1.iTb,ld",
+   "nombres_inventados": []
   },
   {
    "paso": 50,
    "prompt": "Señor presidente, ",
-   "texto": "da0 ta. de de a dereto r do a lictentr eleben gren po lalo la die Labirenlecolo ue de r es lo cosetesio e soncis con endode en enacio r icalie larer cta sioracida nuantr prtue die deontiaren dir e varicir des men da ue Varo el lesay ude din era Ntrielassa har "
+   "texto": "da0 ta. de de a dereto r do a lictentr eleben gren po lalo la die Labirenlecolo ue de r es lo cosetesio e soncis con endode en enacio r icalie larer cta sioracida nuantr prtue die deontiaren dir e varicir des men da ue Varo el lesay ude din era Ntrielassa har ",
+   "nombres_inventados": []
   },
   {
    "paso": 150,
    "prompt": "Señor presidente, ",
-   "texto": "prereside cidia e entor blaraseva a erisiocino ntra. detel Mula s: incasiadegadar de va pra Nite bl esiesta den ela eles ladeciel (Mua P VTreraguroni.\nT Ala.\nEsta DEl — prar DEla 5 Spua eñoridenchal esto putechanoda a plide (FTesipurarera CVVUBa — Ma Ria A Sen"
+   "texto": "prereside cidia e entor blaraseva a erisiocino ntra. detel Mula s: incasiadegadar de va pra Nite bl esiesta den ela eles ladeciel (Mua P VTreraguroni.\nT Ala.\nEsta DEl — prar DEla 5 Spua eñoridenchal esto putechanoda a plide (FTesipurarera CVVUBa — Ma Ria A Sen",
+   "nombres_inventados": []
   },
   {
    "paso": 400,
    "prompt": "Señor presidente, ",
-   "texto": "pior sin interme presental interior que dice el dictamen y lo que dice el articulado del Mes nosumeros del menos de enurstencia de primemeneranto reluctia habera desde Preransidad de Cerrriteries grentes iendentes general.\nDiputada Analialiarislles.\n\nSevane la"
+   "texto": "pior sin interme presental interior que dice el dictamen y lo que dice el articulado del Mes nosumeros del menos de enurstencia de primemeneranto reluctia habera desde Preransidad de Cerrriteries grentes iendentes general.\nDiputada Analialiarislles.\n\nSevane la",
+   "nombres_inventados": []
   },
   {
    "paso": 800,
    "prompt": "Señor presidente, ",
-   "texto": "so discutir los medios sin discutir el objetivo. Es cuanto tengo para decir. Muchas gracias.\n\nPor Secretaria se dara lectura al dictamen.\nDiputada Nelida Falcon (UAP — Costa Azul).\nGracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la"
+   "texto": "so discutir los medios sin discutir el objetivo. Es cuanto tengo para decir. Muchas gracias.\n\nPor Secretaria se dara lectura al dictamen.\nDiputada Nelida Falcon (UAP — Costa Azul).\nGracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la",
+   "nombres_inventados": [
+    "Nelida Falcon"
+   ]
   },
   {
    "paso": 1200,
    "prompt": "Señor presidente, ",
-   "texto": "señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: \"la transferencia de la competencia sin la transferencia de los recursos convierte una politica publica en un problema municipal\". Y aca esta el punto: esa frase resume el "
+   "texto": "señores diputados: Los intendentes de Valle Hondo nos mandaron una nota. Dice, textual: \"la transferencia de la competencia sin la transferencia de los recursos convierte una politica publica en un problema municipal\". Y aca esta el punto: esa frase resume el ",
+   "nombres_inventados": []
   }
  ],
  "bigrama": {
@@ -2342,15 +2358,15 @@
    {
     "id": "cerca",
     "pregunta": "¿de qué bloque es este diputado?",
-    "titulo": "La pista está CERCA: el nombre, a unas 16 fichas",
-    "explicacion": "El modelo aprendió que el nombre de cada diputado predice su bloque. La pista es el nombre completo. Achicá la ventana hasta que el nombre de pila quede afuera y mirá qué pasa.",
+    "titulo": "La pista está CERCA: el apellido, justo antes de la pregunta",
+    "explicacion": "El modelo aprendió que el nombre de cada diputado predice su bloque, y casi siempre le alcanza con el apellido. Achicá la ventana: mientras el apellido entero está adentro, contesta bien; cuando empieza a perder letras del apellido, empieza a fallar. La curva sube de a poco, a medida que entra más del apellido: el corte duro es del dato, no de la curva.",
     "ejemplo": {
      "texto": " resume el debate de hoy. Es cuanto tengo para decir. Muchas gracias.\n\nSe va a votar en general. Los que esten por la afirmativa, sirvanse indicarlo.\nDiputada Beatriz Aguirre (",
      "objetivo": "FCA",
      "nombre": "Beatriz Aguirre",
-     "distancia_pista": 17,
+     "distancia_pista": 9,
      "tramo_pista": [
-      159,
+      167,
       174
      ],
      "flipea": true,
@@ -3392,25 +3408,25 @@
       "ventana": 8,
       "aciertos": 14,
       "n": 30,
-      "con_pista": 0
+      "con_pista": 13
      },
      {
       "ventana": 12,
       "aciertos": 24,
       "n": 30,
-      "con_pista": 0
+      "con_pista": 29
      },
      {
       "ventana": 16,
       "aciertos": 27,
       "n": 30,
-      "con_pista": 19
+      "con_pista": 30
      },
      {
       "ventana": 20,
       "aciertos": 28,
       "n": 30,
-      "con_pista": 29
+      "con_pista": 30
      },
      {
       "ventana": 24,
@@ -3575,13 +3591,20 @@
       "con_pista": 30
      }
     ],
-    "n_casos": 30
+    "n_casos": 30,
+    "pista": "el apellido del diputado",
+    "distancia_mediana": 9,
+    "mayoritaria": {
+     "respuesta": "FCA",
+     "aciertos": 7,
+     "n": 30
+    }
    },
    {
     "id": "lejos",
     "pregunta": "¿de qué bloque es quien viene hablando?",
-    "titulo": "La pista está LEJOS: el encabezado, a unas 70 fichas",
-    "explicacion": "Acá el dato está en el encabezado del turno, mucho más atrás. Ojo con esta curva: es plana. Aunque la pista esté ADENTRO de la ventana, este modelo no la usa. Su horizonte efectivo es más corto que su ventana.",
+    "titulo": "La pista está LEJOS: el encabezado, entre 40 y 120 fichas atrás",
+    "explicacion": "Acá el dato está en el encabezado del turno, mucho más atrás. Ojo con esta curva: es plana, y nunca le gana a contestar siempre el bloque más frecuente. Aunque la pista esté ADENTRO de la ventana, este modelo no la usa: su horizonte efectivo es más corto que su ventana.",
     "ejemplo": {
      "texto": "Diputado Hector Falcon (VVA — Cerro Verde).\nGracias, presidente. Antes de entrar en el fondo de la cuestion, El bloque del ",
      "objetivo": "Vecinos y Vecinas de Aguasclaras",
@@ -4813,7 +4836,14 @@
       "con_pista": 24
      }
     ],
-    "n_casos": 24
+    "n_casos": 24,
+    "pista": "el bloque, en el encabezado del turno",
+    "distancia_mediana": 86,
+    "mayoritaria": {
+     "respuesta": "Partido de la Union Nacional",
+     "aciertos": 8,
+     "n": 24
+    }
    }
   ],
   "contexto_maximo": 128,
@@ -4957,7 +4987,7 @@
    },
    {
     "id": "no-existe",
-    "titulo": "Una diputada que NO existe (nos la inventamos nosotros)",
+    "titulo": "Una diputada que NO existe (el nombre lo pusimos nosotros)",
     "prompt": "Diputada Marisol Bengoechea (",
     "verdad": null,
     "existe": false,
@@ -5091,7 +5121,7 @@
    },
    {
     "id": "ley",
-    "titulo": "Una ley que no está en el padrón",
+    "titulo": "Una ley que no existe (el número lo pusimos nosotros)",
     "prompt": "Cuando discutimos la Ley 7841 de ",
     "verdad": null,
     "existe": false,
@@ -5225,7 +5255,7 @@
    },
    {
     "id": "cita",
-    "titulo": "Una cita atribuida a una provincia que no existe",
+    "titulo": "Una provincia que no existe (la pusimos nosotros)",
     "prompt": "Los intendentes de Puerto Bermejo nos mandaron una nota. Dice, textual: \"",
     "verdad": null,
     "existe": false,

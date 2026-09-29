@@ -153,6 +153,12 @@ p.alDibujar(() => {
     horizontal: true, max: 1,
     formato: v => (v * 100).toFixed(1) + '%'
   });
+  p.canvas.setAttribute('role', 'img');
+  p.canvas.setAttribute('aria-label',
+    'Las ' + N_BARRAS + ' fichas más probables después de «' + pr.texto + '», con ' +
+    'temperatura ' + claveT(tempActual()) + ', en orden: ' +
+    items.slice(0, 5).map(d => d.etiqueta + ' ' + (d.valor * 100).toFixed(1) + '%')
+      .join(', ') + '… El orden es siempre el mismo.');
 });
 
 /* --- 4. el texto generado --------------------------------------------------- */
