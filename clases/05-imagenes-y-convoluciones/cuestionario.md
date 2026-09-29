@@ -7,6 +7,10 @@ Las abiertas se responden en tres o cuatro oraciones: no se busca extensión, se
 
 Podés tener el notebook abierto. De hecho, para algunas conviene.
 
+**Cuánto lleva y para cuándo.** Todo, unos 40 minutos. **Para la clase que viene alcanzan
+las preguntas 1 a 7 y la 10** (unos 25 minutos); las otras (8, 9, 11 y 12) son de criterio
+sobre tu propio trabajo y se pueden hacer después, cuando las necesites.
+
 ---
 
 ### 1. (opción múltiple)
@@ -124,9 +128,9 @@ explicá por qué cada cosa es imprescindible.
 
 ### 10. (lectura crítica)
 
-> Un estudio predice el nivel de consumo de los hogares a partir de imágenes satelitales diurnas
-> en un país africano, usando luminosidad nocturna como señal intermedia. Reporta R² = 0,75
-> contra los datos de una encuesta de hogares. Los autores concluyen que el método permite
+> Un estudio (inventado, del estilo del que vimos en clase) predice el nivel de consumo de los
+> hogares a partir de imágenes satelitales diurnas en un país africano, usando luminosidad
+> nocturna como señal intermedia. Reporta R² = 0,45 contra los datos de una encuesta de hogares. Los autores concluyen que el método permite
 > «producir estimaciones de pobreza en regiones sin datos de encuesta».
 
 Escribí **las tres preguntas de la clase** aplicadas a este caso, y para cada una **la duda

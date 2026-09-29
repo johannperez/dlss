@@ -12,8 +12,10 @@
      puede ser falsa."
 
      SIEMBRA: las filas de RNN y Transformer quedan grises ("lo vemos en las
-     clases 6 y 7"). En la clase 7 esta misma viz se reusa con esas filas
-     abiertas: cambiar DESBLOQUEADAS a true, abajo, y nada más.
+     clases 6 y 7"). Se desbloquean por separado, con un parámetro en la URL:
+       supuestos-de-arquitectura.html?hasta=6  -> abre la fila de la RNN
+       supuestos-de-arquitectura.html?hasta=7  -> abre también la del Transformer
+     (la clase 7 tiene además su propia copia, con las dos filas abiertas).
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -121,7 +123,8 @@
       <i>Why do tree-based models still outperform deep learning on tabular data?</i>
       <span class="chip">[VERIFICAR URL]</span> — la cita está en <code>referencias.md</code>.
       Las filas de RNN y Transformer se abren en las clases 6 y 7: esta misma página se
-      vuelve a usar allá, con esas filas desbloqueadas.
+      vuelve a usar allá, con esas filas desbloqueadas (<code>?hasta=6</code> abre la de
+      la RNN; <code>?hasta=7</code>, también la del Transformer).
     </p>
   </footer>
 
@@ -130,10 +133,15 @@
 <script src="../../../_shared/js/viz.js"></script>
 <script>
 /* --------------------------------------------------------------------------
-   SIEMBRA PARA LA CLASE 7: poné esto en true y las dos filas grises se abren.
-   No hace falta tocar nada más.
+   SIEMBRA PARA LAS CLASES 6 Y 7: cada fila gris dice en qué clase se abre
+   (`clase`). Se abren todas las filas hasta la clase que diga la URL:
+     ?hasta=6  -> la RNN (clase 6)      ?hasta=7 -> la RNN y el Transformer
+   Sin parámetro, la página es la de la clase 5: las dos filas grises.
    -------------------------------------------------------------------------- */
-const DESBLOQUEADAS = false;
+const HASTA_CLASE = (() => {
+  const m = /[?&]hasta=(\d+)/.exec(location.search || '');
+  return m ? +m[1] : 5;
+})();
 
 /* --------------------------------------------------------------------------
    1. Las cuatro arquitecturas
@@ -154,18 +162,18 @@ const ARQ = [
     ejemplo: 'La invariancia traslacional es el mismo tipo de supuesto que la <b>equivalencia de medición</b> en una encuesta: decir "este patrón significa lo mismo en cualquier parte de la imagen" es decir "esta pregunta significa lo mismo en todas las provincias". A veces es cierto y a veces es una fuente conocida de sesgo.'
   },
   {
-    id: 'rnn', nombre: 'RNN (secuencial)', pie: 'clase 6', gris: true,
+    id: 'rnn', nombre: 'RNN (secuencial)', pie: 'clase 6', gris: true, clase: 6,
     supone: 'Que los datos vienen en <b>orden</b> y que lo que importa se puede acumular leyendo de a uno y arrastrando una memoria.',
     cierto: 'Series temporales y texto leído de corrido: lo de recién pesa más que lo de hace rato.',
-    miente: 'Cuando lo que importa está lejos: el sujeto de la línea 1 y el verbo de la línea 30. La memoria se diluye por el camino.',
+    miente: 'Cuando lo que importa está lejos: el sujeto de la línea 1 y el verbo de la línea 30. La memoria es una mochila de tamaño fijo que se va sobrescribiendo: lo del principio se pierde por el camino.',
     ejemplo: 'Se ve entera en la <b>clase 6</b>, con la frase larga donde el modelo se olvida de quién era el sujeto.'
   },
   {
-    id: 'transformer', nombre: 'Transformer (atención)', pie: 'clase 7', gris: true,
+    id: 'transformer', nombre: 'Transformer (atención)', pie: 'clase 7', gris: true, clase: 7,
     supone: 'Que cualquier parte puede depender de cualquier otra, y que el modelo puede aprender <b>a quién mirar</b> en vez de que se lo digamos nosotros.',
     cierto: 'Cuando las dependencias son largas e impredecibles: lenguaje, código, secuencias largas.',
     miente: 'Casi no supone nada, y eso se paga en datos: necesita muchísimos ejemplos, o alguien que ya lo haya entrenado por vos.',
-    ejemplo: 'Se ve entero en la <b>clase 7</b>, y en la 9 se usa uno que ya viene entrenado.'
+    ejemplo: 'Se ve entero en la <b>clase 7</b>, y en la 9 se usa uno de texto que ya viene entrenado.'
   }
 ];
 
@@ -190,7 +198,7 @@ const DATOS_POSIBLES = [
     id: 'satelital', nombre: 'fotos satelitales de un territorio',
     v: {
       densa: ['R', 'Aplanar una imagen satelital es tirar la grilla justo cuando la grilla es todo lo que hay.'],
-      cnn: ['V', 'Hay grilla de verdad, la vecindad significa algo y los patrones (techos, calles, cultivos) se repiten. Es el caso para el que la CNN fue inventada.'],
+      cnn: ['V', 'Hay grilla de verdad, la vecindad significa algo y los patrones (techos, calles, cultivos) se repiten. Es el caso ideal para una CNN.'],
       rnn: ['R', 'No hay una secuencia: una foto no se lee de izquierda a derecha.'],
       transformer: ['A', 'Existen versiones para imágenes y andan muy bien, pero piden muchísimos más datos que una CNN.']
     },
@@ -211,7 +219,7 @@ const DATOS_POSIBLES = [
   {
     id: 'discursos', nombre: 'un corpus de discursos',
     v: {
-      densa: ['A', 'Sobre una bolsa de palabras funciona, pero la bolsa ya tiró el orden: "la comisión rechazó al ministro" y "el ministro rechazó a la comisión" son el mismo vector.'],
+      densa: ['A', 'Sobre una bolsa de palabras funciona, pero la bolsa ya tiró el orden: sin contar las palabras vacías (artículos, preposiciones), "la comisión rechazó al ministro" y "el ministro rechazó a la comisión" son el mismo vector.'],
       cnn: ['A', 'Una CNN 1D detecta bien las frases hechas ("estado de derecho"), que son patrones locales. Lo lejano se le escapa.'],
       rnn: ['A', 'Lee en orden, que es lo correcto, pero se olvida del principio de los párrafos largos.'],
       transformer: ['V', 'Cada palabra puede mirar directamente a cualquier otra, sin importar la distancia. Es la arquitectura hecha para esto.']
@@ -234,9 +242,9 @@ const DATOS_POSIBLES = [
     id: 'archivo', nombre: 'un archivo fotográfico o de prensa gráfica',
     v: {
       densa: ['R', 'Mismo problema que siempre: aplanar tira la única estructura que había.'],
-      cnn: ['V', 'Es el caso ideal, y con transferencia (clase 9) alcanza con unos cientos de fotos etiquetadas.'],
+      cnn: ['V', 'Es el caso ideal. Y partiendo de un modelo que ya entrenó otro (transferencia: en la clase 9 la vemos con texto, y con imágenes la receta es la misma) suelen alcanzar unos cientos de fotos etiquetadas.'],
       rnn: ['R', 'Una foto no es una secuencia.'],
-      transformer: ['A', 'Los modelos de imagen que ya vienen entrenados suelen ser transformers, y en la clase 9 vamos a usar uno sin entrenarlo nosotros.']
+      transformer: ['A', 'De los modelos de imagen que ya vienen entrenados, muchos son CNN (ResNet, EfficientNet, ConvNeXt) y los más nuevos son transformers (ViT). Entrenar uno desde cero con tu archivo, en cambio, pide muchísimas más fotos que una CNN.']
     },
     cartel: ['ok', 'El caso más concreto para esta sala',
       'Clasificar 40.000 fotos de archivo en tres categorías es imposible a mano y perfectamente factible con esto. Lo que necesitás antes de empezar: <b>etiquetas</b>, una <b>partición honesta</b> (que no mezcle las fotos del mismo álbum entre train y test) y un <b>baseline</b> contra el cual comparar.']
@@ -245,12 +253,21 @@ const DATOS_POSIBLES = [
 
 const COLOR_VEREDICTO = { V: 'ok', A: 'val', R: 'error' };
 const TEXTO_VEREDICTO = { V: 'supuesto razonable', A: 'depende', R: 'supuesto falso' };
+// el veredicto no se dice sólo con color: cada uno lleva además su signo
+const SIMBOLO_VEREDICTO = { V: '✓', A: '~', R: '✗' };
 
 /* --------------------------------------------------------------------------
    3. Los iconitos: un dibujo por arquitectura
    -------------------------------------------------------------------------- */
 function icono(id, celda) {
   const cv = document.createElement('canvas');
+  cv.setAttribute('role', 'img');
+  cv.setAttribute('aria-label', {
+    densa: 'dibujito: todas las entradas conectadas con todas las salidas',
+    cnn: 'dibujito: una grilla y una ventanita de 3 por 3 que la recorre',
+    rnn: 'dibujito: una cadena de cajas que se pasan una memoria de una a la otra',
+    transformer: 'dibujito: arcos que conectan cada palabra con todas las demás'
+  }[id] || 'dibujito de la arquitectura');
   const W = 150, H = 46, dpr = window.devicePixelRatio || 1;
   cv.width = W * dpr; cv.height = H * dpr;
   cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.className = 'icono';
@@ -310,7 +327,7 @@ function pintar() {
   cuerpo.innerHTML = '';
   const D = datosElegidos();
   for (const a of ARQ) {
-    const gris = a.gris && !DESBLOQUEADAS;
+    const gris = a.gris && !(a.clase && HASTA_CLASE >= a.clase);
     const tr = document.createElement('tr');
     tr.className = 'fila' + (gris ? ' gris' : '');
 
@@ -328,7 +345,7 @@ function pintar() {
     if (D) {
       const [v, just] = D.v[a.id];
       const b = document.createElement('span');
-      b.className = 'badge'; b.textContent = TEXTO_VEREDICTO[v];
+      b.className = 'badge'; b.textContent = SIMBOLO_VEREDICTO[v] + ' ' + TEXTO_VEREDICTO[v];
       b.style.background = Viz.color(COLOR_VEREDICTO[v]);
       td0.appendChild(b);
       const j = document.createElement('div');
@@ -388,8 +405,8 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'texto', id: 'lectura', html: '' },
   { tipo: 'titulo', texto: 'Cómo se lee' },
   { tipo: 'texto', id: 'ayuda', html:
-      '<span id="ayuda-caja">Cada fila es una <b>teoría sobre la forma del mundo</b>. Verde: el supuesto es ' +
-      'razonable para estos datos. Amarillo: depende. Rojo: la arquitectura está ' +
+      '<span id="ayuda-caja">Cada fila es una <b>teoría sobre la forma del mundo</b>. Verde (✓): el supuesto es ' +
+      'razonable para estos datos. Amarillo (~): depende. Rojo (✗): la arquitectura está ' +
       'afirmando algo falso.<br><br>Hacé clic en cualquier celda para abrir el ejemplo.</span>' },
   { tipo: 'boton', texto: 'Cerrar los ejemplos', alClic: () => { abierta = null; pintar(); } }
 ], () => pintar());

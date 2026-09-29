@@ -4,9 +4,11 @@
 revela cada distractor**, porque esa confusión reaparece en las clases 6, 7 y 10. Cada ítem trae
 la respuesta, por qué cada opción incorrecta es tentadora, y qué hacer con quien la eligió.
 
-Los números que se citan son los de la corrida real de la clase
-(`medir-experimentos.py`, semilla 1983): densa 85,8 % / barajada 85,6 %; CNN 87,8 % / barajada
-83,2 %; con la foto corrida 3 píxeles, densa 32,3 % y CNN 74,1 %.
+Los números que se citan son los de la corrida de referencia de la clase
+(`medir-experimentos.py`, semilla 1983, torch 2.14; están en `datos-experimentos.json`):
+densa 85,7 % / barajada 85,5 %; CNN 87,7 % / barajada 83,1 %; con la foto corrida 3 píxeles,
+densa 32,2 % y CNN 74,4 %. Con otra versión de las librerías pueden cambiar unas décimas:
+**no corrijas por el dígito**, corregí por el patrón.
 
 ---
 
@@ -45,27 +47,35 @@ El filtro son los números. El pincel.
 
 ### 3.
 
-**a) La red densa queda prácticamente igual: 85,8 % → 85,6 %.**
+**a) La red densa queda prácticamente igual: 85,7 % → 85,5 %.**
 La razón: para una capa densa, cada píxel de entrada es una variable con su propio peso, y el
 orden en que estén las variables no significa nada. Aplicar siempre la misma permutación equivale
-a renombrar las variables; la red aprende los mismos pesos, sólo que en otras posiciones. La
-información está intacta —la permutación es reversible— y la densa nunca usó la vecindad, así que
-no tiene nada que perder.
+a renombrar las variables; la red puede aprender los mismos pesos, sólo que en otras posiciones.
+La información está intacta —la permutación es reversible— y la densa nunca usó la vecindad, así
+que no tiene nada que perder. (Las dos décimas de diferencia son ruido: con la misma semilla, los
+pesos iniciales caen sobre píxeles distintos. Si se barajaran también los pesos iniciales, daría
+lo mismo salvo el redondeo. Con otras semillas, la diferencia va y viene: a veces la barajada saca más.)
 
-**b) La CNN baja: 87,8 % → 83,2 %.**
+**b) La CNN baja: 87,7 % → 83,1 %** (entre 2 y 5 puntos según la semilla).
 Baja porque sus filtros de 3×3 miran **vecinos en la grilla**, y después del barajado los nueve
 píxeles de una ventana son nueve píxeles cualesquiera de la foto. Esos puntos de caída son,
 literalmente, lo que la CNN estaba sacando de la estructura espacial.
 
 *Se acepta —y se valora— que noten que la caída es chica.* La lectura honesta es: lo contundente
 no es cuánto pierde la CNN, sino que la densa **no pierde nada**. La prueba más fuerte de que la
-CNN usa la grilla es la foto corrida: 32,3 % contra 74,1 %.
+CNN usa la grilla es la foto corrida: 32,2 % contra 74,4 %.
 
-**c) Con una permutación distinta por imagen, se caen las dos, y muchísimo.**
+**c) Con una permutación distinta por imagen, se caen las dos muchísimo, cerca del azar.**
 Ahí sí se destruye la relación entre posición y contenido: la variable número 30 ya no significa
-lo mismo en dos imágenes distintas. Ningún modelo que reciba un vector puede aprender nada
-estable. Es la mejor forma de mostrar la diferencia entre *cambiar de nombre a las variables*
-(inocuo) y *cambiarles el significado caso por caso* (letal).
+lo mismo en dos imágenes distintas. Lo medimos aparte (`medir-experimentos.py`,
+parte D, 6 pasadas): la densa queda en **20,7 %** y la CNN en **33,3 %**, contra un azar del
+10 %. No llegan al azar porque sobrevive lo que no depende de la posición: **cuánta tinta tiene
+la foto y qué tan clara es** (un pantalón y un abrigo no tienen la misma cantidad de píxeles
+encendidos), y la CNN, con su máximo final, aprovecha un poco mejor esas estadísticas de
+conjunto. Es la mejor forma de mostrar la diferencia entre *cambiar de nombre a las variables*
+(inocuo) y *cambiarles el significado caso por caso* (casi letal).
+
+*Nota extra* para quien diga que «algo queda» y explique qué: es exactamente lo que pasa.
 
 > **Qué revela cada error.** Quien contesta que la densa «empeora un poco» no terminó de aceptar
 > el resultado y está razonando desde su propia visión (a nosotros el revoltijo nos parece ruido).
@@ -78,14 +88,18 @@ estable. Es la mejor forma de mostrar la diferencia entre *cambiar de nombre a l
 
 **a) Sí, anda razonablemente bien**, y eso es precisamente la invariancia traslacional: los mismos
 nueve números recorren toda la imagen, así que un patrón aprendido en el centro se detecta en la
-esquina. En nuestra medición, corriendo la foto 3 píxeles la CNN pasó de 87,8 % a 74,1 %, mientras
-que la densa se desplomó de 85,8 % a 32,3 %.
+esquina. Lo medimos tal cual (`medir-experimentos.py`, parte D): prendas centradas en un lienzo de
+56×56 para entrenar y puestas en una esquina para probar. La CNN pasa de **84,6 %** a **73,1 %** y
+**72,4 %** (las dos esquinas); la densa, de **84,5 %** a **9,3 %** y **11,2 %**: el azar. En clase
+vimos lo mismo en chiquito: corriendo la foto 3 píxeles, la CNN pasó de 87,7 % a 74,4 % y la
+densa se desplomó de 85,7 % a 32,2 %.
 
 **Matiz que hay que premiar:** la CNN **también** baja. La invariancia no es perfecta ni infinita
 —el *pooling* y el máximo global la dan de a poco, y si el objeto se sale del encuadre no hay
 arquitectura que lo salve—. Es un supuesto que se cumple *hasta cierto punto*, no una garantía.
 
-**b) Con las fotos rotadas 90° la respuesta cambia: la CNN se cae.**
+**b) Con las fotos rotadas 90° la respuesta cambia: la CNN se cae** (medido: la CNN de la clase
+pasa de 87,7 % a **7,5 %** con las fotos de prueba rotadas, por debajo del azar).
 La arquitectura supone que un patrón vale igual **trasladado**, no **rotado**. Un detector de
 bordes verticales rotado 90° es un detector de bordes horizontales: es otro filtro. La invariancia
 rotacional **no viene gratis**; se compra con datos (*data augmentation*: entrenar con copias
@@ -222,15 +236,18 @@ regiones que el modelo no vio, o sobre regiones parecidas a las de entrenamiento
 **Pregunta 3 — ¿Qué pasa fuera de donde se entrenó?**
 La duda concreta: **¿la partición fue geográfica?** Un R² alto con una partición al azar de
 puntos vecinos es casi seguro optimista, porque los vecinos se parecen (es fuga espacial: la
-versión geográfica de 2005/2006 de la clase 4). Y transferir el modelo a otro país es una apuesta
-mucho más fuerte todavía.
+versión geográfica de 2005/2006 de la clase 4). Y una duda que el resumen esconde detrás del
+número global: **¿dónde se equivoca?** En el trabajo real que inspira este ejemplo (Jean et
+al., 2016) el modelo distingue mal *entre los más pobres*, debajo de la línea de pobreza, que es
+justo donde más importa para focalizar. Que ande en otras regiones o países es otra hipótesis
+que hay que probar (Rolf et al., 2021, discuten cuándo generaliza).
 
 > **Cómo se corrige.** Se busca que las tres preguntas estén y que cada una venga con una duda
 > **concreta y verificable**, no con una queja general. «Puede tener sesgo» no cuenta.
 > «¿La partición fue geográfica o al azar?» sí. Premiá la especificidad.
 >
 > **Respuesta a desactivar:** el rechazo global («esto no sirve, la pobreza es multidimensional»).
-> El punto de la clase no es descartar: es **saber qué preguntar**. Un R² de 0,75 en una región sin
+> El punto de la clase no es descartar: es **saber qué preguntar**. Un R² de 0,45 en una región sin
 > ninguna encuesta puede ser muchísimo mejor que no tener nada, siempre que se diga qué es.
 
 ---

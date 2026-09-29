@@ -2,250 +2,252 @@
 
 **«La forma de los datos manda (I): imágenes»** · `clases/05-imagenes-y-convoluciones/`
 
-Segunda pasada, hecha por alguien que **no** construyó la clase y que empezó
-por no creerle al informe del que la construyó. Todo lo que dice acá se
-comprobó **corriendo el código y mirando los PNG**, no leyendo los archivos:
-`nbconvert --execute` cronometrado (cuatro veces, una de ellas con la red
-cortada y la cache borrada), Chromium por Playwright con `context.route`
-abortando **cualquier** `http(s)`, `curl` sobre cada URL, y **más de 60
-capturas miradas con los ojos** —slides, viz antes y después de mover cada
-control, y las figuras que produce el notebook—.
+Este archivo junta tres pasadas. La **primera** fue la del equipo que construyó la
+clase. La **segunda** la hizo alguien que no la construyó, con `nbconvert`,
+Chromium por Playwright y capturas de pantalla (2026-08-29; resumida en §3). La
+**tercera** (2026-09-29, §1 y §2) aplicó los arreglos de la revisión general del
+curso. Cada afirmación dice **en qué pasada** se comprobó y **cómo**. Lo que no se
+volvió a comprobar en la tercera pasada está dicho como tal.
 
-**Veredicto: la clase se puede dar.** Se encontraron **11 problemas** y se
-arreglaron **11**. Uno era serio (el notebook afirmaba en voz alta algo falso
-cuando corría sin internet); el resto eran de coherencia, de rigor fino y de
-maquetación.
+**Veredicto: la clase se puede dar.** El argumento central (la densa no pierde
+nada al barajar; la CNN sí; con la foto corrida la densa se desploma y la CNN
+aguanta) se sostiene con otras semillas y en dos entornos distintos. Los
+dígitos exactos, en cambio, **no** son los mismos en cualquier máquina, y la
+clase ya no lo promete.
 
 ---
 
-## 1. Lo que se midió, con el número real
+## 1. Lo que se midió en la tercera pasada, con el número real
+
+Entorno: python 3.12.13 · torch 2.14.0 · numpy 2.5.3 · macOS arm64 (queda
+guardado en `datos-experimentos.json`, clave `entorno`). Todo corrido sobre una
+copia del repo en el scratchpad, nunca dentro del repo.
 
 | Chequeo | Resultado |
 |---|---|
-| `nbformat.validate` | **válido**, 50 celdas |
-| `nbconvert --execute` (con cache, máquina tranquila) | **0 errores** · **81 s**, **86 s**, **91 s** y **116 s** en cuatro corridas |
-| `nbconvert --execute` **sin red y sin cache** (plan B sintético) | **0 errores** · **170 s** |
-| Slides: consola y red | **36 slides recorridas una por una: 0 errores, 0 requests externas** |
-| Las 4 viz sueltas: consola y red | **0 errores, 0 requests externas** cada una |
-| Los 4 `<iframe>` embebidos en las slides | **cargan y dibujan** (verificado por captura, no por inspección del HTML) |
-| KaTeX | carga sin error; **la clase no usa ni una fórmula**, así que no hay nada que renderizar (es deliberado) |
-| Tema oscuro | slides y viz, **correctos** (verificado por captura) |
-| `medir-experimentos.py` reproduce sus propios datos | **sí: todos los números idénticos**, sólo cambian los `segundos` de reloj |
-| Notebook ↔ `datos-experimentos.json` ↔ slides ↔ viz | **coinciden dígito a dígito** |
-| La permutación del barajado del `.js` vs la del notebook | **la misma** (`np.random.default_rng(1983).permutation(784)`) |
-| URLs de `referencias.md` | 1 responde (**200**), y es la única marcada `[VERIFICADA]`. Las otras 13 están marcadas `[VERIFICAR URL]` |
-| Presupuesto de tiempo | **120 min exactos**, continuo, con la pausa entera |
+| `medir-experimentos.py` (partes A-E) | corre entero, **~5 min** (A-D ≈ 1,5 min; E, las otras semillas, el resto). Dos corridas seguidas dan **los mismos números** en A-D |
+| Notebook ↔ `datos-experimentos.json` | el notebook, ejecutado en el mismo entorno, da **los mismos números** que el JSON (ver §2) |
+| Slides y viz ↔ JSON | los números de la slide 8, 9 y 28 y los de las viz **se leen del JSON** (`data-num` en las slides; `DATOS_EXP` en las viz). El texto fijo que queda en el HTML es sólo el valor de respaldo |
+| `nbconvert --execute` del notebook | **0 errores**, **53 s** con FashionMNIST en cache; y **0 errores**, 54 s, sin red ni cache (plan B). Ver §4 |
+| Slides y viz en Chrome headless | **0 errores de consola** en las 4 viz y en las slides (el único mensaje es el aviso benigno «ResizeObserver loop…» de reveal). Ver §4 |
 
-### Los números de la clase, remedidos acá
-
-Corrida real, semilla 1983, 12.000 imágenes de entrenamiento, 12 pasadas:
+### Los números de la clase, remedidos (semilla 1983)
 
 | | perillas | foto normal | píxeles barajados | corrida 3 px |
 |---|---|---|---|---|
-| red densa | 50.890 | 85,8 % | **85,6 %** | **32,3 %** |
-| CNN | 23.946 | **87,8 %** | 83,2 % | **74,1 %** |
+| red densa | 50.890 | 85,7 % | **85,5 %** | **32,2 %** |
+| CNN | 23.946 | **87,7 %** | 83,1 % | **74,4 %** |
 
-Mini-caso del archivo fotográfico sintético: **97,0 %** global, **88,5 %** en
-follaje, **7 de los 12 errores** ahí. Todo verificado dos veces (notebook y
-`medir-experimentos.py`, por separado).
+Los publicados antes (85,8 / 85,6 / 87,8 / 83,2; 32,3 / 74,1) salían de otro
+entorno (el contenedor de construcción, con otras versiones). **La diferencia es
+de 0,1-0,3 puntos**, salvo la CNN con 6 píxeles de corrimiento (38,1 → 40,5) y el
+mini-caso del archivo (ver abajo). O sea: la semilla fija la corrida **en la misma
+máquina y con las mismas versiones de las librerías**; con otras, los números
+cambian un poco.
 
----
+**Con otras semillas** (parte E: 1984-1987; mismos datos y misma permutación,
+cambia sólo la inicialización y el orden de los lotes):
 
-## 2. Los 11 problemas encontrados, y qué se hizo
+- la densa se mueve **menos de un punto** al barajar, para arriba o para abajo
+  (caídas de −0,9 a +0,6);
+- la CNN pierde **entre 2 y 5 puntos** (2,0 a 4,8);
+- con la foto corrida 3 px, la densa queda entre 30 y 34 % y la CNN entre 67 y 75 %.
 
-### Serio
+El patrón se sostiene en las cinco semillas. Los dígitos no.
 
-**1. Sin internet, el notebook afirmaba algo falso.**
-Con la red cortada y la cache borrada, el notebook cae a su plan B (figuras
-sintéticas de numpy) y corre entero, como promete. Pero ese plan B es
-**demasiado fácil**: los cuatro modelos sacan 100,0 % y el barajado no le
-mueve nada a ninguno (0,0 y 0,0). El problema no era ése: era que la celda
-**imprimía igual** el texto fijo *«La densa ni se enteró. La CNN sí»* — o sea,
-el argumento central de la clase, afirmado sobre unos números que dicen
-exactamente lo contrario. En un aula sin wifi, eso se proyecta.
-*Arreglado:* (a) la narración de la caída ahora se **calcula** a partir de lo
-medido y, si las dos redes quedan igual, dice que este experimento no muestra
-lo que muestra en clase y por qué; (b) la rama del plan B imprime un cartel
-grande que avisa lo mismo y **da los números medidos de FashionMNIST para la
-discusión**. Comprobado volviendo a correrlo sin red: sale el cartel, sale la
-advertencia, 0 errores.
+**Mini-caso del archivo fotográfico sintético** (semilla 1983): **96,7 %**
+global, 13 errores; follaje **85,2 %** (9 errores), multitud 98,5 % (3),
+edificio 99,3 % (1). Antes se publicaba 97,0 % y «7 de 12 errores en follaje».
+Con **doce semillas** (1983-1994) el follaje es el tipo con menos aciertos en
+**10 de 12**; en las otras dos el que peor sale es «multitud» (el modelo se
+pierde multitudes ralas), que es la misma confusión mirada del otro lado. Los
+edificios fallan poco en casi todas (0-3 errores en 10 de 12; 9 y 10 en las
+otras dos). Por eso el notebook, las slides y las
+notas ya no dicen «7 de 12» ni «siempre el follaje»: dicen que los errores se
+amontonan en las escenas con manchitas, sobre todo el follaje, y el notebook
+**avisa** si en tu corrida el que peor sale es otro. El detalle por semilla está
+en `datos-experimentos.json` → `otras_semillas.archivo`.
 
-### De rigor
+**Experimentos del cuestionario** (parte D, 6 pasadas; antes no estaban
+medidos por ningún script):
 
-**2. «La red densa es *exactamente* la de la clase 4» no era cierto.**
-La clase 4 entrena `Linear(1,16) → ReLU → Linear(16,1)` sobre una serie de
-números; acá es `Flatten → Linear(784,64) → ReLU → Linear(64,10)`. Es la
-**misma forma de máquina**, no la misma red, y un estudiante que vuelva a la
-clase 4 a buscar el 784→64 no lo encuentra. Aparecía tres veces (slide 6,
-slide 16 y dos celdas del notebook).
-*Arreglado:* se dice lo que es —«la misma máquina de la clase 4: dos capas
-densas con un doblez en el medio; lo único que cambia es que ahora entran 784
-números en vez de uno»—, que además es más útil para el argumento.
-
-**3. «Cada casilla es un número de 0 a 255: cuánta *materia* hay ahí».**
-No es nada: el número es luz, y encima la slide la dibuja invertida (tinta
-sobre papel) y lo aclara dos líneas abajo. Las notas del docente decían
-«cuánta luz» y la slide decía otra cosa.
-*Arreglado:* dice «cuánta luz hay en ese punto», que es lo que es y lo que
-coincide con las notas.
-
-**4. El notebook mandaba a la sección 6 y el mini-caso está en la 5.**
-La celda del cartel de FashionMNIST prometía «en la sección 6 volvemos al
-dominio», y `referencias.md` hablaba del «corpus visual de la sección 6». La 6
-es «qué te llevás». *Arreglado en los dos.*
-
-**5. Tiempos declarados optimistas.** El notebook decía «menos de 4 minutos» y
-«unos 70 segundos» los cuatro entrenamientos; las notas del docente decían
-«~1 minuto». Medido: **81-116 s** el notebook entero, y ~90 s los cuatro
-entrenamientos. *Arreglado con los números medidos y con la advertencia de que
-en Colab y con la máquina cargada es más.*
-
-**6. El cuestionario decía «Once preguntas» y tiene doce.** *Arreglado.*
-
-### De coherencia
-
-**7. `notas-docente.md` numeraba las slides sin contar la pausa.**
-El mazo muestra `n / 36` con la pausa como slide 18; las notas venían de la
-especificación, donde la pausa no está numerada, así que **todo lo posterior a
-la pausa estaba corrido en uno**: «las slides 24-25» eran la 25-26 en pantalla,
-«el bloque 28-30» era el 29-31, y los cuatro números que el docente tiene que
-saber de memoria estaban en «la slide 27», que en pantalla es la 28. Con el
-proyector prendido eso hace perder treinta segundos cada vez.
-*Arreglado:* la tabla de tiempos y las quince referencias sueltas pasan a la
-numeración del mazo, y arriba de la tabla quedó dicho cuál es cuál.
-Lo mismo en `referencias.md` («el caso de las slides 28-30» → 29-31).
-
-**8. Punto y coma decimales mezclados.** Las slides escriben **85,6 %** y la
-viz embebida al lado, en la misma pantalla, escribía **85.6 %** (`Viz.num`
-devuelve punto). *Arreglado local en `vecindad-de-pixeles.html`*, con un
-ayudante de una línea; no se tocó la biblioteca compartida, que usan las otras
-nueve clases.
-
-### De maquetación
-
-**9. La viz de supuestos dejaba un recuadro vacío en la slide 26.**
-El archivo escondía el *texto* de la ayuda «cómo se lee» cuando va embebida,
-pero no la **caja ni su rótulo**: en el proyector se veía un cartel con título
-y nada adentro. *Arreglado:* ahora se esconde la ayuda entera (título + caja),
-y de paso entra más de la fila del Transformer. Verificado por captura.
-
-**10. El rótulo del máximo global se salía de su caja** en el diagrama de la
-CNN (slide 24): «máx de cada mapa → 64» pisaba el borde derecho.
-*Arreglado:* «máx por mapa → 64».
-
-**11. `.viz-frame` de `curso.css` no tiene `box-sizing`** y con padding propio
-se monta sobre el panel. El equipo anterior lo parchó local en los cinco HTML
-de esta clase. **Se confirma que el parche funciona** (la jerarquía embebida ya
-no corta la primera letra de los rótulos) y **se confirma que el defecto es del
-CSS compartido**: sigue abierto para el equipo de la espina.
+- 3c, una permutación **distinta por imagen**: densa **20,7 %**, CNN **33,3 %**
+  (el azar es 10 %). La solución decía que «ningún modelo puede aprender nada»;
+  ahora dice que caen cerca del azar y por qué no llegan.
+- 4a, entrenar centrado en un lienzo de 56×56 y probar en las esquinas: CNN
+  84,6 → 73,1 / 72,4 %; densa 84,5 → 9,3 / 11,2 %.
+- 4b, la CNN de la clase con la foto rotada 90°: 87,7 → **7,5 %**.
 
 ---
 
-## 3. Lo que se revisó y está bien (no se tocó)
+## 2. Qué se cambió en la tercera pasada
 
-- **Los cuatro momentos aha existen y se ven.** Se movió cada control y se
-  miró el resultado:
-  - *Barajar*: la animación de los píxeles mudándose, las dos tiras con los
-    mismos 784 números, y las barras 85,8 → 85,6 contra 87,8 → 83,2. La
-    segunda pestaña («correrla») da 85,8 → 32,3 contra 87,8 → 74,1 y el slider
-    de 0 a 6 píxeles responde en vivo.
-  - *Kernel deslizante*: con «borde vertical» sobre el afiche se encienden
-    **sólo** los palotes verticales de las letras; «todo cero» deja el panel 3
-    vacío; «identidad» devuelve la imagen; «filtro al azar» da porquería una y
-    otra vez. Las ocho imágenes cargan y la cuenta de los nueve productos se
-    actualiza.
-  - *Jerarquía*: clic en «la rueda» enciende arco + círculo + unión en T de la
-    capa 2 y los bordes de la capa 1, con las líneas de composición dibujadas.
-    «La multitud» baja a cabeza y pancarta. El rótulo de «esquema ilustrativo»
-    está puesto.
-  - *Supuestos*: con «una tabla de encuesta» **no se pone verde ninguna fila** y
-    aparece el cartel de los modelos de árboles. Las seis opciones de datos
-    funcionan; RNN y Transformer quedan grises para las clases 6 y 7.
-- **Las figuras del notebook** (13, todas miradas): ejes rotulados, leyendas,
-  y la de los errores del mini-caso muestra la confusión follaje/multitud sin
-  necesidad del texto.
-- **Las citas.** Se revisó una por una: Jean et al. 2016 *Science* 353(6301)
-  790-794 con su DOI, Olah et al. *Distill* con su DOI, Zeiler & Fergus ECCV
-  2014, Grinsztajn et al. NeurIPS 2022, Cantú 2019 APSR 113(3), Torres & Cantú
-  2022 *Political Analysis* 30(1), Rolf et al. 2021 *Nat. Commun.* 12,
-  Krizhevsky 2012 (el 26 %→15 % es top-5, y está bien dicho), LeCun et al. 1998
-  *Proc. IEEE* 86(11). **No se encontró ninguna cita inventada ni ningún autor
-  o año mal.** Ninguna URL se afirma sin haberla abierto.
-- **El cuestionario.** Las doce preguntas se contestan con lo que se dio.
-  Las soluciones son correctas —incluidas las cuentas: 16·9+16 = 160,
-  784·16+16 = 12.560, y 78,5 veces— y los distractores son tentadores, no
-  absurdos (el de la pregunta 2, «la imagen de salida», es literalmente la
-  confusión que la clase viene a desarmar).
-- **Tono.** Voseo sostenido, humor sin chiste forzado, cero condescendencia,
-  ningún párrafo-muro. No hay una sola slide sin imagen, ejemplo o pregunta.
-- **Los puentes.** Hacia atrás: slide 2 (el módulo 1 entero) y los callbacks a
-  las clases 2, 3 y 4 en las slides 6, 15, 16 y 22. Hacia adelante: la fila
-  gris de RNN en la viz de supuestos, la clase 9 en las slides 32 y 33, y la
-  slide 36 con la frase de la comisión y el ministro.
-- **Coherencia con la especificación.** Están los 34 bloques del guion, en su
-  orden, más la slide de pausa (obligatoria) y la de «tres ideas». Las dos
-  desviaciones que declaró el equipo constructor —la arquitectura con máximo
-  global y el experimento del corrimiento— **se verificaron midiendo**: son
-  mejoras, no atajos, y sin ellas el aha se cae (con conv→pool→conv→pool→densa
-  el barajado casi no mueve la aguja).
+**Reproducibilidad honesta.**
+- `medir-experimentos.py` guarda el **entorno** (python, torch, numpy,
+  plataforma, fecha) en el JSON y en la cabecera del `.js`, mide los
+  experimentos del cuestionario (parte D) y la variación con otras semillas
+  (parte E; `--rapido` la saltea sin borrar la ya medida).
+- La nota de la slide 28 decía que al aula «les tienen que haber dado
+  idénticos». Ahora dice «casi iguales» y explica por qué; lo mismo en las
+  notas del docente, las soluciones del cuestionario y el notebook.
+- El notebook lee los números de referencia del JSON (ya no los tiene escritos a
+  mano), imprime los suyos al lado de los de las slides con las dos versiones de
+  torch, y **calcula** la frase del barajado, la del corrimiento y la del
+  análisis de errores: si el momento clave no aparece en tu corrida, lo dice.
+
+**Contenido.**
+- «La densa saca *exactamente* lo mismo» → «prácticamente lo mismo» (notas §1).
+- Slide 16: comparaba 32 filtros (288 pesos) contra la capa densa y decía «anda
+  mejor» del modelo entero. Ahora usa **16 filtros (144 pesos)**, como el
+  notebook, dice que la comparación es capa contra capa y da el total del modelo
+  (23.946 contra 50.890).
+- Invariancia y equivariancia: nota a pie en la slide 25, en las notas de las
+  slides 12 y 24, en el glosario de la slide 35, en las notas del docente y en
+  `referencias.md` (Goodfellow). El discurso principal no cambió.
+- Slide 12 (notas): el mapa se achica en la cuenta a mano, pero la CNN usa
+  `padding=1`; el 28 → 14 → 7 viene del pooling.
+- TODO 2: la pista 2 da un detector de **borde** diagonal que se enciende en la
+  «/» y da cero sobre `np.eye`. Se agregó la explicación (el borde es
+  perpendicular al cambio de signo), el detector de **línea**
+  `[[2,-1,-1],[-1,2,-1],[-1,-1,2]]` y un mensaje que dice a qué raya reacciona
+  el filtro. La viz del kernel nombra igual su preset «diagonal».
+- La promesa de un modelo de **imagen** preentrenado en la clase 9 (que es sólo
+  de texto) se reformuló en la viz de supuestos, la slide 32, las notas y el
+  notebook: la clase 9 muestra la transferencia con texto; con imágenes la receta
+  es la misma, sin ejercicio prometido.
+- Viz de supuestos: «el caso para el que la CNN fue inventada» → «el caso
+  ideal»; «los modelos de imagen preentrenados suelen ser transformers» →
+  «muchos son CNN y los más nuevos, transformers (ViT)»; la bolsa de palabras
+  lleva la salvedad «sin contar las palabras vacías»; la RNN, la mochila de
+  tamaño fijo que se sobrescribe; y las filas grises se desbloquean **por
+  separado** con `?hasta=6` / `?hasta=7`.
+- Slide 31, punto 3: en vez de «hay literatura que muestra que se degrada», la
+  limitación que reporta el propio Jean et al. (el modelo distingue mal entre
+  los más pobres) y Rolf et al. (2021) para la generalización. Lo mismo en la
+  solución 10 y en `referencias.md`.
+- Cuestionario 10: el estudio es ahora explícitamente inventado «del estilo del
+  de la clase», con R² = 0,45 (0,75 se parecía más a los de activos que a los de
+  consumo de Jean et al.).
+- El puente a la clase 6: las dos frases «usan las mismas palabras con
+  contenido», no «exactamente las mismas palabras» («al» es «a» + «el»).
+
+**Calendario.** `[EL LUNES]` → «En tu investigación» (marca de la slide 32,
+título «Qué te llevás a tu investigación», notebook «En tu propia
+investigación, desde ya»). Se sacaron «esta semana» y «el lunes». Carga para la
+clase que viene, dicha en el notebook y en el cuestionario: terminar la sección 5
+y las preguntas 1-7 y 10 (menos de una hora). Jean et al. pasa de «lectura
+obligatoria» a recomendada.
+
+**Tiempos.** La slide 27 decía «veinte minutos» y el plan le daba 13; las notas
+de cada slide sumaban más de 120. Ahora la tabla de `notas-docente.md` §2, las
+notas de cada slide y la slide 27 dicen lo mismo (práctico 2: **13 minutos**) y
+suman 120.
+
+**Accesibilidad.** Todas las figuritas de canvas de las slides y de las viz
+tienen `role="img"` y `aria-label` (el del mapa de la viz del kernel se
+actualiza con el filtro y la imagen). Los signos ya no se dicen sólo con color:
+leyenda «rojo = positivo, azul = negativo» en la slide 12 y en el panel 3 del
+kernel (los números de la cuenta llevan su signo); ✓ y ✗ en la tabla de la
+slide 28 y en los veredictos de la viz de supuestos; «pierde» o «gana» en
+palabras en la viz del barajado; marca en el rótulo de la unidad elegida y de sus
+piezas en la viz de la jerarquía (además de `aria-pressed`).
+
+**Otros.** Los comentarios `<!-- n · … -->` de `slides.html` usan ahora la
+numeración del contador (la pausa es la 18). `kernel-deslizante.html` escribe
+con coma decimal, como las slides. El notebook decía que la viz del kernel trae
+«cinco imágenes» (son ocho); las notas, «cinco opciones de datos» (son seis) y
+«el `assert`» (es un `revisar()`).
+
+**Lo que se verificó de todo esto, y cómo:** ver el final de §4 («Qué se
+corrió en la tercera pasada»).
+
+---
+
+## 3. La segunda pasada (2026-08-29), resumida
+
+Se encontraron 11 problemas y se arreglaron 11; la lista completa está en la
+historia de git de este archivo. Los que siguen importando:
+
+1. **Sin internet, el notebook afirmaba algo falso.** El plan B (figuras
+   sintéticas) es demasiado fácil y el barajado no mueve nada; el notebook
+   imprimía igual «la densa ni se enteró, la CNN sí». Se arregló calculando la
+   frase a partir de lo medido. (En la tercera pasada se agregó que el
+   experimento de la **foto corrida sí** se ve en el plan B.)
+2. «La red densa es *exactamente* la de la clase 4» → «la misma máquina»
+   (dos capas densas con un doblez); ahora también en el docstring de
+   `medir-experimentos.py`.
+3. «Cuánta *materia*» → «cuánta luz».
+4. El notebook mandaba a la sección 6 por el mini-caso, que está en la 5.
+5. Tiempos del notebook medidos: 81-116 s en aquel contenedor.
+6. El cuestionario tiene doce preguntas, no once.
+7. `notas-docente.md` numeraba las slides sin contar la pausa.
+8. Coma decimal en la viz del barajado.
+9. La viz de supuestos dejaba un recuadro vacío embebida.
+10. El rótulo del máximo global se salía de su caja (slide 24).
+11. `.viz-frame` sin `box-sizing`: parche local en los cinco HTML.
+
+En aquella pasada también se revisaron las citas una por una (autor, año,
+revista) y no se encontró ninguna inventada; eso no cambió.
 
 ---
 
 ## 4. Lo que queda abierto
 
-1. **Los 13 `[VERIFICAR URL]` y los `DOI [VERIFICAR]`.** Desde este contenedor
-   sólo responde `raw.githubusercontent.com`. Se confirmó con `curl`: la única
-   URL de la lista que devuelve 200 es la del README de FashionMNIST, y es la
-   única marcada `[VERIFICADA]`. **Nada de esto frena la clase**: las obras se
-   encuentran por autor y título, y todas existen.
+1. **Los `[VERIFICAR URL]` y los `DOI [VERIFICAR]` de `referencias.md`.** Nadie
+   abrió esos enlaces; las obras se encuentran por autor y título.
 2. **`.viz-frame { box-sizing: border-box }` tiene que ir a
-   `_shared/css/curso.css`.** Está parchado local en los cinco HTML de la clase
-   5, pero el defecto afecta a cualquier `.viz-frame` con padding propio de las
-   otras nueve clases. Es para el equipo de la espina.
-3. **La slide 3 usa un esquema sintético de multitud dibujado con numpy.**
-   Funciona y está rotulado, pero se lee como un montón de crucecitas, no como
-   una foto: una foto real de una movilización con licencia libre funcionaría
-   mejor. Es lo primero que conviene reemplazar; está anotado en
-   `notas-docente.md` §11.
-4. **El plan B sin internet no reproduce el experimento del barajado.** Ahora
-   lo dice en voz alta (problema 1), pero sigue siendo un plan B degradado: si
-   se quiere que el argumento cierre también sin red, hay que diseñar un
-   conjunto sintético con estructura espacial que un modelo denso no pueda
-   resolver de memoria. No es trivial y no se intentó acá.
-5. **El tiempo del notebook depende mucho de la carga de la máquina.** Medido:
-   81 s, 86 s, 91 s y 116 s en este contenedor. En Colab (2 vCPU) hay que contar
-   3-4 minutos. Las palancas son `N_TRAIN` (12.000) y `EPOCAS` (12) en la celda
-   de configuración, **pero si se tocan hay que volver a correr
-   `medir-experimentos.py`**, porque las slides y las viz muestran esos números
-   exactos.
-6. **La viz de supuestos embebida sigue recortando la última fila** (el alto
-   del `iframe` es fijo, 610 px). Suelta —que es como la proyecta el docente—
-   se ve entera. Si alguien quiere que entre también embebida, hay que acortar
-   los textos de la fila del Transformer.
-7. **La clase 7 tiene que desbloquear las filas de RNN y Transformer** de
-   `viz/supuestos-de-arquitectura.html`. Está anotado en el pie de la propia
-   viz y en las notas del docente.
+   `_shared/css/curso.css`.** Sigue parchado local. Es para el equipo de la espina.
+3. **La slide 3 usa un esquema sintético de multitud.** Se lee como un montón de
+   crucecitas, no como una foto; una foto real con licencia libre funcionaría
+   mejor (`notas-docente.md` §11).
+4. **El plan B sin internet no reproduce el barajado** (sí el corrimiento). Para
+   que cierre también sin red haría falta un conjunto sintético que una red densa
+   no pueda resolver sin mirar la grilla.
+5. **Los números dependen del entorno.** Si se cambian `N_TRAIN`, `EPOCAS` o la
+   versión de torch del entorno de referencia, hay que volver a correr
+   `medir-experimentos.py`; las slides y las viz toman los números del JSON, pero
+   los textos de `notas-docente.md`, `cuestionario-soluciones.md` y este archivo
+   los citan escritos.
+6. **La viz de supuestos embebida puede recortar la última fila** (el `iframe`
+   tiene alto fijo). Suelta se ve entera. No se volvió a mirar en la tercera
+   pasada.
+7. **El mini-caso del archivo depende de la semilla** más que el resto (ver §1).
+   Si se quiere que el follaje sea siempre el que peor sale, hay que rediseñar el
+   generador sintético; no se hizo.
 
----
+### Qué se corrió en la tercera pasada
 
-## 5. Cómo reproducir esta verificación
+Todo sobre copias del repo en el scratchpad, con `PYTHONDONTWRITEBYTECODE=1`:
 
-```bash
-# el notebook, cronometrado
-time python3 -m nbconvert --to notebook --execute --output /tmp/out.ipynb \
-     clases/05-imagenes-y-convoluciones/notebook.ipynb
+- `medir-experimentos.py` completo, dos veces (la segunda, con la parte E
+  ampliada): partes A-D idénticas entre corridas; ~5 min cada una. Los
+  `datos-experimentos.json/.js` del repo son los de la segunda.
+- El notebook con `jupyter nbconvert --execute`, **con** FashionMNIST en cache:
+  0 errores, 53 s. Sus números son los del JSON, dígito a dígito (85,7 / 85,5 /
+  87,7 / 83,1; corrimiento; archivo 96,7 % con 9 de 13 errores en follaje). Las
+  frases calculadas salen bien: «la densa ni se enteró», «la densa se cae mucho
+  más que la CNN», la comparación con la corrida de las slides. Los TODO sin
+  resolver dan «Todavía no» sin explotar.
+- El notebook **sin red y sin cache** (proxy a un puerto cerrado): cae al plan
+  B, imprime el cartel con los números del JSON, 0 errores, 54 s. El barajado da
+  100 / 100 y lo dice; el corrimiento sí aparece (densa 100 → 91,9 % a 3 px y
+  71,5 % a 6 px; CNN 100 % en todos).
+- Los filtros de la pista del TODO 2, a mano: `[[2,1,0],[1,0,-1],[0,-1,-2]]` da
+  0 sobre `np.eye(9)` y 44 sobre la otra diagonal; el detector de línea
+  `[[2,-1,-1],[-1,2,-1],[-1,-1,2]]`, 76 contra 44. Los dos pasan el chequeo.
+- Chrome headless (`--dump-dom`, consola a stderr) sobre las slides y las 4 viz:
+  0 errores de consola; los `data-num` de las slides se llenan desde el JSON
+  (85,7 / 85,5 / 87,7 / 83,1 / 32,2 / 74,4) con el entorno al pie de la slide 28;
+  la viz de supuestos abre sólo la RNN con `?hasta=6`, las dos filas con
+  `?hasta=7` y ninguna sin parámetro, con los veredictos «✓ / ~ / ✗»; la viz
+  del barajado con `#correr` escribe «pierde 53,5 puntos» / «pierde 13,3
+  puntos»; el `aria-label` del mapa del kernel se actualiza con el filtro.
+- Capturas (Chrome headless, 1280×760) de las slides que cambiaron de tamaño
+  de texto: 16, 25, 28 y 32. Entran en pantalla; en la 25 la nota al pie queda
+  pegada a las flechas de navegación, sin taparse.
+- **No** se volvió a mirar con capturas el resto (tema oscuro, recortes del
+  `iframe`, la marca ★/↳ de la jerarquía): lo que dice §3 sobre eso es de la
+  segunda pasada. Tampoco se probaron los clics de la viz de
+  la jerarquía en el navegador.
 
-# el notebook SIN red y SIN cache (hay que mover datos/cache/fashion-mnist y devolverlo)
-HTTPS_PROXY=http://127.0.0.1:9 python3 -m nbconvert --to notebook --execute ...
-
-# que los números de las slides salgan de una corrida real
-PYTHONPATH=_shared python3 clases/05-imagenes-y-convoluciones/medir-experimentos.py
-git diff clases/05-imagenes-y-convoluciones/datos-experimentos.json   # sólo cambian los segundos
-
-# el HTML, a la profundidad real, con la red abortada
-#   PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers  NODE_PATH=/opt/node22/lib/node_modules
-#   chromium.launch({executablePath:'/opt/pw-browsers/chromium'})
-#   ctx.route('**/*', r => /^https?:/i.test(r.request().url()) ? r.abort() : r.continue())
-```
-
-*Verificado el 2026-08-29.*
+*Tercera pasada: 2026-09-29.*

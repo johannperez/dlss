@@ -7,15 +7,19 @@
 
 <!-- ==========================================================================
      MOMENTO AHA: "las dos tiras tienen exactamente los mismos 784 números, sólo
-     cambiados de orden. Y la red densa saca EL MISMO 85,6 %. Entonces la red
-     densa nunca supo que había una grilla: para ella eran 784 variables sueltas."
+     cambiados de orden. Y la red densa saca PRÁCTICAMENTE LO MISMO (dos décimas
+     de diferencia). Entonces la red densa nunca supo que había una grilla: para
+     ella eran 784 variables sueltas."
 
      SEGUNDO MOMENTO (pestaña «correrla»): con la foto corrida 3 píxeles la densa
-     se desploma de 85,8 % a 32,3 % y la CNN se queda en 74,1 %. Eso es lo que
-     compramos con el supuesto de que un patrón vale igual en cualquier posición.
+     se desploma a un tercio de aciertos y la CNN se queda cerca de las tres
+     cuartas partes. Eso es lo que compramos con el supuesto de que un patrón
+     vale igual en cualquier posición.
 
      Todos los números salen de medir-experimentos.py (semilla 1983), que corre
-     el mismo código que el notebook. Ninguno está estimado.
+     el mismo código que el notebook, y se leen de datos-experimentos.js: acá no
+     hay ninguno escrito a mano. Determinista en la misma máquina y con las
+     mismas versiones de las librerías; con otras versiones cambian un poco.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -69,11 +73,11 @@
       <div class="tres">
         <figure>
           <figcaption>1 · la foto original</figcaption>
-          <div id="orig"></div>
+          <div id="orig" role="img" aria-label="la foto original, de 28 por 28 píxeles"></div>
         </figure>
         <figure>
           <figcaption id="cap-mod">2 · la foto con los píxeles barajados</figcaption>
-          <div id="mod"></div>
+          <div id="mod" role="img" aria-label="la foto transformada"></div>
         </figure>
         <figure>
           <figcaption>3 · cuánto acierta cada modelo</figcaption>
@@ -86,11 +90,11 @@
         <p class="tira-titulo">Cómo se la damos a la red densa: los 784 números, en fila</p>
         <div class="tira-fila">
           <span class="tira-etq">la foto original</span>
-          <div class="tira-lienzo"><div id="tira-a"></div></div>
+          <div class="tira-lienzo"><div id="tira-a" role="img" aria-label="los 784 números de la foto original, en una fila"></div></div>
         </div>
         <div class="tira-fila">
           <span class="tira-etq" id="tira-etq-b">la foto barajada</span>
-          <div class="tira-lienzo"><div id="tira-b"></div></div>
+          <div class="tira-lienzo"><div id="tira-b" role="img" aria-label="los 784 números de la segunda foto, en una fila"></div></div>
         </div>
         <p class="b-nota" id="nota-tira"></p>
       </div>
@@ -114,7 +118,7 @@
       un sandbox técnico, no un dato de ciencias sociales. Los porcentajes son de
       una corrida real de <code>medir-experimentos.py</code> con semilla 1983,
       el mismo código que corre el notebook: 12.000 imágenes de entrenamiento,
-      12 pasadas, 4.000 imágenes de prueba.
+      12 pasadas, 4.000 imágenes de prueba. <span id="pie-entorno"></span>
     </p>
   </footer>
 
@@ -132,10 +136,16 @@ const PERM = DATOS_EXP.permutacion;          // la permutación exacta que se us
 const IMGS = DATOS_EXP.muestras;
 const N = 28;
 
-/* Coma decimal: en las slides los mismos numeros se escriben «85,6 %» y esta
+/* Coma decimal: en las slides los mismos numeros se escriben «85,5 %» y esta
    viz va embebida al lado de ese texto. Viz.num devuelve punto, asi que lo
    traducimos aca, local, sin tocar la biblioteca compartida. */
 const pc = (v, d) => Viz.num(v, d === undefined ? 1 : d).replace('.', ',');
+/* "pierde 4,6 puntos" / "gana 0,1 puntos": el signo va en palabras, no en color */
+function perdida(antes, despues) {
+  const dif = Math.round((antes - despues) * 10) / 10;
+  if (dif === 0) return 'no pierde nada';
+  return (dif > 0 ? 'pierde ' : 'gana ') + pc(Math.abs(dif)) + ' puntos';
+}
 
 const estado = {
   modo: 'barajar',      // 'barajar' | 'correr'
@@ -260,14 +270,14 @@ function refrescarBarras() {
     caja.innerHTML =
       barra('red densa · foto normal', R.densa_normal.exactitud, 'datos') +
       (mezclado ? barra('red densa · píxeles barajados', R.densa_barajada.exactitud, 'datos',
-            'pierde ' + pc(R.densa_normal.exactitud - R.densa_barajada.exactitud) + ' puntos') : '') +
+            perdida(R.densa_normal.exactitud, R.densa_barajada.exactitud)) : '') +
       barra('CNN · foto normal', R.cnn_normal.exactitud, 'modelo') +
       (mezclado ? barra('CNN · píxeles barajados', R.cnn_barajada.exactitud, 'modelo',
-            'pierde ' + pc(R.cnn_normal.exactitud - R.cnn_barajada.exactitud) + ' puntos') : '');
+            perdida(R.cnn_normal.exactitud, R.cnn_barajada.exactitud)) : '');
     ver.innerHTML = mezclado
-      ? '<div class="aha compacta" style="margin:0">La densa quedó igual (<b>' +
-        pc(R.densa_normal.exactitud - R.densa_barajada.exactitud) +
-        '</b> puntos de diferencia). La CNN perdió <b>' +
+      ? '<div class="aha compacta" style="margin:0">La densa quedó prácticamente igual (<b>' +
+        pc(Math.abs(R.densa_normal.exactitud - R.densa_barajada.exactitud)) +
+        '</b> puntos de diferencia: ruido). La CNN perdió <b>' +
         pc(R.cnn_normal.exactitud - R.cnn_barajada.exactitud) +
         '</b>. Esa diferencia es <em>todo</em> lo que la CNN estaba sacando de la grilla.</div>'
       : '<div class="ojo compacta" style="margin:0">Apostá primero: si barajo los píxeles de <b>todas</b> las imágenes con la misma permutación y vuelvo a entrenar, ¿a quién le va a ir peor?</div>';
@@ -278,10 +288,10 @@ function refrescarBarras() {
     caja.innerHTML =
       barra('red densa · sin correr', CORR.densa[0], 'datos') +
       barra('red densa · corrida ' + d + ' px', vd, 'datos',
-            d ? 'pierde ' + pc(CORR.densa[0] - vd) + ' puntos' : 'es la foto original') +
+            d ? perdida(CORR.densa[0], vd) : 'es la foto original') +
       barra('CNN · sin correr', CORR.cnn[0], 'modelo') +
       barra('CNN · corrida ' + d + ' px', vc, 'modelo',
-            d ? 'pierde ' + pc(CORR.cnn[0] - vc) + ' puntos' : 'es la foto original');
+            d ? perdida(CORR.cnn[0], vc) : 'es la foto original');
     ver.innerHTML = d === 0
       ? '<div class="ojo compacta" style="margin:0">Movés el slider y corrés la foto. Los dos modelos ya están entrenados: <b>no se vuelve a entrenar nada</b>, es la misma foto un poco más a la derecha.</div>'
       : '<div class="aha compacta" style="margin:0">Con <b>' + d + ' píxeles</b> de corrimiento la densa cae a <b>' +
@@ -342,6 +352,8 @@ function sincronizar() {
     ? '2 · la misma foto, corrida ' + estado.corrimiento + ' píxeles'
     : (estado.t > .5 ? '2 · la foto con los píxeles barajados'
                      : '2 · la misma foto (todavía sin barajar)');
+  document.getElementById('mod').setAttribute('aria-label',
+    document.getElementById('cap-mod').textContent.replace(/^2 · /, ''));
   document.getElementById('caja-tira').style.display = estado.tira ? '' : 'none';
   pMod.redibujar();
   if (estado.tira) refrescarTiras();
@@ -368,6 +380,11 @@ function leer() {
    --------------------------------------------------------------------------- */
 pOrig.redibujar();
 sincronizar();
+(function () {                 // con qué versiones se midió (lo guarda medir-experimentos.py)
+  const E = DATOS_EXP.entorno, pie = document.getElementById('pie-entorno');
+  if (E && pie) pie.textContent = 'Medido con torch ' + E.torch + ' y numpy ' + E.numpy +
+    ': con otras versiones los números cambian unas décimas.';
+})();
 if (estado.modo === 'barajar') estado.t = 0;
 window.addEventListener('resize', () => { if (estado.tira) refrescarTiras(); });
 Viz.botonTema();

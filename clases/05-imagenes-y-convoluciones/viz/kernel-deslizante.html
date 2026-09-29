@@ -75,16 +75,19 @@
       <div class="tres">
         <figure>
           <figcaption>1 · la imagen · la ventana está acá</figcaption>
-          <div id="entrada"></div>
+          <div id="entrada" role="img" aria-label="la imagen de entrada, con un recuadro de 3 por 3 donde está mirando el filtro"></div>
         </figure>
         <figure>
           <figcaption>2 · el filtro (editable)</figcaption>
           <div id="filtro-grid" class="rejilla3"></div>
-          <p class="pie3">azul − &nbsp;·&nbsp; blanco 0 &nbsp;·&nbsp; rojo +</p>
+          <p class="pie3">el color repite el signo del número:
+            azul − &nbsp;·&nbsp; blanco 0 &nbsp;·&nbsp; rojo +</p>
         </figure>
         <figure>
           <figcaption>3 · el mapa de activación</figcaption>
-          <div id="salida"></div>
+          <div id="salida" role="img" aria-label="el mapa de activación que produce el filtro"></div>
+          <p class="pie3">azul: la cuenta dio negativa (−) &nbsp;·&nbsp; blanco: 0 &nbsp;·&nbsp;
+            rojo: positiva (+). La cuenta exacta de cada píxel está abajo, con su signo.</p>
         </figure>
       </div>
 
@@ -151,6 +154,9 @@ const PRESETS = {
   horizontal: [[ 1, 2,  1], [ 0, 0,  0], [-1, -2, -1]],
   desenfoque: [[.11, .11, .11], [.11, .11, .11], [.11, .11, .11]],
   realce:     [[ 0, -1,  0], [-1,  5, -1], [ 0, -1,  0]],
+  // + arriba a la izquierda, − abajo a la derecha: se enciende en los bordes
+  // que van de abajo-izquierda a arriba-derecha ("/"), PERPENDICULARES a la
+  // dirección en que cambia el signo. Sobre una raya "\" da cero.
   diagonal:   [[ 2,  1,  0], [ 1,  0, -1], [ 0, -1, -2]],
   identidad:  [[ 0,  0,  0], [ 0,  1,  0], [ 0,  0,  0]],
   cero:       [[ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0]]
@@ -167,6 +173,9 @@ const estado = {
 let img = normalizar(IMAGENES[0].px);
 let mapa = ceros(M, M);
 let listo = ceros(M, M);       // 1 si ese píxel ya se calculó
+
+/* coma decimal, como en las slides (Viz.num devuelve punto) */
+const pc = (v, d) => Viz.num(v, d).replace('.', ',');
 
 function normalizar(px) { return px.map(f => f.map(v => v / 255)); }
 function ceros(f, c) { const a = []; for (let j = 0; j < f; j++) a.push(new Array(c).fill(0)); return a; }
@@ -295,7 +304,7 @@ function pintarFiltro() {
   const pal = Viz.paleta('divergente');
   for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) {
     const k = j * 3 + i, v = estado.filtro[j][i];
-    if (document.activeElement !== cajas[k]) cajas[k].value = Viz.num(v, 2);
+    if (document.activeElement !== cajas[k]) cajas[k].value = pc(v, 2);
     cajas[k].style.background = pal((v / lim + 1) / 2);
   }
 }
@@ -313,7 +322,7 @@ function miniGrilla(id, valores, colorear) {
   const gris = Viz.paleta('grises');
   valores.forEach(v => {
     const s = document.createElement('span');
-    s.textContent = Viz.num(v, 2);
+    s.textContent = pc(v, 2);
     s.style.background = colorear === 'gris' ? gris(Viz.acotar(v, 0, 1))
                                              : pal((v / lim + 1) / 2);
     cont.appendChild(s);
@@ -331,13 +340,13 @@ function leer() {
   miniGrilla('c-parche', parche, 'gris');
   miniGrilla('c-filtro', filtroPlano);
   miniGrilla('c-prod', prod);
-  document.getElementById('c-res').textContent = Viz.num(suma, 2);
+  document.getElementById('c-res').textContent = pc(suma, 2);
 
   const nombre = { vertical: 'un detector de bordes verticales',
                    horizontal: 'un detector de bordes horizontales',
                    desenfoque: 'un promediador: borronea',
                    realce: 'un realzador: exagera las diferencias',
-                   diagonal: 'un detector de diagonales',
+                   diagonal: 'un detector de bordes diagonales: + arriba a la izquierda y − abajo a la derecha, así que se enciende en los bordes que van en la otra diagonal («/»), perpendiculares al cambio de signo',
                    identidad: 'la identidad: devuelve la imagen igual',
                    cero: 'nada: todo por cero es cero',
                    'a-mano': 'tuyo, hecho a mano',
@@ -346,6 +355,10 @@ function leer() {
   if (ctl.valores.preset === 'azar') {
     extra = ` Van <b>${estado.azares}</b> filtros al azar. ¿Cuántos sirvieron?`;
   }
+  document.getElementById('salida').setAttribute('aria-label',
+    'el mapa de activación de ' + IMAGENES[estado.imagen].nombre + ' con el filtro ' +
+    estado.filtro.map(f => f.map(v => pc(v, 2)).join(' ')).join(' / ') +
+    '; el píxel marcado da ' + pc(suma, 2));
   ctl.texto('lectura',
     `El filtro de ahora es <b>${nombre}</b>. Va por el píxel <b>${estado.hecho}</b> de ` +
     `<b>${M * M}</b> del mapa.${extra}`);

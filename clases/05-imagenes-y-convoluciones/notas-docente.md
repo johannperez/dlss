@@ -12,7 +12,8 @@
    **cambiaron las 784 variables al mismo tiempo**. Ahí queda instalada la pregunta del día.
 3. Aplanás una imagen delante de ellos y se ve dónde se perdió la vecindad.
 4. **Votan** si barajar los píxeles empeora el modelo. Casi todos dicen que sí.
-5. La viz muestra que la red densa saca **exactamente lo mismo**: nunca supo que había una grilla.
+5. La viz muestra que la red densa saca **prácticamente lo mismo** (dos décimas de diferencia: ruido de
+   inicialización): nunca supo que había una grilla.
 6. La solución es un gesto, no una fórmula: mirar de a nueve y deslizar la ventanita.
    Un filtro es un pincel; nueve números y ya tenés un detector de bordes.
 7. Practican. Escriben la convolución con dos `for` e inventan un filtro propio.
@@ -45,29 +46,32 @@ de datos y más fácil de engañar.*
 | **12-15** | 6 | Aplanar | Con el dedo: acá la grilla, acá la fila. Preguntás qué se perdió. |
 | **15-17** | 7 | **VOTACIÓN** | A mano alzada, contás en voz alta y anotás en el pizarrón. |
 | **17-23** | 8 | **VIZ barajado** | Barajar → tiras → barras. Después la pestaña «correrla». |
-| **23-25** | 9-10 | La conclusión + los tres supuestos | La analogía del marco teórico, textual. |
-| **25-28** | 11-12 | Mirar de a pedacitos y deslizar | El gesto con la mano. El nombre después. |
-| **28-36** | 13 | **VIZ kernel deslizante** | El guion de la sección 5 de estas notas. |
+| **23-27** | 9-10 | La conclusión + los tres supuestos | La analogía del marco teórico, textual. |
+| **27-30** | 11-12 | Mirar de a pedacitos y deslizar | El gesto con la mano. El nombre después. |
+| **30-36** | 13 | **VIZ kernel deslizante** | El guion de la sección 5 de estas notas. |
 | **36-40** | 14-15 | El pincel + se aprenden | El callback a la clase 2 y el cierre del «filtro al azar». |
 | **40-43** | 16 | La cuenta que importa | Los dos números en el pizarrón. |
 | **43-45** | 17 | Consignas del práctico 1 | Leelas en voz alta. |
 | **45-60** | — | **Práctico 1** | Notebook, secciones 1-3. Pasás por las mesas. |
 | **60-70** | **18** | **PAUSA** | Diez minutos. **No se toca.** Poné alarma. |
-| **70-74** | 19 | Volvimos: ¿qué filtro inventaron? | Proyectás dos o tres del aula. |
-| **74-78** | 20 | Apilar filtros | La segunda capa no mira la imagen. |
-| **78-83** | 21 | **VIZ jerarquía** | «La rueda» y «la multitud». Aclarás que es un esquema. |
-| **83-85** | 22-23 | Por qué profundo + pooling | La promesa de la clase 2, cobrada. Pooling en 30 s de verdad. |
-| **85-88** | 24-25 | La CNN completa + **la arquitectura es una teoría** | La slide central. Leela despacio. |
-| **88-94** | 26 | **VIZ supuestos** | Satelital primero; después «tabla de encuesta» y te callás. |
-| **94-95** | 27 | Consignas del práctico 2 | |
-| **95-108** | — | **Práctico 2** | De a dos. Secciones 4-5 del notebook. |
-| **108-110** | 28 | El resultado | Comparás con lo que les dio a ellos. |
-| **110-116** | 29-31 | El caso y las tres preguntas | El bloque de ciencias sociales. **Nunca se recorta.** |
-| **116-120** | 32-36 | Cierre | El lunes, otros usos, tres ideas, glosario, puente. |
+| **70-73** | 19 | Volvimos: ¿qué filtro inventaron? | Proyectás dos o tres del aula. |
+| **73-76** | 20 | Apilar filtros | La segunda capa no mira la imagen. |
+| **76-81** | 21 | **VIZ jerarquía** | «La rueda» y «la multitud». Aclarás que es un esquema. |
+| **81-83** | 22-23 | Por qué profundo + pooling | La promesa de la clase 2, cobrada. Pooling en 30 s de verdad. |
+| **83-85** | 24 | La CNN completa | El máximo del final es el que ignora el corrimiento. |
+| **85-88** | 25 | **La arquitectura es una teoría** | La slide central. Leela despacio. |
+| **88-93** | 26 | **VIZ supuestos** | Satelital primero; después «tabla de encuesta» y te callás. |
+| **93-94** | 27 | Consignas del práctico 2 | |
+| **94-107** | — | **Práctico 2** | De a dos, **13 minutos**. Secciones 4-5 del notebook. |
+| **107-109** | 28 | El resultado | Comparás con lo que les dio a ellos. |
+| **109-116** | 29-31 | El caso y las tres preguntas | El bloque de ciencias sociales. **Nunca se recorta.** |
+| **116-120** | 32-36 | Cierre | En tu investigación, otros usos, tres ideas, glosario, puente. |
 
-> **Ojo con el reloj.** El presupuesto oficial le da 20 minutos al práctico 2 (85-105) y 15 al
-> cierre. El plan de arriba le saca cinco minutos al práctico y se los da al bloque del caso,
-> porque el práctico se puede terminar en casa y **la lectura crítica no**.
+> **Ojo con el reloj.** La especificación le daba 20 minutos al práctico 2 y 15 al cierre, y
+> así no entra en 120. Este plan —que es el que suman las notas de cada slide— le da **13** al
+> práctico 2 (la slide 27 dice «trece minutos»), 2 al resultado, 7 al caso con las tres
+> preguntas y 4 al cierre. El práctico se puede terminar en casa (lo que falte de la sección
+> 5: es un rato corto, cabe de sobra antes de la clase que viene); **la lectura crítica no**.
 
 ---
 
@@ -81,7 +85,7 @@ de datos y más fácil de engañar.*
 | Slide 7 | **"¿A, B o C? Voten."** | Sin la apuesta previa, la viz que sigue es un dibujito lindo. |
 | Slide 8, después de barajar | "¿Quién había votado A?" | El error público sin costo. Es el motor de la clase. |
 | Slide 13 (viz) | "¿Cuántos filtros al azar sirvieron?" | Prepara la slide 15: por eso se **aprenden**. |
-| Slide 16 | "¿De dónde sale que 288 alcancen?" | Que aparezca «se reusan los mismos nueve números». |
+| Slide 16 | "¿De dónde sale que 144 alcancen?" | Que aparezca «se reusan los mismos nueve números». |
 | Slide 25 | **"¿Alguien puede darme un supuesto de este tipo en su propio trabajo?"** | El momento en que la clase deja de ser sobre CNNs. |
 | Slide 26 (viz) | "Si reordenás las columnas de tu CSV, ¿cambió algo?" | Demuele el supuesto de vecindad para tablas, en una línea. |
 | Práctico 2 | "¿Qué tienen en común los errores?" | La pregunta profesional de toda la clase. |
@@ -97,8 +101,8 @@ no en el modelo"*.
 
 **"Es que barajar destruye la información."** Es la objeción más frecuente y es *falsa*: una
 permutación es reversible, no se pierde ni un número. Por eso la viz muestra las dos tiras de
-784 valores. Si alguien insiste, mostrá el `assert` del notebook: `np.allclose(originales
-ordenados, barajados ordenados)` da `True`.
+784 valores. Si alguien insiste, mostrá el chequeo `revisar(...)` de la sección 2 del notebook:
+`np.allclose(originales ordenados, barajados ordenados)` da `True`.
 
 **"Entonces la CNN es mejor."** Frená ahí. La CNN es mejor **para datos con grilla**.
 Prometeles que después de la pausa vas a mostrar un caso donde es peor que casi todo, y cumplilo
@@ -110,8 +114,10 @@ rotadas 90°, la CNN se cae. Se arregla con *data augmentation* (entrenar con co
 es admitir el supuesto y comprarlo con datos. Es la pregunta 4 del cuestionario.
 
 **"Mi archivo tiene 300 fotos, no 12.000."** Esa es la buena noticia del día: es exactamente el
-régimen donde el sesgo inductivo paga. Y es la puerta a la clase 9 (usar un modelo ya entrenado
-por otro). Anotá quién lo preguntó: tiene una monografía ahí.
+régimen donde el sesgo inductivo paga. Y es la puerta a la transferencia (usar un modelo ya
+entrenado por otro): la clase 9 la muestra con texto, y con imágenes la receta es la misma
+(un ResNet de `torchvision`, por ejemplo). No prometas un ejercicio de imágenes en la 9: no lo
+hay. Anotá quién lo preguntó: tiene una monografía ahí.
 
 ---
 
@@ -144,7 +150,8 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
 | **Pánico con las dimensiones** | Se pierden con `(batch, canales, alto, ancho)` y se frustran con los errores de forma. | La mnemotecnia: *cuántas fotos, cuántas capas de color, cuán alta, cuán ancha*. Y **enseñales a leer el error**: «expected 4-dimensional input… got 2-dimensional» te está diciendo qué falta. Leer errores es contenido. |
 | **Querer entender pooling/stride/padding a fondo** | Se traban en detalles. | Decilo explícito: *"esto es plomería. El día que armes una red lo googleás. No son conceptos."* |
 | **«Entonces mido pobreza con satélites y listo»** | Entusiasmo acrítico con el caso. | Slides 30-31, y la pregunta que ordena todo: **¿qué está midiendo realmente?** |
-| **«¿Por qué el mapa sale más chico?»** | Confusión con las formas de salida. | La ventana no se puede asomar afuera de la foto: pierde un píxel de cada lado. Nada más. |
+| **«¿Por qué el mapa sale más chico?»** | Confusión con las formas de salida. | La ventana no se puede asomar afuera de la foto: pierde un píxel de cada lado. En la CNN del notebook se le pone un marco de ceros (`padding=1`) y no se achica; el 28 → 14 → 7 viene del pooling. Plomería. |
+| **«Invariante» o «equivariante»** | Quien leyó Goodfellow cap. 9 encuentra «equivariante» y cree que la clase se contradice. | Las dos cosas son ciertas en lugares distintos: la convolución *acompaña* el corrimiento (el mapa se corre con la foto: equivariancia); el máximo final lo *ignora* (invariancia). La frase de la slide 25 es la del modelo entero. |
 
 ---
 
@@ -155,7 +162,7 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
 1. **Slide 23 (pooling).** Es plomería declarada. Decí una frase y pasá.
 2. **Slide 33 (otros usos en ciencias sociales).** Mandalo por mail; está escrito.
 3. **Slide 22 (por qué profundo).** Duele, pero se puede resumir en la 21 mientras mostrás la viz.
-4. **Cinco minutos del práctico 2.** El notebook se puede terminar en casa; lo que no se puede
+4. **Unos minutos del práctico 2.** El notebook se puede terminar en casa; lo que no se puede
    es hacer la lectura crítica sin docente.
 
 **Lo que NUNCA se recorta, en ningún escenario:**
@@ -176,11 +183,13 @@ Si tenés que elegir entre terminar el práctico 2 y hacer el bloque 29-31, hac�
 
 - **Volvé a la viz del kernel y dejá que un estudiante maneje.** Que elija imagen y filtro y
   narre lo que ve. Es la mejor forma de comprobar si el vocabulario quedó.
-- **Abrí la viz de supuestos y recorré las cinco opciones de datos**, no sólo dos. La de «una
+- **Abrí la viz de supuestos y recorré las seis opciones de datos**, no sólo dos. La de «una
   red de contactos» genera buena discusión.
 - **La pregunta de la rotación**: mostrala en el notebook rotando `X_te` con
-  `torch.rot90(X_te, 1, (2, 3))` y midiendo. Se cae. Es un minuto y vale oro.
-- **Adelantá la conversación de la clase 9**: "¿y si no tengo 12.000 imágenes etiquetadas?".
+  `torch.rot90(X_te, 1, (2, 3))` y midiendo. Se cae (medido: 87,7 % → 7,5 %, por debajo del
+  azar). Es un minuto y vale oro.
+- **Adelantá la conversación de la transferencia**: "¿y si no tengo 12.000 imágenes
+  etiquetadas?". La clase 9 la hace con texto; acá alcanza con plantear la pregunta.
 
 ---
 
@@ -214,10 +223,10 @@ gran analogía y conviene usarla, no esquivarla.
 
 **«¿Cuántas imágenes etiquetadas necesito para mi archivo?»**
 Honestamente: depende de qué tan separables sean tus categorías, y no hay número mágico. Órdenes
-de magnitud realistas: con **100-300 por clase** y un modelo ya entrenado por otro (clase 9) se
-puede empezar a mirar algo; entrenando desde cero, como hoy, necesitás miles. La respuesta
-metodológica es mejor que la técnica: **etiquetá 100, medí, y decidí si vale la pena seguir
-etiquetando.** Es exactamente el mismo razonamiento que con codificadores humanos.
+de magnitud realistas: con **100-300 por clase** y un modelo ya entrenado por otro (la
+transferencia; la clase 9 la muestra con texto) se puede empezar a mirar algo; entrenando
+desde cero, como hoy, necesitás miles. La respuesta metodológica es mejor que la técnica:
+**etiquetá 100, medí, y decidí si vale la pena seguir etiquetando.** Es exactamente el mismo razonamiento que con codificadores humanos.
 
 **«¿Esto no es una caja negra? ¿Cómo lo justifico ante un revisor?»**
 Es una caja negra en el sentido de que no podés leer la regla; no lo es en el sentido de que
@@ -251,10 +260,17 @@ mundo, exactamente igual.
 
 - [ ] `slides.html` abre con doble clic, sin internet, y las cuatro viz cargan adentro.
 - [ ] Probaste las viz **sueltas** en pantalla completa: son las que vas a proyectar.
-- [ ] Corriste el notebook entero una vez esta semana (**tarda unos 2 minutos** en CPU:
-      medido acá, entre 81 y 116 s según la carga; en Colab, 3-4 min).
+- [ ] Corriste el notebook entero después del último `git pull`, en la máquina (o el Colab)
+      desde donde vas a proyectar (**tarda unos 2 minutos** en CPU; en Colab, 3-4 min).
+      Anotá tus números: con otra versión de PyTorch pueden diferir en unas décimas de los
+      de las slides, y conviene que lo digas antes de que alguien lo descubra.
 - [ ] Tenés la alarma de la pausa puesta.
-- [ ] Sabés de memoria los cuatro números de la slide 28: **85,8 / 85,6 / 87,8 / 83,2**,
-      y el par de la foto corrida: **32,3** contra **74,1**.
+- [ ] Sabés de memoria el patrón de la slide 28, más que los dígitos: la densa **85,7 → 85,5**
+      (no pierde nada), la CNN **87,7 → 83,1** (pierde unos 4 o 5 puntos), y la foto corrida
+      3 píxeles: densa **32,2** contra CNN **74,4**. Son los de la corrida de referencia
+      (torch 2.14, en `datos-experimentos.json`, que guarda las versiones). **No prometas que
+      les va a dar idéntico**: la semilla fija la corrida en la misma máquina y con las mismas
+      versiones; con otras, cambian unas décimas. Con otras semillas la densa se mueve menos de
+      un punto y la CNN pierde entre 2 y 5 al barajar: el patrón se sostiene.
 - [ ] Si conseguiste una foto real de una movilización con licencia libre, ponela en la slide 3
       en lugar del esquema sintético. El esquema funciona, pero una foto de verdad funciona mejor.

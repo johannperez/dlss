@@ -23,12 +23,14 @@ En el orden en que conviene leerlas.
 **1. Jean, N., Burke, M., Xie, M., Davis, W. M., Lobell, D. B. & Ermon, S. (2016).
 *Combining satellite imagery and machine learning to predict poverty*. Science, 353(6301),
 790-794.** `[VERIFICAR URL]` · DOI: 10.1126/science.aaf7894
-> **La lectura obligatoria de esta clase.** Es el caso de las slides 29-31, y es el mejor ejemplo
+> **La lectura recomendada de esta clase** (no es para la clase que viene: una hora, cuando
+> puedas). Es el caso de las slides 29-31, y es el mejor ejemplo
 > disponible de una CNN haciendo algo que a las ciencias sociales le importa de verdad: producir
 > estimaciones de bienestar en regiones donde no hay encuestas. Leelo con las tres preguntas al
 > lado y prestá especial atención a **cómo describen la validación**: qué partición usaron y hasta
-> dónde dicen que se puede extrapolar. No lo leas para aprender la técnica; leelo para practicar
-> el modo de leer.
+> dónde dicen que se puede extrapolar. Fijate en una limitación que reportan ellos mismos: el
+> modelo distingue mal *entre los más pobres* (debajo de la línea de pobreza). No lo leas para
+> aprender la técnica; leelo para practicar el modo de leer.
 > *Empezá por acá.* Una hora con las notas suplementarias por encima.
 
 **2. Documentación de PyTorch — tutorial *Training a Classifier* (parte de «Deep Learning with
@@ -36,7 +38,7 @@ PyTorch: A 60 Minute Blitz»).** `[VERIFICAR URL]`
 > El mismo recorrido del notebook de hoy, escrito por los autores de la biblioteca: cargar
 > imágenes, definir una CNN, entrenarla, mirar los errores. **Sólo esa página.** Buscalo como
 > "PyTorch tutorial Training a Classifier". Sirve sobre todo para acostumbrar el ojo a la
-> cuaterna `(batch, canales, alto, ancho)`, que es donde todo el mundo tropieza la primera semana.
+> cuaterna `(batch, canales, alto, ancho)`, que es donde todo el mundo tropieza la primera vez.
 > 40 minutos.
 
 **3. Olah, C., Mordvintsev, A. & Schubert, L. (2017). *Feature Visualization*. Distill.**
@@ -105,7 +107,10 @@ Machine Learning and the Social Sciences*. Princeton University Press.** `[VERIF
 > El tratamiento canónico, con matemática. **Sólo si querés la formalización.** Las secciones 9.1
 > a 9.3 explican con precisión las tres ideas de la clase de hoy —conexiones dispersas, parámetros
 > compartidos, representaciones equivariantes— y verlas escritas con símbolos, *después* de
-> haberlas manoseado con el slider, es una experiencia distinta a verlas antes.
+> haberlas manoseado con el slider, es una experiencia distinta a verlas antes. Ojo con una
+> palabra: el libro dice que la convolución es **equivariante** (si corrés la foto, el mapa se
+> corre igual) y en clase dijimos «invariancia traslacional». No se contradicen: la invariancia
+> («me da igual dónde») la pone el máximo o el pooling del final, no la convolución sola.
 > Tres horas si lo trabajás.
 
 **10. Rolf, E., Proctor, J., Carleton, T., Bolliger, I., Shankar, V., Ishihara, M., Recht, B. &
@@ -143,8 +148,9 @@ satellite imagery*. Nature Communications, 12, 4392.** `[VERIFICAR URL]` · DOI 
 **13. Krizhevsky, A., Sutskever, I. & Hinton, G. E. (2012). *ImageNet Classification with Deep
 Convolutional Neural Networks*. NeurIPS 2012.** `[VERIFICAR URL]`
 > El paper que arrancó todo esto. No lo pongas como lectura del curso —es técnico y de 2012—,
-> pero conviene tener presente la escena: en un año se pasó de un error del 26 % al 15 % en una
-> competencia estancada, y eso reorientó un campo entero. Sirve para contestar «¿por qué ahora?»
+> pero conviene tener presente la escena: en un año se pasó de un error del 26 % al 15 % (error
+> top-5) en una competencia que venía mejorando de a poco (28 % en 2010, 26 % en 2011), y eso
+> reorientó un campo entero. Sirve para contestar «¿por qué ahora?»
 > sin mitología.
 
 **14. LeCun, Y., Bottou, L., Bengio, Y. & Haffner, P. (1998). *Gradient-based learning applied to
