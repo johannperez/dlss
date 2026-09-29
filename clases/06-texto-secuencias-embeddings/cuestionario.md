@@ -77,8 +77,9 @@ parlamentarios. Se ven cuatro grupos:
             │
    escuela  │              inflación
    docentes │              precios      dólar
-   alumnos  │   OBRA         déficit
-   maestros │  PÚBLICA
+ LICITACIÓN │              déficit
+   alumnos  │
+   maestros │
   ──────────┼──────────────────────────────  dimensión 1
    senadores│
    diputados│    hospital   médicos

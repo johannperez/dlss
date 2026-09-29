@@ -16,7 +16,7 @@ Uso:
 
     PYTHONPATH=_shared python3 clases/06-texto-secuencias-embeddings/medir-embeddings.py
 
-Tarda ~15 segundos en CPU y escribe tres archivos:
+Tarda menos de un minuto en CPU y escribe tres archivos:
 
     datos-embeddings.js            el mapa completo (2000 x 100) — la viz central
     datos-texto.js                 la parte liviana — tokenizador, one-hot, frases
@@ -26,11 +26,20 @@ Deja además dos `.npz` de cache al lado para que una segunda corrida sea
 instantánea. **Esos `.npz` no van al repo**: son reproducibles corriendo esto, y
 el script los regenera solo si no están. Borralos cuando termines (y siempre que
 toques CONFIG).
+
+Reproducibilidad: el resultado es **determinista en la misma máquina y con las
+mismas versiones de las librerías** (quedan anotadas en `meta.versiones`). Con
+otra versión de numpy/LAPACK, el SVD puede devolver cada dirección con el signo
+cambiado; por eso acá se fija el signo a mano (de cada dimensión del embedding
+y de los dos ejes del mapa), y el dibujo no se espeja al regenerar. Los demás
+números pueden moverse en el tercer decimal. Al final, el script compara lo que
+midió contra los números que citan las slides y avisa si alguno cambió.
 """
 from __future__ import annotations
 
 import json
 import pathlib
+import platform
 import re
 import sys
 import time
@@ -121,11 +130,32 @@ def embeddings(texto, **cfg):
     return V, palabras, time.time() - t0
 
 
-def pca2d(V):
+def fijar_signo_columnas(V):
+    """El SVD devuelve cada dirección con un signo arbitrario (depende de la
+    versión de LAPACK). Lo fijamos: en cada columna, la entrada más grande en
+    valor absoluto queda positiva. No cambia ninguna similitud coseno."""
+    V = np.array(V, dtype=np.float32, copy=True)
+    k = np.abs(V).argmax(axis=0)
+    V *= np.sign(V[k, np.arange(V.shape[1])])[None, :]
+    return V
+
+
+# Anclas para el signo de los dos ejes del mapa: sin esto, otra versión de
+# numpy puede dibujar el mapa espejado. Elegidas porque quedan lejos del cero
+# en cada eje: «educación» a la derecha, «inflación» abajo (así quedó el mapa
+# que se usó para armar la clase).
+ANCLA_X, ANCLA_Y = "educación", "inflación"
+
+
+def pca2d(V, palabras):
     """PCA a mano: centrar y quedarse con las dos direcciones más grandes."""
     X = V - V.mean(axis=0, keepdims=True)
     U, S, Wt = np.linalg.svd(X, full_matrices=False)
     XY = U[:, :2] * S[:2]
+    if ANCLA_X in palabras and XY[palabras.index(ANCLA_X), 0] < 0:
+        XY[:, 0] *= -1
+    if ANCLA_Y in palabras and XY[palabras.index(ANCLA_Y), 1] > 0:
+        XY[:, 1] *= -1
     var = float((S[:2] ** 2).sum() / (S ** 2).sum())
     return XY, var
 
@@ -213,6 +243,7 @@ def main():
         V, palabras, seg = embeddings(texto, **CONFIG)
         np.savez_compressed(cache, V=V, palabras=np.array(palabras), seg=seg)
         print(f"  {V.shape} en {seg:.0f} s")
+    V = fijar_signo_columnas(V)
     idx = {p: i for i, p in enumerate(palabras)}
 
     # --- frecuencias (para ordenar el mapa) ---------------------------------
@@ -224,7 +255,7 @@ def main():
     # --- el mapa -----------------------------------------------------------
     mapa = palabras[:N_MAPA]
     Vm = V[:N_MAPA]
-    XY, var2d = pca2d(Vm)
+    XY, var2d = pca2d(Vm, mapa)
     # Normalizamos CADA EJE por separado a [-1, 1]. Ojo: eso reescala los dos
     # ejes distinto, así que la nube llena el recuadro y los grupos se ven.
     # La viz lo dice en el pie: las distancias que valen son las de las 100
@@ -269,6 +300,11 @@ def main():
             "semilla": SEMILLA,
             "config": CONFIG,
             "generado_por": "clases/06-texto-secuencias-embeddings/medir-embeddings.py",
+            "versiones": {"python": platform.python_version(),
+                          "numpy": np.__version__},
+            "nota_reproducibilidad": "determinista en la misma máquina y con las "
+                                     "mismas versiones; el signo del SVD y del PCA "
+                                     "se fija a mano",
         },
         "mapa": {
             "palabras": mapa,
@@ -324,36 +360,46 @@ def main():
 
     # Cada analogía viene con lo que UNA PERSONA esperaría de antemano
     # (`esperado`), y `acierta` se calcula: ¿está esa palabra entre las 5 que
-    # devuelve el modelo? No se elige después de mirar el resultado. Con un
-    # corpus de 350.000 tokens, casi ninguna acierta, y eso es el contenido.
+    # devuelve el modelo? No se elige después de mirar el resultado.
+    #
+    # OJO CON EL ORDEN DE LA RESTA. `a − b + c ≈ d` codifica «b es a a como c
+    # es a d»: el vector (a − b) es la relación, y se la aplicamos a c.
+    #   rey − hombre + mujer = reina   →   hombre : rey :: mujer : reina
+    # Una versión anterior de este archivo tenía siete analogías con la resta
+    # al revés (por ejemplo `senadores − senado + diputados`, que le aplica
+    # «cuerpo → miembros» a «diputados») y medía «2 de 10». Bien planteadas
+    # aciertan 5. Las invertidas quedan abajo, en `aritmetica_invertida`,
+    # porque ese error de planteo es en sí mismo una lección de medición.
     candidatos = [
         ("inflación", "precios", "desempleo", "desocupación",
          "la relación «el problema y su síntoma» sí queda dibujada en el espacio"),
         ("presidente", "ejecutivo", "legislativo", "asamblea",
          "el corpus está lleno de «Asamblea Legislativa»: la analogía funciona "
          "porque la frase existe, no porque el modelo razone"),
-        ("córdoba", "provincia", "salta", "provincias",
-         "no devuelve «provincias», devuelve OTRAS provincias (formosa, mendoza, "
-         "catamarca). El barrio es el correcto, la casa no"),
-        ("escuelas", "escuela", "hospitales", "hospital",
-         "plural → singular: no lo captura. El singular de una palabra rara "
-         "aparece poco y su vector es peor"),
-        ("senadores", "senado", "diputados", "cámara",
-         "la relación «cuerpo → sus miembros» no está: devuelve otros cargos"),
+        ("nación", "nacional", "provincial", "provincia",
+         "adjetivo → sustantivo: no está. Devuelve «asamblea, legislativa, "
+         "cámara»: otra vez manda la colocación, no la relación"),
+        ("escuela", "escuelas", "hospitales", "hospital",
+         "plural → singular: no lo captura. «hospital» aparece poco y su "
+         "vector es peor"),
+        ("senado", "senadores", "diputados", "cámara",
+         "«miembros → su cuerpo» aparece (3.ª), detrás de «carlos» y "
+         "«señor»: el barrio es el correcto, con ruido"),
         ("mujeres", "hombres", "niños", "niñas",
-         "«niñas» ni siquiera está en el vocabulario del corpus. Ese dato "
-         "también es un hallazgo sobre de qué se habla y de qué no"),
-        ("leyes", "ley", "decretos", "decreto",
-         "otra vez plural → singular. No hay relación morfológica en el espacio"),
-        ("ministro", "ministerio", "juez", "justicia",
-         "devuelve nombres propios y causas: el corpus habla de jueces "
-         "concretos, no de la categoría"),
-        ("educación", "escuelas", "salud", "hospitales",
-         "devuelve palabras de política pública en general: el espacio agrupa "
-         "por tema, no por la relación específica"),
-        ("importaciones", "importar", "exportaciones", "exportar",
-         "sustantivo → verbo tampoco. Los verbos aparecen en contextos muy "
-         "distintos de los sustantivos"),
+         "«niñas» ni siquiera entra al vocabulario de 2.000 palabras (aparece "
+         "11 veces). Ese dato también es un hallazgo sobre de qué se habla"),
+        ("ley", "leyes", "decretos", "decreto",
+         "otra vez plural → singular, y otra vez no. No hay relación "
+         "morfológica en el espacio"),
+        ("ministerio", "ministro", "juez", "justicia",
+         "devuelve causas y expedientes (amia, causa, declaración): el corpus "
+         "habla de jueces concretos, no de la categoría"),
+        ("escuelas", "educación", "salud", "hospitales",
+         "«el edificio de cada área» aparece (5.ª), mezclado con viviendas y "
+         "centros: el espacio agrupa sobre todo por obra pública"),
+        ("importar", "importaciones", "exportaciones", "exportar",
+         "sustantivo → verbo sale (3.ª), detrás de «trigo» y «carne», que es "
+         "lo que se exporta"),
     ]
     salida["aritmetica"] = []
     for a, b, c, esperado, nota in candidatos:
@@ -364,10 +410,32 @@ def main():
             "a": a, "b": b, "c": c, "esperado": esperado, "nota": nota,
             "esperado_en_vocab": esperado in idx,
             "acierta": esperado in [w for w, _ in r],
+            "primera": bool(r and r[0][0] == esperado),
             "resultados": r,
         })
     n_ok = sum(1 for x in salida["aritmetica"] if x["acierta"])
-    print(f"  aritmética: {n_ok} de {len(salida['aritmetica'])} analogías aciertan")
+    n_top1 = sum(1 for x in salida["aritmetica"] if x["primera"])
+    print(f"  aritmética: {n_ok} de {len(salida['aritmetica'])} analogías aciertan "
+          f"entre las 5 primeras; {n_top1} sale primera")
+
+    # las mismas relaciones, con la resta al revés: el error de planteo
+    invertidas = [("senadores", "senado", "diputados", "cámara"),
+                  ("escuelas", "escuela", "hospitales", "hospital"),
+                  ("leyes", "ley", "decretos", "decreto"),
+                  ("ministro", "ministerio", "juez", "justicia"),
+                  ("educación", "escuelas", "salud", "hospitales"),
+                  ("importaciones", "importar", "exportaciones", "exportar")]
+    salida["aritmetica_invertida"] = []
+    for a, b, c, esperado in invertidas:
+        r = aritmetica(a, b, c)
+        if r is None:
+            continue
+        salida["aritmetica_invertida"].append({
+            "a": a, "b": b, "c": c, "esperado": esperado,
+            "acierta": esperado in [w for w, _ in r], "resultados": r})
+    n_inv = sum(1 for x in salida["aritmetica_invertida"] if x["acierta"])
+    print(f"  con la resta al revés: {n_inv} de "
+          f"{len(salida['aritmetica_invertida'])} aciertan")
 
     # --- ejes (el modo del paper de Kozlowski et al.) -----------------------
     def proyectar(pos, neg, lista):
@@ -401,6 +469,11 @@ def main():
         {"id": "tiempo", "pos": "futuro", "neg": "pasado",
          "etiqueta": "futuro ←→ pasado",
          "listas": {"ocupaciones": ocupaciones, "conceptos": conceptos}},
+        # («oficialismo» aparece 6 veces y no entra al vocabulario: por eso el
+        #  eje político es gobierno ←→ oposición)
+        {"id": "politica", "pos": "oposición", "neg": "gobierno",
+         "etiqueta": "gobierno ←→ oposición",
+         "listas": {"ocupaciones": ocupaciones, "conceptos": conceptos}},
     ]
     salida["ejes"] = []
     for e in ejes:
@@ -414,19 +487,26 @@ def main():
                                    "etiqueta": e["etiqueta"], "listas": listas})
 
     # --- dos épocas: cambio semántico ---------------------------------------
-    print("Embeddings por época...")
+    # Y la vara del ruido: el mismo corpus partido en dos mitades SIN corte
+    # temporal (los discursos alternados, uno y uno). Si entre dos mitades
+    # cualesquiera ya cambian la mitad de las vecinas, un cambio entre épocas
+    # sólo dice algo si es bastante más grande que ése.
+    print("Embeddings por época (y por mitades alternadas, la vara del ruido)...")
     epocas = [("1984-1999", [a for a in anios if a <= 1999]),
               ("2004-2019", [a for a in anios if a >= 2004])]
+    mitades = [("mitad A", anios[0::2]), ("mitad B", anios[1::2])]
+    CFG_EP = dict(dim=60, top=1200, ventana=5, minimo=4)
     cache_ep = AQUI / "cache-epocas.npz"
-    guardar_ep = {}
+    pares_ep = {}
     if cache_ep.exists():
         z = np.load(cache_ep, allow_pickle=True)
-        pares_ep = {k: (z[k + "_V"], list(z[k + "_p"])) for k, _ in epocas}
-    else:
-        pares_ep = {}
-        for nombre, aa in epocas:
+        if all(k + "_V" in z.files for k, _ in epocas + mitades):
+            pares_ep = {k: (z[k + "_V"], list(z[k + "_p"])) for k, _ in epocas + mitades}
+    if not pares_ep:
+        guardar_ep = {}
+        for nombre, aa in epocas + mitades:
             t = "\n".join(porAnio[a] for a in aa)
-            Ve, pe, se = embeddings(t, dim=60, top=1200, ventana=5, minimo=4)
+            Ve, pe, se = embeddings(t, **CFG_EP)
             print(f"  {nombre}: {len(aa)} discursos, vocab {len(pe)}, {se:.0f} s")
             pares_ep[nombre] = (Ve, pe)
             guardar_ep[nombre + "_V"] = Ve
@@ -434,19 +514,44 @@ def main():
         np.savez_compressed(cache_ep, **guardar_ep)
 
     comunes = None
-    for nombre, _ in epocas:
-        s = set(pares_ep[nombre][1])
-        comunes = s if comunes is None else (comunes & s)
+    for nombre, _ in epocas + mitades:
+        s_ = set(pares_ep[nombre][1])
+        comunes = s_ if comunes is None else (comunes & s_)
     interes = [w for w in mapa[:400] if w in comunes and w not in FUNCION][:220]
     salida["epocas"] = {"nombres": [n for n, _ in epocas], "palabras": interes,
-                        "vecinos": {}}
-    for nombre, _ in epocas:
+                        "discursos": [len(aa) for _, aa in epocas],
+                        "config": CFG_EP, "vecinos": {},
+                        "mitades": {"como": "discursos alternados, uno y uno",
+                                    "discursos": [len(aa) for _, aa in mitades],
+                                    "siguen": {}}}
+
+    def vecinas_ep(nombre, w):
         Ve, pe = pares_ep[nombre]
         ie = {p: i for i, p in enumerate(pe)}
-        salida["epocas"]["vecinos"][nombre] = {
-            w: vecinos_de(w, Ve, pe, ie, k=8, excluir_funcion=True)
-            for w in interes
-        }
+        return vecinos_de(w, Ve, pe, ie, k=8, excluir_funcion=True)
+
+    for nombre, _ in epocas:
+        salida["epocas"]["vecinos"][nombre] = {w: vecinas_ep(nombre, w) for w in interes}
+    for w in interes:
+        a_ = {x for x, _ in vecinas_ep("mitad A", w)}
+        b_ = {x for x, _ in vecinas_ep("mitad B", w)}
+        salida["epocas"]["mitades"]["siguen"][w] = len(a_ & b_)
+
+    def siguen_epocas(w):
+        va = {x for x, _ in salida["epocas"]["vecinos"][epocas[0][0]][w]}
+        vb = {x for x, _ in salida["epocas"]["vecinos"][epocas[1][0]][w]}
+        return len(va & vb)
+
+    if "seguridad" in interes:
+        print(f"  «seguridad»: entre épocas siguen {siguen_epocas('seguridad')} de 8; "
+              f"entre mitades alternadas, "
+              f"{salida['epocas']['mitades']['siguen']['seguridad']} de 8")
+    prom_ep = np.mean([siguen_epocas(w) for w in interes])
+    prom_mi = np.mean(list(salida["epocas"]["mitades"]["siguen"].values()))
+    salida["epocas"]["promedio_siguen"] = {"epocas": round(float(prom_ep), 2),
+                                           "mitades": round(float(prom_mi), 2)}
+    print(f"  promedio sobre {len(interes)} palabras: siguen {prom_ep:.2f} de 8 entre "
+          f"épocas y {prom_mi:.2f} de 8 entre mitades")
 
     # --- BPE ----------------------------------------------------------------
     print("BPE...")
@@ -518,7 +623,8 @@ def main():
          "roles_a": {"agente": "la comisión", "paciente": "al ministro"},
          "roles_b": {"agente": "el ministro", "paciente": "a la comisión"},
          "humano": "Acá la bolsa no queda idéntica del todo: cambian los "
-                   "artículos («al» contra «a la»). Ninguna palabra con "
+                   "artículos («al» de un lado, «a» + «el» del otro). "
+                   "Ninguna palabra con "
                    "contenido cambia. Y como casi todo pipeline de texto tira "
                    "las palabras vacías antes de contar, en la práctica el "
                    "vector que llega al modelo es el mismo."},
@@ -602,6 +708,41 @@ def main():
     salida["onehot"] = onehot
     print("    one-hot: cos(diputados,senadores) =",
           onehot["coseno"][0][1], "· cos(diputados,trigo) =", onehot["coseno"][0][-1])
+
+    # --- chequeo: ¿siguen valiendo los números que citan las slides? --------
+    # Si regenerás con otra versión de numpy y algo de esto cambia, el script
+    # lo avisa: hay que actualizar slides, notas y VERIFICACION.md a mano.
+    arit = salida["aritmetica"]
+    medidos = {
+        "tokens": salida["meta"]["tokens"],
+        "hapax": salida["meta"]["hapax"],
+        "cos(diputados, senadores)": onehot["coseno"][0][1],
+        "cos(diputados, trigo)": onehot["coseno"][0][-1],
+        "analogías que aciertan (top 5)": sum(x["acierta"] for x in arit),
+        "analogías que salen primeras": sum(x["primera"] for x in arit),
+        "analogías invertidas que aciertan": n_inv,
+        "vecinas de «seguridad» que siguen entre épocas": siguen_epocas("seguridad"),
+        "vecinas de «seguridad» que siguen entre mitades":
+            salida["epocas"]["mitades"]["siguen"].get("seguridad"),
+        "coseno del par de la negación": next(
+            x["coseno_promedio"] for x in salida["frases"] if x["id"] == "negacion"),
+    }
+    CITADOS = {
+        "tokens": 347714, "hapax": 9712,
+        "cos(diputados, senadores)": 0.863, "cos(diputados, trigo)": 0.031,
+        "analogías que aciertan (top 5)": 5, "analogías que salen primeras": 1,
+        "analogías invertidas que aciertan": 0,
+        "vecinas de «seguridad» que siguen entre épocas": 2,
+        "vecinas de «seguridad» que siguen entre mitades": 4,
+        "coseno del par de la negación": 0.9842,
+    }
+    distintos = [(k, CITADOS[k], v) for k, v in medidos.items() if v != CITADOS[k]]
+    if distintos:
+        print("\n[!] Cambiaron números que la clase cita (¿otra versión de numpy?):")
+        for k, antes, ahora in distintos:
+            print(f"    {k}: la clase dice {antes}, ahora da {ahora}")
+    else:
+        print("\nChequeo: los números que citan las slides coinciden con esta corrida.")
 
     # --- a disco ------------------------------------------------------------
     js = AQUI / "datos-embeddings.js"

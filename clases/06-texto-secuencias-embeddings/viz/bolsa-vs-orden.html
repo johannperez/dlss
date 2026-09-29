@@ -33,6 +33,9 @@
   .conteos span.dif { background: var(--c-error-suave); color: var(--c-error); font-weight: 700; }
   .promedio { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; margin-top: .2rem; }
   .promedio > i { display: block; padding-top: 100%; border-radius: 2px; }
+  /* el signo no puede depender sólo del color: los negativos van rayados */
+  .promedio > i.neg { background-image: repeating-linear-gradient(45deg,
+      transparent 0 2px, var(--papel) 2px 3px); }
   .roles { font-size: .86rem; }
   .roles b { font-family: var(--f-mono); color: var(--c-acento); }
 
@@ -105,13 +108,17 @@ const cajaHum = document.getElementById('humano');
 
 function tiras(vec) {
   if (!vec) return '';
-  // misma convención que la clase 5: azul negativo, rojo positivo
+  // misma convención que la clase 5: azul negativo (y rayado), rojo positivo
   const M = Math.max.apply(null, vec.map(Math.abs)) || 1;
-  return '<div class="promedio">' + vec.map(v => {
+  const nNeg = vec.filter(v => v < 0).length;
+  return '<div class="promedio" role="img" aria-label="' + vec.length +
+    ' números del promedio: ' + (vec.length - nNeg) + ' positivos, ' + nNeg +
+    ' negativos">' + vec.map(v => {
     const t = v / M;
     const c = t >= 0 ? Viz.alfa('error', .1 + Math.abs(t) * .9)
                      : Viz.alfa('modelo', .1 + Math.abs(t) * .9);
-    return '<i style="background:' + c + '" title="' + v + '"></i>';
+    return '<i class="' + (t < 0 ? 'neg' : '') + '" style="background-color:' + c +
+           '" title="' + String(v).replace('.', ',') + '"></i>';
   }).join('') + '</div>';
 }
 
@@ -162,7 +169,7 @@ function pintar() {
   cajaVer.innerHTML =
     '<div class="fila">' +
       '<div><span class="numeron">' + Viz.num(cos, 3).replace('.', ',') + '</span>' +
-      '<div class="etiqueta-chica">parecido entre los dos promedios</div></div>' +
+      '<div class="etiqueta-chica">similitud coseno entre los dos promedios</div></div>' +
       '<div style="flex:1;min-width:16rem">' +
       '<p style="margin:0">' +
       (iguales
@@ -173,7 +180,7 @@ function pintar() {
           'Ni con conteos, ni con embeddings promediados.'
         : '<b>Las tablas difieren en ' +
           par.conteos.filter((w, k) => par.conteo_a[k] !== par.conteo_b[k]).length +
-          ' palabra(s)</b>, marcadas en rojo. El parecido entre los promedios ' +
+          ' palabra(s)</b>, marcadas en rojo y en negrita. El parecido entre los promedios ' +
           'igual da <b>' + Viz.num(cos, 3).replace('.', ',') + '</b>: para casi ' +
           'cualquier umbral que uses, esto es "el mismo documento".') +
       '</p></div>' +

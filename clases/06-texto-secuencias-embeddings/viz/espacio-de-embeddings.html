@@ -17,10 +17,12 @@
           Y esa es, tal cual, la metodología de Kozlowski, Taddy & Evans (2019)
           en la American Sociological Review.
 
-     Y el contra-veneno, que es igual de importante: el botón
-     "ejemplos que NO funcionan" de la aritmética. De 10 analogías con una
-     expectativa escrita de antemano, aciertan 2. La divulgación exageró esto
-     muchísimo y acá se ve.
+     Y el contra-veneno, que es igual de importante: la aritmética. De 10
+     analogías con una expectativa escrita de antemano, 5 aciertan entre las
+     cinco primeras respuestas y 1 sola sale primera. Funciona a medias, y a
+     veces por colocaciones («Asamblea Legislativa»), no por la relación.
+     Ojo con el orden de la resta: a − b + c codifica «b es a a como c es a d».
+     Una versión anterior tenía siete analogías al revés y medía «2 de 10».
 
      Todos los números salen de `medir-embeddings.py` sobre el corpus REAL de
      discursos de apertura 1984-2019. Cero datos inventados.
@@ -56,6 +58,7 @@
   .lista .w { font-family: var(--f-mono); }
   .lista .s { color: var(--tinta-3); font-family: var(--f-mono); font-size: .82em; }
   .lista li.nuevo .w { color: var(--c-ok); font-weight: 700; }
+  .lista li.nuevo .w::before { content: '+ '; }   /* el signo no depende sólo del color */
   .lista li.se-fue .w { color: var(--c-error); text-decoration: line-through; }
   .nota { font-size: .84rem; color: var(--tinta-2); margin: .45rem 0 0; }
   .veredicto { font-weight: 700; }
@@ -103,15 +106,17 @@
       Mirá dónde caen <em>niños</em>, <em>protección</em> y <em>familia</em>,
       y dónde caen <em>poder</em> y <em>fuerza</em>. Eso no lo inventó el
       modelo: estaba en cómo se habló durante treinta y cinco años.
-      Y antes de irte, apretá <em>«los que NO funcionan»</em> en el modo
-      aritmética: de diez analogías, aciertan dos.
+      Y antes de irte, pasá por el modo aritmética: de diez analogías escritas
+      de antemano, aciertan <b>cinco</b> (entre las cinco primeras respuestas)
+      y sólo <b>una</b> sale primera. Y probá una al revés: el orden de la
+      resta importa.
     </div>
     <p class="viz-pie">
       Datos <b>reales</b>: 35 discursos de apertura de sesiones (1984-2019),
       347.714 palabras, vocabulario de 2.000. Vectores de 100 dimensiones
       calculados con coocurrencia + PPMI + SVD (<code>ssdl.datos.embeddings_ppmi_svd</code>),
       sin red y sin modelos bajados. <b>El mapa que ves es una sombra:</b> las dos
-      direcciones dibujadas explican el <b>7,4 %</b> de la variación de las 100.
+      direcciones dibujadas explican el <b id="pie-varianza">7,4 %</b> de la variación de las 100.
       Dos palabras pueden verse pegadas acá y estar lejísimos de verdad.
     </p>
   </footer>
@@ -134,6 +139,13 @@ const TEMA = D.mapa.tema;                     // '' o el tema del léxico
 const ETIQ = new Set(D.mapa.etiquetadas);     // cuáles llevan el nombre escrito
 const IDX  = new Map(PAL.map((w, i) => [w, i]));
 const DIM  = VEC[0].length;
+// números con coma decimal, como en toda la clase
+function numAR(v, d) { return Viz.num(v, d).replace('.', ','); }
+const VAR2D = numAR(100 * D.mapa.varianza_2d, 1).replace('.', ',') + ' %';
+document.getElementById('pie-varianza').textContent = VAR2D;
+const ARIT = D.aritmetica || [];
+const N_OK = ARIT.filter(x => x.acierta).length;
+const N_PRIMERA = ARIT.filter(x => x.primera).length;
 
 const COLOR_TEMA = {
   'seguridad':    'error',
@@ -200,6 +212,24 @@ const p = Viz.plano('#lienzo', {
   xmin: -1.05, xmax: 1.05, ymin: -1.05, ymax: 1.05,
   alto: ALTO_MAPA, margen: { i: 46, d: 16, a: 26, b: 40 }
 });
+
+// el mapa es un canvas: para un lector de pantalla, lo describimos con palabras
+p.canvas.setAttribute('role', 'img');
+function describirCanvas() {
+  let t;
+  if (estado.modo === 'eje') {
+    t = 'Ranking de palabras sobre el eje ' + estado.ejeNeg + ' – ' + estado.ejePos +
+        '. De más cerca de «' + estado.ejePos + '» a más cerca de «' + estado.ejeNeg + '»: ' +
+        rankingActual.map(d => d.w + ' ' + (d.v >= 0 ? 'más ' : 'menos ') +
+                                numAR(Math.abs(d.v), 2)).join(', ') + '.';
+  } else {
+    t = 'Mapa de las 2.000 palabras del corpus proyectadas a dos dimensiones (' +
+        VAR2D + ' de la variación).' +
+        (estado.resaltados.length
+          ? ' Resaltadas: ' + estado.resaltados.map(r => PAL[r.i]).join(', ') + '.' : '');
+  }
+  p.canvas.setAttribute('aria-label', t);
+}
 
 function encuadre() {
   const r = 1.05 / estado.zoom;
@@ -276,7 +306,7 @@ function dibujarMapa() {
   }
 
   p.textoPx(p.R - 6, p.T + 4,
-            'las dos direcciones dibujadas explican el 7,4 % de la variación',
+            'las dos direcciones dibujadas explican el ' + VAR2D + ' de la variación',
             { alinear: 'right', tam: 10, color: 'tinta3' });
 }
 
@@ -299,7 +329,7 @@ function dibujarEje() {
   p.ejeX = ''; p.ejeY = '';
   p.fondo();
   p.grilla({ ticksY: [] });
-  p.ejes({ ticksY: [], formatoX: v => Viz.num(v, 2) });
+  p.ejes({ ticksY: [], formatoX: v => numAR(v, 2) });
 
   // el cero, que es la frontera
   p.segmento(0, -0.5, 0, rankingActual.length - 0.5,
@@ -311,7 +341,9 @@ function dibujarEje() {
     const col = d.v >= 0 ? 'parametro' : 'val';
     p.segmento(0, y, d.v, y, { color: col, grosor: 9, opacidad: .5 });
     p.punto(d.v, y, { color: col, r: 4.5 });
-    p.texto(d.v, y, d.w, { color: 'tinta', tam: 12, peso: '600',
+    // el signo va escrito, no sólo en el color y en el lado
+    p.texto(d.v, y, d.w + ' ' + (d.v >= 0 ? '+' : '−') + numAR(Math.abs(d.v), 2),
+                         { color: 'tinta', tam: 12, peso: '600',
                            alinear: d.v >= 0 ? 'left' : 'right',
                            dx: d.v >= 0 ? 10 : -10 });
   }
@@ -357,7 +389,7 @@ p.tooltip(w => {
   if (estado.modo === 'eje') {
     const k = Math.round(rankingActual.length - 1 - w.y);
     const d = rankingActual[k];
-    return d ? d.w + '\nproyección ' + Viz.num(d.v, 3) : null;
+    return d ? d.w + '\nproyección ' + numAR(d.v, 3) : null;
   }
   let mejor = null, dmin = Infinity;
   const tol = (p.xmax - p.xmin) * 0.02;
@@ -444,7 +476,7 @@ function armarEntradas() {
    ========================================================================= */
 function li(w, s, clase) {
   return '<li' + (clase ? ' class="' + clase + '"' : '') + '><span class="w">' + w +
-         '</span> <span class="s">' + (s === undefined ? '' : Viz.num(s, 3)) + '</span></li>';
+         '</span> <span class="s">' + (s === undefined ? '' : numAR(s, 3)) + '</span></li>';
 }
 
 function pintarExplorar() {
@@ -493,6 +525,11 @@ function pintarAritmetica() {
   const v = normalizar(VEC[ia].map((x, k) => x - VEC[ib][k] + VEC[ic][k]));
   const res = masParecidas(v, 5, new Set([ia, ib, ic]));
   const guardado = (D.aritmetica || []).find(x => x.a === a && x.b === b && x.c === c);
+  const INV = D.aritmetica_invertida || [];
+  const invertida = INV.find(x => x.a === a && x.b === b && x.c === c);
+  // de las relaciones que tienen versión invertida, cuántas aciertan bien planteadas
+  const bienPlanteadas = INV.map(x => ARIT.find(y => y.a === x.b && y.b === x.a && y.c === x.c))
+                            .filter(Boolean);
 
   estado.resaltados = [
     { i: ia, color: 'modelo', forzar: true }, { i: ib, color: 'val', forzar: true },
@@ -508,19 +545,35 @@ function pintarAritmetica() {
       (guardado
         ? '<p>Antes de mirar, una persona esperaría <b>«' + guardado.esperado + '»</b>' +
           (guardado.esperado_en_vocab ? '' :
-            ' <span class="aviso">(y esa palabra ni siquiera está en el corpus)</span>') +
+            ' <span class="aviso">(y esa palabra ni siquiera entró al vocabulario ' +
+            'de 2.000: aparece en el corpus, pero muy pocas veces)</span>') +
           '.</p><p class="veredicto ' + (guardado.acierta
             ? 'ok">acertó — está entre las cinco'
             : 'mal">no acertó — no está entre las cinco') +
           '</p><p>' + guardado.nota + '.</p>' +
           '<p class="fino">Contamos acierto con manga ancha: alcanza con que la ' +
-          'palabra esperada aparezca entre las cinco que devuelve el modelo. Con ' +
-          'el criterio estricto —que salga primera— de las diez acierta una.</p>'
+          'palabra esperada aparezca entre las cinco que devuelve el modelo. Así ' +
+          'aciertan ' + N_OK + ' de ' + ARIT.length + '. Con el criterio estricto ' +
+          '—que salga primera— acierta' + (N_PRIMERA === 1 ? ' una' : 'n ' + N_PRIMERA) +
+          ' de ' + ARIT.length + '.</p>'
+        : invertida
+        ? '<p><b>La trampa.</b> Es la misma relación con la resta al revés: bien ' +
+          'planteada sería <code>' + b + ' − ' + a + ' + ' + c + '</code>. Esperábamos ' +
+          '<b>«' + invertida.esperado + '»</b>.</p><p class="veredicto ' +
+          (invertida.acierta ? 'ok">igual acertó' : 'mal">no acertó') + '</p>' +
+          '<p>Con la resta al revés aciertan <b>' + INV.filter(x => x.acierta).length +
+          ' de ' + INV.length + '</b>; bien planteadas, esas mismas relaciones aciertan <b>' +
+          bienPlanteadas.filter(x => x.acierta).length + '</b>. Un error de planteo ' +
+          'hace que un método parezca peor (o mejor) de lo que es: es una decisión de ' +
+          'medición, y hay que revisarla antes de concluir nada.</p>'
         : '<p>Esta combinación la armaste vos. Preguntate <b>antes</b> de mirar ' +
-          'qué esperabas, y después fijate si está en la lista.</p>') +
+          'qué esperabas, y después fijate si está en la lista. Y chequeá el ' +
+          'orden: <code>a − b + c</code> toma la relación que lleva de <code>b</code> ' +
+          'a <code>a</code> y se la aplica a <code>c</code>. Si invertís la resta, ' +
+          'medís otra relación.</p>') +
     '</div>';
-  cajaNota.innerHTML = 'En el mapa: la flecha naranja es la relación «' + b + ' → ' + a +
-    '», la roja es «' + c + ' → ' + res[0].w + '». ' +
+  cajaNota.innerHTML = 'En el mapa: la flecha que sale de «' + b + '» es la relación «' +
+    b + ' → ' + a + '», la que sale de «' + c + '» es «' + c + ' → ' + res[0].w + '». ' +
     '<b>Si la analogía funcionara, las dos flechas serían paralelas y del mismo largo.</b> ' +
     'Mirá si lo son.';
 }
@@ -549,8 +602,8 @@ function pintarEje() {
     '<em>American Sociological Review</em></b> (Kozlowski, Taddy &amp; Evans, 2019): ' +
     'definir un eje con dos palabras y proyectar el vocabulario sobre él para ' +
     'medir cómo se estructura culturalmente un corpus. ' +
-    'Los números son chicos —van de ' + Viz.num(abajo[abajo.length - 1].v, 2) + ' a ' +
-    Viz.num(arriba[0].v, 2) + '— porque el eje es una dirección entre cien. ' +
+    'Los números son chicos —van de ' + numAR(abajo[abajo.length - 1].v, 2) + ' a ' +
+    numAR(arriba[0].v, 2) + '— porque el eje es una dirección entre cien. ' +
     'Lo que importa es <b>el orden</b>, no la escala.';
 }
 
@@ -570,6 +623,8 @@ function pintarEpocas() {
   }
   const sa = new Set(va.map(x => x[0])), sb = new Set(vb.map(x => x[0]));
   const siguen = va.filter(x => sb.has(x[0])).length;
+  const M = E.mitades || null;
+  const vara = M && M.siguen ? M.siguen[w] : undefined;
   cajaListas.className = 'listas';
   cajaListas.innerHTML =
     '<div class="lista"><h4>vecinas de «' + w + '» en ' + E.nombres[0] + '</h4><ol>' +
@@ -579,10 +634,19 @@ function pintarEpocas() {
   cajaNota.innerHTML = 'De las <b>' + va.length + '</b> vecinas que «' + w +
     '» tenía en ' + E.nombres[0] + ', <b>' + siguen + '</b> siguen siéndolo en ' +
     E.nombres[1] + '. <span class="c-error">Tachadas</span>: las que se fueron. ' +
-    '<span class="c-ok">En verde</span>: las que llegaron. ' +
-    'Eso es <b>cambio semántico medido</b>, y es una tesis. ' +
-    '<em>Recaudo:</em> son dos corpus chicos (16 y 15 discursos), así que parte ' +
-    'del cambio es ruido. Un paper serio repite esto con remuestreo.';
+    '<span class="c-ok">Con «+», en verde</span>: las que llegaron. ' +
+    (vara !== undefined
+      ? '<br><b>La vara del ruido:</b> partiendo el mismo corpus en dos mitades ' +
+        '<em>sin</em> corte de época (' + M.como + ', ' + M.discursos.join(' y ') +
+        ' discursos), de las 8 vecinas de «' + w + '» siguen <b>' + vara + '</b>. ' +
+        (siguen < vara
+          ? 'Entre épocas siguen menos: hay una pista de <b>cambio semántico</b>, ' +
+            'pero parte de la diferencia es ruido de corpus chico. '
+          : 'Entre épocas siguen ' + (siguen === vara ? 'las mismas' : 'más') +
+            ': con esta vara, <b>no hay evidencia de cambio</b>. ') +
+        'Un paper serio repite esto con muchas particiones y reporta la variabilidad.'
+      : '<em>Recaudo:</em> son dos corpus chicos (16 y 15 discursos), así que parte ' +
+        'del cambio es ruido.');
 }
 
 /* =========================================================================
@@ -608,7 +672,7 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'checkbox', id: 'soloLexico',
     etiqueta: 'mostrar sólo el léxico político y económico', valor: false },
   { tipo: 'slider', id: 'zoom', etiqueta: 'cuánto acercar', sub: 'o usá la rueda del mouse',
-    min: 1, max: 14, paso: .1, valor: 1, decimales: 1, formato: v => Viz.num(v, 1) + '×',
+    min: 1, max: 14, paso: .1, valor: 1, decimales: 1, formato: v => numAR(v, 1) + '×',
     color: 'acento' },
   { tipo: 'boton', texto: 'Volver a encuadrar', alClic: () => {
       estado.zoom = 1; estado.cx = 0; estado.cy = 0;
@@ -641,17 +705,21 @@ function armarAtajos() {
       boton(w, () => { estado.palabra = w; armarEntradas(); actualizar(); });
     }
   } else if (estado.modo === 'aritmetica') {
-    boton('los 2 que funcionan', () => rotarAnalogia(true), true);
-    boton('los 8 que NO funcionan', () => rotarAnalogia(false));
+    boton('las ' + N_OK + ' que aciertan', () => rotarAnalogia(true), true);
+    boton('las ' + (ARIT.length - N_OK) + ' que NO aciertan', () => rotarAnalogia(false));
+    if ((D.aritmetica_invertida || []).length) {
+      boton('la trampa: la resta al revés', () => {
+        const inv = D.aritmetica_invertida;
+        const x = inv[iInvertida++ % inv.length];
+        estado.a = x.a; estado.b = x.b; estado.c = x.c;
+        armarEntradas(); actualizar();
+      });
+    }
   } else if (estado.modo === 'eje') {
     for (const e of PRESETS_EJE) {
       boton(e.texto, () => { estado.ejePos = e.pos; estado.ejeNeg = e.neg;
                              armarEntradas(); actualizar(); });
     }
-    boton('oficialismo ←→ oposición', () => {
-      estado.ejePos = 'oposición'; estado.ejeNeg = 'oficialismo';
-      armarEntradas(); actualizar();
-    });
   } else {
     for (const w of ['seguridad', 'trabajo', 'estado', 'derechos', 'crecimiento', 'justicia']) {
       boton(w, () => { estado.epocaPalabra = w; armarEntradas(); actualizar(); });
@@ -674,6 +742,7 @@ function armarAtajos() {
 }
 
 let iAnalogia = { true: 0, false: 0 };
+let iInvertida = 0;
 function rotarAnalogia(funciona) {
   const cands = (D.aritmetica || []).filter(x => x.acierta === funciona);
   if (!cands.length) return;
@@ -687,9 +756,12 @@ function rotarAnalogia(funciona) {
 const AYUDA = {
   explorar: 'Escribí una palabra arriba del mapa y mirá sus diez vecinas. ' +
             'La vecindad la decidió <b>con quién aparece</b>, nada más.',
-  aritmetica: 'La cuenta famosa: <code>rey − hombre + mujer</code>. Acá con ' +
-              'vocabulario del corpus. <b>Casi nunca funciona</b>, y eso es el punto: ' +
-              'la divulgación exageró muchísimo este resultado.',
+  aritmetica: 'La cuenta famosa: <code>rey − hombre + mujer ≈ reina</code>. ' +
+              '<code>a − b + c</code> codifica «<code>b</code> es a <code>a</code> como ' +
+              '<code>c</code> es a <code>d</code>»: el orden de la resta importa. ' +
+              'Con este corpus <b>funciona a medias</b> (' + N_OK + ' de ' + ARIT.length +
+              ' entre las cinco primeras, ' + N_PRIMERA + ' primera), y a veces acierta ' +
+              'por una frase hecha, no por la relación. La divulgación lo exageró muchísimo.',
   eje: 'Dos palabras definen una dirección y todas las demás se ordenan sobre ' +
        'ella. <b>Este es el modo que mide sesgo</b>, y es el más útil para una tesis.',
   epocas: 'Dos embeddings entrenados por separado: uno con los discursos de ' +
@@ -707,6 +779,7 @@ function actualizar() {
   else if (estado.modo === 'epocas')     pintarEpocas();
   p.redibujarYa();                       // el eje necesita el ranking recién calculado
   if (estado.modo === 'eje') pintarEje();
+  describirCanvas();
   ctl.texto('lectura',
     estado.modo === 'eje'
       ? 'El mapa está mostrando el <b>ranking sobre el eje</b>. Volvé a «explorar» ' +

@@ -12,8 +12,11 @@
      «trigo»: a la izquierda pasa exactamente lo mismo que antes; a la derecha
      cambia todo."
 
-     El número que lo dice: cos(diputados, senadores) = 0,863 ·
-     cos(diputados, trigo) = 0,031. En one-hot las dos distancias son idénticas.
+     El número que lo dice (SIMILITUD coseno, más alto = más parecido):
+     cos(diputados, senadores) = 0,863 · cos(diputados, trigo) = 0,031.
+     En one-hot las dos similitudes valen 0 (y las dos distancias, √2).
+     Ojo con no mezclar: √2 es una DISTANCIA (más = más lejos); 0,863 es una
+     SIMILITUD (más = más cerca). En distancia, el embedding da 0,52 contra 1,39.
 
      Datos reales de `medir-embeddings.py` sobre los discursos 1984-2019.
      ========================================================================== -->
@@ -43,6 +46,9 @@
   /* --- embedding: las 100 celdas --- */
   .celdas { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; }
   .celdas > i { display: block; padding-top: 100%; border-radius: 2px; }
+  /* el signo no puede depender sólo del color: los negativos van rayados */
+  .celdas > i.neg { background-image: repeating-linear-gradient(45deg,
+      transparent 0 2px, var(--papel) 2px 3px); }
 
   .cuenta { font-size: .85rem; margin: .6rem 0 0; color: var(--tinta-2); }
   .cuenta b { color: var(--tinta); font-family: var(--f-mono); }
@@ -76,7 +82,7 @@
       <div class="caja">
         <h3>one-hot</h3>
         <p class="sub">un casillero por cada palabra del vocabulario</p>
-        <div class="tira" id="tira"></div>
+        <div class="tira" id="tira" role="img"></div>
         <div class="regla"><span>0</span><span id="regla-fin"></span></div>
         <p class="cuenta" style="margin-top:.7rem">Con lupa, alrededor del único 1:</p>
         <div class="lupa" id="lupa"></div>
@@ -86,7 +92,7 @@
       <div class="caja">
         <h3>embedding</h3>
         <p class="sub">100 números, todos distintos de cero, aprendidos del corpus</p>
-        <div class="celdas" id="celdas"></div>
+        <div class="celdas" id="celdas" role="img"></div>
         <p class="cuenta" id="cuenta-emb"></p>
       </div>
     </div>
@@ -105,9 +111,11 @@
       A la izquierda el 1 se corre de casillero y <em>nada más</em>. A la derecha el
       patrón de colores es casi el mismo. Ahora apretá <b>trigo</b>: del lado
       izquierdo pasa <em>exactamente lo mismo</em> que antes —el 1 se corre—, y del
-      derecho cambia todo. En one-hot, «diputados» está tan lejos de «senadores»
-      como de «trigo»: las dos distancias valen √2, siempre, para cualquier par.
-      En el embedding, una vale <b>0,863</b> y la otra <b>0,031</b>.
+      derecho cambia todo. En one-hot, «diputados» se parece a «senadores»
+      exactamente lo mismo que a «trigo»: la <b>similitud coseno</b> vale 0 en
+      los dos casos (y la distancia, √2), siempre, para cualquier par.
+      En el embedding, la similitud con «senadores» es <b>0,863</b> y con
+      «trigo» <b>0,031</b> (más alto = más parecido).
       <em>Ahí está toda la diferencia.</em>
     </div>
     <p class="viz-pie">
@@ -180,22 +188,30 @@ function pintar() {
     'nada: no es un orden alfabético ni una medida de nada. Es simplemente el ' +
     'lugar donde quedó esta palabra en la lista.';
 
+  tira.setAttribute('aria-label', 'Vector one-hot de «' + w + '»: ' +
+    NVOC.toLocaleString('es-AR') + ' casilleros, todos en cero salvo el de la posición ' +
+    id + ', que vale 1.');
+
   // --- embedding ---
   const M = Math.max.apply(null, v.map(Math.abs));
+  const nNeg = v.filter(x => x < 0).length;
+  celdas.setAttribute('aria-label', 'Embedding de «' + w + '»: ' + NDIM +
+    ' números, ' + (NDIM - nNeg) + ' positivos y ' + nNeg + ' negativos.');
   cuadros.forEach((el, k) => {
     const t = v[k] / M;                       // −1 .. 1
     // misma convención que `graficos.grilla_de_filtros` de la clase 5:
     // azul = negativo · casi blanco = cero · rojo = positivo
-    el.style.background = t >= 0
+    el.style.backgroundColor = t >= 0
       ? Viz.alfa('error',  Math.min(1, .10 + Math.abs(t) * .90))
       : Viz.alfa('modelo', Math.min(1, .10 + Math.abs(t) * .90));
-    el.title = 'dimensión ' + k + ': ' + v[k];
+    el.classList.toggle('neg', t < 0);
+    el.title = 'dimensión ' + k + ': ' + String(v[k]).replace('.', ',');
   });
   const vecinas = window.DATOS_TEXTO.onehot.vecinos[w] || [];
   document.getElementById('cuenta-emb').innerHTML =
     '<b>' + NDIM + '</b> números, ninguno cero. ' +
-    '<span class="c-error">Rojo</span> es positivo, ' +
-    '<span class="c-modelo">azul</span> negativo, más fuerte = más grande ' +
+    '<span class="c-error">Rojo liso</span> es positivo, ' +
+    '<span class="c-modelo">azul rayado</span> negativo, más fuerte = más grande ' +
     '(la misma convención que los filtros de la clase 5). ' +
     '<b>Ninguna dimensión suelta significa nada</b>: lo que significa es el patrón entero.' +
     (vecinas.length
@@ -204,19 +220,20 @@ function pintar() {
       : '');
 
   // --- la tabla de parecidos ---
-  let html = '<table class="dist"><tr><th>parecido con…</th>' +
+  let html = '<table class="dist"><tr><th>similitud coseno con…</th>' +
     '<th>one-hot</th><th>embedding</th></tr>';
   PAL.forEach((otra, k) => {
     if (k === j) return;
     const c = COS[j][k];
     const clase = c > .4 ? 'alto' : (c < .15 ? 'bajo' : '');
     html += '<tr><td>' + otra + '</td>' +
-            '<td>0.000</td>' +
-            '<td class="' + clase + '">' + Viz.num(c, 3) + '</td></tr>';
+            '<td>0,000</td>' +
+            '<td class="' + clase + '">' + Viz.num(c, 3).replace('.', ',') + '</td></tr>';
   });
-  html += '</table><p class="cuenta">En one-hot <b>todos</b> los pares dan lo mismo: ' +
-    'coseno 0, distancia √2. No hay grados. Para ese esquema, «' + w + '» es ' +
-    'igual de distinta de todas las palabras del idioma, y eso es falso.</p>';
+  html += '</table><p class="cuenta">Similitud coseno: más alto = más parecido ' +
+    '(1 es «apuntan igual», 0 es «nada que ver»). En one-hot <b>todos</b> los pares ' +
+    'dan lo mismo: similitud 0, distancia √2. No hay grados. Para ese esquema, «' + w +
+    '» es igual de distinta de todas las palabras del idioma, y eso es falso.</p>';
   tabla.innerHTML = html;
 
   ctl.texto('lectura',

@@ -23,7 +23,7 @@ and How to Tell the Difference for Applied Research*. The Journal of Politics.**
 > **Si vas a leer una sola cosa de esta clase, es ésta.** Está escrita exactamente para
 > esta audiencia: gente de ciencias sociales que quiere usar embeddings en su
 > investigación y necesita saber cuándo confiar. Responde con evidencia las tres
-> preguntas que te vas a hacer el lunes: ¿entreno los míos o uso pre-entrenados?
+> preguntas que te vas a hacer cuando lo apliques a tu corpus: ¿entreno los míos o uso pre-entrenados?
 > ¿cuántas dimensiones? ¿cuánto texto hace falta? Y —lo más útil— compara los métodos
 > contra juicios humanos, así que las conclusiones no son de fe.
 > *Empezá por acá.* Una hora larga, y se lee sin sufrir.
@@ -80,16 +80,31 @@ Linguistic Analysis*, Blackwell.** `[VERIFICAR URL]`
 Representations in Vector Space*.** `[VERIFICAR URL]`
 > El paper de **word2vec**, el que popularizó todo esto. Corto y legible. Ojo con la
 > sección de analogías: es la que generó el entusiasmo desmedido que hoy vimos
-> desinflarse (dos de diez, en nuestro corpus). Leelo sabiendo eso.
+> desinflarse (en nuestro corpus, cinco de diez entre las cinco primeras respuestas y
+> una sola primera). Leelo sabiendo eso, y fijate en el orden de la resta: en
+> `rey − hombre + mujer`, la relación es la que va de *hombre* a *rey*.
 
 **8. Levy, O. & Goldberg, Y. (2014). *Neural Word Embedding as Implicit Matrix
 Factorization*. NeurIPS.** `[VERIFICAR URL]`
-> **El paper que justifica lo que hicimos en el notebook.** Demuestra que word2vec con
+> **El puente entre lo que hicimos y word2vec.** Demuestra que word2vec con
 > muestreo negativo está factorizando implícitamente una matriz de PMI desplazada — o
-> sea, que el camino «contar coocurrencias → PPMI → SVD» y el camino «entrenar una red»
-> llegan al mismo lugar. Es la versión formal de la celda donde el descenso por
-> gradiente y el SVD dieron 5,2 vecinas de 6 en común.
+> sea, que el camino «contar coocurrencias → PMI → factorizar» y el camino «entrenar
+> una red» están emparentados de cerca. Ojo: **no** es la justificación de la celda del
+> notebook donde el descenso por gradiente y el SVD dieron 5,2 vecinas de 6 en común.
+> Esa celda no entrena word2vec: minimiza el error cuadrático contra la PPMI, y para
+> ese problema el SVD truncado es la solución exacta (el teorema de Eckart–Young,
+> abajo). El descenso llega a la misma loss que el SVD; las vecinas no coinciden del
+> todo porque la solución de `E @ C.T` no es única (cualquier cambio de base que se
+> compense entre `E` y `C` da la misma loss).
 > Técnico, pero la introducción sola ya vale.
+
+**8b. Eckart, C. & Young, G. (1936). *The approximation of one matrix by another of
+lower rank*. Psychometrika 1(3), 211-218.** `[VERIFICAR URL]`
+> El resultado que hace que el «atajo exacto» del notebook sea exacto: la mejor
+> aproximación de rango *k* a una matriz, en error cuadrático, sale de quedarse con las
+> *k* direcciones más grandes del SVD. Por eso el descenso por gradiente de la sección 6
+> no puede hacerlo mejor que el SVD: a lo sumo, llegar al mismo lugar. No hace falta
+> leerlo; hace falta saber que existe cuando un revisor pregunte «¿y por qué SVD?».
 
 **9. Bolukbasi, T., Chang, K.-W., Zou, J., Saligrama, V. & Kalai, A. (2016). *Man is to
 Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings*. NeurIPS.**
@@ -113,13 +128,15 @@ Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings*. NeurIP
 **11. Sennrich, R., Haddow, B. & Birch, A. (2016). *Neural Machine Translation of Rare
 Words with Subword Units*. ACL.** `[VERIFICAR URL]`
 > De dónde sale el **BPE** de la visualización del tokenizador. Explica por qué las
-> sub-palabras ganaron: nunca hay palabras desconocidas y el vocabulario queda chico.
-> Es el algoritmo que hoy usa GPT, en grande.
+> sub-palabras ganaron: las palabras raras se arman con pedazos y el vocabulario queda
+> chico. Es el algoritmo que hoy usa GPT, en grande y **sobre bytes** en vez de
+> caracteres: por eso ahí no hay desconocidas nunca, y en el tokenizador de juguete de
+> la clase un emoji sí cae en `<desc>`.
 > Sólo si te picó la curiosidad del tokenizador. Media hora.
 
 ---
 
-## Herramientas (para usar el lunes)
+## Herramientas (para tu propio corpus)
 
 - **gensim** — la biblioteca clásica para entrenar y usar word2vec, fastText y
   similares en Python. `https://pypi.org/project/gensim/` **[VERIFICADA · 2026-08-29]**
@@ -129,7 +146,7 @@ Words with Subword Units*. ACL.** `[VERIFICAR URL]`
   `https://pypi.org/project/spacy/` **[VERIFICADA · 2026-08-29]**. Los modelos en
   castellano se llaman `es_core_news_sm` / `es_core_news_lg`. `[VERIFICAR URL]`
 - **`ssdl.datos`** (este curso) — `embeddings_ppmi_svd()`, `vecinos()` y
-  `matriz_de_coocurrencia()`. Sin dependencias, sin red, cuatro segundos sobre 350.000
+  `matriz_de_coocurrencia()`. Sin dependencias, sin red, unos segundos sobre 350.000
   palabras. Suficiente para explorar un corpus propio, y es el código que leíste.
 
 ## Los datos de hoy
@@ -144,8 +161,10 @@ Words with Subword Units*. ACL.** `[VERIFICAR URL]`
   La portada del repo (`github.com/lucariel/discursos_presidenciales`) no se pudo
   abrir desde acá: `github.com` en HTML da 403. `[VERIFICAR URL]`.
   Los textos son mensajes presidenciales al Congreso de la Nación: documentos públicos. **La recopilación no declara licencia**; se usa acá
-  con fines educativos y se cita. Las trampas del corpus (los agujeros son los golpes
-  de Estado; 2005 y 2006 son el mismo discurso; el largo varía por un factor de 9)
+  con fines educativos y se cita. Las trampas del corpus (en la serie completa, los
+  agujeros son los golpes de Estado; 2005 y 2006 son el mismo discurso, y por eso el
+  corpus de esta clase trae 35 discursos de 1984-2019 y deja afuera 2006; el largo
+  varía por un factor de 9)
   están documentadas en `datos/README.md` §1.1, y **hay que leerlas antes de sacar
   cualquier conclusión sustantiva de este material**.
 
@@ -157,7 +176,7 @@ Dicho explícitamente, porque la tentación es real y no ayuda:
 
 - **El paper original de las LSTM** (Hochreiter & Schmidhuber, 1997). Las RNN están en
   esta clase sólo como motivación de attention. Si te ponés a estudiar compuertas, vas
-  a gastar una semana en una arquitectura que ya casi nadie usa.
+  a gastar mucho tiempo en una arquitectura que ya casi nadie usa para texto.
 - **Cualquier cosa sobre t-SNE o UMAP.** Son mejores que PCA para dibujar nubes, sí, y
   también son mucho más fáciles de sobreinterpretar: las distancias entre grupos en un
   t-SNE **no significan nada**. Antes de usarlos, que quede firme la idea de que el

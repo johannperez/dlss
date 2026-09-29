@@ -8,8 +8,9 @@
 <!-- ==========================================================================
      MOMENTO AHA: "para saber si va 'lo' o 'la' necesito la palabra 2, y cuando
      llego a la palabra 32 de la palabra 2 no queda nada: 50 y 50. Agrando la
-     mochila 128 veces y recién ahí llega con el 40 %: el olvido se posterga,
-     no se arregla."
+     mochila 128 veces (de 4 a 512) y recién ahí llega con el 40 %: el olvido
+     se posterga, no se arregla. Con el doble de distancia, ni la mochila
+     máxima llega: queda un 16 %, casi moneda al aire (58/42)."
 
      OJO, HONESTIDAD: esto es una ILUSTRACIÓN ESQUEMÁTICA del olvido de una RNN,
      no una RNN corriendo. El fenómeno (la información vieja se degrada con la
@@ -58,10 +59,12 @@
 <div class="viz-pagina">
 
   <header>
-    <h1>La mochila que se va vaciando</h1>
-    <p>Una red que lee <em>en orden</em> arrastra una mochila con todo lo que entendió
-       hasta ahora. Apretá <b>Leer</b> y mirá qué le queda de cada palabra cuando llega
-       al final. La palabra que necesita para decidir está en el puesto 2.</p>
+    <h1>Una mochila de tamaño fijo</h1>
+    <p>Una red que lee <em>en orden</em> arrastra una mochila con lo que entendió
+       hasta ahora. La mochila no se agranda: cada palabra nueva entra pisando algo,
+       y lo del principio se va perdiendo. Apretá <b>Leer</b> y mirá qué le queda de
+       cada palabra cuando llega al final. La palabra que necesita para decidir está
+       en el puesto 2.</p>
   </header>
 
   <div>
@@ -80,9 +83,11 @@
       apretá <b>Leer</b>. Cuando el cursor llega a <em>«lo»</em>, de
       <em>«proyecto»</em> no queda nada: el modelo elige entre <em>lo</em> y
       <em>la</em> tirando una moneda, 50 y 50. Ahora subí la mochila al máximo
-      (512) y volvé a leer: ahora sí acierta, pero <b>de la primera palabra perdió
-      igual el 60 %</b>. Ciento veintiocho veces más memoria para llegar con menos
-      de la mitad — y si la oración fuera el doble de larga, volvés a cero.
+      (512) y volvé a leer: ahora sí acierta, pero <b>de «proyecto», la segunda
+      palabra, perdió igual el 60 %</b>. Ciento veintiocho veces más memoria que
+      el mínimo para llegar con menos de la mitad — y si entre «proyecto» y «lo»
+      hubiera el doble de palabras, con esta misma curva te quedaría un 16 %:
+      casi otra vez la moneda al aire.
       Agrandar la memoria <b>posterga</b> el problema; no lo resuelve. Ese es el
       hueco que viene a tapar <b>attention</b> la clase que viene.
     </div>
@@ -150,6 +155,7 @@ const p = Viz.plano('#lienzo', {
   titulo: 'lo que la memoria conserva de cada palabra, ahora mismo',
   alto: 330
 });
+p.canvas.setAttribute('role', 'img');   // el canvas, descripto con palabras
 
 p.alDibujar(() => {
   p.fondo(); p.grilla();
@@ -248,6 +254,11 @@ Viz.controlesAnimacion('#panel', anim, {
 
 function dibujar() {
   const q = queda(I_CLAVE, estado.cursor);
+  p.canvas.setAttribute('aria-label', 'Barras de cuánto queda de cada palabra en la ' +
+    'mochila. Lectura en la palabra ' + (estado.cursor + 1) + ' de ' + N + ', mochila de ' +
+    Math.round(estado.mochila) + ' dimensiones. ' +
+    (estado.cursor < I_CLAVE ? '«proyecto» todavía no se leyó.'
+                             : 'De «proyecto» queda el ' + (q * 100).toFixed(0) + ' %.'));
   ctl.medidor('resto', q, (q * 100).toFixed(0) + '%');
   const enDecision = estado.cursor >= I_DECISION;
   ctl.texto('lectura',

@@ -57,6 +57,8 @@ Aparecen en contextos parecidos **dentro del corpus con el que se entrenó**.
 palabra. Es una medición legítima y publicable. En nuestro corpus lo tenemos medido:
 las vecinas de `seguridad` pasan de *social · justicia · ministerio · salud* (1984-1999)
 a *policía · fuerzas · defensa · federal* (2004-2019). **De ocho vecinas, siguen dos.**
+Y con la vara al lado: partiendo el mismo corpus en dos mitades alternadas, sin corte
+de época, siguen **cuatro**. Hay una pista de cambio, no una prueba.
 
 **(c)** Lo que buscamos acá. Al menos una de estas:
 
@@ -67,7 +69,9 @@ a *policía · fuerzas · defensa · federal* (2004-2019). **De ocho vecinas, si
   es legítimo; comparar coordenadas o hacer aritmética entre los dos espacios, no,
   salvo que los alinees explícitamente (procrustes).
 - **Corpus chicos = mucho ruido.** Con 16 y 15 discursos, parte del cambio de vecinas
-  es azar. Un paper serio lo repite con remuestreo y reporta la variabilidad.
+  es azar: en nuestro corpus, dos mitades de la *misma* época ya comparten sólo la mitad
+  de las vecinas de `seguridad`. Un paper serio lo repite con remuestreo y reporta la
+  variabilidad.
 - **Cambió el mundo, no la palabra.** Si entre las dos épocas hubo una pandemia o una
   crisis, el vocabulario de coyuntura arrastra a todo.
 
@@ -104,15 +108,17 @@ declararlo y validarlo.
 **(a)** Educación · economía · salud · instituciones legislativas.
 (Aceptar cualquier nombre razonable: lo que se evalúa es que agrupen bien.)
 
-**(b)** **`dólar`** está pegada al grupo de economía en el dibujo pero un poco separada,
-y sobre todo **`OBRA PÚBLICA`** aparece en el medio del grupo de educación.
-La respuesta esperada es *obra pública*: uno la esperaría con economía o con
-infraestructura, no con escuelas y maestros.
+**(b)** **`licitación`**, que aparece en el medio del grupo de educación, entre
+*docentes* y *alumnos*. Uno la esperaría con economía (o con obra pública e
+infraestructura), no con escuelas y maestros. Es una sola palabra a propósito: en un
+embedding de palabras, cada punto es **una** palabra, y una expresión de dos
+(«obra pública») no tendría un punto propio.
 
 **(c)** Hipótesis aceptables (cualquiera, si está argumentada):
 
-- En estos debates se habla de obra pública **cuando se habla de construir escuelas**:
-  comparte contexto con el vocabulario educativo.
+- En estos debates se habla de licitaciones **cuando se habla de construir escuelas**
+  (o de comprar computadoras o guardapolvos): comparte contexto con el vocabulario
+  educativo.
 - La proyección 2D aplasta: en las 100 dimensiones reales puede estar lejos, y sólo
   *parece* cerca en la sombra.
 - Es una palabra de baja frecuencia y su vector es pobre.
@@ -190,9 +196,16 @@ mencionan **ni una sola** decisión discutible. Devolvelas pidiendo la segunda c
 
 Arrastra un estado de tamaño fijo que se va sobrescribiendo.
 
+> **Para quien quiera la razón técnica:** al entrenar, la señal de error que tiene que
+> viajar hacia atrás hasta las primeras palabras se multiplica una vez por cada paso,
+> y se achica hasta casi desaparecer: es el *gradiente que se desvanece* (Hochreiter,
+> 1991; Bengio, Simard & Frasconi, 1994). La mochila de tamaño fijo es la imagen; el
+> gradiente que se desvanece es el mecanismo. Las compuertas de la LSTM se inventaron
+> para eso. No hace falta pedirlo en la respuesta.
+
 | distractor | por qué tienta | qué confusión revela |
 |---|---|---|
-| **A** (pocos parámetros) | Es la explicación por defecto para todo lo que no anda. | Que no vieron que el problema es **estructural, no de tamaño**. La viz lo muestra: agrandás la mochila al máximo y el olvido se hace más lento, pero **igual llega abajo**. Desarme: `viz/memoria-que-se-olvida.html`, slider al máximo. |
+| **A** (pocos parámetros) | Es la explicación por defecto para todo lo que no anda. | Que no vieron que el problema es **estructural, no de tamaño**. La viz lo muestra: con la mochila al máximo (128 veces el mínimo) el olvido se hace más lento y llega con un 40 %, pero con el doble de distancia volvería a quedar casi nada. Agrandar posterga, no arregla. Desarme: `viz/memoria-que-se-olvida.html`, slider al máximo. |
 | **C** (promedia y el promedio no tiene orden) | **Es el distractor más peligroso del ítem**, porque describe algo que sí vimos hoy y que sí es verdad… de *otra* cosa. | Confunde las dos maneras de armar el vector de una frase. **Promediar** (slides 31-32) tira el orden de entrada; **la RNN no promedia**: lee en orden, y por eso el orden sí le llega. Su problema es otro y es posterior: lo que leyó primero se le degrada. Si alguien elige C, la mitad final de la clase se le mezcló, y conviene volver sobre la slide 33 («leer en orden, con una mochila»). |
 | **D** (las palabras lejanas quedan fuera del vocabulario) | Mezcla el problema de **memoria** con el de **vocabulario**, y los dos aparecieron hoy. | Estar fuera de vocabulario no tiene nada que ver con estar lejos en la oración: `<desc>` depende de la frecuencia de la palabra en el corpus, no de su posición. Son dos límites distintos y se arreglan con cosas distintas. |
 
@@ -254,7 +267,7 @@ no está en el modelo: está en para qué lo usás y sobre quién.
 
 > **Cómo corregir esto.** Si alguien contesta bien (a) y (b) pero en (c) dice «es lo
 > mismo, el sesgo siempre es malo», no está mal informado: está aplicando bien una
-> regla que en este caso no aplica. Devolveleo con la analogía del termómetro. Es la
+> regla que en este caso no aplica. Devolvéselo con la analogía del termómetro. Es la
 > idea que más cuesta y la que más vale de la clase.
 
 ---

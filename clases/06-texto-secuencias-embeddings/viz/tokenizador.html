@@ -6,7 +6,7 @@
 <title>Tokenizá vos — Clase 6</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA: "«inconstitucionalidad» son 6 pedazos y ninguno es
+     MOMENTO AHA: "«inconstitucionalidad» son 5 pedazos y ninguno es
      «constitución». El modelo nunca ve la palabra entera: ve pedazos, y para él
      son números."
 
@@ -17,6 +17,13 @@
      Los datos (fusiones de BPE, vocabulario de palabras y de caracteres) salen
      de `medir-embeddings.py`, entrenados sobre el corpus real de discursos de
      apertura 1984-2019.
+
+     HONESTIDAD: este BPE de juguete trabaja sobre CARACTERES, no sobre bytes.
+     Un carácter que el corpus nunca vio (un emoji, una letra de otro alfabeto)
+     no tiene ficha y cae en <desc>, y la viz lo marca así. Los tokenizadores de
+     GPT trabajan sobre bytes: cualquier cosa se escribe con los 256 bytes de
+     base, y por eso ahí no hay desconocidas nunca. Los números se parten en
+     dígitos (acá, uno por uno), como hacen varios tokenizadores reales.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -91,14 +98,16 @@
       <em>«constitución»</em>: los cortes no siguen la morfología, siguen la
       estadística del corpus. Ahora probá <em>«por palabras»</em>: la palabra
       entera desaparece y queda <code>&lt;desc&gt;</code>, "no la conozco".
-      Y con <em>«por caracteres»</em> no se pierde nada... a cambio de una
-      secuencia larguísima. No hay estrategia gratis: hay tres compromisos.
+      Y con <em>«por caracteres»</em> no se pierde casi nada (salvo un carácter
+      que el corpus nunca vio, como un emoji)... a cambio de una secuencia
+      larguísima. No hay estrategia gratis: hay tres compromisos.
     </div>
     <p class="viz-pie">
       Vocabularios y fusiones entrenados sobre el corpus real de
       <b>discursos de apertura de sesiones (Argentina, 1984-2019)</b>,
       2,2 MB de texto. Generados por <code>medir-embeddings.py</code>.
-      No es el tokenizador de GPT: es uno chiquito, con el mismo algoritmo (BPE).
+      No es el tokenizador de GPT: es uno chiquito, con el mismo algoritmo (BPE),
+      pero sobre caracteres y no sobre bytes, así que un emoji no tiene ficha.
     </p>
   </footer>
 
@@ -123,8 +132,9 @@ const rango = new Map(FUSIONES.map((f, i) => [f[0] + '\u0000' + f[1], i]));
 
 /** Por caracteres: cada letra es una ficha. Vocabulario chiquito, secuencias largas. */
 function porCaracteres(texto) {
+  // un carácter que el corpus nunca vio (un emoji) no tiene número: <desc>
   return Array.from(texto.toLowerCase()).map(
-    c => ({ t: c, id: idCar.has(c) ? idCar.get(c) : 0 }));
+    c => idCar.has(c) ? { t: c, id: idCar.get(c) } : { t: c, id: 0, desc: true });
 }
 
 /** Por palabras: se corta en palabras y signos. Lo que no está en el vocabulario
@@ -155,12 +165,21 @@ function bpePalabra(palabra) {
 function porSubPalabras(texto) {
   const trozos = texto.toLowerCase().match(/[\p{L}\p{M}]+|\d+|[^\s\p{L}\p{M}\d]/gu) || [];
   const salida = [];
+  // lo que no está en el vocabulario de sub-palabras se marca <desc>, con id 0
+  const ficha = (t, extra) => idBpe.has(t)
+    ? Object.assign({ t: t, id: idBpe.get(t) }, extra || {})
+    : Object.assign({ t: t, id: 0, desc: true }, extra || {});
   for (const t of trozos) {
-    if (!/[\p{L}\p{M}]/u.test(t)) { salida.push({ t: t, id: idBpe.get(t) || 0 }); continue; }
+    if (!/[\p{L}\p{M}]/u.test(t)) {
+      // números y signos: un carácter por ficha (2019 → 2 · 0 · 1 · 9)
+      for (const c of Array.from(t)) salida.push(ficha(c));
+      continue;
+    }
     for (const f of bpePalabra(t)) {
       const limpio = f.replace('</w>', '');
-      salida.push({ t: limpio === '' ? '·' : limpio, id: idBpe.has(f) ? idBpe.get(f) : 0,
-                    fin: f.endsWith('</w>') });
+      const r = ficha(f, { fin: f.endsWith('</w>') });
+      r.t = limpio === '' ? '·' : limpio;
+      salida.push(r);
     }
   }
   return salida;
@@ -204,7 +223,11 @@ function pintar() {
     d.style.borderColor = f.desc ? Viz.color('error') : 'transparent';
     const t = document.createElement('span');
     t.className = 't';
-    t.textContent = f.desc ? '<desc>' : (f.t === ' ' ? '␣' : f.t);
+    // en «por palabras» la palabra se pierde entera; en los otros modos se
+    // muestra qué pedazo no tiene ficha, para que se vea por qué
+    t.textContent = f.desc
+      ? (ctl.valores.estrategia === 'palabras' ? '<desc>' : '<desc> ' + f.t)
+      : (f.t === ' ' ? '␣' : f.t);
     if (f.fin) { const s = document.createElement('span'); s.className = 'fin';
                  s.textContent = '⏎'; t.appendChild(s); }
     d.appendChild(t);
@@ -236,15 +259,32 @@ function pintar() {
   cajaPromesa.innerHTML = '¿Cuántas veces aparece la letra <b>R</b> en <b>«' + primera +
     '»</b>? El modelo ve esto: <code>[' + trozosP.map(f => f.id).join(', ') + ']</code>.';
 
+  const BYTES = ' Los tokenizadores de GPT trabajan sobre <b>bytes</b>, no sobre ' +
+    'caracteres: cualquier cosa se escribe con los 256 bytes de base, y ahí no hay ' +
+    'desconocidas nunca. Este tokenizador de juguete no llega a tanto.';
+  const est_ = ctl.valores.estrategia;
   ctl.texto('lectura',
-    ctl.valores.estrategia === 'palabras' && desc
-      ? 'Ojo: <b>' + desc + '</b> palabra(s) cayeron en <code>&lt;desc&gt;</code>. ' +
-        'Todo lo que dijeran esas palabras, el modelo no lo va a ver nunca.'
-      : (ctl.valores.estrategia === 'caracteres'
-         ? 'Con caracteres no hay palabras desconocidas jamás. El precio es la ' +
-           'longitud: <b>' + fichas.length + '</b> pasos para leer esto.'
-         : 'Con sub-palabras nunca hay <code>&lt;desc&gt;</code> y la secuencia queda ' +
-           'corta. El precio: las fichas no coinciden con unidades de significado.'));
+    est_ === 'palabras'
+      ? (desc
+          ? 'Ojo: <b>' + desc + '</b> ficha(s) cayeron en <code>&lt;desc&gt;</code> ' +
+            '(palabras raras, números, signos). Todo lo que dijeran, el modelo no lo ' +
+            'va a ver nunca.'
+          : 'Todas las palabras de este texto están en el vocabulario. Probá con una ' +
+            'rara, o con los ejemplos de abajo.')
+      : est_ === 'caracteres'
+        ? (desc
+            ? 'Con caracteres, <b>palabras</b> desconocidas no hay. Pero hay <b>' + desc +
+              '</b> carácter(es) que el corpus nunca vio (un emoji, una letra rara): ' +
+              'esos sí caen en <code>&lt;desc&gt;</code>.' + BYTES
+            : 'Con caracteres no hay palabras desconocidas. El precio es la ' +
+              'longitud: <b>' + fichas.length + '</b> pasos para leer esto.')
+        : (desc
+            ? 'Con sub-palabras, cualquier palabra se arma con pedazos… salvo que ' +
+              'tenga un carácter que el corpus nunca vio: hay <b>' + desc +
+              '</b> ficha(s) en <code>&lt;desc&gt;</code>.' + BYTES
+            : 'Con sub-palabras no hay <code>&lt;desc&gt;</code> y la secuencia queda ' +
+              'corta. El precio: las fichas no coinciden con unidades de significado. ' +
+              'Los números se parten en dígitos.'));
 }
 
 /* --- 5. el panel ----------------------------------------------------------- */

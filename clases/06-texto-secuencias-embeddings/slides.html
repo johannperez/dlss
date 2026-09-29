@@ -51,7 +51,7 @@
     descubrir que ese mapa, además de servir, confiesa cosas.</p>
   <aside class="notes">
     1 minuto. No leas objetivos: pasá directo al gancho. La clase entera se juega
-    en los primeros tres minutos y en el modo «eje» de la viz del minuto 70.
+    en los primeros tres minutos y en el modo «eje» de la viz del minuto 75.
   </aside>
 </section>
 
@@ -136,8 +136,9 @@
     <div>
       <h4>Sigue siendo la elección correcta cuando…</h4>
       <p>…tu pregunta es <strong>de qué se habla</strong>. Contar palabras es barato,
-         transparente, auditable y lo entiende un revisor. Un diccionario validado
-         le gana a un transformer en la mitad de los casos.</p>
+         transparente, auditable y lo entiende un revisor. Para muchas preguntas,
+         un diccionario validado alcanza, y es más fácil de defender que un
+         modelo grande.</p>
     </div>
     <div>
       <h4>Se queda corta cuando…</h4>
@@ -151,7 +152,7 @@
   <aside class="notes">
     Esta slide es política, en el buen sentido: mucha gente del aula publicó con
     diccionarios y con LDA. Si arrancás despreciando eso, perdiste la clase.
-    Decilo en serio, no como concesión. 2 minutos.
+    Decilo en serio, no como concesión. 1 minuto.
   </aside>
 </section>
 
@@ -190,7 +191,7 @@
   <aside class="notes">
     Preguntá: «¿qué se perdió acá?». Alguien dice las mayúsculas. Otro, la
     puntuación. Perfecto: son decisiones, no automatismos. Es el libro de códigos
-    de un análisis de contenido, en una línea de código. 3 minutos.
+    de un análisis de contenido, en una línea de código. 2 minutos.
   </aside>
 </section>
 
@@ -200,21 +201,22 @@
   <div class="tarjetas">
     <div><h4>Por caracteres</h4>
       <code>i·n·c·o·n·s…</code><br>
-      Vocabulario chiquito (~100). <strong>Nunca</strong> hay palabra desconocida.
-      Precio: secuencias larguísimas.</div>
+      Vocabulario chiquito (~100). <strong>Nunca</strong> hay palabra desconocida
+      (a lo sumo un carácter raro, como un emoji). Precio: secuencias larguísimas.</div>
     <div><h4>Por palabras</h4>
       <code>inconstitucionalidad</code><br>
       Lo más intuitivo. Precio: el castellano tiene un vocabulario enorme y
       siempre aparece una palabra que no viste. Esa se pierde entera.</div>
     <div><h4>Por sub-palabras</h4>
       <code>in·constitu·ci·on·alidad</code><br>
-      El compromiso que ganó (BPE). Nunca hay desconocidas y las secuencias
-      quedan cortas. Precio: los pedazos no coinciden con el significado.</div>
+      El compromiso que ganó (BPE). Las palabras raras se arman con pedazos y las
+      secuencias quedan cortas (el de GPT trabaja sobre <em>bytes</em>: ahí no hay
+      desconocidas nunca). Precio: los pedazos no coinciden con el significado.</div>
   </div>
   <aside class="notes">
     Tres compromisos, no tres opciones donde una es mejor. Preguntá cuál usarían.
     La mayoría dice «por palabras» porque es la intuitiva. Anotalo: en la viz que
-    sigue van a ver por qué ganó la tercera. 3 minutos.
+    sigue van a ver por qué ganó la tercera. 2 minutos.
   </aside>
 </section>
 
@@ -234,7 +236,9 @@
     vea partirse. Después cambiá a «por palabras» y mostrá el &lt;desc&gt;.
     <b>Cerrá con la siembra:</b> «¿cuántas erres tiene esta palabra? Guardá la
     pregunta: en la clase 8 explicamos con esto por qué ChatGPT cuenta mal las
-    letras». No la respondas. 5 minutos.
+    letras». No la respondas. Si alguien aprieta «números y emoji», el emoji sale
+    como &lt;desc&gt; también con sub-palabras: este BPE de juguete trabaja sobre
+    caracteres; el de GPT, sobre bytes, y por eso ahí no pasa. 4 minutos.
   </aside>
 </section>
 
@@ -247,18 +251,20 @@
      y cada una se reemplaza por su posición en la lista.</p>
   <table>
     <tr><th>ficha</th><td>el</td><td>proyecto</td><td>fue</td><td>aprobado</td><td>por</td><td>la</td><td>cámara</td></tr>
-    <tr><th>número</th><td>5</td><td>147</td><td>63</td><td>—</td><td>11</td><td>2</td><td>281</td></tr>
+    <tr><th>número</th><td>5</td><td>146</td><td>59</td><td>—</td><td>11</td><td>2</td><td>768</td></tr>
   </table>
   <div class="ojo compacta"><strong>Ese número no significa nada.</strong> Es el lugar
     donde quedó la palabra en una lista ordenada por frecuencia. Que «cámara» sea
-    281 y «la» sea 2 no dice que una sea el doble de nada.
+    768 y «la» sea 2 no dice que una valga más que la otra.
     Y <code>aprobado</code> no está: es
     <span class="glosario"><span class="en">OOV</span><span class="es">fuera de vocabulario</span></span>,
     y desaparece sin avisar.</div>
   <aside class="notes">
     El «no significa nada» es importante: si el número tuviera sentido de escala,
     el modelo aprendería una relación falsa. Es lo que motiva la slide siguiente.
-    2 minutos.
+    Los números son las posiciones reales en el vocabulario de 2.000 del corpus
+    (el 0 queda reservado para &lt;desc&gt;), los mismos que muestra la viz del
+    tokenizador en modo «por palabras». 1 minuto.
   </aside>
 </section>
 
@@ -279,7 +285,7 @@
   <p>Un vector del tamaño del vocabulario entero. Por cada palabra.</p>
   <aside class="notes">
     Estirá los brazos para dar la idea del largo del vector. Es tonto y funciona.
-    2 minutos.
+    1 minuto.
   </aside>
 </section>
 
@@ -313,12 +319,16 @@
   <p class="viz-pie"><b>Qué mirar:</b> alterná <code>diputados</code> ↔
     <code>senadores</code>: a la izquierda el 1 se corre y nada más; a la derecha
     el patrón es casi el mismo. Ahora poné <code>trigo</code>: a la izquierda pasa
-    <em>lo mismo de siempre</em>; a la derecha cambia todo.
+    <em>lo mismo de siempre</em>; a la derecha cambia todo. Similitud coseno
+    (más alto = más parecido): en one-hot, 0 y 0; en el embedding,
     <span class="cifra">0,863</span> contra <span class="cifra">0,031</span>.</p>
   <aside class="notes">
     Alterná vos entre las tres palabras, despacio, mirando la pantalla en silencio.
     Que vean los dos lados a la vez. Después preguntá: «¿de dónde salieron esos
-    cien números de la derecha?». Nadie sabe. Esa es la slide que sigue. 4 minutos.
+    cien números de la derecha?». Nadie sabe. Esa es la slide que sigue.
+    Ojo con mezclar: el √2 de la slide anterior es una <b>distancia</b> (más = más
+    lejos); 0,863 es una <b>similitud</b> (más = más cerca). Si alguien pide la
+    distancia del embedding: 0,52 contra 1,39. 3 minutos.
   </aside>
 </section>
 
@@ -342,7 +352,7 @@
   <aside class="notes">
     Este es el [CALLBACK DIBUJO] de la clase y hay que decirlo con todas las
     letras. La metáfora del curso se estira: seguimos dibujando, cambió qué.
-    2 minutos.
+    1 minuto.
   </aside>
 </section>
 
@@ -361,9 +371,9 @@
     <strong>Ustedes pueden discutir esto mejor que un ingeniero.</strong></div>
   <aside class="notes">
     <b>Acá se pregunta y se escucha.</b> «¿El significado de una palabra es su uso?»
-    Dejá que hablen dos o tres minutos. Es la slide donde la clase deja de ser «de
+    Dejá que hablen un par de minutos. Es la slide donde la clase deja de ser «de
     computación». No la apures y no la cierres vos: cerrala con «bueno, la máquina
-    ya decidió que sí; veamos qué le sale». 4 minutos.
+    ya decidió que sí; veamos qué le sale». 3 minutos.
   </aside>
 </section>
 
@@ -371,8 +381,8 @@
 <section>
   <h2>Cómo se aprende el mapa</h2>
   <ol>
-    <li><strong>Contar</strong> con qué palabras aparece cada palabra (a menos de
-        5 de distancia). Eso es una tabla gigante: la <em>coocurrencia</em>.</li>
+    <li><strong>Contar</strong> con qué palabras aparece cada palabra (a 5 palabras
+        o menos, a cada lado). Eso es una tabla gigante: la <em>coocurrencia</em>.</li>
     <li><strong>Descontar la frecuencia</strong>: «de» está cerca de todo, y eso no
         dice nada. Se pregunta si dos palabras aparecen juntas <em>más de lo
         esperado por azar</em>. Es un residuo de tabla de contingencia.</li>
@@ -385,7 +395,7 @@
   <aside class="notes">
     La analogía del análisis de correspondencias baja la ansiedad muchísimo: «esto
     que parece de Silicon Valley lo hace la sociología francesa desde los setenta».
-    Si en el aula hay gente de sociología, mirala al decirlo. 3 minutos.
+    Si en el aula hay gente de sociología, mirala al decirlo. 2 minutos.
   </aside>
 </section>
 
@@ -411,7 +421,7 @@
   </aside>
 </section>
 
-<!-- ===== PAUSA ======================================================== -->
+<!-- ===== 18 · PAUSA =================================================== -->
 <section class="pausa">
   <h2>Pausa</h2>
   <p class="minutos">10 minutos</p>
@@ -421,7 +431,7 @@
   </p>
 </section>
 
-<!-- ===== 18 · VOLVIMOS =============================================== -->
+<!-- ===== 19 · VOLVIMOS =============================================== -->
 <section>
   <span class="marca">discusión</span>
   <h2>Volvimos: ¿qué encontraron?</h2>
@@ -438,11 +448,11 @@
   <aside class="notes">
     Pedí dos o tres listas que hayan sacado ellos con sus palabras del TODO 2.
     Escribilas en el pizarrón. Que la clase vea que el hallazgo salió de ellos y no
-    de la pantalla. 3 minutos.
+    de la pantalla. 2 minutos.
   </aside>
 </section>
 
-<!-- ===== 19 · VIZ EL MAPA ============================================ -->
+<!-- ===== 20 · VIZ EL MAPA ============================================ -->
 <section>
   <span class="marca">viz</span>
   <h3>El mapa donde viven las palabras</h3>
@@ -460,7 +470,7 @@
   </aside>
 </section>
 
-<!-- ===== 20 · LOS VECINOS CUENTAN UNA HISTORIA ====================== -->
+<!-- ===== 21 · LOS VECINOS CUENTAN UNA HISTORIA ====================== -->
 <section>
   <h2>Los vecinos cuentan una historia</h2>
   <table class="vecinos">
@@ -482,41 +492,50 @@
     y no lo produjo una teoría: lo produjo un conteo.</div>
   <aside class="notes">
     Detenete en «docentes». Preguntá: «¿qué les dice que docentes esté al lado de
-    salario y de piso, y no al lado de aula o de pedagogía?». Sale solo.
-    3 minutos.
+    salario y de piso, y no al lado de aula o de pedagogía?». Sale solo. Y si
+    alguien lo quiere llevar a un paper: es una pista a validar. Con la mitad del
+    corpus, de esas vecinas queda sólo «mínimo» (celda de estabilidad del notebook).
+    2 minutos.
   </aside>
 </section>
 
-<!-- ===== 21 · ARITMÉTICA ============================================ -->
+<!-- ===== 22 · ARITMÉTICA ============================================ -->
 <section>
   <h2>La cuenta famosa (y su letra chica)</h2>
   <p class="frase-grande">rey − hombre + mujer ≈ reina</p>
   <p>Se puede hacer porque son vectores. Y se exageró <strong>muchísimo</strong> en
      la divulgación. En nuestro corpus, de <strong>diez</strong> analogías con una
-     expectativa escrita <em>de antemano</em>, aciertan <span class="cifra">dos</span>.</p>
+     expectativa escrita <em>de antemano</em>, aciertan <span class="cifra">cinco</span>,
+     y sólo <span class="cifra">una</span> sale primera.</p>
   <table class="vecinos">
-    <tr><td>córdoba − provincia + salta</td><td>= formosa, mendoza, catamarca… <em>otras provincias</em>, no «provincias». El barrio correcto, la casa no.</td></tr>
-    <tr><td>escuelas − escuela + hospitales</td><td>= municipios, viviendas, centros. Plural→singular: no está.</td></tr>
+    <tr><td>senado − senadores + diputados</td><td>= carlos, señor, <b>cámara</b>… Acierta (3.ª), con ruido. <em>Al revés</em> (senadores − senado + diputados) da gobernadores, miembros, ministros.</td></tr>
+    <tr><td>escuela − escuelas + hospitales</td><td>= primaria, atención, órganos… Plural→singular: no está.</td></tr>
     <tr><td>mujeres − hombres + niños</td><td>= embarazadas, menores, hijo. Esperábamos «niñas», que ni siquiera entra al vocabulario de 2.000 palabras.</td></tr>
   </table>
-  <div class="ojo compacta">Con 347.714 palabras de corpus, la aritmética casi no
-    funciona. Es una propiedad que aparece con <em>muchísimo</em> más texto. Decilo
-    antes de que lo descubran solos y se frustren.<br>
-    <span style="font-size:.8em;color:var(--tinta-3)">Y somos generosos contando:
-    damos por acertada la analogía si la palabra esperada aparece entre las
-    <b>cinco</b> primeras. Con el criterio estricto —que salga primera— acierta
-    <b>una</b> de diez.</span></div>
+  <div class="ojo compacta"><strong>El orden de la resta importa:</strong>
+    <code>a − b + c</code> le aplica a <code>c</code> la relación que lleva de
+    <code>b</code> a <code>a</code>. Seis de las diez relaciones, planteadas al revés,
+    aciertan <b>cero</b>; bien planteadas, <b>tres</b>. Con 347.714 palabras, la
+    aritmética funciona a medias, y a veces por una frase hecha («Asamblea
+    Legislativa»), no por la relación.<br>
+    <span style="font-size:.8em;color:var(--tinta-3)">Contamos con manga ancha:
+    acierta si la palabra esperada está entre las <b>cinco</b> primeras. Con el
+    criterio estricto —que salga primera— acierta <b>una</b> de diez.</span></div>
   <aside class="notes">
-    El dato para dejar caer, con los números medidos: en 35 discursos de apertura
+    Decilo antes de que lo descubran solos y se frustren. El dato para dejar caer,
+    con los números medidos: en 35 discursos de apertura
     <b>«niños» aparece 78 veces y «niñas» 11; «chicos» 69 y «chicas» 2</b>. Por eso
     «niñas» no entra al vocabulario de las 2.000 más frecuentes. No es que no exista
     en el corpus: es que casi no se dice. Eso, solo, ya es un hallazgo, y sale de
-    contar. Dejá cinco segundos. 3 minutos. Si vas apretado, esta slide se recorta
-    a la mitad.
+    contar. Dejá cinco segundos.
+    <b>El orden de la resta es un momento de medición:</b> una versión anterior de
+    esta misma clase tenía siete analogías al revés y concluía «aciertan dos de
+    diez». En la viz, modo aritmética, está el botón «la trampa: la resta al revés».
+    2 minutos. Si vas apretado, esta slide se recorta a la primera fila.
   </aside>
 </section>
 
-<!-- ===== 22 · LA APUESTA (antes de la viz de sesgo) ================= -->
+<!-- ===== 23 · LA APUESTA (antes de la viz de sesgo) ================= -->
 <section class="pregunta">
   <h2>Si armamos un eje entre «hombres» y «mujeres» y proyectamos
       <code>niños</code>, <code>poder</code>, <code>familia</code> y
@@ -533,7 +552,7 @@
   </aside>
 </section>
 
-<!-- ===== 23 · VIZ SESGO / EJE ======================================= -->
+<!-- ===== 24 · VIZ SESGO / EJE ======================================= -->
 <section>
   <span class="marca">viz · modo eje</span>
   <h3>La misma propiedad, mirada del otro lado</h3>
@@ -550,11 +569,11 @@
     Después, una sola frase: «esto no es un error del modelo. El modelo aprendió
     cómo se habla en el corpus. El sesgo estaba en el corpus, o sea, en nosotros».
     Después cambiá a «ocupaciones». No agregues nada más hasta que alguien hable.
-    6 minutos, y si se estira, dejala estirarse.
+    5 minutos, y si se estira, dejala estirarse (y recortá la 22 o la 35).
   </aside>
 </section>
 
-<!-- ===== 24 · PROBLEMA O INSTRUMENTO =============================== -->
+<!-- ===== 25 · PROBLEMA O INSTRUMENTO =============================== -->
 <section>
   <h2>¿Problema… o instrumento?</h2>
   <div class="comparacion">
@@ -576,18 +595,18 @@
     Alguien va a pedir «el modelo sin sesgo». Desarmalo así: un embedding sin sesgo
     es un embedding que no refleja el corpus, o sea, un mal termómetro. La corrección
     tiene sentido en aplicaciones de decisión, y aun ahí es difícil y parcial.
-    3 minutos.
+    2 minutos.
   </aside>
 </section>
 
-<!-- ===== 24bis · LAS TRES LÍNEAS =================================== -->
+<!-- ===== 26 · LAS TRES LÍNEAS ====================================== -->
 <section>
   <span class="marca">el código</span>
   <h3>Todo lo de hoy, en tres líneas</h3>
   <pre><code class="language-python" data-trim>
 corpus = datos.corpus_mini_gpt()          # 35 discursos, 2,2 MB de texto real
 
-V, palabras = datos.embeddings_ppmi_svd(  # unos 4 segundos en CPU
+V, palabras = datos.embeddings_ppmi_svd(  # unos segundos en CPU
     corpus, dim=100, top=2000, ventana=5, minimo=8)
 
 datos.vecinos("pobreza", V, palabras, k=6)
@@ -599,14 +618,14 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <code>corpus</code> por tu corpus y ya está.</div>
   <aside class="notes">
     Mostrá que son literalmente tres líneas. Alguien va a preguntar «¿y para mi
-    corpus?»: la respuesta es que `corpus` es un string, nada más. 2 minutos.
+    corpus?»: la respuesta es que `corpus` es un string, nada más. 1 minuto.
   </aside>
 </section>
 
-<!-- ===== 25 · EL LUNES ============================================= -->
+<!-- ===== 27 · EN TU INVESTIGACIÓN ======================================== -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué podés hacer el lunes con esto</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué podés hacer con esto en tu investigación</h2>
   <ol>
     <li><strong>Los vecinos de tus cinco palabras clave.</strong> Corpus propio, tres
         líneas, diez minutos. Vas a aprender algo de tu corpus que no sabías.</li>
@@ -615,20 +634,23 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <li><strong>Cambio semántico.</strong> Entrená dos embeddings, uno por período, y
         compará las vecinas de una palabra. En este corpus, las vecinas de
         <code>seguridad</code> pasan de <em>social · justicia · salud</em> (1984-1999)
-        a <em>policía · fuerzas · defensa</em> (2004-2019). <strong>De ocho vecinas,
-        siguen dos.</strong></li>
+        a <em>policía · fuerzas · defensa</em> (2004-2019): de ocho vecinas, siguen
+        dos. <strong>Pero con dos mitades del corpus sin corte de época siguen
+        cuatro</strong>: esa es la vara del ruido, y hay que ponerla al lado.</li>
   </ol>
   <div class="ojo compacta">Si tu corpus tiene 200 documentos cortos,
     <strong>no</strong> entrenes embeddings propios: te va a salir ruido. Ahí van
     modelos pre-entrenados, y eso es la clase 9.</div>
   <aside class="notes">
     El punto 3 es el que se llevan puesto. Mostralo en la viz, modo «dos épocas»,
-    palabra «seguridad», si te queda tiempo. Es la tesis de alguien del aula.
-    3 minutos.
+    palabra «seguridad», si te queda tiempo. Es la tesis de alguien del aula, y
+    la vara es lo que la hace defendible: el mismo corpus partido en dos mitades
+    alternadas ya cambia la mitad de las vecinas, así que «de 8 siguen 2» es una
+    pista, no una prueba. 2 minutos.
   </aside>
 </section>
 
-<!-- ===== 26 · ADVERTENCIA DE VALIDEZ ============================== -->
+<!-- ===== 28 · ADVERTENCIA DE VALIDEZ ============================== -->
 <section>
   <h2>La advertencia que te salva de un revisor</h2>
   <div class="ojo">
@@ -653,11 +675,11 @@ datos.vecinos("pobreza", V, palabras, k=6)
   <aside class="notes">
     Preguntá por qué quedan cerca antes de explicarlo. La respuesta correcta —
     «porque aparecen en las mismas oraciones» — la dice alguien del aula casi siempre.
-    3 minutos.
+    2 minutos.
   </aside>
 </section>
 
-<!-- ===== 27 · PRÁCTICO 2 ========================================== -->
+<!-- ===== 29 · PRÁCTICO 2 ========================================== -->
 <section>
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2 — de a dos</h2>
@@ -669,7 +691,8 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <li>Ver que el <strong>loop de cinco líneas de la clase 4</strong>, sin cambiarle
         nada, encuentra casi el mismo mapa que el atajo exacto (5,2 vecinas de 6).</li>
     <li><strong><code>TODO 3</code></strong>: los vecinos de tres palabras tuyas.
-        Anotá <em>cuál te sorprendió</em>.</li>
+        Anotá <em>cuál te sorprendió</em>, y mirá cuánto cambian con la mitad
+        del corpus.</li>
     <li><strong><code>TODO 4</code></strong>: el parecido entre los 35 discursos.
         Ojo con el primer número que les va a dar.</li>
     <li><strong><code>TODO 5</code> y <code>TODO 6</code></strong>: las dos preguntas
@@ -677,12 +700,13 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </ol>
   <aside class="notes">
     17 minutos. Si te atrasaste, esta es la única casilla que se puede achicar a 12,
-    y el resto del notebook se termina en casa. Pasá por las mesas: el momento en
-    que el heatmap crudo les sale todo amarillo es cuando levantan la mano.
+    y el resto del notebook (secciones 8 a 10, una media hora) se termina en casa
+    antes de la clase 7. Pasá por las mesas: el momento en que el heatmap crudo les
+    sale todo amarillo es cuando levantan la mano.
   </aside>
 </section>
 
-<!-- ===== 28 · Y AHORA EL ORDEN ==================================== -->
+<!-- ===== 30 · Y AHORA EL ORDEN ==================================== -->
 <section>
   <h2>Y ahora sí: el orden</h2>
   <p class="bajada">Tenemos un vector por palabra. Nos falta la mitad del problema.</p>
@@ -694,7 +718,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   <aside class="notes">1 minuto. Es una bisagra, no una slide de contenido.</aside>
 </section>
 
-<!-- ===== 29 · PROMEDIAR =========================================== -->
+<!-- ===== 31 · PROMEDIAR =========================================== -->
 <section>
   <h2>Opción 1: promediar</h2>
   <p>Sumás los vectores de todas las palabras y dividís. Es lo primero que se te
@@ -705,11 +729,11 @@ datos.vecinos("pobreza", V, palabras, k=6)
     Volvimos al problema del principio de la clase, con más decimales.</div>
   <aside class="notes">
     «Con más decimales» es el chiste y funciona. Después ponete serio: mejoramos la
-    representación de la palabra y no tocamos el problema de la secuencia. 2 minutos.
+    representación de la palabra y no tocamos el problema de la secuencia. 1 minuto.
   </aside>
 </section>
 
-<!-- ===== 30 · VIZ BOLSA VS ORDEN ================================== -->
+<!-- ===== 32 · VIZ BOLSA VS ORDEN ================================== -->
 <section>
   <span class="marca">viz</span>
   <h3>Dos frases, un solo vector</h3>
@@ -724,50 +748,53 @@ datos.vecinos("pobreza", V, palabras, k=6)
   <aside class="notes">
     Recorré los cinco pares en orden. Frená en la negación. Preguntá: «¿cuántos de
     ustedes tienen una variable en su investigación que depende de una negación?».
-    Se levantan manos. 4 minutos.
+    Se levantan manos. 3 minutos.
   </aside>
 </section>
 
-<!-- ===== 31 · LEER EN ORDEN ====================================== -->
+<!-- ===== 33 · LEER EN ORDEN ====================================== -->
 <section>
   <h2>Opción 2: leer en orden, con una mochila</h2>
   <div class="intuicion">
     Una persona lee palabra por palabra y va arrastrando <strong>una mochila</strong>
-    con todo lo que entendió hasta ahí. Cada palabra nueva actualiza la mochila.
-    Al final, la mochila <em>es</em> el resumen de la frase.
+    con lo que entendió hasta ahí. La mochila es de <strong>tamaño fijo</strong>:
+    cada palabra nueva la actualiza, pisando algo de lo que había. Al final, la
+    mochila <em>es</em> el resumen de la frase.
   </div>
   <p>Eso es una <span class="glosario"><span class="en">RNN</span><span class="es">red recurrente</span></span>:
      lee en orden y arrastra un estado. Fue el estado del arte en texto
      hasta 2017, y <strong>por fin distingue quién le hizo qué a quién</strong>,
      porque el orden le llega.</p>
   <aside class="notes">
-    Caminá por el aula haciendo el gesto de cargar una mochila que se llena. Es tonto
-    y se acuerdan. Dejá la sensación de solución antes de romperla. 2 minutos.
+    Caminá por el aula haciendo el gesto de meter cosas en una mochila chica que ya
+    está llena: para que entre lo nuevo, algo se cae. Es tonto y se acuerdan. Dejá la
+    sensación de solución antes de romperla. 1 minuto.
   </aside>
 </section>
 
-<!-- ===== 32 · VIZ MEMORIA ======================================== -->
+<!-- ===== 34 · VIZ MEMORIA ======================================== -->
 <section>
   <span class="marca">viz</span>
-  <h3>…y la mochila se va vaciando</h3>
+  <h3>…y lo del principio se va perdiendo</h3>
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/memoria-que-se-olvida.html" title="la memoria que se olvida" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> para decidir «lo» o «la» hace falta la palabra
-    <b>2</b>. Con la mochila chica, en la 32 queda <span class="cifra">0 %</span>: moneda
-    al aire. Al máximo (64 veces más memoria) queda <span class="cifra">40 %</span>.</p>
+    <b>2</b>. Con la mochila en el mínimo, en la 32 queda <span class="cifra">0 %</span>:
+    moneda al aire. Al máximo (128 veces más memoria) queda <span class="cifra">40 %</span>.</p>
   <aside class="notes">
     Apretá «Leer» con la mochila en el mínimo y no hables mientras corre. Cuando el
     cursor llega a «lo», mostrá las dos barras 50/50 y decí: «el modelo está tirando
     una moneda». Después subí la mochila al máximo y volvé a leer: ahora acierta,
-    pero de la primera palabra perdió el 60 % igual. La frase que cierra:
-    «agrandar la memoria <b>posterga</b> el problema; con una oración el doble de
-    larga volvés al mismo lugar, y la mochila grande se paga en perillas y en
-    tiempo». 4 minutos.
+    pero de «proyecto», la segunda palabra, perdió el 60 % igual. La frase que
+    cierra: «agrandar la memoria <b>posterga</b> el problema; con el doble de
+    distancia quedaría un 16 %, casi la moneda al aire otra vez, y la mochila
+    grande se paga en perillas y en tiempo». Es una ilustración esquemática, no una
+    RNN entrenada: decilo si preguntan. 3 minutos.
   </aside>
 </section>
 
-<!-- ===== 33 · LAS RNN EN 30 SEGUNDOS ============================= -->
+<!-- ===== 35 · LAS RNN EN 30 SEGUNDOS ============================= -->
 <section>
   <h2>Las RNN en treinta segundos</h2>
   <p>Hubo veinte años de ingeniería para que la mochila olvidara mejor:
@@ -776,16 +803,20 @@ datos.vecinos("pobreza", V, palabras, k=6)
   <div class="ojo compacta">Dos límites que las compuertas no arreglan:
     el olvido se posterga pero no desaparece, y sobre todo
     <strong>hay que leer en orden</strong>, una palabra por vez. No se puede
-    paralelizar, así que no se puede entrenar con muchísimo texto.</div>
+    paralelizar a lo largo de la frase, así que entrenar con muchísimo texto es
+    lentísimo y caro.</div>
   <p style="font-size:.8em">No las vamos a implementar. Están acá sólo para que se
      entienda <em>qué problema</em> vino a resolver lo de la clase que viene.</p>
   <aside class="notes">
     <b>Esta es la slide que se recorta si vas atrasado.</b> Se dice en dos oraciones
-    de pie y se pasa. Lo que NUNCA se recorta es la slide siguiente. 2 minutos.
+    de pie y se pasa. Lo que NUNCA se recorta es la slide siguiente. 1 minuto.
+    Si alguien pregunta por qué olvida: al entrenar, la señal que tiene que volver
+    hasta las primeras palabras se achica paso a paso (el gradiente que se
+    desvanece). Las compuertas de la LSTM son justamente para eso.
   </aside>
 </section>
 
-<!-- ===== 34 · LA PREGUNTA ======================================== -->
+<!-- ===== 36 · LA PREGUNTA ======================================== -->
 <section class="pregunta">
   <h2>¿Y si en vez de <em>recordar</em>,<br>miramos directamente?</h2>
   <p style="font-size:.75em;color:var(--tinta-2);max-width:26em;margin:1em auto 0">
@@ -799,7 +830,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 35 · QUÉ TE LLEVÁS ===================================== -->
+<!-- ===== 37 · QUÉ TE LLEVÁS ===================================== -->
 <section>
   <h2>Qué te llevás de hoy</h2>
   <ol>
@@ -813,11 +844,11 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </ol>
   <aside class="notes">
     Tres, no cuatro. Si te sobra tiempo no agregues una cuarta: repetí la segunda.
-    2 minutos.
+    1 minuto.
   </aside>
 </section>
 
-<!-- ===== 36 · HERRAMIENTAS ====================================== -->
+<!-- ===== 38 · HERRAMIENTAS ====================================== -->
 <section>
   <h2>Herramientas que ya podés usar</h2>
   <div class="tarjetas">
@@ -826,17 +857,17 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <div><h4>gensim</h4>La biblioteca clásica para entrenar word2vec y usar
       embeddings. Si tu corpus es grande, es lo que vas a usar.</div>
     <div><h4>ssdl (este curso)</h4><code>datos.embeddings_ppmi_svd()</code> y
-      <code>datos.vecinos()</code>: sin dependencias, sin red, cuatro segundos.
+      <code>datos.vecinos()</code>: sin dependencias, sin red, unos segundos.
       Suficiente para explorar.</div>
   </div>
-  <div class="ss compacta">No reinventes la rueda el lunes. Lo de hoy es para
+  <div class="ss compacta">No reinventes la rueda cuando lo uses en serio. Lo de hoy es para
     <strong>entender qué hace la rueda</strong> cuando te dé un número raro.</div>
   <aside class="notes">
     1 minuto. No te metas a comparar bibliotecas: no es esta clase.
   </aside>
 </section>
 
-<!-- ===== 37 · GLOSARIO ========================================== -->
+<!-- ===== 39 · GLOSARIO ========================================== -->
 <section>
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista apretada">
@@ -849,15 +880,15 @@ datos.vecinos("pobreza", V, palabras, k=6)
     <li><b>cosine similarity</b><span>similitud coseno — qué tan parecido apuntan dos vectores, de −1 a 1</span></li>
     <li><b>bag-of-words</b><span>bolsa de palabras — representar un texto por sus conteos, tirando el orden</span></li>
     <li><b>distributional hypothesis</b><span>hipótesis distribucional — «conocerás una palabra por la compañía que mantiene»</span></li>
-    <li><b>RNN / LSTM</b><span>red recurrente — lee en orden arrastrando una mochila de memoria</span></li>
+    <li><b>RNN / LSTM</b><span>red recurrente — lee en orden arrastrando una mochila de tamaño fijo; la LSTM le suma compuertas que eligen qué guardar</span></li>
   </ul>
   <aside class="notes">
     No la leas entera: está para que la fotografíen. Señalá dos: OOV y similitud
-    coseno, que son las que van a usar mañana. 1 minuto.
+    coseno, que son las que más van a usar en su propio trabajo. 1 minuto.
   </aside>
 </section>
 
-<!-- ===== 38 · PUENTE =========================================== -->
+<!-- ===== 40 · PUENTE =========================================== -->
 <section class="portada">
   <p class="num-clase">La que viene</p>
   <h1>Clase 7: attention</h1>
@@ -867,7 +898,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
     olvidarse de nada.</p>
   <aside class="notes">
     Cerrá prometiendo algo cobrable: «la clase que viene vamos a construir la pieza,
-    y en la 8 la entrenamos y la vemos escribir». 1 minuto.
+    y en la 8 entrenamos un mini-GPT, letra por letra, y lo vemos escribir». 1 minuto.
   </aside>
 </section>
 
