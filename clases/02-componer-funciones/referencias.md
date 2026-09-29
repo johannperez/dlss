@@ -18,14 +18,22 @@
 
 ## Si te quedaste con ganas
 
-En el orden en que conviene mirarlas.
+En el orden en que conviene mirarlas. **Lo único que vale la pena hacer antes
+de la clase 3 es el 1** (media hora); el resto es para cuando tengas tiempo, sin
+plazo. Entre clase y clase hay dos días, y el notebook y el cuestionario ya
+ocupan su parte.
 
 **1. Nielsen, Michael — *Neural Networks and Deep Learning*, capítulo 4:
 «A visual proof that neural nets can compute any function».** `[VERIFICAR URL]`
 > **Esto es la clase de hoy, escrito por otro y con las visualizaciones adentro
 > del texto.** Si sólo vas a leer una cosa, leé ésta. Nielsen construye la misma
 > demostración que hicimos con `viz/rampas.html`, pero con escalones en vez de
-> rampas, y llega al mismo lugar. El libro es gratuito y está online completo.
+> rampas: arma piezas **locales** («sombreritos», que suben y bajan) y las suma.
+> Con rampas sueltas eso no pasa —cada rampa sigue subiendo después de su
+> codo—, pero se arma igual combinando varias. Llega al mismo lugar. El libro es
+> gratuito y está online completo. (El capítulo 5 cuenta por qué las redes
+> profundas con sigmoides eran difíciles de entrenar, que en este curso no se
+> desarrolla.)
 > Está en inglés, pero el capítulo 4 es más figuras que texto.
 > *Empezá por acá.* Media hora.
 
@@ -64,7 +72,8 @@ Machine Learning and the Social Sciences*, Princeton University Press.**
 **5. Cybenko, G. (1989), *Approximation by superpositions of a sigmoidal
 function*, Mathematics of Control, Signals and Systems 2(4), 303-314.**
 `[VERIFICAR]`
-> El paper original del teorema de aproximación universal, con sigmoides.
+> El paper original del teorema de aproximación universal, **con sigmoides**
+> (no con rampas: para la rampa, ver el 6b).
 > **No hace falta leerlo** y es matemática dura. Está acá para que puedas citarlo
 > correctamente cuando alguien te diga "está demostrado que las redes pueden
 > aproximar cualquier cosa": ahora sabés qué dice exactamente esa demostración
@@ -72,10 +81,20 @@ function*, Mathematics of Control, Signals and Systems 2(4), 303-314.**
 
 **6. Hornik, K. (1991), *Approximation capabilities of multilayer feedforward
 networks*, Neural Networks 4(2), 251-257.** `[VERIFICAR]`
-> La generalización del resultado de Cybenko: la propiedad no depende de la
-> forma exacta del doblez, sino de que **haya** un doblez. Es exactamente la
-> lección de `viz/sin-no-linealidad.html`, escrita como teorema. Misma
-> advertencia: se cita, no se lee, salvo que te guste el análisis funcional.
+> La generalización del resultado de Cybenko a activaciones **acotadas** y no
+> constantes. Ojo: la rampa **no** está acotada (crece sin techo), así que este
+> paper todavía no la cubre. Misma advertencia: se cita, no se lee, salvo que te
+> guste el análisis funcional.
+
+**6b. Leshno, M., Lin, V. Y., Pinkus, A. & Schocken, S. (1993), *Multilayer
+feedforward networks with a nonpolynomial activation function can approximate
+any function*, Neural Networks 6(6), 861-867.** `[VERIFICAR URL]`
+> **El que hay que citar para la rampa (ReLU).** Prueba que la propiedad no
+> depende de la forma exacta del doblez, **mientras el doblez no sea un
+> polinomio**. Que «haya un doblez» no alcanza: un polinomio también dobla y no
+> es aproximador universal. La rampa no es un polinomio, así que entra. Es la
+> lección de `viz/sin-no-linealidad.html` llevada a teorema. Como los otros dos:
+> se cita, no se lee.
 
 **7. McCulloch, W. & Pitts, W. (1943), *A logical calculus of the ideas immanent
 in nervous activity*, Bulletin of Mathematical Biophysics 5, 115-133.**
@@ -97,7 +116,8 @@ Press, capítulo 6 («Deep Feedforward Networks»), secciones 6.1 a 6.4.**
 
 **9. Breiman, L. (2001), *Statistical Modeling: The Two Cultures*, Statistical
 Science 16(3), 199-231.** `[VERIFICAR URL]`
-> No habla de redes neuronales y es de lo mejor que podés leer esta semana.
+> No habla de redes neuronales y es de lo mejor que podés leer en todo el curso
+> (sin apuro: no es tarea).
 > Breiman distingue dos formas de usar modelos: para **explicar** un mecanismo o
 > para **predecir** un resultado. La clase de hoy construyó una máquina
 > descaradamente del segundo tipo, y buena parte de la incomodidad legítima que
@@ -126,8 +146,10 @@ da 403).
 > declara licencia**. Uso educativo con cita. Si el curso se publica, hay que
 > escribirle al autor. Ver `datos/README.md` §1.1.
 
-**La serie que usamos hoy** (`inflacion_suave`, 1984-2019, media móvil de 3 años)
-sale de aplicarle a ese corpus el léxico que está en
+**La serie que usamos hoy** (1984-2019, media móvil de 3 años calculada por
+`ssdl.datos.serie_menciones(..., suavizada=True)` por años calendario, sin
+cruzar los huecos de la serie: el valor de 1984 promedia 1984 y 1985) sale de
+aplicarle a ese corpus el léxico que está en
 `datos/preparar_corpus.py`, a la vista y versionado. **Ese léxico lo escribimos
 nosotros**: la serie mide *ese* léxico, no «la inflación». Cambiar la lista de
 palabras cambia la serie, y eso es un tema de la clase 10 sembrado desde acá.
@@ -138,6 +160,7 @@ palabras cambia la serie, y eso es un tema de la clase 10 sembrado desde acá.
 
 - **El sobreajuste** (lo que viste al apretar «32 rampas»): clase 4.
 - **Cómo se encuentran los pesos solos**: clase 3.
-- **Por qué la rampa y no la sigmoide, en serio**: clase 3, cuando se vea qué le
-  pasa a la señal al bajar por muchas capas.
+- **Por qué la rampa y no la sigmoide, en serio**: no se desarrolla en el curso.
+  Si te interesa, está en el capítulo 5 de Nielsen (el 1 de esta lista).
+- **Softmax** (la activación de salida que convierte en probabilidades): clase 7.
 - **Ancho contra profundo, con imágenes**: clase 5.

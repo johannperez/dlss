@@ -16,11 +16,12 @@
 
      NÚMEROS MEDIDOS sobre la serie real (media móvil de 3 años de las menciones
      a «inflación», 1984-2019, n = 36):
-       · la mejor recta posible ........ MSE 0.001496 · pendiente +0,00043 por año
-       · una raya en el promedio ....... MSE 0.001516
-       · r = 0,115  →  R² = 1,3 %
-     Es decir: la mejor recta explica el 1,3 % de la variación. Ese número es el
-     gancho de la clase entera.
+       · la mejor recta posible ........ MSE 0.001561 · pendiente +0,00026 pp por año
+       · una raya en el promedio ....... MSE 0.001568
+       · r = 0,068  →  R² = 0,5 %
+     Es decir: la mejor recta explica el 0,5 % de la variación. Ese número es el
+     gancho de la clase entera. (Medido con la media móvil corregida en el borde:
+     el valor de 1984 promedia 1984 y 1985, no 1975. Script en notas-docente.md §10.)
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -77,14 +78,14 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Primero, el piso: por más que muevas, el
-      desajuste no baja de <b>0.00150</b>, y una raya horizontal en el promedio
-      da <b>0.00152</b>. O sea que <em>la mejor recta posible casi no mejora
-      sobre no hacer nada</em>: explica el 1,3 % de la variación.
+      desajuste no baja de <b>0.00156</b>, y una raya horizontal en el promedio
+      da <b>0.00157</b>. O sea que <em>la mejor recta posible casi no mejora
+      sobre no hacer nada</em>: explica el 0,5 % de la variación.
       Y ahora el golpe de verdad: pasá a <b>3</b> y a <b>5 perillas</b>. Movelas
       todas. La recta se mueve —claro que se mueve—, pero <em>sigue siendo una
       recta</em>: mirá el renglón del panel, las cinco se vuelven a colapsar a
       <b>dos</b> números. Y por eso <b>el desajuste nunca baja del mismo piso de
-      0.00150</b>, tengas dos perillas o tengas cinco.
+      0.00156</b>, tengas dos perillas o tengas cinco.
       <b>Más parámetros no es más flexibilidad.</b> Acordate de esto cuando
       alguien te venda un modelo por su tamaño.
     </div>
@@ -105,7 +106,7 @@
 const EMBEBIDO = document.body.classList.contains('embebido');
 
 const ANIO_0 = 1984, ANIO_1 = 2019;
-const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+const SERIE = [0.1143, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
                0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
                0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
                0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
@@ -114,10 +115,10 @@ const objetivo = SERIE.map((v, i) => ({ x: ANIO_0 + i, y: v }));
 const PROMEDIO = SERIE.reduce((a, b) => a + b, 0) / SERIE.length;
 
 // Medidos, no estimados (ver la cabecera del archivo).
-const MEJOR_RECTA = 0.001496;
-const MEJOR_A = 0.00043156;                 // pendiente por año
-const MEJOR_B = 0.06242;                    // valor en 1984
-const SOLO_PROMEDIO = 0.001516;
+const MEJOR_RECTA = 0.001561;
+const MEJOR_A = 0.00025994;                 // pendiente por año
+const MEJOR_B = 0.06646;                    // valor en 1984
+const SOLO_PROMEDIO = 0.001568;
 
 // El modelo: SIEMPRE una recta, aunque le pongamos más perillas.
 // 2 perillas:  a·(x−1984) + b
@@ -144,6 +145,7 @@ const p = Viz.plano('#lienzo', {
   titulo: 'menciones a «inflación» en la apertura de sesiones',
   alto: EMBEBIDO ? 296 : 320
 });
+p.canvas.setAttribute('role', 'img');
 
 p.alDibujar(() => {
   p.fondo(); p.grilla();
@@ -238,12 +240,18 @@ function actualizar() {
       'Sólo el promedio: <b>' + SOLO_PROMEDIO.toFixed(5) + '</b>.'
     : 'El piso de <b>cualquier</b> recta sobre estos datos es <b>' +
       MEJOR_RECTA.toFixed(5) + '</b>.<br>Una raya horizontal en el promedio da <b>' +
-      SOLO_PROMEDIO.toFixed(5) + '</b>: la mejor recta explica el <b>1,3 %</b> de la variación.';
-  if (d <= MEJOR_RECTA * 1.02) {
+      SOLO_PROMEDIO.toFixed(5) + '</b>: la mejor recta explica el <b>0,5 %</b> de la variación.';
+  // El piso y el promedio están muy cerca: el margen tiene que ser más chico
+  // que esa diferencia, o una raya en el promedio ya contaría como «el piso».
+  if (d <= MEJOR_RECTA * 1.003) {
     msg += '<br><span class="c-error">Ya llegaste al piso. No es que lo estés haciendo mal: ' +
       '<b>no se puede</b>.</span>';
   }
   ctl.texto('lectura', msg);
+  p.canvas.setAttribute('aria-label',
+    'La serie de menciones a inflación, 1984 a 2019, y tu recta: y = ' + Viz.num(c.pend, 5) +
+    ' por año desde 1984, más ' + Viz.num(c.orden, 3) + '. Desajuste ' + d.toFixed(5) +
+    '; el piso de cualquier recta es ' + MEJOR_RECTA.toFixed(5) + '.');
   p.redibujar();
 }
 

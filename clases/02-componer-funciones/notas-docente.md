@@ -12,7 +12,7 @@
 
 1. Se proyecta una curva real (menciones a *inflación*, 1984-2019) y se les pide
    que le ajusten una recta. El aula tira valores; vos los ponés.
-2. Fracasan. Y no por torpes: **la mejor recta posible explica el 1,3 % de la
+2. Fracasan. Y no por torpes: **la mejor recta posible explica el 0,5 % de la
    variación**. Casi lo mismo que dibujar una raya en el promedio.
 3. «¿Y si le agrego perillas?» — se prueba en vivo y se descubre que cinco
    perillas se colapsan a dos. *Más parámetros no es más flexibilidad.* Ese
@@ -45,14 +45,14 @@
 | **14** | 7-10 | Componer | Dos cajas, seguir el número, la notación, la cadena de mediciones. |
 | **21** | 11 | Viz lego | `viz/lego-de-funciones.html` con el botón del intercambio. |
 | **25** | 12-13 | **Apuesta + baldazo** | Se vota. Después `viz/sin-no-linealidad.html` y quince randomizaciones. |
-| **31** | 14-17 | El doblez | La goma, la hoja, ReLU, la rampa con sus tres perillas. |
+| **31** | 14-17 | El doblez | La goma, la hoja, ReLU, la rampa con sus dos números (tres perillas en la red de verdad). |
 | **38** | 18 | **Manos 1** | Notebook hasta el TODO 3. Recorré el aula. |
 | **55** | 19 | **PAUSA** | **No se toca.** |
 | **65** | 20-21 | Volvimos + la pregunta | Se muestra la solución de alguien. Diez segundos de silencio. |
 | **70** | 22-24 | **El momento fuerte** | `viz/rampas.html`: 1 → 2 → 4 → 8. Silencio. El teorema. |
 | **82** | 25-28 | El nombre y el vocabulario | El diagrama, `viz/red-como-dibujante.html`, las siete palabras, ancho vs profundo. |
 | **90** | 29 | **Manos 2** | De a dos, 17 minutos. TODO 4 y la versión matricial. |
-| **107** | 30-32 | Lo que no es + la siembra | El desinflado. El botón «32». `[EL LUNES]`. |
+| **107** | 30-32 | Lo que no es + la siembra | El desinflado. El botón «32». `[EN TU INVESTIGACIÓN]`. |
 | **115** | 33-35 | Cierre | Las tres cosas, el glosario, el puente a la clase 3. |
 
 Suma exacta: **120 minutos**. La pausa está a los 55 y dura 10.
@@ -141,7 +141,18 @@ iteraciones y valores concretos, escribiendo el estado de `total` en cada paso.
 Tres minutos, y no vuelve a pasar en toda la cursada.
 
 **Codo vs altura** — mezclan las dos perillas de la rampa. Frase corta: **el codo
-es *dónde*, la altura es *cuánto*.**
+es *dónde*, la altura es *cuánto sube por cada unidad* después del codo.** (En
+el notebook se llama `altura`, pero es una pendiente: con altura 2 y el codo en
+5, en x = 10 la rampa ya vale 10. La slide 17 la llama bien: «qué tan empinada».)
+
+**«Cada rampa se ocupa de un tramo»** — la confusión que el material mismo puede
+sembrar si uno se descuida. Una rampa vale cero antes de su codo, pero después
+**sigue subiendo o bajando hasta el final**. Cada rampa dobla la curva en su codo
+y todo lo de la derecha hereda el doblez; lo de la izquierda ni se entera. Por
+eso, al agregar una rampa, hay que reacomodar las otras (el botón «acomodar» de
+`rampas.html`, o la pista 3 del TODO 4). Si alguien quiere una pieza que sí sea
+local, se arma con varias rampas: sube, frena, baja y frena (el «sombrerito» de
+Nielsen).
 
 **«Con suficientes rampas puedo predecir cualquier cosa»** — la más peligrosa.
 Aproximar lo que ya viste no es predecir lo que no viste. Se dice en la slide 24
@@ -169,7 +180,9 @@ malentendidos durante ocho clases.
    conecta con su oficio, pero se puede decir en una frase mientras mostrás la
    viz del lego.
 5. **Bloque práctico 2**, achicándolo de 17 a 12 minutos y dejando la sección 5
-   del notebook (matrices) como tarea.
+   del notebook (matrices) como tarea para antes de la clase 3. Son unos 15
+   minutos; con el cuestionario (25-30) no pasa de una hora, que es el tope de
+   tarea entre clases.
 
 ### Qué NUNCA se recorta
 
@@ -186,13 +199,21 @@ malentendidos durante ocho clases.
 
 ### Si vas adelantado
 
-- En `viz/rampas.html`, pediles que **saquen** rampas de una configuración buena y
-  que apuesten cuál va a doler más. La que tiene el codo en 2014 duele muchísimo;
-  la de 1990, casi nada. Buena discusión sobre qué parte de la curva "importa".
+- En `viz/rampas.html`, apretá **«8»** y pediles que **apuesten** qué rampa va a
+  doler más si la sacás. Después sacala con la **×** de su tarjeta, que **no
+  reacomoda** las demás. Medido: sacar la de 1992 lleva el desajuste a 0.29 y la
+  de 1994 a 0.28 —peor que no hacer nada—, mientras que sacar la de 2017 lo deja
+  en 0.0011. ¿Por qué? Porque una rampa no es local: la de 1992 arrastra toda la
+  curva desde 1992 hasta 2019, y la de 2017 sólo los dos últimos años. Después
+  apretá **«acomodar»**: ahora sacar la de 1990 casi no duele (0.00019, contra
+  0.00016 con las ocho) y las que más duelen son la de 1999 (0.00042) y la de
+  2017 (0.00038). Buena discusión sobre qué quiere decir que una pieza
+  «importa». (Números en §10.)
 - En `viz/lego-de-funciones.html`, poné `sigmoide` en la caja 1 y mostrá cómo
   aplasta todo entre 0 y 1: cualquier cosa que venga después trabaja sobre un
-  rango minúsculo. Es la semilla de por qué las redes profundas con sigmoides
-  eran difíciles de entrenar (y se retoma en la clase 4).
+  rango minúsculo. Es una pista de por qué las redes profundas con sigmoides
+  eran difíciles de entrenar. En este curso no se desarrolla; si alguien quiere
+  seguir, está en el capítulo 5 de Nielsen (el 1 de `referencias.md`).
 - En `viz/red-como-dibujante.html`, apretá «randomizar toda la red» cinco veces y
   preguntá: «¿cuánto tardarías en encontrar la buena a mano?». Es el mejor pie
   posible para la clase 3.
@@ -210,8 +231,9 @@ malentendidos durante ocho clases.
   pasa a la siguiente. Y el remate: **la no linealidad es la ventanilla que dice
   «si no cumple el requisito, cero»**. Sin alguna ventanilla que corte, todo el
   circuito sería una sola operación trivial. Este chiste funciona *siempre*.
-- **El ecualizador con 24 perillas.** Callback a la clase 1: nadie ecualiza 24
-  bandas a mano, por eso existen los presets. El descenso por gradiente es la
+- **El ecualizador con 25 perillas.** Callback a la clase 1: la red de ocho
+  rampas tiene 25 perillas (3 por rampa, más la base), y nadie ecualiza 25
+  bandas a mano: por eso existen los presets. El descenso por gradiente es la
   máquina que fabrica presets. Guardalo para la slide 31.
 - **La goma que se estira dos veces.** Para el "por qué apilar lineales no sirve".
   Si tenés una banda elástica en el bolsillo, mejor.
@@ -234,8 +256,10 @@ docena de variantes con nombres raros— y andan parecido o un poco peor. Gran
 parte del deep learning es así: se probó, funcionó, se quedó. Está bien
 saberlo.»* La honestidad acá compra confianza para toda la cursada. Si querés
 agregar una razón técnica: con la sigmoide, las redes profundas se entrenaban
-muy mal porque la señal se apagaba capa a capa; ReLU no tiene ese problema, y eso
-se ve en la clase 3.
+muy mal porque la señal para ajustar las perillas se achicaba capa a capa; con
+ReLU ese problema es mucho menor. **En este curso no se desarrolla** (no lo
+prometas para otra clase); quien quiera seguir lo tiene en el capítulo 5 de
+Nielsen.
 
 **2. «¿Entonces las neuronas artificiales imitan a las neuronas del cerebro?»**
 *«El nombre es de 1943, de McCulloch y Pitts, y era una analogía razonable para
@@ -267,11 +291,15 @@ sólo mientras la validación mejore.
 sé meterle términos cuadráticos a una regresión.»**
 Excelente pregunta y hay que tomarla en serio, porque quien la hace tiene razón
 en la intuición. *«Se parece muchísimo: en los dos casos armás una función
-flexible sumando piezas. Tres diferencias que importan. Primera: un polinomio de
-grado alto se vuelve loco en los extremos y **una rampa es local** — cada una se
-ocupa de su tramo y no toca el resto (lo viste en `red-como-dibujante`).
-Segunda: con polinomios vos elegís el grado; acá el modelo acomoda **dónde**
-poner cada quiebre, que es una forma de flexibilidad distinta. Tercera, y es la
+flexible sumando piezas. Tres diferencias que importan. Primera: un polinomio es
+**global** —tocar un coeficiente mueve la curva entera, y los de grado alto se
+vuelven locos en los extremos—. Una suma de rampas es **lineal por tramos**:
+mover la altura de una rampa cambia sólo lo que está a la derecha de su codo, y
+más allá del último dato la red sigue derecho con la última recta (extrapola
+lineal, que no es lo mismo que acertar). Si conocés las *splines* lineales o la
+regresión segmentada, es exactamente eso. Segunda: con polinomios vos elegís el
+grado; acá el modelo acomoda **dónde** poner cada quiebre, que es una forma de
+flexibilidad distinta. Tercera, y es la
 grande: esto **escala a muchas variables de entrada**. Con dos predictores ya
 tenés que decidir a mano qué interacciones meter; con veinte, es inviable. Ahí es
 donde la red gana. Y lo que **no** cambia es el riesgo: la misma advertencia que
@@ -294,70 +322,136 @@ armar hoy. No hay un segundo ingrediente secreto.»*
 - **TODO 3 (meseta).** `alturas = [1.0, -1.0, -1.0]` con
   `codos = [2.0, 4.0, 7.0]`. La segunda cancela exactamente a la primera (tramo
   plano) y la tercera hace bajar. Tres rampas.
-- **TODO 4.** Partiendo de las cuatro rampas de `0.00056`, dos soluciones
-  verificadas (los números están redondeados a lo que se puede tipear a mano):
+- **TODO 4.** Partiendo de las cuatro rampas de `0.00060`. Ojo: para esos cuatro
+  codos las alturas y la base **ya son las óptimas** (salen de mínimos
+  cuadrados), así que tocando sólo alturas o base no se mejora; el notebook lo
+  avisa. Hay que mover o agregar codos. Dos soluciones verificadas (alturas
+  redondeadas a 4 decimales, que es lo que se tipea a mano):
 
   | codos | base | alturas | desajuste |
   |---|---|---|---|
-  | 1996, 2002, 2007, 2012, 2016 | `0.078` | `-0.010, 0.021, -0.028, 0.053, -0.042` | **0.00044** |
-  | 1996, 2002, 2007, 2010, 2014, 2017 | `0.078` | `-0.010, 0.023, -0.037, 0.031, 0.039, -0.080` | **0.00027** |
+  | 1996, 2002, 2007, 2012, 2016 | `0.0806` | `-0.0101, 0.0222, -0.0282, 0.0531, -0.0415` | **0.00039** |
+  | 1996, 2002, 2007, 2010, 2014, 2017 | `0.0807` | `-0.0103, 0.0238, -0.0369, 0.0308, 0.0390, -0.0804` | **0.00029** |
+
+  Siguiendo la pista (agregar un codo en 2007, o en 2006 y 2014, y reacomodar)
+  se llega a 0.00039 y 0.00031 con las alturas óptimas.
 
   Ojo: **no les des estos números.** Lo importante no es el valor al que lleguen
   sino que **descubran que es un suplicio** encontrarlos: ése es el motor de la
   clase 3. La estrategia que sí conviene darles es la de la pista: mirar el
   palito rojo más largo y poner un codo ahí.
-- **TODO 5.** La curva con sigmoides queda redondeada; con rampas, angulosa. Las
-  dos aproximan bien. La respuesta buena a «¿por qué?» es: cada pieza dobla
-  suave en vez de doblar de golpe.
+- **TODO 5.** La curva con sigmoides queda redondeada; con rampas, angulosa. La
+  respuesta buena a «¿por qué?» es: cada pieza dobla suave en vez de doblar de
+  golpe. La parte de tocar `suavidad`, medida con los mismos cuatro codos
+  (rampas: `0.00060`): `0.05` → `0.00074`, `0.25` → `0.00066`, `1` → `0.00052`,
+  `5` → `0.00050`. Con `suavidad` grande cada sigmoide es casi un **escalón**
+  (la pieza de Nielsen) y, con estos codos, le gana a las rampas. Es un buen
+  momento para decir que no hay un doblez «mejor» en general: depende de la
+  curva y de dónde están los codos.
 
 ---
 
 ## 10. Los números de la viz (medidos, no estimados)
 
 Todos los números que aparecen en `viz/rampas.html`,
-`viz/la-recta-imposible.html` y `viz/red-como-dibujante.html` salen de este
-script. Si cambiás los datos o los codos, **volvé a correrlo**: un número
-inventado en un curso sobre no inventar es el peor error posible.
+`viz/la-recta-imposible.html`, `viz/red-como-dibujante.html` y las slides salen
+de este script (se corre desde la raíz del repo). Si cambiás los datos o los
+codos, **volvé a correrlo**: un número inventado en un curso sobre no inventar
+es el peor error posible.
+
+> **Estos números cambiaron.** La primera versión de la clase usaba una media
+> móvil que, en 1984, promediaba con el dato de 1975 (el anterior que hay en la
+> serie, nueve años antes). Con el borde corregido en `ssdl.datos`, el valor de
+> 1984 pasa de 0.0762 a 0.1143 y cambian todos los desajustes: la recta pasa de
+> 0.00150 a 0.00156 y su R² de 1,3 % a 0,5 %. Los otros 35 valores de la serie no
+> cambiaron.
 
 ```python
-import numpy as np, sys
-sys.path.insert(0, "_shared")
+import itertools, os, sys
+import numpy as np
+sys.path.insert(0, "_shared"); os.environ["DLSS_RAIZ"] = os.getcwd()
 from ssdl import datos
 
 anios, y = datos.serie_menciones("inflacion", desde=1984, hasta=2019, suavizada=True)
 
 def ajustar(codos):
-    """Mejores alturas para esos codos, por mínimos cuadrados."""
+    """Mejores alturas (y base) para esos codos, por mínimos cuadrados."""
     A = np.column_stack([np.ones_like(anios)] + [np.maximum(0, anios - c) for c in codos])
-    w = np.linalg.solve(A.T @ A + 1e-9 * np.eye(A.shape[1]), A.T @ y)
+    w, *_ = np.linalg.lstsq(A, y, rcond=None)
     return w, A @ w
 
 def mse(p):
     return float(np.mean((y - p) ** 2))
 
-print("sólo el promedio   ", mse(np.full_like(y, y.mean())))     # 0.001516
-print("la mejor recta     ", mse(np.polyval(np.polyfit(anios, y, 1), anios)))  # 0.001496
-for n, codos in [(1, [2013]), (2, [1989, 2012]), (4, [1995, 1997, 2014, 2017]),
-                 (8, [1990, 1992, 1994, 1999, 2007, 2010, 2014, 2017])]:
+print("sólo el promedio   ", mse(np.full_like(y, y.mean())))                 # 0.001568
+print("la mejor recta     ", mse(np.polyval(np.polyfit(anios, y, 1), anios)))  # 0.001561
+ATAJOS = {1: [2013], 2: [1985, 2012], 4: [1995, 1997, 2014, 2017],
+          8: [1990, 1992, 1994, 1999, 2007, 2010, 2014, 2017],
+          32: [1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996,
+               1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+               2008, 2009, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]}
+for n, codos in ATAJOS.items():
     print(f"{n:2d} rampas          ", mse(ajustar(codos)[1]))
+
+# Los atajos de 1, 2 y 4: búsqueda exhaustiva con separación mínima de 2 años.
+candidatos = range(1985, 2019)
+for n in (1, 2, 4):
+    print("óptimo", n, min((mse(ajustar(c)[1]), c) for c in itertools.combinations(candidatos, n)
+                           if all(c[i + 1] - c[i] >= 2 for i in range(n - 1))))
+
+# La red buena de red-como-dibujante: los codos fijos (w1, b1) y las alturas
+# (w2) y la base (b2) por mínimos cuadrados, con el año llevado a 0-1.
+w1 = np.array([1.60, 0.90, 2.20, 1.20, 0.70, 1.90])
+b1 = np.array([-0.5029, -0.3857, -1.4457, -0.8914, -0.6000, -1.7914])
+H = np.maximum(0, ((anios - 1984) / 35).reshape(-1, 1) * w1 + b1)
+w, *_ = np.linalg.lstsq(np.column_stack([np.ones(len(y)), H]), y, rcond=None)
+print("red buena: b2", round(w[0], 5), "w2", np.round(w[1:], 4),
+      "MSE", mse(H @ np.round(w[1:], 4) + round(w[0], 5)))
+
+# Sacar una rampa de las 8, sin reacomodar y reacomodando (§6, «si vas adelantado»).
+w8, _ = ajustar(ATAJOS[8])
+A8 = np.column_stack([np.ones_like(anios)] + [np.maximum(0, anios - c) for c in ATAJOS[8]])
+for i, c in enumerate(ATAJOS[8]):
+    sin = w8.copy(); sin[i + 1] = 0
+    otros = ATAJOS[8][:i] + ATAJOS[8][i + 1:]
+    print("sacar", c, "sin reacomodar", round(mse(A8 @ sin), 6),
+          "reacomodando", round(mse(ajustar(otros)[1]), 6))
 ```
 
 Salida esperada:
 
 | Modelo | Desajuste (MSE) |
 |---|---|
-| sólo el promedio (una raya horizontal) | `0.001516` |
-| la mejor recta posible | `0.001496` — **R² = 1,3 %** |
-| 1 rampa | `0.000843` |
-| 2 rampas | `0.000624` |
-| 4 rampas | `0.000318` |
-| 8 rampas | `0.000144` |
-| 32 rampas (un codo casi por año) | `0.000014` |
+| sólo el promedio (una raya horizontal) | `0.001568` |
+| la mejor recta posible | `0.001561` — **R² = 0,5 %**, pendiente +0,00026 puntos porcentuales por año |
+| 1 rampa (codo en 2013) | `0.000916` |
+| 2 rampas (1985, 2012) | `0.000648` |
+| 4 rampas (1995, 1997, 2014, 2017) | `0.000339` |
+| 8 rampas | `0.000164` |
+| 32 rampas (un codo casi por año) | `0.0000076` |
+| red buena de `red-como-dibujante` (6 rampas) | `0.000200` |
 
-Los codos de cada atajo se buscaron por barrido con separación mínima de 2 años.
+Los codos de 1, 2 y 4 rampas son el óptimo por búsqueda exhaustiva con
+separación mínima de 2 años. Los de 8 son el mejor juego que encontró una
+búsqueda local (60 arranques al azar, mismo criterio de separación): un buen
+juego, no necesariamente el óptimo. Los de 32 están repartidos parejo.
+
 La «configuración buena» de `viz/red-como-dibujante.html` son 6 rampas con codos
-en 1995, 1999, 2007, 2010, 2014 y 2017 (MSE `0.000178`), reescritas como pesos de
-una red `[1, 6, 1]` con la entrada normalizada a 0–1.
+en 1995, 1999, 2007, 2010, 2014 y 2017, escritas como pesos de una red `[1, 6, 1]`
+con la entrada normalizada a 0–1 (19 perillas: 6 + 6 + 6 + 1).
+
+Sacar una rampa de las 8 (§6):
+
+| rampa | sin reacomodar | reacomodando |
+|---|---|---|
+| 1990 | 0.052 | 0.000192 |
+| 1992 | 0.292 | 0.000209 |
+| 1994 | 0.276 | 0.000267 |
+| 1999 | 0.055 | 0.000424 |
+| 2007 | 0.015 | 0.000313 |
+| 2010 | 0.0062 | 0.000239 |
+| 2014 | 0.0026 | 0.000292 |
+| 2017 | 0.0011 | 0.000376 |
 
 ---
 

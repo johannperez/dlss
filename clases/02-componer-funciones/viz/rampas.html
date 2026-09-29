@@ -12,23 +12,26 @@
                      que yo conozco dibuja"
 
        SEGUNDO AHA (sembrado para la clase 4): con 32 rampas la curva azul
-                     pasa por TODOS los puntos, incluidos los que son ruido.
+                     pasa por TODOS los puntos, incluidos los que casi seguro
+                     son ruido.
                      Hoy no se explica. Sólo se dice: "guardá esta imagen".
 
      DATOS: reales. % de palabras del discurso presidencial de apertura de
      sesiones dedicadas al léxico de "inflación", 1984-2019, media móvil de
-     3 años (columna `inflacion_suave` de datos/series). Los 36 valores están
+     3 años (la calcula `ssdl.datos.serie_menciones(..., suavizada=True)`). Los 36 valores están
      copiados abajo tal cual los devuelve `ssdl.datos.serie_menciones`.
 
      NÚMEROS DE REFERENCIA: todos MEDIDOS, ninguno estimado. El script que los
      mide está transcripto en notas-docente.md §"los números de la viz".
-       · la mejor recta posible sobre estos datos ....... MSE 0.001496 (R² = 1,3 %)
-       · una raya horizontal en el promedio ............. MSE 0.001516
-       · lo mejor con  1 rampa .......................... MSE 0.000843
-       · lo mejor con  2 rampas ......................... MSE 0.000624
-       · lo mejor con  4 rampas ......................... MSE 0.000318
-       · lo mejor con  8 rampas ......................... MSE 0.000144
-       · lo mejor con 32 rampas ......................... MSE 0.000014
+     (Medidos con la media móvil corregida en el borde: el valor de 1984
+     promedia 1984 y 1985, no 1975.)
+       · la mejor recta posible sobre estos datos ....... MSE 0.001561 (R² = 0,5 %)
+       · una raya horizontal en el promedio ............. MSE 0.001568
+       · con  1 rampa (codo óptimo) ..................... MSE 0.000916
+       · con  2 rampas (codos óptimos) .................. MSE 0.000648
+       · con  4 rampas (codos óptimos) .................. MSE 0.000339
+       · con  8 rampas (el mejor que halló una búsqueda local) MSE 0.000164
+       · con 32 rampas (un codo casi por año) ........... MSE 0.0000076
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -56,6 +59,9 @@
   .tarjeta-rampa .nombre {
     font-size: .74rem; font-weight: 700; letter-spacing: .04em;
     text-transform: uppercase; color: var(--tinta-2); flex: 1 1 auto;
+  }
+  .tarjeta-rampa .pendiente {
+    font-family: var(--f-mono); font-size: .7rem; font-weight: 700; color: var(--tinta-2);
   }
   .tarjeta-rampa .quitar {
     background: none; border: 0; color: var(--tinta-3); cursor: pointer;
@@ -124,8 +130,10 @@
     <div class="aha">
       <strong>Qué mirar.</strong> Empezá con <b>una</b> rampa y movele el codo por
       todos lados: no hay manera de tapar la curva negra, ni cerca. Agregá la
-      segunda y fijate que cada una se hace cargo de <em>un tramo</em>: la que
-      tiene el codo en 1999 no se entera de lo que pasa en 2015. Cuando llegues
+      segunda y fijate qué hace: <em>dobla</em> la curva en su codo, y todo lo
+      que está a la derecha hereda el doblez (lo de la izquierda ni se entera).
+      Por eso una rampa nueva desacomoda a las demás, y conviene apretar
+      <em>acomodar</em> después de agregarla. Cuando llegues
       a ocho, parate un segundo: acabás de dibujar, con ocho cosas tontas
       sumadas, una figura que ninguna fórmula de las que conocés dibuja. Eso,
       y nada más que eso, es una red neuronal.
@@ -134,6 +142,7 @@
       <b>Y una cosa más:</b> apretá <b>32 rampas</b>. La curva azul pasa por
       <em>todos</em> los puntos, incluidos los que casi seguro son ruido de
       medición —el léxico que produce esta serie lo escribimos nosotros—.
+      Como red, serían 97 perillas para 36 datos.
       Guardá esa imagen: en la clase 4 vamos a hablar de eso, y va a
       tener nombre.
     </p>
@@ -154,7 +163,7 @@
    1. LOS DATOS  (reales, copiados de ssdl.datos.serie_menciones)
    ========================================================================= */
 const ANIO_0 = 1984, ANIO_1 = 2019;
-const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+const SERIE = [0.1143, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
                0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
                0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
                0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
@@ -164,16 +173,18 @@ const objetivo = SERIE.map((v, i) => ({ x: ANIO_0 + i, y: v }));
 
 // Números de referencia MEDIDOS (ver el comentario de la cabecera).
 const REF = {
-  recta:  0.001496,   // la mejor recta posible: R² = 1,3 %
-  media:  0.001516,   // una raya horizontal en el promedio
-  mejorN: { 1: 0.000843, 2: 0.000624, 4: 0.000318, 8: 0.000144, 32: 0.000014 }
+  recta:  0.001561,   // la mejor recta posible: R² = 0,5 %
+  media:  0.001568,   // una raya horizontal en el promedio
+  mejorN: { 1: 0.000916, 2: 0.000648, 4: 0.000339, 8: 0.000164, 32: 0.0000076 }
 };
 
-// Codos de los atajos: el mejor juego de codos para cada N, buscado por
-// barrido con separación mínima de 2 años. Medido, no inventado.
+// Codos de los atajos, con separación mínima de 2 años entre codos. Para
+// N = 1, 2 y 4 son el óptimo por búsqueda exhaustiva; para N = 8, el mejor que
+// encontró una búsqueda local con 60 arranques al azar (un buen juego, no
+// necesariamente el óptimo). Medido, no inventado: script en notas-docente.md §10.
 const ATAJOS = {
   1:  [2013],
-  2:  [1989, 2012],
+  2:  [1985, 2012],
   4:  [1995, 1997, 2014, 2017],
   8:  [1990, 1992, 1994, 1999, 2007, 2010, 2014, 2017],
   // 32 codos repartidos parejo, uno casi por año. Con 36 datos, esto ya no
@@ -321,7 +332,8 @@ p.alDibujar(() => {
       });
     } else {
       // el acumulado: base, base+rampa1, base+rampa1+rampa2, ... Se ve cómo
-      // cada rampa nueva DOBLA la curva anterior en un punto y no toca el resto.
+      // cada rampa nueva DOBLA la curva anterior en su codo: no toca lo que
+      // está a la izquierda, y todo lo de la derecha hereda el doblez.
       for (let k = 0; k < rampas.length; k++) {
         p.curva(x => {
           let s = base;
@@ -367,11 +379,16 @@ p.alDibujar(() => {
   }
   p.leyenda(items, { pos: 'ai' });
 
+  // Cuenta de perillas: acá cada rampa usa 2 números (codo y pendiente con
+  // signo; «sube/baja» es el signo, no otro número). Escrita como red de
+  // verdad, cada neurona tiene 3 (peso de entrada, sesgo, peso de salida) y
+  // la red, 3n + 1.
   const n = rampas.length;
   p.textoPx(p.R - 10, p.T + 10,
-    n + (n === 1 ? ' rampa · ' : ' rampas · ') + (3 * n) + ' perillas + la base',
+    n + (n === 1 ? ' rampa' : ' rampas') + ' · como red: ' + (3 * n + 1) + ' perillas',
     { alinear: 'right', caja: true, tam: 12, peso: '700', color: 'tinta2' });
 });
+p.canvas.setAttribute('role', 'img');
 
 // arrastrar el codo con el dedo: se mueve mientras arrastrás, no al soltar
 const manijas = [];
@@ -416,6 +433,11 @@ const tarjetas = [];
 
 function miniCanvas(cv, i) {
   const r = rampas[i];
+  cv.setAttribute('role', 'img');
+  cv.setAttribute('aria-label', 'rampa ' + (i + 1) + ' sola: cero hasta ' + r.codo +
+    ', después ' + (r.signo > 0 ? 'sube ' : 'baja ') + Viz.num(r.altura, 3) + ' por año');
+  const t = tarjetas[i];
+  if (t && t.pendiente) t.pendiente.textContent = textoPendiente(r);
   const dpr = window.devicePixelRatio || 1;
   const w = cv.clientWidth || 180, h = 46;
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
@@ -453,6 +475,13 @@ function miniCanvas(cv, i) {
   c.beginPath(); c.arc(px(r.codo), py(0), 3.2, 0, 6.2832); c.fill();
 }
 
+// El signo no se codifica sólo con color: cada tarjeta muestra la pendiente
+// con su signo, en texto (+ sube, − baja).
+function textoPendiente(r) {
+  const v = r.signo * r.altura;
+  return (v < 0 ? '−' : '+') + Viz.num(Math.abs(v), 3) + '/año';
+}
+
 function tarjeta(i) {
   const r = rampas[i];
   const card = Viz.el('div', { class: 'tarjeta-rampa' });
@@ -460,8 +489,10 @@ function tarjeta(i) {
   const bola = Viz.el('span', { class: 'bolita' }, hd);
   bola.style.background = colorRampa(i);
   Viz.el('span', { class: 'nombre', texto: 'rampa ' + (i + 1) }, hd);
+  const pend = Viz.el('span', { class: 'pendiente', texto: textoPendiente(r) }, hd);
   const x = Viz.el('button', { class: 'quitar', texto: '×' }, hd);
-  x.title = 'quitar esta rampa';
+  x.title = 'quitar esta rampa (sin reacomodar las otras)';
+  x.setAttribute('aria-label', 'quitar la rampa ' + (i + 1));
   x.addEventListener('click', () => {
     if (rampas.length <= 1) return;
     rampas.splice(i, 1); seleccionada = 0; redibujarTodo();
@@ -510,7 +541,9 @@ function tarjeta(i) {
   });
 
   taller.appendChild(card);
-  tarjetas[i] = { codo: s1, valorCodo: v1, lienzo: cv };
+  s1.setAttribute('aria-label', 'rampa ' + (i + 1) + ': dónde está el codo');
+  s2.setAttribute('aria-label', 'rampa ' + (i + 1) + ': qué tan empinada');
+  tarjetas[i] = { codo: s1, valorCodo: v1, lienzo: cv, pendiente: pend };
   miniCanvas(cv, i);
 }
 
@@ -519,10 +552,12 @@ function construirTaller() {
   tarjetas.length = 0;
   if (rampas.length > TOPE_TARJETAS) {
     const d = Viz.el('div', { class: 'aviso-taller' }, taller);
-    d.innerHTML = '<b>' + rampas.length + ' rampas = ' + (rampas.length * 3) +
-      ' perillas.</b> No te las voy a mostrar todas, y ese es exactamente el punto: ' +
-      'yo puse a mano las 24 de ocho rampas y me llevó una tarde. Un modelo de verdad ' +
-      'tiene millones. <em>¿Cómo se encuentran solas?</em> Clase que viene.';
+    d.innerHTML = '<b>' + rampas.length + ' rampas: como red, ' + (rampas.length * 3 + 1) +
+      ' perillas.</b> (Acá se ajustaron ' + (rampas.length + 1) + ' números —las alturas y ' +
+      'la base— con los codos fijos. Para ' + objetivo.length + ' datos ya es demasiado.) ' +
+      'No te las voy a mostrar todas, y ése es exactamente el punto: ponerlas a mano es un ' +
+      'suplicio, y acá las acomodó una fórmula. Un modelo de verdad tiene millones. ' +
+      '<em>¿Cómo se encuentran solas?</em> Clase que viene.';
     return;
   }
   for (let i = 0; i < rampas.length; i++) tarjeta(i);
@@ -581,9 +616,10 @@ function reiniciar() {
 /* =========================================================================
    7. EL PEGAMENTO
    ========================================================================= */
-// Siempre con 5 decimales fijos: Viz.num pasa a notación exponencial abajo de
-// 0,0001 y "1.43e-5" en un aula es una distracción, no un dato.
-function fmt(v) { return v.toFixed(5); }
+// Decimales fijos: Viz.num pasa a notación exponencial abajo de 0,0001 y
+// "7.6e-6" en un aula es una distracción, no un dato. Abajo de 0,0001 se usan
+// 6 decimales para que el de 32 rampas no se lea «0.00001».
+function fmt(v) { return v < 0.0001 ? v.toFixed(6) : v.toFixed(5); }
 
 function actualizar() {
   vista.debajo = ctl.valores.debajo;
@@ -613,10 +649,14 @@ function actualizar() {
   }
   if (n >= 24) {
     msg = '<b>Mirá bien la curva azul:</b> pasa por <em>todos</em> los puntos, ' +
-      'incluidos los que son ruido del instrumento. Está calcando en vez de dibujar. ' +
+      'incluidos los que casi seguro son ruido del instrumento. Está calcando en vez de dibujar. ' +
       'Guardá esta imagen: en la clase 4 esto tiene nombre.';
   }
   ctl.texto('lectura', msg);
+  p.canvas.setAttribute('aria-label', 'La serie de menciones a inflación, 1984 a 2019, y la suma de ' +
+    n + (n === 1 ? ' rampa' : ' rampas') + (n <= TOPE_TARJETAS ? ' con codos en ' +
+    rampas.map(r => r.codo).join(', ') : '') + '. Desajuste ' + fmt(d) +
+    '; la mejor recta da ' + fmt(REF.recta) + '.');
   p.redibujar();
 }
 

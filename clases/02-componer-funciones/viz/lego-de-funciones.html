@@ -196,6 +196,11 @@ function dibujarBloque(i) {
   c.fillStyle = Viz.color('fondo'); c.fillRect(0, 0, w, h);
 
   const f = x => hasta(i + 1, x);
+  cv.setAttribute('role', 'img');
+  cv.setAttribute('aria-label', 'Caja ' + (i + 1) + ' (' + PIEZAS[bloques[i].pieza].nombre +
+    '): la curva acumulada hasta acá, de x = ' + XMIN + ' a ' + XMAX + '. El número que entra, ' +
+    Viz.num(entrada, 2) + ', sale de esta caja como ' + Viz.num(f(entrada), 2) + '.' +
+    (i === 2 && fantasma ? ' En gris punteado, la curva con el orden anterior.' : ''));
   let lo = Infinity, hi = -Infinity;
   const ys = [];
   for (let k = 0; k <= 240; k++) {
@@ -259,6 +264,7 @@ function construir() {
 
     const cSel = Viz.el('div', { class: 'ctrl' }, card);
     const sel = Viz.el('select', {}, cSel);
+    sel.setAttribute('aria-label', 'qué hace la caja ' + (i + 1));
     for (const clave of ORDEN) {
       const o = Viz.el('option', { value: clave, texto: PIEZAS[clave].nombre }, sel);
       if (clave === b.pieza) o.selected = true;
@@ -282,6 +288,7 @@ function construir() {
       const val = Viz.el('span', { class: 'ctrl-valor', texto: Viz.num(b.k, P.perilla.dec) }, fila);
       const inp = Viz.el('input', { type: 'range' }, w);
       inp.min = P.perilla.min; inp.max = P.perilla.max; inp.step = P.perilla.paso; inp.value = b.k;
+      inp.setAttribute('aria-label', 'caja ' + (i + 1) + ': ' + P.perilla.etiqueta);
       inp.style.setProperty('accent-color', Viz.color('parametro'));
       inp.addEventListener('input', () => {
         b.k = +inp.value; val.textContent = Viz.num(b.k, P.perilla.dec);

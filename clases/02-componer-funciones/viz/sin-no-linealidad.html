@@ -11,7 +11,10 @@
 
      La evidencia se construye por repetición, no por argumento. Por eso el
      contador ("randomizaste 14 veces, salieron 14 rectas") es el corazón de
-     esta viz: sin él es un dibujito lindo.
+     esta viz: sin él es un dibujito lindo. Y el contador MIDE: una cadena
+     cuenta como recta sólo si se desvía de una recta menos de una
+     milmillonésima (relativa a su tamaño). No se copia del contador de
+     randomizaciones.
 
      Segunda evidencia, para quien quiera el número y no el dibujo: el panel
      colapsa las N cajas encadenadas a UNA sola recta `y = a·x + b` y muestra
@@ -98,16 +101,18 @@
       Después de quince randomizaciones, la columna de la izquierda sacó quince
       rectas. No es mala suerte: es que <em>no puede</em> salir otra cosa.
       Estirar y volver a estirar sigue siendo estirar. La cuenta está abajo del
-      todo, en el panel: las cinco cajas se colapsan a <b>una sola</b>
+      todo, en el panel: las cajas (arranca con cinco) se colapsan a <b>una sola</b>
       <code>y = a·x + b</code>, y la cadena entera se desvía de esa recta en
-      exactamente 0. Cinco cajas, dos números.
+      0 (salvo el redondeo de la máquina). Cinco cajas, dos números.
     </div>
     <p class="viz-pie">
       <b>Detalle honesto:</b> los números de las cajas no son <em>del todo</em> al
       azar. El corte de cada ReLU se sortea de manera que caiga adentro del rango
       que efectivamente le llega a esa caja. Sin esa precaución, en cadenas largas
-      la ReLU se apaga —da cero en todo el rango— y la curva de la derecha sale
-      plana: es un problema real y tiene nombre, <em>dying ReLU</em>.
+      alguna ReLU queda apagada —da cero en todo el rango— y la curva de la derecha
+      sale plana. Es un pariente de un problema real: cuando una neurona queda
+      apagada <em>durante el entrenamiento</em> y deja de aprender, se le dice
+      <em>dying ReLU</em>.
       La columna de la izquierda usa <b>exactamente los mismos números</b> y no
       tiene ninguna ayuda: igual siempre sale una recta.
     </p>
@@ -119,11 +124,11 @@
 <script>
 /* ------------------------------------------------------------------ estado */
 const XMIN = -3, XMAX = 3;
-let N = 4;
+let N = 5;
 let semilla = 7;
 let cajas = [];          // [{a, b}]
-let randomizaciones = 1;
-let rectasSeguidas = 0;
+let randomizaciones = 0;
+let rectasSeguidas = 0;  // se cuenta midiendo, no copiando `randomizaciones`
 
 function generar() {
   const r = Viz.azar(semilla);
@@ -187,6 +192,15 @@ function desviacionDeLaRecta() {
   return m;
 }
 
+// El contador honesto: se suma una recta sólo si la cadena sin doblez, MEDIDA,
+// no se aparta de una recta (relativo al tamaño de lo que sale).
+function contarCadena() {
+  randomizaciones++;
+  let escala = 1;
+  for (let k = 0; k <= 40; k++) escala = Math.max(escala, Math.abs(sinDoblez(XMIN + (XMAX - XMIN) * k / 40)));
+  if (desviacionDeLaRecta() < 1e-9 * escala) rectasSeguidas++;
+}
+
 // Codos visibles: dónde cambia la pendiente de la cadena con dobleces. Dos
 // codos más cerca que un 1,5 % del ancho se cuentan como uno solo: a ojo se ven
 // como un codo, y prometer cuatro donde se ven dos es hacer trampa.
@@ -228,6 +242,8 @@ function armar(sel, f, titulo) {
 }
 const pIzq = armar('#izq', sinDoblez, 'la cadena sin ningún doblez');
 const pDer = armar('#der', conDoblez, 'la misma cadena, con ReLU en el medio');
+pIzq.canvas.setAttribute('role', 'img');
+pDer.canvas.setAttribute('role', 'img');
 // los codos, marcados: el aha es que se puedan contar con el dedo
 pDer.alDibujar((function (dibujoBase) {
   return function () {
@@ -245,7 +261,7 @@ const ctl = Viz.controles('#panel', [
     min: 1, max: 6, paso: 1, valor: N, decimales: 0, color: 'parametro' },
   { tipo: 'boton', texto: 'Randomizar las perillas', principal: true, alClic: () => {
       semilla = (semilla * 1103515245 + 12345) % 2147483647;
-      randomizaciones++; generar(); actualizar();
+      generar(); contarCadena(); actualizar();
     } },
   { tipo: 'texto', id: 'contador', html: '' },
   { tipo: 'checkbox', id: 'numeros', etiqueta: 'mostrar los números de cada caja', valor: true },
@@ -260,7 +276,6 @@ function actualizar() {
   const desv = desviacionDeLaRecta();
   const xsCodos = codos();
   const nCodos = xsCodos.length;
-  rectasSeguidas = randomizaciones;
 
   document.getElementById('ver-izq').innerHTML =
     'Sigue siendo una recta. <b>Siempre.</b>';
@@ -280,7 +295,7 @@ function actualizar() {
     '<span class="contador">' + randomizaciones +
     '<small>cadenas que probaste</small></span>' +
     '<span class="contador">' + rectasSeguidas +
-    '<small>rectas que salieron a la izquierda</small></span>');
+    '<small>rectas que salieron a la izquierda (medidas, no supuestas)</small></span>');
 
   if (ctl.valores.numeros) {
     let h = '<div class="cadena">';
@@ -301,6 +316,12 @@ function actualizar() {
       ? '<span class="c-error">' + N + ' cajas, ' + (2 * N) + ' perillas, y terminan siendo 2 números.</span>'
       : ''));
 
+  pIzq.canvas.setAttribute('aria-label', N + (N === 1 ? ' caja lineal' : ' cajas lineales encadenadas') +
+    ', sin doblez: el resultado es una recta, y = ' + Viz.num(c.a, 3) + '·x ' +
+    (c.b >= 0 ? '+ ' : '− ') + Viz.num(Math.abs(c.b), 3) + '.');
+  pDer.canvas.setAttribute('aria-label', 'Las mismas ' + N + ' cajas con una ReLU entre caja y caja: ' +
+    (nCodos === 0 ? 'no se ve ningún codo.' : 'la curva tiene ' + nCodos +
+      (nCodos === 1 ? ' codo' : ' codos') + ' y ya no es una recta.'));
   pIzq.redibujar(); pDer.redibujar();
 }
 
@@ -308,6 +329,8 @@ function actualizar() {
 // (arreglado en `_shared/js/viz.js`). El redibujo de acá es por las dudas.
 Viz.botonTema();
 Viz.recargarColores();
+N = ctl.valores.n;
+contarCadena();          // la primera cadena también se mide
 actualizar();
 </script>
 </body>

@@ -64,8 +64,9 @@ representar. **Es exactamente lo que pasó en el notebook con 4 rampas.**
 El nombre técnico —*underfitting*, subajuste— todavía no se dio; si alguien lo
 usa, bárbaro, y se aclara en la clase 4.
 
-**(b) 500 rampas, 12 datos.** Va a pasar por **todos** los puntos, exactamente.
-El desajuste va a dar prácticamente cero. **Y no, eso no es bueno**: con 500
+**(b) 500 rampas, 12 datos.** Con los codos bien repartidos entre los datos y
+las perillas bien ajustadas, **puede** pasar por todos los puntos, exactamente,
+y el desajuste va a dar prácticamente cero. **Y no, eso no es bueno**: con 500
 perillas y 12 casos, el modelo tiene margen de sobra para copiar cada punto,
 incluidos los que son error de medición. Entre punto y punto puede hacer
 cualquier cosa. Es la imagen del botón «32 rampas» de la viz, llevada al extremo.
@@ -113,14 +114,17 @@ sesgo de la salida       :        1
 | Error típico | Cuánto da | Qué confusión revela |
 |---|---|---|
 | Contar sólo las flechas | 9 | **Se olvidaron los sesgos.** Es el error más frecuente y no es trivial: el sesgo es la perilla que *desplaza*, y sin ella la rampa tendría el codo clavado en cero. Mostrales la viz `red-como-dibujante.html`: los sesgos están dibujados como cabitos que entran a cada bolita. |
-| Contar las neuronas | 6 | Confunden "neurona" con "parámetro". Una neurona **tiene** parámetros, no **es** un parámetro. |
-| 2 + 3 + 1 = 6 | 6 | Sumaron el tamaño de las capas. Es el error de quien todavía no ve que lo que se aprende está en las **conexiones**, no en las bolitas. |
+| Contar las neuronas (ocultas y de salida) | 4 | Confunden "neurona" con "parámetro". Una neurona **tiene** parámetros, no **es** un parámetro. |
+| 2 + 3 + 1 = 6 | 6 | Sumaron el tamaño de las capas, entradas incluidas. Es el error de quien todavía no ve que lo que se aprende está en las **conexiones**, no en las bolitas. |
 | 12 | 12 | Contaron los sesgos de las ocultas pero se olvidaron el de la salida. Casi bien: vale medio punto y una sonrisa. |
 
 **Regla general que conviene que se lleven:** para una red `[a, b, c]` los
 parámetros son `a·b + b + b·c + c`. Para la del notebook, `[1, 4, 1]`:
 `4 + 4 + 4 + 1 = 13`. (Sí, la misma cuenta da 13 en los dos casos. Coincidencia,
-y sirve para chequear.)
+y sirve para chequear.) Con una sola entrada, la regla queda en **3 perillas por
+neurona oculta, más 1**: la red de 8 rampas tiene 25. Si alguien objeta que en
+el notebook cada rampa usa 2 números (codo y altura), tiene razón: ahí el peso
+de entrada está fijo en 1; en una red de verdad también se ajusta.
 
 ---
 
@@ -132,20 +136,22 @@ equivale a una sola recta.
 | Distractor | Por qué es tentador | Qué confusión revela |
 |---|---|---|
 | **A** ("prende o apaga la neurona") | Es la explicación que circula en toda la divulgación, y la palabra *activación* la invita. Además es *casi* cierta para ReLU, que efectivamente deja pasar o pone cero. | La metáfora del interruptor biológico. El problema no es que sea falsa, es que hace pensar que la activación es una **decisión** de la neurona, cuando es simplemente una cuenta. Y sobre todo: no explica **para qué está**. Preguntales "¿y qué pasa si la saco?" — si no saben, eligieron A. |
-| **C** (convierte en probabilidad) | Confusión con *softmax*, que sí hace eso y que van a ver en la clase 4. | Mezcla la activación **de la capa oculta** (el doblez) con la **de la salida** (que a veces sí convierte a probabilidad). Vale aclararlo: son dos cosas con el mismo nombre y distinta función. |
+| **C** (convierte en probabilidad) | Confusión con *softmax*, que sí hace eso y que van a ver en la clase 7. | Mezcla la activación **de la capa oculta** (el doblez) con la **de la salida** (que a veces sí convierte a probabilidad). Vale aclararlo: son dos cosas con el mismo nombre y distinta función. |
 | **D** (evita el sobreajuste) | "Sobreajuste" es una palabra que ya escucharon y que suena a problema serio. | Al revés: la activación es lo que le da al modelo **más** flexibilidad, no menos. Quien elige D está asociando cualquier componente técnico con "algo que controla el modelo". |
 
 ---
 
 ## 8. Vocabulario
 
-**1-c** (peso = la perilla que multiplica) · **2-e** (sesgo = la perilla que suma)
+**1-c** (peso = la perilla que multiplica) · **2-e** (sesgo = la perilla que suma y desplaza)
 · **3-b** (neurona = una rampa) · **4-a** (capa oculta) · **5-d** (activación = el doblez)
 
 *El par que más se confunde es 1-2.* Si intercambiaron peso y sesgo, la frase que
 lo arregla es: **el peso multiplica, el sesgo suma**. Y el recordatorio que
 importa para el resto del curso: *bias* acá **no** quiere decir sesgo social. Es
-un número que corre la figura para arriba o para abajo. Cuando en la clase 10 se
+un número que desplaza: en la salida corre la figura para arriba o para abajo, y
+en una neurona oculta le corre el codo a izquierda o derecha (probalo en
+`red-como-dibujante.html`). Cuando en la clase 10 se
 hable de sesgo de verdad, va a ser otra cosa completamente distinta con el mismo
 nombre en inglés.
 
@@ -165,7 +171,7 @@ afirmación de *existencia*: dice que la combinación de pesos existe. No dice:
 | Distractor | Por qué es tentador | Qué confusión revela |
 |---|---|---|
 | **A** | Es lo que el teorema efectivamente dice, así que quien busca "la falsa" y no lee con cuidado puede marcarla. | Lectura apurada, no confusión conceptual. |
-| **C** | Suena a exageración ("no hace falta buscar una fórmula especial") y por eso levanta sospecha. | En realidad es correcta y es justamente el valor práctico del resultado. Quien la marca suele estar aplicando bien el escepticismo, sólo que al enunciado equivocado. Vale reconocérselo. |
+| **C** | Suena a exageración ("no hace falta una fórmula especial") y por eso levanta sospecha. | Se sigue, porque dice **pueden**: el teorema garantiza que muchas piezas simples alcanzan para *representar* la curva (continua, en un rango acotado). No dice cuántas hacen falta ni que sea la mejor arquitectura para cada problema —las clases 5 y 6 matizan eso—. Quien la marca suele estar aplicando bien el escepticismo, sólo que al enunciado equivocado. Vale reconocérselo. |
 | **D** | Es una afirmación *negativa* sobre el teorema, y las negaciones confunden. | Igual que C: es verdadera. El teorema efectivamente no dice nada sobre cantidad de datos. |
 
 **El paralelo que conviene dejar escrito** (y que se retoma en la clase 10): una
@@ -197,8 +203,8 @@ gráfico, vas a ver un número de desajuste, y los dos van a estar mal.
 > número no cambia cuando debería, ahí hay algo.
 
 *Pista para corregir:* si alguien contesta "se rompería porque `total` no está
-definida", está pensando en Python 2 o en otro lenguaje. Vale la pena aclarar
-que **sí** queda definida, porque el `for` corre al menos una vez.
+definida", vale la pena aclarar que **sí** queda definida, porque el `for` corre
+al menos una vez y la crea adentro.
 (Y si `codos` estuviera vacío, ahí **sí** explotaría con un `NameError`: es un
 buen dato extra, no un error de la respuesta.)
 
@@ -206,14 +212,16 @@ buen dato extra, no un error de la respuesta.)
 
 ## 11. Criterio aplicado
 
-**(a) y (b) — las dos preguntas.** Se busca, en cualquier orden y con cualquier
-formulación:
+**(a) y (b).** La pregunta que el colega ya contestó sin que se la hicieras es
+**¿cuántas perillas?**: 2 millones. Así que de las dos preguntas de revisor de
+la clase falta la otra, y la tercera es la que abre la clase 4. Se busca, con
+cualquier formulación:
 
-1. **«¿Cuántos casos usaste para entrenar?»** — 80 municipios, quizá por unos
+1. **La que falta: «¿Cuántos casos usaste para entrenar?»** — 80 municipios, quizá por unos
    años. Aunque fueran 80 × 20 años = 1.600 observaciones, sigue habiendo
    **1.250 parámetros por cada dato**. Con esa relación, el modelo puede pasar
    por todos los puntos sin haber aprendido nada sobre el fenómeno.
-2. **«¿Ese 0,99 está calculado sobre datos que el modelo no vio?»** — y si la
+2. **La tercera: «¿Ese 0,99 está calculado sobre datos que el modelo no vio?»** — y si la
    respuesta es "sobre los mismos datos con los que lo entrené", la conversación
    terminó ahí. Es la pregunta que separa dibujar de calcar.
 
@@ -245,6 +253,6 @@ encuestas"*, *"mi regresión tenía 14 predictores y 90 casos"*. Una respuesta
 excelente reconoce que la relación perillas/datos también aplica a métodos que
 no son redes neuronales — porque **es un problema de método, no de tecnología**.
 
-Si nadie de la clase se aplicó la vara a sí mismo, decilo en voz alta la clase
-que viene: es la única forma de que el `[EL LUNES]` de esta clase deje de ser una
-frase.
+Si nadie de la clase se aplicó la vara a sí mismo, decilo en voz alta al empezar
+la clase 3: es la única forma de que el `[EN TU INVESTIGACIÓN]` de esta clase
+deje de ser una frase.

@@ -12,11 +12,15 @@
 
      El diagrama de circulitos y flechas es el ícono que todo el mundo vio mil
      veces en notas de divulgación. Acá deja de ser un ícono: cada flecha es una
-     perilla con un efecto visible y LOCALIZABLE en la curva.
+     perilla con un efecto visible en la curva. Ojo: el efecto NO es local. Un
+     peso de salida cambia la curva desde el codo de su neurona hacia la
+     derecha (si el peso de entrada es positivo) y deja intacto lo de antes.
 
-     La «configuración buena» son 6 rampas ajustadas por mínimos cuadrados a la
-     serie real de menciones a «inflación» (codos en 1995, 1999, 2007, 2010,
-     2014 y 2017). MSE medido = 0.000178. El script está en notas-docente.md.
+     La «configuración buena» son 6 rampas con codos en 1995, 1999, 2007, 2010,
+     2014 y 2017 (los w1 y b1 de abajo), con los pesos de salida y el sesgo
+     final ajustados por mínimos cuadrados a la serie real de menciones a
+     «inflación» (con el borde de la media móvil corregido). MSE medido =
+     0.000200. El script está en notas-docente.md §10.
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -89,18 +93,22 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Pasá el mouse por una bolita del medio: se
-      enciende <em>su</em> rampa en el gráfico de la derecha, y vas a ver que
-      cada una se ocupa de un tramo y de ningún otro. Ahora hacé clic en la
-      flecha que sale de esa bolita y movela: se mueve <b>ese</b> pedazo de la
-      curva y el resto ni se entera. Las seis bolitas del medio son las seis
-      rampas de la visualización anterior. Es la misma cosa escrita en otra
-      notación.
+      enciende <em>su</em> rampa en el gráfico de la derecha. Vale cero hasta su
+      codo y después sigue subiendo o bajando hasta el final: no se ocupa de «un
+      tramo», se ocupa de <em>todo lo que está a la derecha</em> de su codo.
+      Ahora hacé clic en la flecha que sale de esa bolita y movela: la curva
+      cambia desde ese codo en adelante, y lo de antes ni se entera. Las seis
+      bolitas del medio son seis rampas como las de la visualización anterior:
+      la misma cosa escrita en otra notación.
+      <br><b>Cómo leer las flechas:</b> el grosor es el tamaño del peso; las
+      <b>llenas</b> son pesos positivos y las <b>punteadas</b>, negativos (el
+      color repite lo mismo).
     </div>
     <p class="viz-pie">
       <b>La entrada está normalizada:</b> el año se lleva a la escala 0–1
       (0 = 1984, 1 = 2019) antes de entrar. No es un truco: es lo que se hace
       siempre, porque si no las perillas quedan con escalas muy distintas entre
-      sí y todo se vuelve más difícil de mover. Volvemos sobre esto en la clase 3.
+      sí y todo se vuelve más difícil de mover.
     </p>
     <p class="viz-pie">
       Datos <b>reales</b>: menciones a «inflación» en el discurso de apertura de
@@ -114,7 +122,7 @@
 <script>
 /* ============================================================== los datos */
 const ANIO_0 = 1984, ANIO_1 = 2019;
-const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+const SERIE = [0.1143, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
                0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
                0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
                0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
@@ -124,13 +132,14 @@ const aT = anio => (anio - ANIO_0) / (ANIO_1 - ANIO_0);
 
 const H = 6;   // neuronas ocultas
 
-// La configuración buena: seis rampas ajustadas por mínimos cuadrados.
-// MSE medido sobre estos datos = 0.000178.
+// La configuración buena: seis rampas con los codos fijos (w1, b1) y los pesos
+// de salida y el sesgo final ajustados por mínimos cuadrados.
+// MSE medido sobre estos datos = 0.000200.
 const BUENA = {
   w1: [1.60, 0.90, 2.20, 1.20, 0.70, 1.90],
   b1: [-0.5029, -0.3857, -1.4457, -0.8914, -0.6000, -1.7914],
-  w2: [-0.3629, 0.9476, -0.4494, 0.7993, 1.9833, -1.4843],
-  b2: 0.08319
+  w2: [-0.3823, 0.9854, -0.4520, 0.8019, 1.9834, -1.4844],
+  b2: 0.08618
 };
 let red = JSON.parse(JSON.stringify(BUENA));
 
@@ -161,6 +170,7 @@ const p = Viz.plano('#curva', {
   xmin: ANIO_0 - 1, xmax: ANIO_1 + 1, ymin: -0.03, ymax: 0.21,
   ejeX: 'año', ejeY: '% de palabras', titulo: 'lo que la red dibuja', alto: 290
 });
+p.canvas.setAttribute('role', 'img');
 
 p.alDibujar(() => {
   p.fondo(); p.grilla();
@@ -216,6 +226,10 @@ function valorDe(capa, j) { return capa === 'b2' ? red.b2 : red[capa][j]; }
 
 function construirDiagrama() {
   svgRed = Viz.svg.crear('#diagrama', { ancho: ANCHO_SVG, alto: ALTO_SVG, altoCss: '290px' });
+  svgRed.setAttribute('role', 'img');
+  svgRed.setAttribute('aria-label', 'Diagrama de la red: una entrada (el año), una capa oculta ' +
+    'de 6 neuronas y una salida. Cada flecha es un peso y cada cabito es un sesgo: ' +
+    (3 * H + 1) + ' perillas en total. Flechas llenas: pesos positivos; punteadas: negativos.');
 
   const cable = (x1, y1, x2, y2, capa, j, recto) => {
     const d = recto
@@ -288,6 +302,9 @@ function actualizarDiagrama() {
     const elegido = seleccion && seleccion.capa === c.capa && seleccion.j === c.j;
     c.path.setAttribute('stroke', elegido ? Viz.color('acento') : colorPeso(w));
     c.path.setAttribute('stroke-width', elegido ? grosor(w) + 2 : grosor(w));
+    // el signo no va sólo en el color: los pesos negativos van punteados
+    if (w < 0) c.path.setAttribute('stroke-dasharray', '5 4');
+    else c.path.removeAttribute('stroke-dasharray');
     c.path.setAttribute('stroke-opacity',
       elegido ? 1 : (resaltada === c.j && c.capa !== 'b2' ? .95 : .5));
   }
@@ -378,7 +395,8 @@ function pintarPerilla() {
   if (!seleccion) {
     cajaPerilla.innerHTML =
       '<div class="perilla-viva">Hacé <b>clic en una flecha</b> del diagrama. ' +
-      'Cada flecha es una perilla, y cada perilla tiene su territorio en la curva.</div>';
+      'Cada flecha es una perilla. Las que salen de una bolita cambian la curva desde ' +
+      'el codo de esa bolita en adelante; las que entran, y los sesgos, mueven el codo.</div>';
     return;
   }
   const { capa, j } = seleccion;
@@ -413,12 +431,24 @@ function refrescar() {
   let msg;
   if (resaltada !== null) {
     const j = resaltada;
-    const codo = -red.b1[j] / (red.w1[j] || 1e-9);
+    const w1 = red.w1[j];
+    const codo = -red.b1[j] / (w1 || 1e-9);
     const anio = ANIO_0 + codo * (ANIO_1 - ANIO_0);
-    msg = 'La <b>bolita ' + (j + 1) + '</b> es una rampa. Su codo cae en ' +
-      (codo > 0 && codo < 1 ? '<b>' + Math.round(anio) + '</b>, así que ' +
-        'sólo puede tocar la curva <b>de ahí en adelante</b>.'
-        : '<b>fuera del rango</b>, así que esta rampa está apagada o es una recta en todo el tramo.');
+    // Hacia qué lado queda viva la rampa depende del signo del peso de entrada:
+    // con w1 > 0 vale cero antes del codo; con w1 < 0, después.
+    let lado;
+    if (Math.abs(w1) < 1e-9) {
+      lado = 'Su peso de entrada es cero: no mira el año, y aporta una constante (o nada).';
+    } else if (codo > 0 && codo < 1) {
+      lado = 'Su codo cae en <b>' + Math.round(anio) + '</b>, así que ' + (w1 > 0
+        ? 'sólo puede tocar la curva <b>de ahí en adelante</b> (y la toca hasta el final).'
+        : 'como su peso de entrada es <b>negativo</b>, está viva <b>antes</b> del codo: ' +
+          'sólo toca la curva <b>de ahí para atrás</b>.');
+    } else {
+      lado = 'Su codo cae <b>fuera del rango</b>, así que esta rampa está apagada o es ' +
+        'una recta en todo el período.';
+    }
+    msg = 'La <b>bolita ' + (j + 1) + '</b> es una rampa. ' + lado;
   } else {
     msg = 'La red tiene <b>' + (3 * H + 1) + ' perillas</b>: ' + H + ' pesos de entrada, ' +
       H + ' sesgos, ' + H + ' pesos de salida y 1 sesgo de salida. ' +
@@ -433,9 +463,12 @@ function refrescar() {
   }
   ctl.texto('lectura', msg);
   ctl.texto('cuenta',
-    'La mejor recta posible sobre estos datos da <b>0.00150</b>. ' +
-    'La configuración buena de esta red da <b>0.00018</b>.');
+    'La mejor recta posible sobre estos datos da <b>0.00156</b>. ' +
+    'La configuración buena de esta red da <b>0.00020</b>.');
 
+  p.canvas.setAttribute('aria-label', 'La serie de menciones a inflación, 1984 a 2019, y la curva ' +
+    'que dibuja la red' + (alAzar ? ' con perillas al azar' : '') + '. Desajuste ' + d.toFixed(5) +
+    (resaltada !== null ? '. Resaltada: la rampa de la bolita ' + (resaltada + 1) + '.' : '.'));
   actualizarDiagrama();
   p.redibujar();
 }

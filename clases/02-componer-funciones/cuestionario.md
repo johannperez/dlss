@@ -6,7 +6,7 @@
 > que viste moverse en clase. Las que piden escribir, escribilas de verdad — son
 > las que más te van a servir el día que tengas que revisar un paper.
 >
-> Tiempo estimado: 25-30 minutos.
+> Tiempo estimado: 25-30 minutos. Se hace en casa, antes de la clase 3.
 
 ---
 
@@ -109,7 +109,7 @@ Uní cada término con su definición en castellano llano.
 | 2 | sesgo (*bias*) | b | Una rampa con sus perillas. |
 | 3 | neurona | c | La perilla que multiplica. |
 | 4 | capa oculta | d | El doblez que va entre capa y capa. |
-| 5 | activación | e | La perilla que suma, y corre la figura para arriba o para abajo. |
+| 5 | activación | e | La perilla que suma y desplaza la figura: en la salida la sube o la baja; en una rampa, le corre el codo. |
 
 ---
 
@@ -123,7 +123,7 @@ bien como se quiera.*
 
 - **A)** Existe alguna combinación de pesos que dibuja casi exactamente la curva que tengo.
 - **B)** Si le doy suficientes neuronas, el modelo va a predecir bien los casos que todavía no vio.
-- **C)** No hace falta buscar una fórmula especial para cada problema: alcanza con poner muchas piezas simples.
+- **C)** En principio, no hace falta una fórmula especial para cada curva: muchas piezas simples pueden representarla.
 - **D)** El teorema no dice nada sobre **cuántos datos** hacen falta.
 
 ---
@@ -164,13 +164,16 @@ Un colega te dice, en un pasillo:
 > «Usé una red neuronal con 2 millones de parámetros para modelar la trayectoria
 > de 80 municipios. Ajusta perfecto: el R² da 0,99.»
 
-**(a)** Escribí las **dos preguntas** que le harías, en el orden en que se las harías.
+**(a)** De las dos preguntas de revisor de la clase (*¿cuántas perillas?* y
+*¿cuántos datos?*), tu colega ya te contestó una sin que se la hicieras. ¿Cuál?
+Escribí **la que falta** y **una tercera** que le agregarías.
 
-**(b)** Explicá, para cada una, **qué información te da** la respuesta.
+**(b)** Explicá, para cada una de las dos que escribiste, **qué información te
+da** la respuesta.
 
 **(c)** ¿Por qué «ajusta perfecto» es, en este caso, una señal de alarma y no un
 resultado? Contestá en tres o cuatro oraciones.
 
 **(d)** *(La que importa.)* Pensá en un modelo o una medida que hayas usado en tu
 propia investigación —una regresión, un índice, una escala—. ¿Cuántas «perillas»
-tenía y cuántos casos? ¿Le harías a tu propio trabajo las mismas dos preguntas?
+tenía y cuántos casos? ¿Le harías a tu propio trabajo las mismas preguntas?

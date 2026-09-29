@@ -116,13 +116,13 @@
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/la-recta-imposible.html" title="ajustar una recta a la curva de inflación" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> el desajuste no baja de <b>0.00150</b>.
-     Y una raya horizontal en el promedio da <b>0.00152</b>.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> el desajuste no baja de <b>0.00156</b>.
+     Y una raya horizontal en el promedio da <b>0.00157</b>.</p>
   <aside class="notes">
     <b>6-9 min.</b> Poné dos o tres valores que grite el aula. Que se vea que baja un poco y se traba.
     Después apretá <b>«Poner la mejor recta posible»</b> y dejá el número en pantalla.<br>
     La frase, textual: <b>"no es que lo hagamos mal. No se puede."</b><br>
-    Rematá con el dato duro: la mejor recta posible explica el <b>1,3 %</b> de la variación.
+    Rematá con el dato duro: la mejor recta posible explica el <b>0,5 %</b> de la variación.
     Dibujar una raya horizontal en el promedio da casi lo mismo.
   </aside>
 </section>
@@ -153,7 +153,7 @@
     <b>9-12 min.</b> Volvé a la viz anterior y apretá los botones <b>3</b> y <b>5 perillas</b>.
     Movelas todas delante de ellos. Ojo con cómo lo decís: <b>la recta sí se mueve</b> (si dijeras
     que no, lo desmiente la pantalla). Lo que no se mueve es el <b>piso</b>: el desajuste rebota
-    para arriba y para abajo pero nunca baja de 0.00150, y el renglón del panel muestra por qué —
+    para arriba y para abajo pero nunca baja de 0.00156, y el renglón del panel muestra por qué —
     las cinco se vuelven a colapsar a dos números.<br>
     Pregunta al aula: "¿por qué no cambia nada?". Si alguien dice "porque son todas lo mismo",
     ganaste: esa persona acaba de descubrir sola por qué apilar cosas lineales no sirve, y lo
@@ -355,7 +355,8 @@ mas_diez(doble(3))   # 16
     <iframe src="viz/sin-no-linealidad.html" title="apilar rectas sin no linealidad" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> no las curvas — el <b>contador</b>.
-     Randomizá quince veces y salen quince rectas.</p>
+     Randomizá quince veces y salen quince rectas (el contador sólo suma una
+     recta si la cadena no se desvía de una recta ni un poquito).</p>
   <aside class="notes">
     <b>27-31 min.</b> Apretá <b>«randomizar»</b> muchas veces. En serio: quince, veinte veces,
     hasta que se rían. La evidencia acá se construye por repetición, no por argumento.<br>
@@ -448,15 +449,20 @@ mas_diez(doble(3))   # 16
     <div class="viz-frame" style="padding:8px" id="caja-rampa"></div>
     <div class="panel" id="panel-rampa"></div>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> tres perillas y podés poner el codo donde quieras,
-     con la inclinación que quieras, para arriba o para abajo. Guardá esa idea: son
-     <b>tres números por rampa</b>. En el notebook la vas a escribir así, tal cual:<br>
+  <p class="viz-pie"><b>Qué mirar:</b> con esto ponés el codo donde quieras, con la
+     inclinación que quieras, para arriba o para abajo. Son <b>dos números</b>: dónde está
+     el codo y cuánto sube por unidad (negativo si baja). En la red de verdad cada rampa
+     tiene <b>tres perillas</b>, porque además se puede estirar la entrada.
+     En el notebook la vas a escribir así, tal cual (la <code>altura</code> es cuánto sube por unidad):<br>
      <code>def rampa(x, codo=0.0, altura=1.0): return altura * np.maximum(0, x - codo)</code></p>
   <aside class="notes">
     <b>36-38 min.</b> Movelas vos, una por una, nombrándolas: "dónde está el codo",
     "qué tan empinada", "para dónde va".<br>
-    Preguntá: "¿cuántos números hacen falta para describir una rampa cualquiera?". Respuesta: tres.
-    Ese número vuelve en la slide del final, cuando tengamos ocho rampas y veinticuatro perillas.
+    Preguntá: "¿cuántos números hacen falta para describir una rampa cualquiera?". Van a decir
+    tres (hay tres controles). Respuesta: <b>dos</b> —el codo y la inclinación con signo: «baja» es
+    una inclinación negativa—. En la red de verdad son <b>tres por rampa</b> (peso de entrada, sesgo
+    y peso de salida), porque además se puede estirar la entrada; más una base para toda la red.
+    Ese número vuelve en la slide 31: ocho rampas, <b>25 perillas</b> (24 en las rampas + 1).
   </aside>
 </section>
 
@@ -486,7 +492,8 @@ mas_diez(doble(3))   # 16
     codo?" en vez de darles el número.<br>
     2. <b>El acumulador del <code>for</code></b>: si alguien no entiende <code>total = total + rampa(...)</code>,
     ejecutalo a mano en el pizarrón con tres iteraciones y valores concretos.<br>
-    3. <b>Confunden codo con altura</b>: el codo es <i>dónde</i>, la altura es <i>cuánto</i>.<br>
+    3. <b>Confunden codo con altura</b>: el codo es <i>dónde</i>, la altura es <i>cuánto sube por
+    cada unidad</i> después del codo (es una pendiente, aunque en el código se llame altura).<br>
     Últimos 2 minutos: preguntá quién resolvió el TODO 3 con tres rampas y quién con cuatro.
     Las dos están bien y la discusión es buena.
   </aside>
@@ -544,17 +551,20 @@ mas_diez(doble(3))   # 16
     <iframe src="viz/rampas.html" title="sumar rampas hasta dibujar la curva" loading="lazy"></iframe>
   </div>
   <div class="escalones">
-    <div class="fragment"><span class="n">1</span><span class="d">0.00084</span><span class="q">mal, obviamente</span></div>
-    <div class="fragment"><span class="n">2</span><span class="d">0.00062</span><span class="q">un poquito mejor</span></div>
-    <div class="fragment"><span class="n">4</span><span class="d">0.00032</span><span class="q">uy</span></div>
-    <div class="fragment"><span class="n">8</span><span class="d">0.00014</span><span class="q">…</span></div>
+    <div class="fragment"><span class="n">1</span><span class="d">0.00092</span><span class="q">mal, obviamente</span></div>
+    <div class="fragment"><span class="n">2</span><span class="d">0.00065</span><span class="q">un poquito mejor</span></div>
+    <div class="fragment"><span class="n">4</span><span class="d">0.00034</span><span class="q">uy</span></div>
+    <div class="fragment"><span class="n">8</span><span class="d">0.00016</span><span class="q">…</span></div>
   </div>
   <aside class="notes">
     <b>70-78 min.</b> <b>Ésta es la visualización más importante del curso. Dejala proyectada.</b><br>
     Guion, apretando los botones del atajo y revelando un escalón por vez:<br>
     · <b>1 rampa</b> — "mal, obviamente". Movele el codo por todos lados para que se vea que
     no hay manera.<br>
-    · <b>2 rampas</b> — "un poquito mejor". Señalá que cada una se hace cargo de un tramo.<br>
+    · <b>2 rampas</b> — "un poquito mejor". Señalá qué hace cada una: <b>dobla la curva en su
+    codo, y todo lo que está a la derecha hereda el doblez</b>; lo de la izquierda ni se entera.
+    (No digas que "cada una se hace cargo de un tramo": una rampa sigue subiendo o bajando
+    hasta el final del gráfico, y por eso al agregar una hay que reacomodar las otras.)<br>
     · <b>4 rampas</b> — "uy".<br>
     · <b>8 rampas</b> — y acá <b>callate cinco segundos</b>. Contalos.<br>
     Si querés la imagen más limpia posible para ese silencio, poné
@@ -562,7 +572,7 @@ mas_diez(doble(3))   # 16
     la azul encima. Las sumas parciales (el modo por defecto) sirven con 2 y con 4 rampas,
     donde se ve cada rampa doblando la curva anterior; con 8 son ocho líneas cruzando el cuadro.<br>
     Recién después: "esto es una red neuronal. Ya está. Eso es todo lo que hay."<br>
-    Recordá el desajuste de la recta: 0.00150. Con ocho rampas: 0.00014. Diez veces mejor.<br>
+    Recordá el desajuste de la recta: 0.00156. Con ocho rampas: 0.00016. Casi diez veces mejor.<br>
     <b>No aprietes «32» todavía.</b> Eso va en la slide 31.
   </aside>
 </section>
@@ -584,8 +594,9 @@ mas_diez(doble(3))   # 16
   <h2>Lo que acaban de ver tiene nombre</h2>
   <div class="intuicion compacta">
     <strong>Teorema de aproximación universal.</strong> Con suficientes rampas se puede
-    aproximar <em>cualquier</em> función continua, tan bien como quieras.
-    No lo vamos a demostrar, porque lo acaban de ver. (Cybenko 1989, Hornik 1991.)
+    aproximar <em>cualquier</em> función continua, en un rango acotado, tan bien como quieras.
+    No lo vamos a demostrar, porque lo acaban de ver. (Cybenko 1989 lo probó para sigmoides;
+    para la rampa, Leshno y otros 1993.)
   </div>
   <div class="ojo">
     El teorema dice que la combinación <strong>existe</strong>.
@@ -604,6 +615,8 @@ mas_diez(doble(3))   # 16
     Van a contestar bien solos. Después: "bueno, acabamos de construir una función así".<br>
     <b>Ésta es la confusión más peligrosa de la clase</b>: "entonces con suficientes rampas
     puedo predecir cualquier cosa". No. Aproximar lo que ya viste no es predecir lo que no viste.
+    Y el «rango acotado» no es letra chica: fuera del rango de los datos (en 2020, digamos) la red
+    sigue derecho con la última recta, y nadie le prometió que eso tenga que ver con el mundo.
   </aside>
 </section>
 
@@ -622,7 +635,8 @@ mas_diez(doble(3))   # 16
       <p>Cada <strong>bolita del medio</strong> es una rampa.</p>
       <p>Cada <strong>flecha</strong> es una perilla.</p>
       <p>La <strong>bolita de la derecha</strong> las suma.</p>
-      <p>Es la misma suma de rampas, con otra notación.</p>
+      <p>Es la misma suma de rampas, con otra notación. Y es una <strong>composición</strong>:
+         correr la entrada → doblar → sumar con pesos.</p>
     </div>
   </div>
   <aside class="notes">
@@ -640,14 +654,17 @@ mas_diez(doble(3))   # 16
     <iframe src="viz/red-como-dibujante.html" title="el diagrama de red, por dentro" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> pasá el mouse por una bolita y se enciende <em>su</em>
-     rampa. Hacé clic en la flecha que <b>sale</b> de esa bolita y movela: se mueve
-     <b>esa</b> parte de la curva y el resto ni se entera. (Las flechas de entrada
-     y los sesgos mueven el codo de lugar, que es otro efecto: probalos también.)</p>
+     rampa. Hacé clic en la flecha que <b>sale</b> de esa bolita y movela: la curva se
+     dobla distinto <b>desde el codo de esa bolita en adelante</b>, y lo que está antes
+     del codo ni se entera. (Las flechas de entrada y los sesgos mueven el codo de lugar,
+     que es otro efecto: probalos también.)</p>
   <aside class="notes">
     <b>84-87 min.</b> Hacé clic en la flecha de salida de la bolita 5 (la del codo en 2014)
-    y movela hasta el tope. Se dispara el final de la curva y el resto queda igual.<br>
-    Frase: <b>"toqué esta flecha de acá y se movió esa parte de la curva de allá.
-    Cada perilla tiene su territorio."</b><br>
+    y movela hasta el tope. Se dispara el final de la curva y todo lo anterior a 2014 queda igual.<br>
+    Frase: <b>"toqué esta flecha de acá y se movió la curva de allá, desde el codo de esa
+    bolita en adelante. Lo de antes del codo ni se enteró."</b><br>
+    Si alguien pregunta "¿y si muevo la bolita 1?": mueve la curva desde 1995 hasta el final,
+    más de dos tercios del gráfico, porque ahí está su codo. Una rampa no se ocupa de un tramo: se ocupa de todo lo que está a su derecha.<br>
     Después apretá <b>«randomizar toda la red»</b> dos veces: sale cualquier cosa.
     Eso también hay que mostrarlo. Y volvé a la configuración buena.
   </aside>
@@ -659,7 +676,7 @@ mas_diez(doble(3))   # 16
   <table>
     <tr><th>palabra</th><th>qué es, en castellano llano</th></tr>
     <tr><td><b>peso</b> · <i>weight</i></td><td>la perilla que <strong>multiplica</strong></td></tr>
-    <tr><td><b>sesgo</b> · <i>bias</i></td><td>la perilla que <strong>desplaza</strong>. Nada que ver con sesgo social</td></tr>
+    <tr><td><b>sesgo</b> · <i>bias</i></td><td>la perilla que <strong>desplaza</strong>: en la salida sube o baja la curva; en una rampa corre el codo. Nada que ver con sesgo social</td></tr>
     <tr><td><b>neurona</b> · <i>neuron</i></td><td>una rampa</td></tr>
     <tr><td><b>capa</b> · <i>layer</i></td><td>un grupo de rampas en paralelo</td></tr>
     <tr><td><b>capa oculta</b> · <i>hidden layer</i></td><td>las del medio, las que no ves entrar ni salir</td></tr>
@@ -667,7 +684,8 @@ mas_diez(doble(3))   # 16
     <tr><td><b>profunda</b> · <i>deep</i></td><td>muchas capas, una atrás de la otra</td></tr>
   </table>
   <div class="ojo compacta">
-    <strong>«Bias» acá no quiere decir sesgo social.</strong> Es un número que sube o baja la recta.
+    <strong>«Bias» acá no quiere decir sesgo social.</strong> Es un número que desplaza: en la
+    salida sube o baja la curva, y en una neurona oculta corre el codo a izquierda o derecha.
     Cuando en la clase 10 hablemos de sesgo <em>de verdad</em>, va a ser otra cosa completamente
     distinta y con el mismo nombre en inglés. Es la trampa de vocabulario número uno del campo.
   </div>
@@ -714,12 +732,14 @@ mas_diez(doble(3))   # 16
     <strong>Diecisiete minutos.</strong>
   </div>
   <ul>
-    <li><strong>TODO 4</strong> — bajá el desajuste de <code>0.00056</code> agregando y
-        moviendo rampas. Anotá cuántas necesitaste.</li>
+    <li><strong>TODO 4</strong> — bajá el desajuste de <code>0.00060</code> agregando y
+        moviendo <strong>codos</strong> (las alturas ya están en su mejor valor para esos codos).
+        Anotá cuántas rampas necesitaste.</li>
     <li>Después, la sección 5: <strong>la misma red escrita con matrices</strong>,
         y un <code>assert</code> que comprueba que da lo mismo.</li>
-    <li><strong>TODO 5</strong> <em>(opcional)</em> — cambiá la rampa por la sigmoide de la
-        clase 1. ¿La curva queda más angulosa o más redondeada?</li>
+    <li><strong>TODO 5</strong> <em>(opcional)</em> — el mismo esqueleto con la sigmoide de la
+        clase 1. ¿La curva queda más angulosa o más redondeada? Y tocá su <code>suavidad</code>:
+        ¿cuándo se parece a un escalón?</li>
   </ul>
   <div class="intuicion compacta">
     Van a escribir una red neuronal entera en <strong>seis líneas</strong>, sin PyTorch,
@@ -764,15 +784,16 @@ mas_diez(doble(3))   # 16
   <div class="comparacion">
     <div>
       <h4>Con 8 rampas</h4>
-      <p>La curva azul sigue la <strong>forma</strong> de la negra. Desajuste <code>0.00014</code>.</p>
-      <p>24 perillas y una base.</p>
+      <p>La curva azul sigue la <strong>forma</strong> de la negra. Desajuste <code>0.00016</code>.</p>
+      <p>Como red, <strong>25 perillas</strong>: 3 por rampa, más la base.</p>
     </div>
     <div>
       <h4>Con 32 rampas</h4>
       <p>La curva azul pasa por <strong>todos</strong> los puntos. Incluidos los que
          casi seguro son ruido del instrumento —el léxico lo escribimos nosotros—.
-         Desajuste <code>0.000014</code>.</p>
-      <p>96 perillas. Y sólo hay <strong>36 datos</strong>.</p>
+         Desajuste <code>0.000008</code>.</p>
+      <p>Como red, <strong>97 perillas</strong>. (Acá la computadora ajustó 33: las 32 alturas
+         y la base, con los codos fijos.) Y sólo hay <strong>36 datos</strong>.</p>
     </div>
   </div>
   <div class="aha">
@@ -784,15 +805,17 @@ mas_diez(doble(3))   # 16
     Dejala en pantalla.<br>
     <b>No expliques el sobreajuste hoy.</b> La tentación es enorme y hay que resistirla:
     la siembra funciona porque queda incómoda. Decí sólo: "guarden esta imagen".<br>
-    Y mostrá el panel: 96 perillas, y no te muestro los sliders porque son demasiados.
+    Y mostrá el panel: 97 perillas, y no te muestro los sliders porque son demasiados.
+    Si alguien objeta que la viz sólo ajustó 33 números: tiene razón, y el argumento
+    no cambia —33 números para 36 datos ya alcanzan para calcar—.
     Ése es el pie para la slide siguiente.
   </aside>
 </section>
 
-<!-- ============================ 32. EL LUNES ============================ -->
+<!-- ============================ 32. EN TU INVESTIGACIÓN ============================ -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué te llevás para el lunes</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué te llevás a tu investigación</h2>
   <p>Cuando leas <em>«usamos una red neuronal»</em>, traducí mentalmente:
      <strong>«usamos una función muy flexible con muchísimas perillas»</strong>.</p>
   <p>Y hacé las dos preguntas de revisor:</p>
@@ -803,7 +826,9 @@ mas_diez(doble(3))   # 16
   <div class="ss">
     Si un paper modela la trayectoria de 80 municipios con 2 millones de parámetros
     y dice que «ajusta perfecto», <strong>ajustar perfecto es la señal de alarma, no el
-    resultado</strong>. Con esas dos preguntas ya podés escribir media revisión.
+    resultado</strong>. Con esas dos preguntas ya podés escribir media revisión. La otra
+    mitad empieza con una tercera, que es la clase 4: <em>¿ese ajuste está medido sobre
+    datos que el modelo no vio?</em>
   </div>
   <aside class="notes">
     <b>112-115 min.</b> Éste es el entregable concreto de la clase. Que lo anoten.<br>
@@ -821,7 +846,8 @@ mas_diez(doble(3))   # 16
     <li><strong>Apilar cosas lineales no sirve de nada.</strong> Hace falta un doblez en el medio,
         y el doblez es <code>max(0, x)</code>. No hay nada que entender ahí adentro.</li>
     <li><strong>Una red neuronal es una suma de rampas.</strong> Con suficientes dibujás cualquier
-        figura — pero <em>poder dibujarla</em> no es lo mismo que <em>predecir bien</em>.</li>
+        figura continua, en el rango de los datos — pero <em>poder dibujarla</em> no es lo mismo
+        que <em>predecir bien</em>.</li>
   </ol>
   <aside class="notes">
     <b>115-116 min.</b> Tres, no cuatro. Si te piden una cuarta, la cuarta es la tercera dicha
@@ -838,11 +864,11 @@ mas_diez(doble(3))   # 16
     <li><b>ReLU</b><span>la rampa: <code>max(0, x)</code>. Si es negativo, cero</span></li>
     <li><b>activation function</b><span>función de activación — el doblez que va entre capa y capa</span></li>
     <li><b>weight</b><span>peso — la perilla que multiplica</span></li>
-    <li><b>bias</b><span>sesgo — la perilla que desplaza. <b>No</b> es el sesgo social</span></li>
+    <li><b>bias</b><span>sesgo — la perilla que desplaza (sube la curva o corre el codo). <b>No</b> es el sesgo social</span></li>
     <li><b>neuron</b><span>neurona — una rampa. Ni una célula, ni algo que piense</span></li>
     <li><b>hidden layer</b><span>capa oculta — el grupo de rampas del medio</span></li>
     <li><b>deep</b><span>profundo — muchas capas, una atrás de la otra</span></li>
-    <li><b>universal approximation</b><span>aproximación universal — con suficientes rampas, cualquier figura</span></li>
+    <li><b>universal approximation</b><span>aproximación universal — con suficientes rampas, cualquier figura continua, en el rango de los datos</span></li>
   </ul>
   <aside class="notes">
     <b>116-118 min.</b> Diez términos. Están todos en <code>recursos/glosario.md</code> con la clase
@@ -857,7 +883,7 @@ mas_diez(doble(3))   # 16
   <h1>Clase 3: estar equivocado es un número,<br>y ese número tiene pendiente</h1>
   <div class="franja"></div>
   <p class="gancho">Sabemos dibujar cualquier cosa. Pero pusimos los pesos a mano, y con ocho
-     perillas ya es un suplicio. Un modelo de verdad tiene millones.
+     rampas —25 perillas— ya es un suplicio. Un modelo de verdad tiene millones.
      <strong>¿Cómo los encuentra solo?</strong></p>
   <aside class="notes">
     <b>118-120 min.</b> Cerrá con la promesa concreta: "hacen falta dos cosas.
@@ -925,7 +951,7 @@ mas_diez(doble(3))   # 16
      Los datos son los mismos que usan las viz de viz/: la serie real de
      menciones a «inflación» (media móvil de 3 años), 1984-2019.
      ===================================================================== */
-  const SERIE = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+  const SERIE = [0.1143, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
                  0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
                  0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
                  0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
@@ -940,6 +966,11 @@ mas_diez(doble(3))   # 16
       ejeX: 'año', ejeY: '% de palabras del discurso',
       titulo: 'menciones a «inflación» en la apertura de sesiones'
     });
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label',
+      'Serie de menciones a inflación, 1984 a 2019: oscila entre 0,06 y 0,12 % hasta mediados ' +
+      'de los noventa, cae a un mínimo de 0,02 % en 2000, sube hasta 0,085 % en 2006, vuelve ' +
+      'a bajar hacia 2010 y se dispara al final, con un máximo de 0,18 % en 2017.');
     p.alDibujar(() => {
       p.fondo(); p.grilla();
       p.ejes({ formatoX: v => String(Math.round(v)), formatoY: v => Viz.num(v, 2) });
@@ -960,6 +991,10 @@ mas_diez(doble(3))   # 16
       xmin: -4, xmax: 4, ymin: -1, ymax: 4, alto: 300,
       ejeX: 'x', ejeY: 'max(0, x)', titulo: 'la función más tonta del mundo'
     });
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label',
+      'La función max(0, x): vale cero para x negativo y crece como una recta de pendiente 1 ' +
+      'para x positivo. El codo está en cero.');
     p.alDibujar(() => {
       p.fondo(); p.grilla(); p.ejes();
       p.curva(x => Math.max(0, x), { color: 'modelo', grosor: 5 });
@@ -971,13 +1006,14 @@ mas_diez(doble(3))   # 16
     planos.push(p);
   })();
 
-  // --- slide 17: una rampa con sus tres perillas ------------------------
+  // --- slide 17: una rampa, dos números (tres controles) ----------------
   (function () {
     const estado = { codo: 0, empinada: 1, signo: 1 };
     const p = Viz.plano('#caja-rampa', {
       xmin: -5, xmax: 5, ymin: -5, ymax: 5, alto: 330,
-      ejeX: 'x', ejeY: 'rampa(x)', titulo: 'tres perillas y ninguna más'
+      ejeX: 'x', ejeY: 'rampa(x)', titulo: 'dos números: dónde y cuánto'
     });
+    p.canvas.setAttribute('role', 'img');
     function rampa(x) {
       return estado.signo * estado.empinada * Math.max(0, x - estado.codo);
     }
@@ -1002,6 +1038,9 @@ mas_diez(doble(3))   # 16
       ctl.texto('lectura', 'Antes de <b>' + Viz.num(estado.codo, 1) +
         '</b> vale cero. Después ' + (estado.signo > 0 ? 'sube' : 'baja') +
         ' <b>' + Viz.num(estado.empinada, 2) + '</b> por cada unidad de x.');
+      p.canvas.setAttribute('aria-label', 'Una rampa: vale cero hasta el codo en x = ' +
+        Viz.num(estado.codo, 1) + ' y después ' + (estado.signo > 0 ? 'sube ' : 'baja ') +
+        Viz.num(estado.empinada, 2) + ' por cada unidad de x.');
       p.redibujar();
     });
     ctl.disparar();

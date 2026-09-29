@@ -1,224 +1,284 @@
-# Verificación adversarial — Clase 2
+# Verificación — Clase 2
 
 **Componer funciones: dibujar lo imposible** · `clases/02-componer-funciones/`
-Segunda pasada, hecha por otro agente que no construyó el material y que **no le
-creyó nada al informe de construcción**. Todo lo que dice acá se comprobó
-corriendo el código: `nbconvert --execute`, `nbformat.validate`, Chromium por
-Playwright con `context.route` abortando cualquier `http(s)`, `curl` contra cada
-host, y **mirando los PNG con los ojos** (35 slides barridas, 5 viz en tema claro
-y oscuro, antes y después de mover cada control, y las 9 figuras del notebook).
+
+Este archivo dice qué se comprobó, cómo, y qué **no** se comprobó. Tiene tres
+pasadas: la de construcción, una verificación adversarial (la «segunda
+pasada», resumida en la §6) y una revisión posterior que encontró errores que
+la segunda pasada había dado por buenos (la «tercera pasada», §1 a §5). Donde
+la segunda pasada afirmaba algo que resultó falso, acá se corrige.
 
 ---
 
-## 1. Veredicto
+## 1. Estado actual
 
-**La clase se puede dictar.** La base que dejó el equipo de construcción era
-buena y los números eran reales. Se encontraron **11 problemas** y **se
-arreglaron los 11**. Dos eran de los que arruinan un momento en el aula:
+**La clase se puede dictar.** El notebook corre de punta a punta sin errores y
+todos los números que citan las slides, las notas, el notebook y las viz salen
+del script de `notas-docente.md` §10, corrido sobre los datos actuales.
 
-- **`red-como-dibujante.html` mostraba un gráfico vacío al randomizar.** El guion
-  del docente dice «apretá randomizar dos veces: sale cualquier cosa». Lo que
-  salía era **nada**: con las alturas al azar la salida se iba a ±5 mientras los
-  datos viven entre 0 y 0,2, así que la curva azul quedaba fuera del cuadro. En
-  el aula eso se lee «se rompió», no «una red sin entrenar dibuja porquería».
-- **Cualquier viz abierta con el tema oscuro ya guardado se dibujaba con la
-  paleta clara.** Es un bug de `_shared/js/viz.js` que afecta a las diez clases
-  (ver sección 5). Parcheado localmente en los cinco archivos de esta clase.
+La tercera pasada encontró cuatro problemas de fondo, que ahora están
+arreglados:
 
-Y uno de rigor, que es de la peor categoría porque *enseña algo falso*:
-**`la-recta-imposible.html` afirmaba que al mover las perillas de más «el
-desajuste no baja ni un poquito» y «la forma no cambia».** Las dos cosas son
-falsas y la pantalla las desmiente en el acto: la recta se mueve. Lo verdadero,
-y lo que ahora dice, es que **cualquiera sea el juego de perillas siempre queda
-una recta y el desajuste nunca baja del piso de 0.00150**.
-
-| Chequeo | Resultado |
-|---|---|
-| Entregables | 6 de 6, más 5 viz. Ninguno vacío ni a medias |
-| `nbformat.validate` | válido, 32 celdas |
-| `nbconvert --execute` | **0 errores**, 9 figuras · **8,9 s** de reloj |
-| Notebook **sin red y sin `datos/cache/`** | 0 errores y **salida idéntica byte a byte** a la corrida con cache |
-| Consola del navegador (slides + 5 viz, claro y oscuro) | **0 errores**, 12 combinaciones |
-| Requests externas (`route` abortando `http(s)`) | **0** |
-| Barrido de las 35 slides | 0 errores, ninguna se sale de cuadro |
-| Ventana angosta (420 px) en las 5 viz | 0 scroll horizontal |
-| Números de las slides y las viz contra el código | **todos coinciden** (sección 3) |
-| Citas de `referencias.md` | 10 de 10 reales y bien citadas; 0 URLs inventadas |
-| Presupuesto de tiempo | continuo, 0 → 120, sin huecos ni solapes |
+1. **La «localidad» de la rampa era falsa.** El material decía que cada rampa
+   «se hace cargo de un tramo y no se entera de lo que pasa en los otros»
+   (notebook, `rampas.html`, `red-como-dibujante.html`, slide 22, notas). Una
+   rampa vale cero antes de su codo, pero **después sigue creciendo hasta el
+   final**. Ahora todo dice lo correcto: cada rampa dobla la curva en su codo,
+   todo lo de la derecha hereda el doblez, lo de la izquierda no se entera. La
+   actividad «si vas adelantado» de las notas hacía una predicción numérica
+   falsa («la de 2014 duele muchísimo, la de 1990 casi nada»); se reescribió
+   con números medidos (§3) para enseñar justamente la no-localidad.
+2. **Los números de inflación estaban calculados con un error de borde en los
+   datos.** La media móvil de 1984 promediaba con 1975 (el dato anterior de la
+   serie, nueve años antes). Con el borde corregido en `ssdl.datos`, el primer
+   valor de la serie pasa de 0.0762 a 0.1143 y **cambian todos los
+   desajustes** (la recta: 0.00150 → 0.00156; su R²: 1,3 % → 0,5 %). Se
+   volvieron a medir y se propagaron a slides, notas, notebook, viz y
+   cuestionario. La serie copiada en las 3 viz y en las slides es la nueva.
+3. **La cuenta de perillas no cerraba.** Las slides y `rampas.html` contaban 3
+   por rampa (el «sube/baja» contado como perilla), el notebook 2 por rampa más
+   la base, el cuestionario 3 por neurona. Ahora hay una sola regla, explicada
+   donde aparece: la rampa del notebook y de la viz usa **2 números** (codo y
+   pendiente con signo); escrita como red de verdad, cada neurona tiene **3
+   perillas** (peso de entrada, sesgo, peso de salida) y la red **3n + 1**. Ocho
+   rampas: 25 perillas; 32 rampas: 97 (la viz ajusta 33 con los codos fijos, y
+   lo dice).
+4. **Citas y promesas rotas.** Cybenko (1989) y Hornik (1991) no cubren la
+   ReLU; se agregó Leshno, Lin, Pinkus y Schocken (1993) en la slide 24 y en
+   `referencias.md`. «Softmax en la clase 4» pasó a la clase 7, donde está.
+   «Por qué ReLU y no sigmoide, en serio, en la clase 3/4» no existía en
+   ninguna clase: se sacó la promesa y se manda al capítulo 5 de Nielsen.
 
 ---
 
-## 2. Lo que se arregló
+## 2. Qué se arregló en la tercera pasada, archivo por archivo
 
-### Rompía un momento de la clase
+**`notebook.ipynb`** (sin tocar la celda de bootstrap)
+- Celda 21: la no-localidad, la pieza local armada con varias rampas
+  («sombrerito» de Nielsen) y la red como **composición** (correr → doblar →
+  sumar).
+- Celda 22: las alturas y la base de las 4 rampas no estaban «puestas a dedo»:
+  eran la solución de mínimos cuadrados. Ahora lo dice, con los valores para
+  los datos corregidos (desajuste 0.00060).
+- TODO 4: avisa que tocando sólo alturas o base no se mejora (hay que mover o
+  agregar codos); pista 3 reescrita según la no-localidad; umbrales nuevos.
+- Celda 26: «números que moviste: 2n+1» y, al lado, «como red: 3n+1».
+- Celdas 27-28: se sacaron «al lado, la figura» (no había figura) y «el mismo
+  número, bit por bit» (la propia celda muestra una diferencia de ~1e-17); el
+  comentario ya no afirma un dígito concreto. Se explica la diferencia 2 vs 3
+  perillas.
+- TODO 5: ya no venía resuelto. Ahora el estudiante toca `suavidad` y predice
+  si la sigmoide se parece a una rampa o a un escalón.
+- Celdas 8-10: «puntos porcentuales por año»; la recta de 5 perillas usa años
+  desde 1984, así los valores quedan en la escala de los datos.
+- Celda 15-16: `altura` es una pendiente; se aclara una vez y en las leyendas.
+- Celda 31: «En tu propia investigación, desde ya» (antes «Para el lunes»);
+  «cualquier figura continua, en el rango de los datos»; sesgo según dónde esté.
 
-**1. `viz/red-como-dibujante.html` — «randomizar» dejaba el cuadro vacío.**
-`w2` al azar en ±2 sobre activaciones de hasta ~5 da salidas del orden de ±10;
-el eje va de −0,03 a 0,21. Medido: desajuste **23,75** y curva invisible.
-*Arreglado:* después de sortear, las alturas y la base se **reescalan** para que
-la curva entre en el cuadro (`salida' = k·(salida − mín) + 0,02`). La **forma
-sigue siendo la que salió al azar**, no se corrige nada, y el panel lo dice con
-todas las letras. Ahora el desajuste típico queda en **0.00348** — peor que la
-mejor recta (0.00150), que es exactamente la lección — y la porquería **se ve**.
+**`slides.html`**: números nuevos (slides 4, 22, 29, 31), perillas (17, 31, 35),
+localidad (22, 26), teorema con Leshno 1993 y «en un rango acotado» (24, 33,
+34), sesgo (27, 34), composición (25), bloque `en tu investigación` (32, con la
+tercera pregunta de revisor como anticipo de la clase 4), TODO 5 (29). Los tres
+canvas de la presentación tienen `role="img"` y `aria-label`.
 
-**2. Tema oscuro guardado = dibujo claro.** Ver sección 5. Parcheado en los cinco
-archivos con `Viz.recargarColores()` después de `Viz.botonTema()`.
+**Viz**
+- `rampas.html`: serie y números nuevos; atajo de 2 rampas en (1985, 2012), que
+  es el óptimo con los datos corregidos; la cabecera ya no dice «el mejor juego»
+  para 8 (es el mejor de una búsqueda local); cartel «n rampas · como red: 3n+1
+  perillas»; se sacó la anécdota inventada «me llevó una tarde»; el desajuste de
+  32 rampas se muestra con 6 decimales (0.000008, no «0.00001»). Accesibilidad:
+  `aria-label` en el lienzo y en cada mini-gráfico, y la pendiente **con signo,
+  en texto** en cada tarjeta (el signo ya no depende sólo del color).
+- `red-como-dibujante.html`: pesos de salida reajustados a los datos corregidos
+  (MSE 0.000200, los codos no cambian); el mensaje de la bolita resaltada depende
+  del signo del peso de entrada (con w1 < 0 la rampa vive a la izquierda); pie
+  sin «cada una se ocupa de un tramo» ni «las seis rampas de la viz anterior»
+  (esa viz no tiene atajo de 6); se sacó una promesa sobre normalización en la
+  clase 3 que no se cumple. Accesibilidad: los pesos negativos van
+  **punteados** además de rojos; `aria-label` en el SVG y en el lienzo.
+- `sin-no-linealidad.html`: el contador de rectas era tautológico (copiaba el de
+  randomizaciones); ahora cuenta una recta sólo si la cadena, medida, se desvía
+  de una recta menos de 1e-9 relativo a su tamaño. Arranca con N = 5 cajas, como
+  dice el pie. *Dying ReLU* se nombra como pariente del fenómeno de
+  entrenamiento, no como el mismo. `aria-label` en los dos lienzos.
+- `la-recta-imposible.html`: números nuevos; el umbral de «ya llegaste al piso»
+  bajó de ×1,02 a ×1,003 (con los datos nuevos, ×1,02 ya aceptaba la raya en el
+  promedio). `aria-label` dinámico en el lienzo.
+- `lego-de-funciones.html`: `aria-label` en los tres mini-gráficos, en los
+  selects y en los sliders.
 
-### Rigor (enseñaban algo falso)
+**`notas-docente.md`**: arco y tiempos con los números nuevos; confusión nueva
+«cada rampa se ocupa de un tramo»; pregunta difícil 5 reescrita (polinomio
+global contra base lineal por tramos, extrapolación lineal, *splines*);
+«si vas adelantado» con números medidos; ecualizador de 25 perillas; sección 5
+del notebook como tarea con tope de 1 h; soluciones del TODO 4 y TODO 5
+recalculadas; §10 con el script completo (atajos, óptimos exhaustivos, 32
+rampas, red buena, sacar rampas) y la nota sobre el cambio de datos.
 
-**3. «El desajuste no baja ni un poquito» / «la forma no cambia»** al agregar
-perillas, en el `aha` y en el panel de `la-recta-imposible.html`, y en las notas
-del docente de la slide 5. Reescrito a lo que efectivamente pasa: la recta se
-mueve, pero sigue siendo una recta y **nunca baja del piso de 0.00150**.
+**`cuestionario.md` / `cuestionario-soluciones.md`**: pregunta 8 (sesgo según
+dónde esté), pregunta 9 C («pueden representarla»), pregunta 11 alineada con las
+dos preguntas de revisor de la clase (la que falta + una tercera), 4(b) «puede
+pasar», fila «contar las neuronas» = 4, se sacó «Python 2», softmax → clase 7,
+`[EN TU INVESTIGACIÓN]` y «al empezar la clase 3». El cuestionario dice que se
+hace en casa antes de la clase 3.
 
-**4. «Los que son *claramente* ruido de medición»** (slide 31 y pie de
-`rampas.html`). La serie es una media móvil de 3 años: el ruido año a año ya
-está parcialmente alisado. Ahora dice «los que casi seguro son ruido —el léxico
-lo escribimos nosotros—», que es lo que `datos/README.md` §1.2(a) y (b)
-sostienen. El argumento fuerte, que no cambió, es **96 perillas para 36 datos**.
-
-**5. La slide 3 no decía que la serie está suavizada.** En un curso que insiste
-en que el instrumento se declara, eso no podía faltar. La bajada ahora dice
-«suavizados con una media móvil de 3 años», y las notas traen la frase para
-cuando alguien pregunte («la serie contesta *en qué parte del período el tema
-estuvo en agenda*, no *cuánto habló ese año*»).
-
-**6. El notebook tenía tres umbrales distintos para el mismo TODO 4.** El texto
-decía «bajá de 0.00056», el `print` decía «objetivo: menos de 0.00050» y el
-premio estaba en 0.00040. Ahora el `print` dice lo mismo que la consigna:
-*bajar de 0.00056; abajo de 0.00040 es excelente*.
-
-**7. La slide 26 prometía un efecto local para *cualquier* flecha.** Sólo los
-**pesos de salida** mueven un tramo dejando el resto quieto; los pesos de entrada
-y los sesgos **mueven el codo de lugar**. Comprobado moviendo las 19 flechas. El
-pie ahora distingue las dos cosas y manda a probar las dos.
-
-### Coherencia y aula
-
-**8. La numeración de slides estaba corrida en uno después de la pausa.** Reveal
-muestra `n / 35` **contando la pausa** (verificado por screenshot: «Y ahora, el
-truco» es la 21, no la 20), pero los comentarios del HTML, las notas del docente
-y `notas-docente.md` §3, §5, §6 y §7 numeraban sin contarla. Un docente que
-buscaba «la slide 30» encontraba otra. *Arreglado:* **todo** usa ahora la
-numeración de reveal; la pausa es la 19.
-
-**9. El bloque práctico 2 tenía la duración de emergencia metida en el plan
-normal.** La slide decía «Veinte minutos», el minutado del docente le daba 12, y
-la sección «si vas atrasado» ofrecía *achicarlo a 12* como recorte. *Arreglado:*
-retimado el tramo post-pausa; los **dos** prácticos duran 17 minutos, que es lo
-que realmente queda, y las slides dicen 17. La pausa no se movió (55-65) y el
-total sigue siendo 120 exactos. La diferencia de 5 minutos contra `PROGRAMA.md`
-está declarada en `notas-docente.md` §2, con la instrucción de qué recortar si
-se quiere respetar el reloj del programa al pie de la letra.
-
-**10. Dos errores de concordancia que se proyectan en pantalla.**
-`rampas.html` decía «Con **1 rampa** bien **puestas**…» en el panel, justo en el
-momento fuerte; `sin-no-linealidad.html`, «Las **1 caja es** una sola recta».
-
-**11. En la slide, las tarjetas de rampa quedaban cortadas al medio.** Con
-`max-height: 186px` y tarjetas de 245 px, los botones «sube/baja» quedaban fuera.
-Subido a 252 px, que entra sin agrandar la página (el alto lo manda el panel, no
-el taller). Verificado por screenshot dentro del iframe con 8 rampas.
-
-**Además** (mejoras chicas, no defectos): los mini-gráficos del taller ahora se
-repintan al cambiar de tema; la slide 17 muestra la línea de `rampa()` **tal cual
-la van a escribir en el notebook**; y las notas de la slide 22 explican cómo
-dejar la imagen más limpia posible («qué mostrar debajo» → «nada, sólo el
-resultado») para el silencio de los cinco segundos, porque con 8 rampas las
-sumas parciales cruzan el cuadro y ensucian justo el momento aha.
+**`referencias.md`**: Leshno et al. 1993 (6b), Hornik con la salvedad de
+«acotadas», Nielsen con la aclaración de piezas locales, lectura prioritaria
+sólo la 1 (media hora) y el resto sin plazo, sin «esta semana», promesas
+corregidas.
 
 ---
 
 ## 3. Los números, verificados uno por uno
 
-Reproducidos con el script de `notas-docente.md` §10 sobre
-`datos.serie_menciones("inflacion", 1984, 2019, suavizada=True)` (n = 36, la
-serie va de **0,021 a 0,184 % de las palabras** — la escala es porcentaje, como
-manda la trampa 3 de la espina, y ningún eje la multiplica de nuevo).
+Medidos con el script de `notas-docente.md` §10 sobre
+`datos.serie_menciones("inflacion", 1984, 2019, suavizada=True)` (n = 36, de
+0,021 a 0,184 % de las palabras), con la versión corregida de `ssdl.datos`.
 
-| Afirmación | Dónde aparece | Medido | ¿Coincide? |
-|---|---|---|---|
-| mejor recta = `0.00150` | slides 4, 22, 31 · 4 viz · notebook | 0.001496 | ✅ |
-| raya en el promedio = `0.00152` | slide 4 · 2 viz | 0.001516 | ✅ |
-| la recta explica el **1,3 %** | slides 4 · notas §1 · notebook | 0.01326 | ✅ |
-| 1 rampa = `0.00084` | slide 22 · `rampas.html` | 0.000843 | ✅ |
-| 2 rampas = `0.00062` | slide 22 · `rampas.html` | 0.000624 | ✅ |
-| 4 rampas = `0.00032` | slide 22 · `rampas.html` | 0.000318 | ✅ |
-| 8 rampas = `0.00014` | slides 22, 31 · `rampas.html` | 0.000144 | ✅ |
-| 32 rampas = `0.00001` | slide 31 · `rampas.html` | 0.000014 | ✅ |
-| 24 perillas (8 rampas) / 96 (32) / **36 datos** | slide 31 | 3·8, 3·32, n=36 | ✅ |
-| red buena de 6 rampas = `0.00018` | `red-como-dibujante.html` | 0.000178 | ✅ |
-| la red `[1,6,1]` tiene **19 perillas** | `red-como-dibujante.html` | 6+6+6+1 | ✅ |
-| 4 rampas del notebook = `0.00056` | slide 29 · notebook | 0.00056 | ✅ |
-| soluciones del TODO 4: `0.00044` y `0.00027` | `notas-docente.md` §9 | 0.00044 / 0.00027 | ✅ |
-| `for` vs matrices difieren `6.94e-18` | notebook celda 28 | 6.94e-18 | ✅ |
-| red `[1,4,1]` = **13** parámetros | notebook · cuestionario 6 | 4+4+4+1 | ✅ |
-| `doble(mas_diez(3))=26`, al revés `16` | slides 8 y 9 · lego · notebook | ✅ | ✅ |
-| TODO 1 da `18` y `13` | `notas-docente.md` §9 | 18 / 13 | ✅ |
+| Afirmación | Dónde aparece | Medido |
+|---|---|---|
+| mejor recta = `0.00156` | slides 4, 22, 29 · 4 viz · notebook | 0.001561 |
+| raya en el promedio = `0.00157` | slide 4 · 2 viz · notebook | 0.001568 |
+| la recta explica el **0,5 %**, sube 0,00026 por año | slide 4 · notas §1 · notebook · viz | R² = 0.0046; pendiente 0.000260 |
+| 1 rampa = `0.00092` (codo 2013) | slide 22 · `rampas.html` | 0.000916 (óptimo exhaustivo) |
+| 2 rampas = `0.00065` (1985, 2012) | slide 22 · `rampas.html` | 0.000648 (óptimo exhaustivo) |
+| 4 rampas = `0.00034` | slide 22 · `rampas.html` | 0.000339 (óptimo exhaustivo) |
+| 8 rampas = `0.00016` | slides 22, 31 · `rampas.html` · notebook | 0.000164 (mejor de 60 búsquedas locales) |
+| 32 rampas = `0.000008` | slide 31 · `rampas.html` | 0.0000076 |
+| 25 perillas (8 rampas) / 97 (32) / 33 ajustados / **36 datos** | slides 17, 31, 35 · `rampas.html` | 3·8+1, 3·32+1, 32+1, n = 36 |
+| red buena de 6 rampas = `0.00020` | `red-como-dibujante.html` | 0.000200 |
+| la red `[1,6,1]` tiene **19 perillas** | `red-como-dibujante.html` | 6+6+6+1 |
+| 4 rampas del notebook = `0.00060`, «2.6 veces mejor» | slide 29 · notebook | 0.000598 |
+| soluciones del TODO 4: `0.00039` y `0.00029` | `notas-docente.md` §9 | 0.000392 / 0.000292 |
+| TODO 5: sigmoide `0.00066` con suavidad 0,25 (0,05 → `0.00074`; 1 → `0.00052`; 5 → `0.00050`) | notebook · notas §9 | ídem |
+| sacar la rampa de 1992 sin reacomodar = 0,29; la de 2017 = 0,0011; reacomodando, la de 1990 = 0,00019 y la de 1999 = 0,00042 | notas §6 y §10 | ídem |
+| `for` contra matrices | notebook celda 28 | 6,94e-18 en esta máquina (< 1e-12, que es lo que chequea el `assert`) |
+| red `[1,4,1]` = **13** parámetros | notebook · cuestionario 6 | 4+4+4+1 |
+| `doble(mas_diez(3))=26`, al revés `16`; TODO 1 da 18 y 13 | slides 8-9 · lego · notebook · notas | ídem |
 
-**Ningún número inventado.** El *clamp* de altura (`MAX_ALTURA = 0.15`) de
-`rampas.html` no altera ninguno de los atajos: el peso más grande que sale de
-mínimos cuadrados es 0,091.
+El tope de altura de `rampas.html` (`MAX_ALTURA = 0.15`) no altera ningún atajo:
+el peso más grande que sale de mínimos cuadrados es 0,091 (con 32 rampas).
 
----
-
-## 4. Lo que se miró con los ojos
-
-- **35 slides** barridas una por una a 1280×720 con los `fragment` revelados.
-  Ninguna se corta, ninguna se encima, ninguna es un muro de texto sin imagen,
-  ejemplo o pregunta. La más cargada (la 5, «¿y si le agrego perillas?») no tiene
-  figura pero sí el ejemplo algebraico concreto: pasa la regla de oro.
-- **Los 5 iframes cargan de verdad** dentro de las slides (screenshot de las
-  slides 4, 13, 22 y 26 con la viz viva adentro), y se puede interactuar con
-  `rampas.html` **desde la slide** (apretados «8» y «32» dentro del iframe).
-- **Cada viz, control por control:** los cinco atajos de `rampas.html` con su
-  desajuste leído del DOM; el select de tres modos; el checkbox de errores;
-  «+ agregar», «acomodar», «empezar de nuevo»; el arrastre del codo; 15
-  randomizaciones seguidas en `sin-no-linealidad.html` (contador: **16/16
-  rectas**, desviación `0.000000` en todas); el intercambio de bloques del lego
-  (**16 → 26**, con el fantasma gris y «mismas cajas, mismas perillas, otro
-  resultado»); las 19 flechas de `red-como-dibujante.html`, el hover de las
-  bolitas, randomizar y volver; y el 2/3/5 perillas de `la-recta-imposible.html`.
-- **Los aha se ven.** Con 8 rampas la curva azul tapa a la negra; con 32 pasa por
-  todos los puntos y el panel se niega a mostrar 96 sliders con el argumento que
-  hace de pie para la clase 3.
-- **Las 9 figuras del notebook**: todas con ejes rotulados en castellano
-  (`año`, `% de palabras`), título, leyenda y el MSE anotado. Se entienden solas.
-- **KaTeX**: las slides **no tienen ni una fórmula** (la única del material está
-  en el markdown del notebook, que Jupyter renderiza). El plugin queda cargado y
-  configurado, sin nada que hacer. No es un defecto: es coherente con «nada de
-  matemática sin una imagen al lado».
+Los números son deterministas en la misma máquina y con las mismas versiones de
+las librerías; con otras versiones pueden cambiar en los últimos decimales (el
+6,94e-18 de la celda 28 es el más sensible, y puede dar 0).
 
 ---
 
-## 5. Lo que queda abierto
+## 4. Qué se ejecutó en la tercera pasada, y qué no
+
+**Se ejecutó:**
+- El notebook entero con `nbconvert --execute` sobre una copia del repo
+  (`scratchpad/runs2/02-componer-funciones`): 0 errores, unos 4 s. Salidas
+  cotejadas con el texto: 36 años; máximo 2017 (0,1837); mínimo 2000 (0,0211);
+  0.00156 / 0.00157 / 0,5 %; `True` en las 5 perillas; 26/16; 18/13; 4 rampas
+  0.00060 y «2.6 veces»; 13 parámetros; rampas 0.00060 contra sigmoides 0.00066.
+  Los TODO 2, 3 y 4 muestran «✗ todavía no» a propósito. Además se comprobó
+  que las soluciones de las notas pasan los chequeos del TODO 4.
+- El script de `notas-docente.md` §10, extraído tal cual del Markdown.
+- Las 5 viz y las slides en Chrome sin interfaz (`--headless`), con captura de
+  pantalla y la consola del navegador. Y una copia de cada viz con un script
+  agregado al final que aprieta los atajos y botones y escribe en la consola lo
+  que resulta (desajustes de cada atajo, sacar rampas, 15 randomizaciones del
+  contador, el mensaje de la bolita con peso de entrada negativo, los
+  `aria-label`). Resultados en la §5.
+
+**No se ejecutó:**
+- No se probaron las viz a mano con el mouse (arrastrar codos, hover), ni el
+  tema oscuro, ni la ventana angosta: eso lo hizo la segunda pasada (§6) y no
+  se repitió.
+- No se abrieron las URLs de `referencias.md`: siguen `[VERIFICAR URL]`.
+- No se corrió en Colab.
+
+**Verificación independiente (después de la tercera pasada).** Se volvió a
+correr todo sobre otra copia (`scratchpad/runs3`): notebook sin errores, script
+de §10 con la misma salida que la tabla, búsqueda local de 8 codos (200
+arranques) que vuelve a dar los codos actuales, JS de las 6 páginas con
+`node --check` y Chrome sin interfaz sin errores de consola. Se corrigió una
+cosa: con las alturas redondeadas a 4 decimales, poner las óptimas exactas
+bajaba el desajuste unas 4 diezmillonésimas y el chequeo del TODO 4 (margen
+`1e-7`) lo daba por bueno, contra lo que dice la consigna. El margen pasó a
+`1e-6` (hay que ganar en el quinto decimal) y la consigna dice ahora «no vas a
+mejorar nada que se note». Con las alturas óptimas exactas: ✗; con la solución
+1 de las notas: ✓ y ★ (0.00039).
+
+---
+
+## 5. Resultados del navegador (tercera pasada)
+
+Chrome sin interfaz, abriendo los archivos con `file://` desde la copia del
+repo. **0 mensajes de error en la consola** en las 5 viz y en `slides.html`, y
+las 6 capturas de pantalla se miraron: todo se dibuja, nada queda cortado en el
+ancho de 1280 px.
+
+Lo que devolvieron las copias instrumentadas:
+
+| Viz | Qué se hizo | Resultado |
+|---|---|---|
+| `rampas.html` | atajos 1, 2, 4, 8 y 32 | 0.0009164, 0.0006477, 0.0003387, 0.0001635, 0.0000076: los mismos del script de Python |
+| | 8 rampas, sacar la de 1992 / la de 2017 con la ×, sin reacomodar | 0.29180 / 0.00107 |
+| | 8 rampas, sacar la de 1990 y apretar «acomodar» | 0.000192 |
+| | tarjetas y aviso de 32 | la tarjeta 1 dice «−0.015/año» y su mini-gráfico tiene `aria-label`; el aviso dice «32 rampas: como red, 97 perillas. (Acá se ajustaron 33 números…)»; el medidor muestra 0.000008 |
+| `sin-no-linealidad.html` | abrir y apretar «randomizar» 15 veces | arranca con N = 5 y contador 1/1; después, 16 cadenas y 16 rectas **medidas** (desviación del orden de 1e-15) |
+| `red-como-dibujante.html` | configuración buena | desajuste 0.000200 |
+| | bolita 5 con peso de entrada positivo / negativo | «sólo puede tocar la curva de ahí en adelante» / «está viva antes del codo: sólo toca la curva de ahí para atrás» |
+| | randomizar | desajuste 0.00362; 8 de las 19 flechas punteadas (pesos negativos) |
+| `la-recta-imposible.html` | «poner la mejor recta» / raya en el promedio | 0.001561 con «Ya llegaste al piso» / 0.001568 **sin** ese mensaje |
+| `lego-de-funciones.html` | intercambiar los bloques | la caja 3 pasa de sacar 16 a sacar 26, y su `aria-label` lo dice |
+
+---
+
+## 6. La segunda pasada (histórica), con correcciones
+
+La segunda pasada encontró y arregló 11 problemas; siguen arreglados. En
+resumen: `red-como-dibujante` quedaba vacía al randomizar (ahora se reescala la
+salida, y el panel lo dice); tema oscuro guardado con paleta clara; «el
+desajuste no baja ni un poquito» al agregar perillas en `la-recta-imposible`
+(falso: la recta se mueve, lo que no baja es el piso); «claramente ruido»
+pasó a «casi seguro ruido»; la slide 3 no decía que la serie está suavizada;
+tres umbrales distintos para el TODO 4; la slide 26 prometía efecto local para
+cualquier flecha; numeración de slides corrida en uno después de la pausa; los
+dos prácticos duran 17 minutos; dos errores de concordancia; tarjetas de rampa
+cortadas.
+
+Lo que esa pasada afirmó y **no era cierto** (corregido acá):
+- «Salida idéntica byte a byte» sin red y sin cache: la afirmación correcta es
+  que el notebook es determinista en la misma máquina y con las mismas
+  versiones.
+- «Las 10 citas son correctas»: los datos bibliográficos sí, pero la slide 24
+  usaba Cybenko y Hornik como fuente para la **rampa**, y no la cubren.
+- «Contador: 16/16 rectas» en `sin-no-linealidad`: el contador era, por
+  construcción, igual al de randomizaciones. No medía nada.
+- «24 perillas / 96 perillas»: contaba el signo como una perilla (§1, punto 3).
+- Los números de su tabla (0.00150, 1,3 %, 0.00014, etc.) estaban bien
+  calculados sobre la serie con el error de borde; ya no valen (§3).
+- Declaraba abierto el bug de `_shared/js/viz.js` (`botonTema()` no recargaba
+  la paleta): ya está arreglado en el archivo compartido, que llama a
+  `recargarColores()` y emite `viz:tema`. Las viz de esta clase conservan una
+  llamada extra a `Viz.recargarColores()`, inofensiva.
+
+---
+
+## 7. Lo que queda abierto
 
 | # | Qué | Para quién |
 |---|---|---|
-| 1 | **Bug de `_shared/js/viz.js`, afecta a las diez clases.** `botonTema()` aplica el `data-tema` guardado en `localStorage` pero **no llama a `recargarColores()` ni redibuja**, así que una viz abierta con el tema oscuro ya guardado dibuja el canvas con la paleta **clara** sobre fondo oscuro. Verificado por screenshot en las 5 viz de esta clase antes del parche. El arreglo son dos líneas dentro de `botonTema()`, después del `setAttribute`: `recargarColores();` y `global.dispatchEvent(new Event('viz:tema'));`. **No se tocó el archivo compartido** para no pisar a los otros nueve equipos; está parcheado localmente en las 5 viz de la clase 2, con el comentario que lo explica. | quien mantenga la espina |
-| 2 | `_shared/css/curso.css` no declara `box-sizing: border-box` (lo dejó anotado el equipo de construcción y **se confirma**). Parchado local en las 5 viz; a 420 px de ancho no hay scroll horizontal en ninguna. Falta arreglarlo en la hoja compartida. | quien mantenga la espina |
-| 3 | **Las 9 marcas `[VERIFICAR URL]` de `referencias.md` siguen ahí.** Se corrió `curl` de nuevo: `raw.githubusercontent.com` responde **200**; `neuralnetworksanddeeplearning.com` da **403**; 3Blue1Brown, Playground y deeplearningbook dan **000**. Las 10 citas se revisaron una por una contra su referencia bibliográfica (revista, volumen, páginas, año, autores) y **las 10 son correctas**: Cybenko 1989 MCSS 2(4) 303-314, Hornik 1991 NN 4(2) 251-257, McCulloch & Pitts 1943 BMB 5 115-133, Breiman 2001 Stat Sci 16(3) 199-231, Molina & Garip 2019 ARS 45 27-45. **Ninguna URL inventada.** Falta que alguien con red las abra y las pase a `[VERIFICADA · aaaa-mm-dd]`. | quien tenga red |
-| 4 | **La clase 1 ya existe** (no existía cuando se construyó ésta) y tiene `viz/maquina-de-perillas.html`, `variable-vs-parametro.html` y `zoo-de-funciones.html`. Se comprobó que **el vocabulario cierra**: el zoo de la clase 1 es recta, parábola, exponencial, sigmoide, seno y escalón, y la slide 2 de la clase 2 lista exactamente esos seis; las dos usan «medidor de desajuste»; y la slide de cierre de la clase 1 anuncia «Clase 2: componer funciones para dibujar lo imposible». **No hace falta tocar nada.** `viz/la-recta-imposible.html` se queda: usa la serie de `inflacion` y los botones 3/5 perillas, que la viz de la clase 1 no tiene. | nadie, es sólo para saber |
-| 5 | **La siembra del sobreajuste está puesta y hay que cobrarla.** Botón «32» de `rampas.html`, slide **31** (ojo: 31, no 30, ver arreglo 8). Los números para cerrarla están en `notas-docente.md` §10. Aviso honesto para el equipo de la clase 4: como la serie está suavizada, con 32 rampas la curva **no se ve grotesca**, se ve prolija. El golpe visual es flojo; el que sirve es el numérico (96 perillas, 36 datos, desajuste 0.00001). Conviene cobrar la promesa con ese par de números y no sólo con la imagen. | equipo 4 |
-| 6 | El TODO 3 («¿cuántas rampas para una meseta?») admite **3 y 4** y las dos son correctas (3 sube-frena-baja; 4 si además querés que termine plana). Está anotado en las notas y en la slide 20. | equipo 3 |
-| 7 | En `sin-no-linealidad.html` los codos de la cadena con ReLU se sortean con la restricción de que el corte caiga adentro del rango que le llega a esa caja, para que la cadena no se apague. **Está declarado en el pie de la página** y nombrado (*dying ReLU*). Consecuencia visible: con 4-6 cajas suelen verse **2 codos**, no N−1, y el cartel cuenta los que efectivamente se ven, que es lo honesto. Si la clase 3 o la 4 quieren mostrar el fenómeno de verdad, acá está el lugar para desactivar la restricción con un toggle. | equipos 3 y 4 |
-| 8 | El plan de esta clase corre el práctico 2 de **90 a 107** en vez de 85 a 105 como dice `PROGRAMA.md`. Está declarado y justificado en `notas-docente.md` §2, con qué recortar para volver al reloj del programa. | quien coordine el programa |
+| 1 | `_shared/css/curso.css` no declara `box-sizing: border-box`. Está parcheado localmente en las 5 viz. | quien mantenga la espina |
+| 2 | Las marcas `[VERIFICAR URL]` de `referencias.md` (ahora 10, con Leshno). | quien tenga red |
+| 3 | La siembra del sobreajuste (botón «32», slide 31) la cobra la clase 4. Como la serie está suavizada, con 32 rampas la curva se ve prolija, no grotesca: el golpe fuerte es el numérico (97 perillas, 33 ajustados, 36 datos, desajuste 0.000008). | equipo 4 |
+| 4 | ~~`recursos/GUIA-DEL-DOCENTE.md` §8 (tabla de siembras) decía «32 rampas → 96 perillas».~~ **[resuelto]**: ahora dice 97 como red (33 ajustados con los codos fijos). | — |
+| 5 | El plan de esta clase corre el práctico 2 de 90 a 107 en vez de 85-105 como `PROGRAMA.md`; está declarado en `notas-docente.md` §2. | quien coordine el programa |
 
 ---
 
-## 6. Cómo reproducir esta verificación
+## 8. Cómo reproducir
 
 ```bash
-# el notebook, con y sin red y sin cache
-python3 -m nbconvert --to notebook --execute \
-        --output /tmp/out.ipynb clases/02-componer-funciones/notebook.ipynb
+# el notebook (en una copia del repo, no adentro del repo)
+python -m jupyter nbconvert --to notebook --execute \
+       --output /tmp/out.ipynb clases/02-componer-funciones/notebook.ipynb
 
-# los números de las slides y de las viz
-python3 - < <(sed -n '/^```python/,/^```/p' \
+# los números de las slides, las notas y las viz (desde la raíz del repo)
+python - < <(sed -n '/^```python/,/^```/p' \
               clases/02-componer-funciones/notas-docente.md | sed '1d;$d')
 ```
-
-Para el HTML: Chromium por Playwright (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`),
-abriendo por `file://` con `context.route('**/*')` abortando toda URL `http(s)` y
-contándolas, en tema claro y oscuro (sembrando `localStorage['dlss-tema']`
-**antes** de cargar: es la única forma de destapar el bug 1 de la sección 5).
