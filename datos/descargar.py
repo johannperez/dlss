@@ -15,7 +15,7 @@ de aca sigue el mismo patron, que es el patron obligatorio de los notebooks:
 
 Uso desde un notebook de Colab:
 
-    !git clone --depth 1 https://github.com/<org>/dlss.git
+    !git clone --depth 1 https://github.com/johannperez/dlss.git
     import sys; sys.path.insert(0, 'dlss/datos')
     import descargar
     serie = descargar.serie_menciones()          # clases 1-4
@@ -36,7 +36,9 @@ import io
 import json
 import os
 import sys
+import tempfile
 import unicodedata
+import zipfile
 import urllib.error
 import urllib.request
 
@@ -139,24 +141,92 @@ def _cache_path(*partes):
     return p
 
 
-def bajar(url, destino, timeout=TIMEOUT, silencioso=False):
-    """Baja `url` a `destino` si no existe ya. Devuelve True/False, nunca explota."""
-    if os.path.exists(destino) and os.path.getsize(destino) > 0:
-        return True
+def _archivo_valido(ruta, nombre=None):
+    """¿El archivo esta entero? Chequeo barato pero de verdad, segun el tipo
+    (que sale de la extension de `nombre`, o de `ruta` si no se pasa).
+
+    - vacio: no sirve;
+    - `.gz`: se descomprime entero (un .gz cortado da EOFError o BadGzipFile);
+    - `.xlsx` / `.zip`: tiene que ser un zip legible, con su indice al final;
+    - el resto (txt, csv): alcanza con que no este vacio.
+    Devuelve (True, "") o (False, motivo).
+    """
+    import gzip
+    nombre = nombre or ruta
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "dlss-curso/1.0"})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            datos = r.read()
-        if not datos:
-            raise ValueError("respuesta vacia")
+        if not os.path.exists(ruta) or os.path.getsize(ruta) == 0:
+            return False, "archivo vacio o inexistente"
+        if nombre.endswith(".gz"):
+            with gzip.open(ruta, "rb") as fh:
+                while fh.read(1 << 20):
+                    pass
+        elif nombre.endswith((".xlsx", ".zip")):
+            with zipfile.ZipFile(ruta) as z:
+                malo = z.testzip()
+            if malo is not None:
+                return False, f"zip corrupto ({malo})"
+        return True, ""
+    except Exception as e:  # EOFError, BadGzipFile, BadZipFile, OSError...
+        return False, f"{type(e).__name__}: {e}"
+
+
+def bajar(url, destino, timeout=TIMEOUT, silencioso=False):
+    """Baja `url` a `destino` si no existe ya. Devuelve True/False, nunca explota.
+
+    La escritura es ATOMICA: se baja a un archivo temporal en la misma carpeta,
+    se verifica (largo declarado por el servidor y `_archivo_valido`) y recien
+    ahi se renombra a `destino` con `os.replace`. Asi una descarga cortada (el
+    wifi del aula, Colab que se reinicia, dos procesos bajando a la vez) nunca
+    deja en la cache un archivo a medias que despues se use como si estuviera
+    bien. Si en la cache ya hay un archivo roto de una version anterior, se
+    borra y se vuelve a bajar.
+    """
+    if os.path.exists(destino):
+        ok, motivo = _archivo_valido(destino)
+        if ok:
+            return True
+        _log(f"  [!] {os.path.basename(destino)} en la cache esta roto ({motivo}); "
+             "lo borro y lo vuelvo a bajar.")
+        try:
+            os.remove(destino)
+        except OSError:
+            pass
+    tmp = None
+    try:
         os.makedirs(os.path.dirname(destino), exist_ok=True)
-        with open(destino, "wb") as fh:
-            fh.write(datos)
+        req = urllib.request.Request(url, headers={"User-Agent": "dlss-curso/1.0"})
+        fd, tmp = tempfile.mkstemp(prefix=os.path.basename(destino) + ".",
+                                   suffix=".parcial", dir=os.path.dirname(destino))
+        escritos = 0
+        with os.fdopen(fd, "wb") as fh, \
+                urllib.request.urlopen(req, timeout=timeout) as r:
+            esperado = r.headers.get("Content-Length")
+            while True:
+                bloque = r.read(1 << 16)
+                if not bloque:
+                    break
+                fh.write(bloque)
+                escritos += len(bloque)
+        if escritos == 0:
+            raise ValueError("respuesta vacia")
+        if esperado is not None and esperado.isdigit() and int(esperado) != escritos:
+            raise ValueError(f"descarga cortada: llegaron {escritos} de {esperado} bytes")
+        ok, motivo = _archivo_valido(tmp, nombre=destino)
+        if not ok:
+            raise ValueError(f"archivo invalido: {motivo}")
+        os.replace(tmp, destino)
+        tmp = None
         return True
-    except Exception as e:  # red, DNS, proxy, 404, lo que sea
+    except Exception as e:  # red, DNS, proxy, 404, corte, lo que sea
         if not silencioso:
             _log(f"  [x] no se pudo bajar {url}\n      motivo: {type(e).__name__}: {e}")
         return False
+    finally:
+        if tmp is not None and os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
 
 
 def _aviso_fallback(que, ruta):
@@ -301,8 +371,13 @@ def prensa_titulares(forzar_muestra=False):
                     df["particion_original"] = k
                     dfs.append(df)
                 d = pd.concat(dfs, ignore_index=True)
-                _log(f"  [ok] prensa (FakeDeS): {len(d)} notas desde {len(ok)} archivos")
-                return _normalizar_prensa(d.to_dict("records"))
+                notas = _normalizar_prensa(d.to_dict("records"))
+                # como la muestra versionada: sin las notas que no traen titular
+                # (1543 -> 1471; las 72 que faltan son todas de test.xlsx)
+                con_titular = [n for n in notas if n["titular"] not in ("", "nan")]
+                _log(f"  [ok] prensa (FakeDeS): {len(con_titular)} notas con titular "
+                     f"(de {len(notas)}) desde {len(ok)} archivos")
+                return con_titular
             except ImportError:
                 _log("  [x] falta pandas/openpyxl para leer los .xlsx; uso la muestra")
             except Exception as e:
@@ -317,7 +392,7 @@ def prensa_titulares(forzar_muestra=False):
 # El corpus fuente viene con las etiquetas mezcladas entre archivos:
 # train/dev usan "Fake"/"True" y test usa "False"/"True". Ademas los temas
 # estan en ingles en train/dev y en castellano en test. Si concatenas los tres
-# archivos sin mirar, te quedan 3 clases donde hay 2 y 16 temas donde hay 9.
+# archivos sin mirar, te quedan 3 clases donde hay 2 y 16 temas donde hay 12.
 # Lo unificamos aca, y guardamos el valor original al lado para que la
 # correccion sea auditable y no una desaparicion silenciosa.
 _MAPA_CATEGORIA = {"fake": "Fake", "false": "Fake", "true": "True"}

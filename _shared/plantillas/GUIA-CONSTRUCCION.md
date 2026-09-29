@@ -78,7 +78,7 @@ Todas funcionan igual adentro de reveal y en una página suelta.
 <div class="ojo">La confusión típica. Lo que sale mal todos los años.</div>
 <div class="manos">Momento de hacer, no de mirar. Notebook, slider, discusión.</div>
 <div class="aha">La revelación. Va DESPUÉS de que movieron el control, nunca antes.</div>
-<div class="ss">El puente al oficio: un paper, un dato real, algo para el lunes.</div>
+<div class="ss">El puente al oficio: un paper, un dato real, algo para tu investigación.</div>
 ```
 
 Cada una se rotula sola (`LA IDEA`, `OJO CON ESTO`, `A LAS MANOS`, `MOMENTO AHA`,
@@ -400,7 +400,9 @@ ya lo dice la slide. **Un archivo, dos presentaciones**: no hagas dos versiones 
 - [ ] Todos los términos nuevos en inglés están en `recursos/glosario.md` con su clase.
 - [ ] `referencias.md` no tiene ninguna URL sin `VERIFICADA` o `[VERIFICAR URL]`.
 - [ ] El notebook corre en CPU, de punta a punta, sin red, en minutos.
-- [ ] Hay un `[EL LUNES]`: algo concreto que le sirve en su investigación esta semana.
+- [ ] Hay un `[EN TU INVESTIGACIÓN]`: algo concreto que le sirve en su investigación, desde ya.
+- [ ] Ningún plazo por día de la semana ni por semanas: "la clase que viene" o "antes de la clase N".
+      Toda tarea entre clases cabe en una hora (dos si hay un fin de semana en el medio).
 
 Para probar rápido que `viz.js` anda: abrí `_shared/plantillas/demo.html`. Si ahí se ve bien y
 en tu página no, el problema es tuyo, no de la biblioteca.

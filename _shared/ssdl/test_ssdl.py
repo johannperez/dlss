@@ -135,6 +135,21 @@ class TestCargaDeDatos(unittest.TestCase):
         # la variación de un año al siguiente tiene que ser menor
         self.assertLess(np.abs(np.diff(suave)).mean(), np.abs(np.diff(cruda)).mean())
 
+    def test_serie_menciones_suavizada_no_cruza_el_borde(self):
+        # 1984 no se promedia con 1975 (el discurso anterior en el CSV):
+        # sólo con 1985, porque 1983 no existe.
+        # (delta=1.5e-4: la serie viene redondeada a 4 decimales)
+        anios, cruda = datos.serie_menciones("inflacion")
+        _, suave = datos.serie_menciones("inflacion", suavizada=True)
+        self.assertAlmostEqual(suave[0], (cruda[0] + cruda[1]) / 2, delta=1.5e-4)
+        self.assertAlmostEqual(suave[0], 0.1143)   # antes daba 0.0762
+        # y el recorte manda: 2000 como primer año no mira a 1999
+        a, c = datos.serie_menciones("inflacion", desde=2000, hasta=2010)
+        _, s = datos.serie_menciones("inflacion", desde=2000, hasta=2010,
+                                     suavizada=True)
+        self.assertAlmostEqual(s[0], (c[0] + c[1]) / 2, delta=1.5e-4)
+        self.assertAlmostEqual(s[5], c[4:7].mean(), delta=1.5e-4)
+
     def test_serie_menciones_en_fraccion(self):
         _, pct = datos.serie_menciones("seguridad")
         _, frac = datos.serie_menciones("seguridad", en_porcentaje=False)

@@ -51,10 +51,17 @@ python3 datos/preparar_corpus.py              # doctests + informe sobre los dat
 
 **Qué es.** Los mensajes que el presidente o la presidenta de la Nación
 Argentina lee ante la Asamblea Legislativa al abrir las sesiones ordinarias
-del Congreso, cada 1 de marzo. Es el documento más comparable que existe en
-la política argentina: mismo emisor institucional, mismo auditorio, misma
-fecha, misma función (rendir cuentas del Estado de la Nación), durante
-165 años. Por eso es el hilo del curso.
+del Congreso. Es el documento más comparable que existe en la política
+argentina: mismo emisor institucional, mismo auditorio, misma función
+(rendir cuentas del Estado de la Nación), durante 165 años. Por eso es el
+hilo del curso.
+
+La fecha, en cambio, **no** es siempre la misma: hasta 1994 las sesiones
+ordinarias se abrían el **1 de mayo**, y la reforma constitucional de 1994
+las pasó al **1 de marzo** (desde 1995). El discurso de 1984 arranca «El 1°
+de Mayo tiene para los argentinos…». En la serie 1984-2019 eso toca 11 de
+los 36 puntos (1984-1994): el calendario cambió en el medio de la serie, y
+es una salvedad más para sospechar del instrumento.
 
 **Quién lo hizo.** Los textos son documentos oficiales del Congreso argentino.
 La recopilación y digitalización la hizo **Lucas Ariel** en
@@ -81,7 +88,10 @@ t = descargar.corpus_discursos_texto()      # un string de 2,2 MB (1984-2019)
 
 **Verificado que sirve para lo que decimos que sirve.** No es una promesa:
 
-- *Mini-GPT (clase 8).* Corpus de 2.184.070 caracteres, vocabulario de 112
+- *Mini-GPT (prueba de factibilidad, histórica).* **No es el modelo actual de la
+  clase 8**, que entrena un mini-GPT de 4 bloques y 1.541.056 parámetros sobre el
+  corpus sintético de Aguasclaras, con 71 fichas de caracteres. Esta prueba, hecha
+  al construir el curso, fue: corpus de 2.184.070 caracteres, vocabulario de 112
   caracteres. Un transformer de 640.240 parámetros (3 bloques, 4 cabezas,
   contexto 128) entrenado **en CPU** baja la loss de 4,87 a 1,67 en
   **400 pasos y 45 segundos**, y ya genera castellano reconocible
@@ -138,11 +148,24 @@ la trampa.
 > porque a cada muestra el script le agrega una cabecera de comentarios `#`
 > propia. Lo idéntico es el texto del discurso, no el archivo con su cabecera.
 > Para verificarlo vos mismo: `python3 datos/preparar_corpus.py` lo comprueba
-> sobre el corpus completo y lo imprime. `preparar_corpus.diagnostico_de_fuga()` los detecta, y
+> sobre el corpus completo y lo imprime. Sobre `muestras/`, sacando las líneas
+> que empiezan con `#` (`grep -v '^#' archivo | md5sum`), los dos textos dan el
+> mismo hash (`89b4c032…`).
+
+`preparar_corpus.diagnostico_de_fuga()` los detecta, y
 `corpus_discursos_texto()` excluye 2006.
+
+**En la serie de §1.2 el duplicado sigue adentro:** 2005 y 2006 dan los mismos
+números (18.234 palabras, `seguridad` 0,1645, `inflacion` 0,0823). O sea: la
+serie tiene **36 puntos (1984-2019) pero 35 discursos distintos**; el valor
+de 2006 no es una medición nueva. Quien use la serie tiene que decir si lo
+deja a la vista (clase 1, como salvedad) o lo excluye (clase 6).
+
 Esto no es una anécdota: si partís al azar, ese par cae de los dos lados de
-la partición y tu modelo "predice" perfecto un caso que ya vio. Es la clase 4
-en vivo, con datos reales del curso.
+la partición. Un modelo que lee el texto "predice" perfecto un caso que ya
+vio; uno que sólo ve el año (como el de la clase 4) tiene al gemelo en el año
+de al lado, con el mismo valor, y le basta con interpolar. Es la clase 4 en
+vivo, con datos reales del curso.
 
 **(d) El largo cambia por un factor de 9.**
 De 2.873 palabras (1996) a 25.217 (2013). Contar menciones crudas mediría
@@ -177,7 +200,16 @@ anio, presidente, palabras, seguridad, inflacion, educacion, trabajo, salud,
 - `muestras/series/menciones-democracia-1984-2019.csv` — 36 filas. **Esta es
   la de las clases 1 a 4.**
 
-Las columnas `_suave` son una media móvil centrada de 3 años.
+Las columnas `_suave` son una media móvil centrada de 3 años **calendario**:
+cada año promedia con el anterior y el siguiente, si existen. En los bordes
+y al lado de un hueco de la serie se promedia con los vecinos que hay. Así
+1984 promedia sólo con 1985, y no con 1975, que es la fila anterior del CSV
+completo pero está nueve años (y una dictadura) antes. Hasta la versión
+anterior el CSV completo contaba filas en vez de años y mezclaba 1984 con
+1975 (y lo mismo en cada hueco anterior); ya está corregido.
+`ssdl.datos.serie_menciones(..., suavizada=True)` no lee esas columnas: la
+recalcula adentro del recorte `desde..hasta` que pidas, así que el borde del
+recorte tampoco mira años de afuera.
 
 **Por qué hay dos versiones y cuál usar en cada clase:**
 
@@ -197,7 +229,7 @@ bueno. Un `r = 0,95` haría la clase 2 innecesaria.
 
 **(a) El léxico es el instrumento de medición, y lo escribimos nosotros.**
 Está en `preparar_corpus.LEXICO`, a la vista, versionado. `seguridad` tiene
-23 palabras. Si sacás "policía", la serie cambia. Si agregás "orden", cambia
+24 palabras. Si sacás "policía", la serie cambia. Si agregás "orden", cambia
 más. **Ninguna de esas listas es neutral.** Es exactamente el problema que
 Jacobs & Wallach (2021) llaman medición: entre el constructo "cuánto le
 importa la seguridad a este gobierno" y el número que sale hay una lista de
@@ -207,7 +239,7 @@ la conclusión se mueve. Eso es la clase 10, sembrada desde la clase 1.
 **(b) Hay ceros exactos y no significan lo que parece.**
 2002 y 2009 dan `seguridad = 0.000`. No quiere decir que no hubo inseguridad
 en 2002. Quiere decir que en ese discurso, con ese léxico, no apareció
-ninguna de esas 23 palabras. Un cero en una serie de proporciones casi
+ninguna de esas 24 palabras. Un cero en una serie de proporciones casi
 siempre es un problema de instrumento, no un hallazgo.
 
 **(c) Suavizar cambia la pregunta.**
@@ -225,9 +257,14 @@ que trabaja muchísima investigación social.
 
 ### 1.3 `prensa` — noticias en castellano con etiquetas
 
-**Qué es.** El **Spanish Fake News Corpus 2.0**: notas de prensa en
-castellano recolectadas entre noviembre de 2020 y marzo de 2021, etiquetadas
-como verdaderas o falsas, con tema, medio, titular, texto completo y enlace.
+**Qué es.** El **Spanish Fake News Corpus** en su versión 2.0: notas de
+prensa en castellano etiquetadas como verdaderas o falsas, con tema, medio,
+titular, texto completo y enlace. Son **dos recolecciones de dos épocas**
+pegadas (el detalle y los números están en la trampa (e)):
+- `train` + `dev` (**971 notas**): la versión 1.0 del corpus, recolectada
+  **de enero a julio de 2018**;
+- `test` (**500 notas**): la versión 2.0 de FakeDeS 2021, recolectada **de
+  noviembre de 2020 a marzo de 2021**.
 Cubre variantes de castellano de México, Argentina, España, Colombia, Chile,
 Perú, Uruguay y otros.
 
@@ -244,6 +281,11 @@ tienen titular. 694 falsas / 777 verdaderas.
 **Formato.** `muestras/prensa/titulares-prensa-es.csv`, con columnas:
 `id, categoria, categoria_original, tema, tema_original, fuente, titular,
 frac_mayusculas, largo_texto, texto_recortado, particion_original`.
+
+> **Ojo con `id`: no es una llave.** Viene del corpus fuente y se repite entre
+> particiones (676 valores distintos para 1471 filas: cada partición numera
+> desde cero). Para identificar una nota, usá el número de fila o el par
+> (`particion_original`, `id`).
 
 **Estado de la URL:** `raw.githubusercontent.com/jpposadas/...` →
 **VERIFICADA-OK** (los tres `.xlsx` bajaron y se leyeron).
@@ -294,10 +336,30 @@ normalizar aparecen 16 temas donde hay 12.
 Esto no es una anécdota de programación: es lo que pasa siempre que juntás
 archivos que armó gente distinta en momentos distintos.
 
-**(e) Ventana temporal de cinco meses, y esos meses son la pandemia.**
-Noviembre 2020 a marzo 2021. `Covid-19` es el segundo tema más frecuente
-(192 notas). Un modelo entrenado acá aprende, entre otras cosas, el
-vocabulario de esa coyuntura. No lo apliques a 2026 sin revalidar.
+**(e) Dos épocas pegadas, y la segunda es la pandemia.**
+El corpus no trae columna de fecha. Lo que sí trae es la partición original
+(`particion_original`), y cada partición viene de una recolección distinta:
+
+| partición | notas | recolección (según el repo fuente) | año en el enlace, cuando lo tiene |
+|---|---|---|---|
+| `train` + `dev` | 971 (676 + 295) | enero a julio de 2018 | 490 enlaces con año: 2018 → 277, 2017 → 118, 2016 → 41, 2015 → 16, 2014 o antes → 32, posteriores a 2018 → 6 |
+| `test` | 500 | noviembre de 2020 a marzo de 2021 | 143 enlaces con año: 2021 → 53, 2020 → 58, 2019 → 13, 2018 o antes → 19 |
+
+La columna de la derecha la calculamos buscando un año (20XX) en el campo
+`Link` de los `.xlsx` originales. Muestra que "recolectada en 2018" no quiere
+decir "publicada en 2018": hay notas de 2016 y 2017 recogidas después. (Los
+6 enlaces con año posterior a 2018 en la primera fila son ruido de las URL,
+no fechas.)
+
+La descripción corta y exacta es: **dos tercios de las notas (971 de 1471)
+son de la recolección de 2018, y un tercio (500) de la de noviembre de 2020 a
+marzo de 2021.** No es "una ventana de cinco meses".
+
+Y **tema y época están confundidos**: las 192 notas de `Covid-19` (el tercer
+tema más frecuente) están **todas** en `test`, o sea, en la parte de
+2020-21. Un modelo entrenado acá aprende, entre otras cosas, el vocabulario
+de dos coyunturas distintas, y puede estar separando épocas cuando creés que
+separa temas o veracidad. No lo apliques a 2026 sin revalidar.
 
 **(f) Desbalance de temas.** `Politica` 413, `Sociedad` 322, `Covid-19` 192…
 y `Ambiental` 3. Con tres casos no se estima nada.
@@ -321,8 +383,10 @@ columnas de codificación para practicar el cálculo de kappa de Cohen.
 
 > **Está en el nombre del archivo y lo repetimos acá: los dos codificadores
 > son SIMULADOS.** No hubo dos personas codificando. Se generaron con
-> `random.Random(1983)` y tasas de acierto de 0,88 y 0,82 contra la etiqueta
-> del corpus. Da acuerdo observado 0,73 y **kappa = 0,46**.
+> `random.Random(1983)` con tasas de acierto nominales de 0,88 y 0,82; en estos
+> 100 casos, contra la etiqueta del corpus (1 = «es falsa»), aciertan 0,82 (A) y
+> 0,83 (B). Da acuerdo observado 0,73, **kappa = 0,46** y un F1 de un codificador
+> contra el otro de 0,71 (el techo humano que usa la clase 9).
 >
 > Sirve para que el aula calcule kappa con datos que tienen la forma correcta
 > y para discutir qué significa un kappa de 0,46 (respuesta corta: "moderado",
@@ -575,7 +639,7 @@ problema resuelto cuatro veces, cada vez mejor. No lo cambien.
 datos/
   README.md                  este archivo
   descargar.py               una función por dataset, con cache y fallback
-  preparar_corpus.py         limpieza, medición, particiones (28 doctests + informe)
+  preparar_corpus.py         limpieza, medición, particiones (29 doctests + informe)
   generar_aguasclaras.py     el corpus sintético, con su justificación adentro
   cache/                     descargas (NO versionado)
   muestras/                  5,2 MB versionados — la red de seguridad

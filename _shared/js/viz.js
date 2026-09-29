@@ -245,7 +245,10 @@
    * interacción (hover, clic, arrastre) y el redibujado.
    *
    * Opciones: {ancho, alto, xmin, xmax, ymin, ymax, margen:{i,d,a,b},
-   *            ejeX, ejeY, titulo, cuadrado}
+   *            ejeX, ejeY, titulo, cuadrado, desc}
+   * `desc` es la descripción accesible del canvas (aria-label). Si no se da,
+   * se arma con el título y los ejes. La página puede actualizarla después con
+   * `p.canvas.setAttribute('aria-label', ...)`.
    *
    * @example
    *   const p = Viz.plano('#lienzo', { xmin:1983, xmax:2023, ymin:0, ymax:12,
@@ -262,6 +265,12 @@
     this.canvas = el('canvas', { class: 'viz-canvas' }, cont);
     this.canvas.style.display = 'block';
     this.canvas.style.width = '100%';
+    this.canvas.setAttribute('role', 'img');
+    {
+      const partes = [op.titulo, op.ejeY && op.ejeX ? (op.ejeY + ' según ' + op.ejeX) : ''];
+      const desc = op.desc || partes.filter(Boolean).join('. ') || 'gráfico';
+      this.canvas.setAttribute('aria-label', desc);
+    }
     this.ctx = this.canvas.getContext('2d');
 
     this.xmin = op.xmin !== undefined ? op.xmin : 0;

@@ -267,7 +267,7 @@ body.curso {
 .aha::before          { content: "Momento aha";                color: var(--c-acento); }
 .aha                  { font-size: 1.02em; }
 
-/* CIENCIAS SOCIALES — el puente al oficio: paper, dato real, el lunes. */
+/* CIENCIAS SOCIALES — el puente al oficio: paper, dato real, en tu investigación. */
 .ss                   { border-left-color: var(--c-parametro); background: var(--c-parametro-suave); }
 .ss::before           { content: "En ciencias sociales";       color: var(--c-parametro); }
 

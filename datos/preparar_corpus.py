@@ -186,17 +186,27 @@ def serie_de_menciones(discursos: dict, lexico: dict | None = None,
         for tema, ws in lex.items():
             fila[tema] = round(porcentaje_tematico(texto, ws), 4)
         filas.append(fila)
-    # columnas suavizadas, para que coincidan con el CSV versionado
+    # columnas suavizadas, para que coincidan con el CSV versionado.
+    # La ventana cuenta AÑOS, no filas: la serie tiene huecos (1976-1983,
+    # por ejemplo) y promediar por filas mezclaba 1984 con 1975.
+    anios = [f["anio"] for f in filas]
     for tema in lex:
-        suave = media_movil([f[tema] for f in filas], 3)
+        suave = media_movil([f[tema] for f in filas], 3, anios=anios)
         for f, v in zip(filas, suave):
             f[tema + "_suave"] = round(v, 4)
     return filas
 
 
 
-def media_movil(valores: list[float], ventana: int = 3) -> list[float]:
+def media_movil(valores: list[float], ventana: int = 3,
+                anios: list[int] | None = None) -> list[float]:
     """Media movil centrada. Suaviza la serie.
+
+    Si pasas `anios`, la ventana cuenta AÑOS y no posiciones: cada año
+    promedia solo con los años que estan a `ventana // 2` o menos. Hace falta
+    cuando la serie tiene huecos: sin `anios`, el 1984 de la serie completa
+    se promediaba con 1975, que es la fila anterior pero nueve años antes.
+    En los bordes y al lado de un hueco se promedia con los vecinos que hay.
 
     [DECISION] Suavizar NO es cosmetica: cambia la pregunta. La serie cruda
     responde "cuanto hablo de esto ESE año"; la suavizada responde "en que
@@ -208,12 +218,17 @@ def media_movil(valores: list[float], ventana: int = 3) -> list[float]:
     [1.5, 2.0, 3.0, 4.0, 4.5]
     >>> media_movil([1, 2, 3], 1)
     [1.0, 2.0, 3.0]
+    >>> media_movil([0.0, 2.0, 4.0], 3, anios=[1975, 1984, 1985])
+    [0.0, 3.0, 3.0]
     """
     n, r = len(valores), []
     m = ventana // 2
     for i in range(n):
-        lo, hi = max(0, i - m), min(n, i + m + 1)
-        tramo = valores[lo:hi]
+        if anios is None:
+            lo, hi = max(0, i - m), min(n, i + m + 1)
+            tramo = valores[lo:hi]
+        else:
+            tramo = [v for a, v in zip(anios, valores) if abs(a - anios[i]) <= m]
         r.append(round(sum(tramo) / len(tramo), 6))
     return r
 

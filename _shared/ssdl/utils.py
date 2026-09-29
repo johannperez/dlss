@@ -23,9 +23,10 @@ import time
 from contextlib import contextmanager
 
 # La semilla del curso. 1983: el año de la vuelta de la democracia en Argentina.
-# La usamos SIEMPRE la misma para que dos personas distintas, en dos máquinas
-# distintas, vean exactamente los mismos números. Eso se llama reproducibilidad
-# y es un tema de la clase 10, no un capricho.
+# La usamos SIEMPRE la misma para que una corrida sea determinista: en la misma
+# máquina y con las mismas versiones de las librerías, los mismos números. Con
+# otras versiones (o en GPU) los números cambian un poco. Eso se llama
+# reproducibilidad y es un tema de la clase 10, no un capricho.
 SEMILLA_DEL_CURSO = 1983
 
 

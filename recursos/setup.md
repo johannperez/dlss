@@ -20,19 +20,41 @@ lo mismo si tu máquina es vieja.
 
 1. Andá a [colab.research.google.com](https://colab.research.google.com).
 2. `Archivo` → `Abrir cuaderno` → pestaña **GitHub**. Pegá la dirección del
-   repositorio del curso —**tu docente te la pasa**— y elegí la rama.
-   > **Nota para quien dicta:** la dirección que viene escrita en el repo
-   > (`https://github.com/johannperez/dlss`) es un **marcador de posición**: está
-   > en la celda de bootstrap de los diez notebooks, en la plantilla y acá abajo.
-   > Antes de publicar el curso hay que reemplazarla por la dirección real, en
-   > los 12 lugares. Los notebooks corren igual si esa dirección no existe (caen
-   > a los datos de muestra), pero el `[EL LUNES]` queda cojo.
+   repositorio del curso, `https://github.com/johannperez/dlss`, y elegí la
+   rama **`main`**.
    Abrí el notebook de la clase: `clases/01-funciones-y-parametros/notebook.ipynb`.
 3. Corré la primera celda (la que dice **BOOTSTRAP**) con `Shift + Enter`.
    Va a tardar unos veinte segundos la primera vez: está bajando el repo del
-   curso. Cuando termine imprime `Listo. Repo del curso en: /content/dlss`.
+   curso (la rama `main`). Cuando termine imprime
+   `Listo. Repo del curso en: /content/dlss`.
 
 Listo. Ya podés correr el resto del notebook de arriba hacia abajo.
+
+### Si el bootstrap no puede bajar el repo
+
+Si la celda dice `No pude clonar el repo` y después `No encuentro el repo del
+curso` (a veces con `Repository not found`, `404` o `could not read
+Username`), es que Colab no pudo entrar a `github.com/johannperez/dlss`. Hay
+dos causas y una salida:
+
+- **El repo no es público.** Colab entra a GitHub sin tu usuario, así que un
+  repo privado le da 404 aunque vos lo veas en tu navegador. Si dictás el
+  curso: el repo tiene que ser **público** para que la celda ande sola.
+- **No hay red hacia GitHub** (una red que lo bloquea, un corte).
+- **La salida, en los dos casos: el `.zip`.** Conseguí el `.zip` del repo (en
+  la página del repo, `Code` → `Download ZIP`, con una cuenta que tenga
+  acceso; o pedíselo a quien da el curso). En Colab, abrí el panel de archivos
+  (el ícono de la carpeta, a la izquierda), subí el `.zip` sin
+  descomprimirlo —el nombre tiene que empezar con `dlss`, como
+  `dlss-main.zip`— y volvé a correr la celda de bootstrap. La celda lo
+  encuentra, lo descomprime y sigue como si hubiera clonado.
+
+> **Nota para quien dicta:** la dirección y la rama están escritas en la
+> celda de bootstrap, que es **idéntica en los diez notebooks**
+> (`REPO = "https://github.com/johannperez/dlss"`, `RAMA = "main"`). Si el
+> repo se muda, se cambia en los diez notebooks a la vez y en esta página.
+> Probá la celda en un Colab **sin haber iniciado sesión en GitHub** antes de
+> la primera clase: es la prueba que hace falta.
 
 ### Lo que conviene saber de Colab
 
@@ -132,7 +154,9 @@ jupyter lab
 ```
 
 Se abre el navegador solo. Navegá hasta `clases/01-.../notebook.ipynb`.
-La celda de bootstrap detecta que estás local y no instala ni clona nada.
+La celda de bootstrap detecta que estás local y no instala ni clona nada. Si
+te falta un paquete (por ejemplo `torch`, que no todas las clases usan), lo
+avisa con la línea de `pip install` para copiar.
 
 ---
 
@@ -275,8 +299,8 @@ pasa el resto a `float32`.
 
 ### 7. La loss da `nan`
 
-**Qué pasó.** Casi siempre el `lr` (learning rate, el tamaño del paso) es
-demasiado grande: el modelo pega un salto enorme, se va al infinito y de ahí no
+**Qué pasó.** Casi siempre el `lr` (learning rate, el número que multiplica a
+la pendiente para decidir cuánto moverse) es demasiado grande: el modelo pega un salto enorme, se va al infinito y de ahí no
 vuelve. Es la "firma del fracaso" de la clase 3.
 
 **Solución.** Bajá el `lr` por un factor de 10 y volvé a probar:

@@ -96,7 +96,14 @@ def serie_menciones(tema: str = "seguridad", desde: int = 1984, hasta: int = 201
         "inflacion" es la de la clase 2 (tiene dos picos y un valle: imposible
         para una recta, perfecta para ocho rampas).
     desde, hasta : recorte de años (inclusive).
-    suavizada : usa la media móvil de 3 años en vez de la serie cruda.
+    suavizada : usa la media móvil centrada de 3 años en vez de la serie
+        cruda. Se calcula ACÁ, adentro del recorte `desde..hasta`: el valor de
+        cada año promedia ese año con el anterior y el siguiente, pero sólo si
+        esos años existen en la serie y caen adentro del recorte. En los bordes
+        (y al lado de un hueco, como 1976-1983) el promedio usa 2 años, no 3.
+        Así 1984 no se mezcla con 1975, nueve años y una dictadura antes.
+        (Las columnas `_suave` del CSV no se usan: se armaron sobre la serie
+        entera 1854-2019 y no conocen tu recorte.)
     en_porcentaje : los valores del CSV YA vienen en porcentaje (0,42 quiere
         decir "el 0,42% de las palabras del discurso"). Con False te los
         devuelve como fracción (0,0042), por si necesitás esa escala.
@@ -112,21 +119,44 @@ def serie_menciones(tema: str = "seguridad", desde: int = 1984, hasta: int = 201
                          f"Los que hay son: {', '.join(TEMAS_DISPONIBLES)}")
 
     filas = _leer_csv(ruta_de_muestras("series", "menciones-por-tema-apertura.csv"))
-    columna = f"{tema}_suave" if suavizada else tema
 
     anios, valores = [], []
     for fila in filas:
         anio = int(fila["anio"])
         if desde <= anio <= hasta:
             anios.append(anio)
-            valores.append(float(fila[columna]))
+            valores.append(float(fila[tema]))
 
     if not anios:
         raise ValueError(f"No hay datos entre {desde} y {hasta}. "
                          "La serie va de 1854 a 2019.")
 
+    a = np.array(anios, dtype=float)
     v = np.array(valores, dtype=float)
-    return np.array(anios, dtype=float), v if en_porcentaje else v / 100.0
+    if suavizada:
+        v = _media_movil_por_anio(a, v)
+    return a, v if en_porcentaje else v / 100.0
+
+
+def _media_movil_por_anio(anios, valores, radio: int = 1):
+    """
+    Media móvil centrada, contando AÑOS y no filas: cada año promedia los
+    valores de los años que están a `radio` años o menos (ventana de 3 con
+    radio 1). Si un vecino no existe (borde del recorte o hueco en la serie),
+    el promedio se hace con los que hay. Redondea como
+    `datos/preparar_corpus.py`, que armó las columnas `_suave` del CSV de
+    1984-2019: da exactamente los mismos números.
+
+    >>> _media_movil_por_anio([1975, 1984, 1985], [0.0, 0.1285, 0.1]).tolist()
+    [0.0, 0.1143, 0.1143]
+    """
+    anios = [float(x) for x in anios]
+    valores = [float(x) for x in valores]
+    salida = []
+    for a in anios:
+        tramo = [v for b, v in zip(anios, valores) if abs(b - a) <= radio]
+        salida.append(round(round(sum(tramo) / len(tramo), 6), 4))
+    return np.array(salida, dtype=float)
 
 
 def serie_completa(desde: int = 1984, hasta: int = 2019) -> dict:
