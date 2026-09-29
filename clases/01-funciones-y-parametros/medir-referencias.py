@@ -14,13 +14,26 @@ otra vez y actualizá los números en:
 
   · viz/maquina-de-perillas.html   -> MEJOR_RECTA, MEJOR_A, MEJOR_B, RAYA_PROMEDIO
   · viz/zoo-de-funciones.html      -> el diccionario MEJORES
-  · slides.html                    -> la slide «el piso de la recta»
-  · notebook.ipynb                 -> la sección del ajuste a ojo
+  · slides.html                    -> la slide «el piso de la recta», la slide 31
+                                      (INFLACION, INF_A, INF_B) y la slide 4
+  · notebook.ipynb                 -> la sección del ajuste a ojo, §3 (salvedades)
+                                      y §6 (inflación y la copia de emergencia)
+  · notas-docente.md, cuestionario-soluciones.md, referencias.md, VERIFICACION.md
+
+No hay azar en ninguna cuenta: los resultados son deterministas en la misma
+máquina y con las mismas versiones de las librerías; con otras versiones los
+números pueden cambiar un poco.
 """
+
+from collections import Counter
+from pathlib import Path
+import sys
 
 import numpy as np
 
 from ssdl import datos
+
+RAIZ = Path(__file__).resolve().parents[2]
 
 ANIO0 = 1984
 
@@ -62,6 +75,12 @@ def piso_de_la_recta():
           f"{mse(seguridad, -0.010 * x + 0.350):.5f}")
     print(f"  Lectura sustantiva: cada año sube {mejor[1]:.4f} puntos porcentuales,")
     print(f"  o sea {mejor[1] * 35:.3f} puntos en los 35 años del período.")
+    print(f"  desajuste(0, 0.10), el arranque del TODO 2 : "
+          f"{mse(seguridad, np.full_like(seguridad, 0.10)):.5f}")
+    i05, i06 = int(np.where(anios == 2005)[0][0]), int(np.where(anios == 2006)[0][0])
+    print(f"  2005 y 2006 (el mismo discurso en la fuente): "
+          f"{seguridad[i05]:.4f} y {seguridad[i06]:.4f}")
+    print(f"  Los dos ceros: {[int(a) for a in anios[seguridad == 0]]}")
     print()
 
 
@@ -140,6 +159,8 @@ def fracaso_de_la_recta():
         print(f"      MSE de la raya en el promedio: "
               f"{mse(serie, np.full_like(serie, serie.mean())):.5f}")
     print("  O sea: la mejor recta casi no le gana a no hacer nada.")
+    print(f"  Arranque del ejercicio del notebook (a=-0.002, b=0.12): "
+          f"{mse(suave, -0.002 * x + 0.12):.5f}")
     print("  Valores de la serie suavizada, para copiar a la slide:")
     print("  " + ", ".join(f"{v:.4f}" for v in suave))
     print()
@@ -174,8 +195,44 @@ def numeros_del_cuestionario():
     print()
 
 
+# =============================================================================
+# 5. La polisemia de «seguridad» (notebook §3, notas §8, solucionario P10)
+# =============================================================================
+def polisemia_de_seguridad():
+    """Cuántas de las apariciones de «seguridad» no hablan de delito.
+
+    Se mide sobre corpus-mini-gpt.txt (los 35 discursos distintos 1984-2019,
+    sin la copia de 2006), con el mismo tokenizador y el mismo léxico que
+    arman la serie.
+    """
+    sys.path.insert(0, str(RAIZ / "datos"))
+    from preparar_corpus import LEXICO, normalizar, tokenizar
+
+    ruta = RAIZ / "datos/muestras/discursos-apertura/corpus-mini-gpt.txt"
+    lineas = [l for l in ruta.read_text(encoding="utf-8").splitlines()
+              if not l.startswith("#")]
+    toks = tokenizar(normalizar("\n".join(lineas)))
+    lexico = set(LEXICO["seguridad"])
+    aciertos = [i for i, w in enumerate(toks) if w in lexico]
+    de_seguridad = [i for i in aciertos if toks[i] == "seguridad"]
+    siguiente = Counter(toks[i + 1] for i in de_seguridad if i + 1 < len(toks))
+    otras = {k: siguiente[k] for k in ("social", "juridica", "alimentaria", "vial")}
+
+    print("=" * 72)
+    print("5. La polisemia de «seguridad»")
+    print("=" * 72)
+    print(f"  Palabras del léxico                 : {len(LEXICO['seguridad'])}")
+    print(f"  Aciertos del léxico (35 discursos)  : {len(aciertos)}")
+    print(f"  …de los cuales, la palabra seguridad: {len(de_seguridad)}")
+    print(f"  «seguridad» + social/jurídica/alimentaria/vial: {otras} "
+          f"= {sum(otras.values())}")
+    print(f"  = {sum(otras.values()) / len(aciertos):.0%} de todos los aciertos")
+    print()
+
+
 if __name__ == "__main__":
     piso_de_la_recta()
     piso_del_zoo()
     fracaso_de_la_recta()
     numeros_del_cuestionario()
+    polisemia_de_seguridad()

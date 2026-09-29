@@ -3,7 +3,8 @@
 **Una función es una máquina con perillas**
 
 No es un examen. Es para que veas qué te quedó y qué conviene volver a mirar antes de
-la clase 2. Se hace en unos 20 minutos. Las soluciones están en
+la clase 2. Se hace en unos 20 minutos; el bonus del final es
+opcional. Las soluciones están en
 `cuestionario-soluciones.md`: **mirálas recién después de haber contestado todo**,
 incluso lo que te salió mal, porque ahí está lo interesante.
 
@@ -164,7 +165,7 @@ que puedas escribir dos objeciones que un revisor te haría.)*
 
 ---
 
-## 11. Bonus, para pensar hasta la clase que viene
+## 11. Bonus (opcional), para pensar hasta la clase que viene
 
 En el zoo hay seis formas. El **desafío 3** (dos picos y un valle) no lo saca
 ninguna: está medido, el mejor techo es 0,213 y se ve mal.

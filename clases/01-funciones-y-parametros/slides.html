@@ -69,7 +69,7 @@
     <li>Alguna vez dijiste «esto <strong>viene creciendo</strong>» mirando una serie.</li>
     <li>Alguna vez discutiste si <strong>una medida mide lo que dice medir</strong>.</li>
     <li class="fragment"><strong>Las tres cosas son esta clase.</strong> Lo único que cambia
-      en las diez semanas que vienen es que las figuras se van a poner más raras que una recta.</li>
+      en las nueve clases que vienen es que las figuras se van a poner más raras que una recta.</li>
   </ul>
   <aside class="notes">
     <b>1:00 — 2 min.</b> Preguntá a mano alzada: «¿quién corrió alguna vez una regresión?».
@@ -82,7 +82,8 @@
 <!-- ======================== 3 · LOS PUNTOS MISTERIOSOS ======================== -->
 <section>
   <h2>¿Qué le pasó a este país?</h2>
-  <div class="viz-frame" style="padding:10px"><div id="fig-misterio"></div></div>
+  <div class="viz-frame" style="padding:10px"><div id="fig-misterio"
+    data-desc="Treinta y seis puntos sueltos, sin ejes ni rótulos. Suben y bajan sin un patrón obvio: la mayoría abajo, algunos picos altos, dos puntos pegados al piso."></div></div>
   <p class="viz-pie">Treinta y seis años de algo. Sin ejes, a propósito.</p>
   <aside class="notes">
     <b>3:00 — 4 min. Esta es la slide más importante del arranque: no la apures.</b><br>
@@ -97,19 +98,27 @@
 <!-- ======================== 4 · LOS MISMOS PUNTOS, CON EJES ======================== -->
 <section>
   <h2>Los mismos puntos, con los ejes puestos</h2>
-  <div class="viz-frame" style="padding:10px"><div id="fig-revelado"></div></div>
+  <div class="viz-frame" style="padding:10px"><div id="fig-revelado"
+    data-desc="Los mismos 36 puntos con ejes: año de 1984 a 2019 en el eje horizontal, porcentaje de palabras del discurso en el vertical, de 0 a 0,44 %. Casi todos entre 0 y 0,25 %; picos en 1998, 2000, 2001, 2008 y 2016; ceros en 2002 y 2009."></div></div>
   <p class="viz-pie"><b>Qué es:</b> el porcentaje de palabras del discurso presidencial de
-    apertura de sesiones ordinarias que pertenecen a un léxico de 23 palabras sobre
-    <em>seguridad</em>. Un punto por año, 1984-2019. Datos reales.</p>
+    apertura de sesiones ordinarias que pertenecen a un léxico de 24 palabras sobre
+    <em>seguridad</em>. Un punto por año, 1984-2019. Datos reales, con una salvedad:
+    el punto de 2006 repite el discurso de 2005 (así viene en la fuente).</p>
   <aside class="notes">
     <b>7:00 — 3 min.</b> «Ah. Bueno. ¿Cambia lo que dijeron? ¿Alguien mantiene su historia?»<br>
     Volvé a las versiones que anotaste y preguntá cuáles sobreviven.<br>
     Decí <b>esta frase, que se cobra en la clase 10</b>: «Ojo con lo que acabo de hacer.
-    Les mostré un número, pero antes de ese número hay una decisión: qué 23 palabras cuentan
+    Les mostré un número, pero antes de ese número hay una decisión: qué 24 palabras cuentan
     como “seguridad”. Esa lista la escribió una persona un martes. Está en el repo, la pueden
     cambiar, y si la cambian el gráfico cambia.»<br>
     Mencioná los dos ceros (2002 y 2009) sólo si alguien pregunta: no significan que no hubo
-    inseguridad, significan que ninguna de esas 23 palabras apareció.
+    inseguridad, significan que ninguna de esas 24 palabras apareció.<br>
+    Si alguien pregunta por la palabra «seguridad» misma, regalo: también cuenta
+    «seguridad <b>social</b>», «jurídica», «alimentaria» y «vial». Son 64 de los 461 aciertos
+    del léxico (el 14 %, medido en <code>medir-referencias.py</code>): una parte de la serie
+    habla de jubilaciones y de contratos, no de delito. Anotalo para la clase 10.<br>
+    El 2005 = 2006 no lo expliques ahora: «es la misma copia en la fuente; en la clase 4
+    vamos a ver por qué un duplicado así es peligroso».
   </aside>
 </section>
 
@@ -132,7 +141,8 @@
 <!-- ======================== 6 · TRES CANDIDATAS ======================== -->
 <section>
   <h2>Tres personas dibujaron estas tres</h2>
-  <div class="viz-frame" style="padding:10px"><div id="fig-candidatas"></div></div>
+  <div class="viz-frame" style="padding:10px"><div id="fig-candidatas"
+    data-desc="Los 36 puntos con tres líneas encima: A, una recta gruesa que sube apenas; B, una curva punteada suave que sigue las subidas y bajadas; C, una línea fina en zigzag que pasa por todos los puntos."></div></div>
   <p class="viz-pie"><b>A</b> una recta · <b>B</b> una curva suave · <b>C</b> una que pasa
     por todos los puntos.</p>
   <aside class="notes">
@@ -147,7 +157,8 @@
 <!-- ======================== 7 · DOS NÚMEROS ======================== -->
 <section>
   <h2>Para dibujar esa recta hacen falta <span class="c-parametro">dos números</span></h2>
-  <div class="viz-frame" style="padding:10px"><div id="fig-dos-numeros"></div></div>
+  <div class="viz-frame" style="padding:10px"><div id="fig-dos-numeros"
+    data-desc="La recta A sobre los puntos, con dos rótulos: dónde arranca, 0,085 en 1984, y qué tan empinada, 0,0040 por año, marcada con un triángulo punteado entre 2004 y 2014."></div></div>
   <p class="viz-pie">Dos. Nada más. Toda la información de esa línea infinita entra en dos números.</p>
   <aside class="notes">
     <b>14:00 — 2 min.</b> Señalá los dos con el dedo en la pantalla: dónde arranca y qué tan
@@ -216,7 +227,7 @@
       <h4><span class="c-parametro">Parámetro</span> — la perilla</h4>
       <p>Es <strong>el mismo para toda la base</strong>.</p>
       <p>Lo elegís vos, o lo aprende la máquina.</p>
-      <p>Un coeficiente. Una tasa. Un peso. Un umbral.</p>
+      <p>Un coeficiente. Una tasa. Un umbral.</p>
       <p>Moverlo <strong>deforma</strong> la figura entera.</p>
     </div>
   </div>
@@ -229,7 +240,10 @@
     «díganme un parámetro». El segundo cuesta más, y ese esfuerzo es el contenido.<br>
     Si alguien dice «el tamaño de la muestra», es una buena confusión: n no es ni una cosa ni
     la otra, es una propiedad del diseño. Usalo para mostrar que la regla del dedo se aplica
-    a los números que entran al modelo, no a todo número que exista.
+    a los números que entran al modelo, no a todo número que exista.<br>
+    Si alguien dice «el peso muestral», es la trampa buena: <b>es una variable</b>. Cada
+    encuestado tiene el suyo y vive en una columna de la base. La regla del dedo lo resuelve
+    sola: ¿cambia de una fila a otra? Sí. Entonces no es una perilla del modelo.
   </aside>
 </section>
 
@@ -241,8 +255,8 @@
       El año es la variable.</div>
     <div><h4>«Por cada año de educación, +X de ingreso»</h4>Ese <b class="c-parametro">X</b>
       es un parámetro. Es <em>el</em> coeficiente del que discute todo el paper.</div>
-    <div><h4>Un peso muestral</h4>Un <b class="c-parametro">número</b> que elegiste vos para
-      que la muestra se parezca a la población.</div>
+    <div><h4>«Bajo la línea de pobreza»</h4>Ese <b class="c-parametro">umbral</b> es un
+      parámetro: es el mismo para todos los hogares, y alguien lo eligió.</div>
   </div>
   <div class="ss compacta">
     Cuando reportás un coeficiente en una tabla de regresión, estás reportando una perilla.
@@ -303,8 +317,9 @@
   <div class="viz-frame" data-alto="grande">
     <iframe src="viz/variable-vs-parametro.html" title="variable contra parámetro" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> el rastro violeta de la derecha son
-    <em>todas las curvas que tu modelo podría dibujar</em>. Elegir el parámetro es elegir una.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> el abanico violeta de la derecha es
+    <em>la familia de curvas que tu modelo puede dibujar</em> (una cada 0,1 de <code>a</code>;
+    entre medio hay infinitas). Elegir el parámetro es elegir una.</p>
   <p class="abrir-suelta">Para proyectar más grande:
     <a href="viz/variable-vs-parametro.html" target="_blank">abrir la visualización sola</a>.</p>
   <aside class="notes">
@@ -315,7 +330,8 @@
     Leé en voz alta las dos frases de abajo de los paneles, que son la mitad del valor de la viz:
     <i>«estoy mirando otro caso de la misma teoría»</i> contra
     <i>«estoy proponiendo otra teoría»</i>.<br>
-    Y cerrá con el aha: «ese rastro violeta son todas las teorías que tu modelo puede sostener.
+    Y cerrá con el aha: «ese abanico violeta son las teorías que tu modelo puede sostener.
+    Hay infinitas más entre medio; dibujamos una cada tanto.
     Aprender, en este curso entero, va a ser elegir una de esas.»
   </aside>
 </section>
@@ -324,7 +340,8 @@
 <section>
   <h2>Un número que dice qué tan mal está</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:10px"><div id="fig-desajuste"></div></div>
+    <div class="viz-frame" style="padding:10px"><div id="fig-desajuste"
+      data-desc="Una recta mal puesta, que baja de 0,35 a 0 %, sobre los 36 puntos. De cada punto sale un palito vertical hasta la recta: es el error de ese año."></div></div>
     <div>
       <p>Cada <span class="c-error"><b>palito rojo</b></span> es lo que le erró el modelo
         en un año.</p>
@@ -391,7 +408,8 @@ def recta(x, a, b):
   <ul>
     <li>Escribieron una función y la graficaron. <strong>Eso ya es un modelo.</strong></li>
     <li>Cambiaron dos números y la figura cambió. Ninguno de esos dos números era un dato.</li>
-    <li>Vieron un número de desajuste subir y bajar según dónde pusieran la recta.</li>
+    <li>En la viz vieron un número de desajuste subir y bajar según dónde estuviera la recta.
+      Ahora lo van a mover ustedes.</li>
   </ul>
   <p class="bajada">¿Qué encontraron? ¿A alguien le pasó algo raro?</p>
   <aside class="notes">
@@ -436,7 +454,8 @@ def recta(x, a, b):
 <section>
   <h2>La recta</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-recta"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-recta"
+      data-desc="Una recta que sube de izquierda a derecha, siempre con la misma inclinación."></div></div>
     <div>
       <p class="formulon" style="font-size:1.2em">f(<span class="v">x</span>) =
         <span class="p">a</span>·<span class="v">x</span> + <span class="p">b</span></p>
@@ -454,7 +473,8 @@ def recta(x, a, b):
 <section>
   <h2>La parábola</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-parabola"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-parabola"
+      data-desc="Una U invertida: sube, llega a un máximo en el medio y baja."></div></div>
     <div>
       <p><strong>Qué afirma:</strong> sube y después baja (o al revés). Hay un punto de giro
         y ese punto es lo interesante.</p>
@@ -470,7 +490,8 @@ def recta(x, a, b):
 <section>
   <h2>La exponencial</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-exponencial"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-exponencial"
+      data-desc="Una curva casi plana al principio que se dispara hacia arriba al final."></div></div>
     <div>
       <p><strong>Qué afirma:</strong> el crecimiento se acelera solo. Cuanto más grande es,
         más rápido crece.</p>
@@ -487,22 +508,24 @@ def recta(x, a, b):
 <section>
   <h2>La sigmoide <span class="c-acento">— guardá esta</span></h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-sigmoide"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-sigmoide"
+      data-desc="Una S: plana abajo, sube rápido en el medio y se aplana arriba, contra un techo."></div></div>
     <div>
       <p><strong>Qué afirma:</strong> empieza lento, se acelera y <strong>se satura</strong>.
         Hay un techo y se llega.</p>
       <div class="ss compacta">La adopción de una innovación (Rogers). La saturación de un
         tema en la agenda mediática: no se puede hablar del 200 % del tiempo.</div>
-      <div class="aha compacta">Márquenla. Esta función vuelve en la clase 2, en la 3 y en la 9.
-        Es la más importante del curso después de la recta.</div>
+      <div class="aha compacta">Márquenla. Esta función vuelve en la clase 2, y en la 9 está
+        adentro de la regresión logística aunque no la veamos.</div>
     </div>
   </div>
   <aside class="notes">
     <b>78:00 — 3 min. Bajá la velocidad acá.</b><br>
     Mostrá con el dedo las tres zonas: el arranque lento, la explosión del medio, el techo.
     «Casi todo lo que en ciencias sociales llamamos “difusión” tiene esta forma.»<br>
-    Y sembrá: «acuérdense del techo. En la clase 9, cuando un modelo les devuelva un número
-    entre 0 y 1 y les diga que es una probabilidad, va a ser por esta función.»
+    Y sembrá: «acuérdense del techo. En la clase 9, cuando una regresión logística les
+    devuelva un número entre 0 y 1 y les diga que es una probabilidad, va a ser por esta
+    función.» No la prometas para otras clases: en la 3 y en la 4 no aparece.
   </aside>
 </section>
 
@@ -510,7 +533,8 @@ def recta(x, a, b):
 <section>
   <h2>El seno</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-seno"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-seno"
+      data-desc="Una ola que sube y baja parejo, repitiéndose dos veces en el gráfico."></div></div>
     <div>
       <p><strong>Qué afirma:</strong> esto ya pasó y va a volver a pasar, cada tanto igual.</p>
       <div class="ss compacta">El ciclo electoral. La estacionalidad de las noticias
@@ -545,7 +569,10 @@ def recta(x, a, b):
     <i>varias familias pueden contener la misma figura</i>.<br>
     Desafío 2: sólo la sigmoide. Insistí con la recta a la vista de todos hasta que se aburran.<br>
     Desafío 3: no la saca ninguna. Apretá «mostrar el techo de cada forma»: los números están
-    medidos. «No es que no le pusieron ganas. Está demostrado que no se puede.»<br>
+    medidos. «No es que no le pusieron ganas. Está medido: con estas perillas no se puede.»
+    Si alguien objeta que al seno le faltan perillas (la fase, la altura), tiene razón:
+    con esas dos más baja algo, pero igual no llega (un ajuste así da 0,078 contra el
+    umbral de 0,02). «Con más perillas mejora: eso es justo lo que hace la clase 2.»<br>
     <b>Esa frustración es el gancho de la clase 2 y no hay que resolverla hoy.</b>
   </aside>
 </section>
@@ -554,7 +581,8 @@ def recta(x, a, b):
 <section>
   <h2>La misma fórmula, tres historias distintas</h2>
   <div class="lado-a-lado">
-    <div class="viz-frame" style="padding:8px"><div id="fig-familia"></div></div>
+    <div class="viz-frame" style="padding:8px"><div id="fig-familia"
+      data-desc="Tres curvas en S con la misma fórmula y el mismo techo. Lenta y temprana: sube despacio desde el principio. Brusca y tardía: plana hasta el año 6 y salta de golpe cerca del 7. Lenta y tardía: sube despacio y cruza la mitad recién en el año 8."></div></div>
     <div>
       <ul style="font-size:.88em">
         <li><b>Lenta y temprana:</b> «empezó enseguida, pero tardó unos <b>diez años</b>
@@ -581,8 +609,10 @@ def recta(x, a, b):
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2 — ajuste a ojo, de a dos</h2>
   <div class="manos">
+    Notebook, <b>sección 4</b> (el <code>TODO 2</code>; el <code>TODO 3</code> es para quien vaya rápido).
     De a dos. <b>Uno mueve los números, el otro mira el desajuste y grita.</b>
     Consigna: bajar el desajuste todo lo que puedan. Anoten los dos números que encontraron.
+    Las secciones 5 y 6 quedan para después de clase.
   </div>
   <pre><code class="language-python" data-trim>
 def desajuste(a, b):
@@ -633,21 +663,22 @@ def desajuste(a, b):
     Y hacerlo a mano, con dos perillas, es insoportable.
   </div>
   <p>Ustedes acaban de hacer a mano, con <strong>dos</strong> perillas y en diez minutos,
-    lo que una computadora hace con <strong>mil millones</strong> de perillas en dos semanas.
-    La idea es exactamente la misma. Lo único que falta es que la máquina sepa
-    <em>para dónde</em> mover.</p>
+    lo que una computadora hace con <strong>miles de millones</strong> de perillas, durante
+    semanas y con miles de procesadores. La idea de fondo es la misma. Lo primero que falta
+    es que la máquina sepa <em>para dónde</em> mover.</p>
   <aside class="notes">
-    <b>108:00 — 2 min.</b> Marcá la escala con las manos: dos contra mil millones.
-    «No hay ningún salto conceptual entre lo que hicieron ustedes y lo que hace GPT.
-    Hay un salto de tamaño, que es enorme, y una idea sobre cómo elegir la dirección,
-    que vemos en la clase 3. Nada más.»
+    <b>108:00 — 2 min.</b> Marcá la escala con las manos: dos contra miles de millones.
+    «El corazón de lo que hace GPT es lo que hicieron ustedes: mover perillas para bajar un
+    número. Encima hay un salto de tamaño enorme, una idea sobre cómo elegir la dirección
+    (clase 3), una forma particular de armar la máquina (clases 7 y 8) y bastante trabajo
+    con datos y con personas. Pero no hay magia escondida.»
   </aside>
 </section>
 
-<!-- ======================== 30 · EL LUNES ======================== -->
+<!-- ======================== 30 · EN TU INVESTIGACIÓN ======================== -->
 <section>
-  <span class="marca">el lunes</span>
-  <h2>Qué te llevás para el lunes</h2>
+  <span class="marca">en tu investigación</span>
+  <h2>Qué te llevás a tu investigación</h2>
   <ol>
     <li>Tomá una serie de <strong>tu</strong> investigación (una variable por año, por mes,
       por provincia).</li>
@@ -663,6 +694,9 @@ def desajuste(a, b):
   <aside class="notes">
     <b>110:00 — 3 min.</b> Insistí en el paso 2: mirar antes de modelar. La mitad de los
     errores metodológicos de un paper se evitan graficando primero.<br>
+    No es tarea con fecha: es cómo se usa lo de hoy en su trabajo. Lo que sí conviene hacer
+    antes de la clase 2 es el cuestionario y la sección 6 del notebook; en
+    total, menos de una hora.<br>
     Si alguien no tiene una serie propia, ofrecele las otras cuatro del corpus del curso
     (<code>inflacion</code>, <code>educacion</code>, <code>trabajo</code>, <code>salud</code>).
   </aside>
@@ -671,11 +705,12 @@ def desajuste(a, b):
 <!-- ======================== 31 · PERO... ======================== -->
 <section>
   <h2>Pero…</h2>
-  <div class="viz-frame" style="padding:10px"><div id="fig-inflacion"></div></div>
+  <div class="viz-frame" style="padding:10px"><div id="fig-inflacion"
+    data-desc="Menciones a inflación suavizadas, 1984-2019: altas a fines de los 80 y principios de los 90, bajas y planas en los 2000, y de nuevo altas desde 2015. La mejor recta casi horizontal pasa por el medio y le erra en los dos extremos y en el valle."></div></div>
   <p class="viz-pie">Menciones a <em>inflación</em>, mismos discursos, mismos años,
     suavizadas con una media móvil de 3 años, con la <b>mejor</b> recta posible encima.
-    Su desajuste es <b>0.0015</b>; el de no hacer absolutamente nada (una raya horizontal
-    en el promedio) es <b>0.0015</b>: empatan hasta el cuarto decimal (0.00150 contra 0.00152).
+    Su desajuste es <b>0.0016</b>; el de no hacer absolutamente nada (una raya horizontal
+    en el promedio) es <b>0.0016</b>: empatan hasta el cuarto decimal (0.00156 contra 0.00157).
     <br><b>Ojo:</b> suavizar cambia la pregunta. La serie cruda dice «cuánto se habló de
     esto <em>ese año</em>»; la suavizada dice «en qué parte del período el tema estaba en
     agenda». Las dos son legítimas; usar una y reportar la otra, no.</p>
@@ -766,8 +801,9 @@ def desajuste(a, b):
   <aside class="notes">
     <b>119:00 — 1 min.</b> Cerrá con la deuda abierta, no con un resumen:
     «se van con una frustración: ninguna de las seis formas pudo con el desafío 3.
-    La semana que viene la cobramos.»<br>
-    Y la tarea real: el <code>[EL LUNES]</code> de la slide 30.
+    La clase que viene la cobramos.»<br>
+    Y lo que se llevan: el <code>[EN TU INVESTIGACIÓN]</code> de la slide 30. Para antes de
+    la clase 2: el cuestionario (unos 20 minutos) y la sección 6 del notebook.
   </aside>
 </section>
 
@@ -841,7 +877,7 @@ def desajuste(a, b):
                      0.4267, 0.2496, 0.3112, 0.2453];
   // «inflación», suavizada con una media móvil de 3 años: es la serie con la que
   // arranca la clase 2. Suavizar cambia la pregunta y hay que decirlo (datos/README).
-  const INFLACION = [0.0762, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
+  const INFLACION = [0.1143, 0.1016, 0.0588, 0.0658, 0.0674, 0.1152, 0.0921, 0.0825,
                      0.0601, 0.0719, 0.1105, 0.0966, 0.0745, 0.0359, 0.0365, 0.0297,
                      0.0211, 0.0219, 0.0465, 0.0410, 0.0555, 0.0583, 0.0850, 0.0807,
                      0.0532, 0.0323, 0.0217, 0.0320, 0.0267, 0.0321, 0.0340, 0.1143,
@@ -858,14 +894,18 @@ def desajuste(a, b):
 
   // números MEDIDOS con medir-referencias.py — no estimados
   const MEJOR_A = 0.0040, MEJOR_B = 0.085;          // seguridad: MSE 0.01455
-  const INF_A = 0.000432, INF_B = 0.0624;           // inflación suave: MSE 0.00150
+  const INF_A = 0.000260, INF_B = 0.0665;           // inflación suave: MSE 0.00156
   const mejorRecta = x => MEJOR_A * (x - ANIO0) + MEJOR_B;
 
   // ---------- ayudante: crea un plano y lo registra para el redibujo --------
   const planos = [];
   function figura(sel, op, dibujo) {
-    if (!document.querySelector(sel)) return null;
+    const cont = document.querySelector(sel);
+    if (!cont) return null;
     const p = Viz.plano(sel, op);
+    // accesibilidad: el canvas es una imagen; su texto alternativo vive en data-desc
+    p.canvas.setAttribute('role', 'img');
+    p.canvas.setAttribute('aria-label', cont.dataset.desc || op.titulo || 'figura de la clase');
     p.alDibujar(() => dibujo(p));
     planos.push(p);
     p.redibujar();
@@ -949,8 +989,14 @@ def desajuste(a, b):
     'mini-seno':        x => 4 + 2.4 * Math.sin(2 * Math.PI * x / 5),
     'mini-escalon':     x => (x < 5 ? 1 : 7)
   };
+  const ZOO_DESC = {
+    'mini-recta': 'recta que sube', 'mini-parabola': 'U invertida',
+    'mini-exponencial': 'curva que se dispara', 'mini-sigmoide': 'S que se satura',
+    'mini-seno': 'ola que se repite', 'mini-escalon': 'escalón: plano abajo, salto, plano arriba'
+  };
   for (const id in ZOO) {
     const f = ZOO[id];
+    document.getElementById(id).dataset.desc = ZOO_DESC[id];
     figura('#' + id,
       { xmin: 0, xmax: 10, ymin: -1, ymax: 9.5, alto: 155, margen: { i: 12, d: 12, a: 8, b: 12 } },
       p => { p.fondo(); p.grilla(); p.curva(f, { color: 'modelo', grosor: 3.4 }); });
@@ -1013,6 +1059,10 @@ def desajuste(a, b):
     const cont = document.querySelector(sel);
     if (!cont) return null;
     const s = Viz.svg.crear(cont, { ancho: ancho, alto: alto, altoCss: altoCss });
+    s.setAttribute('role', 'img');
+    s.setAttribute('aria-label', 'Una caja rotulada «la máquina»: entra x (el año) por la ' +
+      'izquierda, sale f(x) (el % de palabras) por la derecha, y arriba tiene dos perillas: ' +
+      'a, qué tan empinada, y b, dónde arranca.');
     function pintar() {
       Viz.svg.limpiar(s);
       const c = Viz.colores(), E = Viz.svg.el, F = escala;

@@ -30,7 +30,7 @@ un caso a otro.
 | Distractor | Por qué es tentador | Qué confusión revela |
 |---|---|---|
 | **A (decimal vs entero)** | En los ejemplos de clase `a` suele ser 0,004 y `x` suele ser 1998. El patrón visual existe. | Confunde una **coincidencia de formato** con una **diferencia de rol**. Es un buen momento para decir que el año podría escribirse 1998,0 y no cambiaría nada. |
-| **B (letras del alfabeto)** | Es cierto que la convención existe: `a, b, c` para parámetros, `x, y, z` para variables. | Confunde la convención tipográfica con la definición. Peligroso porque **funciona** casi siempre y falla justo cuando importa (en la clase 2 los parámetros se van a llamar `w`, y en la 6 los datos se van a llamar `V`). |
+| **B (letras del alfabeto)** | Es cierto que la convención existe: `a, b, c` para parámetros, `x, y, z` para variables. | Confunde la convención tipográfica con la definición. Peligroso porque **funciona** casi siempre y falla justo cuando importa (en la clase 2 los parámetros se van a llamar `w`, y en la 7 aparecen `Q`, `K` y `V`, que no son ni los datos crudos ni perillas sueltas: son cuentas hechas con los dos). |
 | **D (quién lo calcula)** | Tiene algo de verdad: los parámetros muchas veces los estima la computadora. | Confunde **quién produce el número** con **qué papel juega**. Hoy los parámetros los movieron a mano, y no dejaron de ser parámetros por eso. |
 
 ---
@@ -81,7 +81,7 @@ hallazgo sobre el fenómeno, no una limitación del método.
   un resultado**. Es una excelente puerta de entrada a la conversación sobre por qué
   los papers con resultados nulos casi no se publican.
 - Quien escribe la oración usando la palabra «pendiente» aunque se lo pediste sin
-  jerga: no está mal, pero es exactamente el hábito que el `[EL LUNES]` quiere romper.
+  jerga: no está mal, pero es exactamente el hábito que el `[EN TU INVESTIGACIÓN]` quiere romper.
   Pedile la versión para su abuela.
 
 ---
@@ -135,7 +135,7 @@ del 30 % del aula contesta «variable», arrancá la clase 2 con esa viz.
 | # | Forma | Por qué |
 |---|---|---|
 | 1 | **D, sigmoide** | «arrancó despacio, se aceleró, ya casi no crece» son las tres zonas de la S: arranque, explosión y **techo**. La palabra clave es la saturación. |
-| 2 | **E, seno** | «cada cuatro años, sin falta» = periodicidad. |
+| 2 | **E, seno** | «cada cuatro años, sin falta» = periodicidad. (Un tema que aparece sólo en el año electoral se parece más a un tren de picos que a una ola suave; como apareamiento, el seno es lo único del zoo que se repite. Si alguien lo objeta, tiene razón y vale decírselo.) |
 | 3 | **A, recta** | «siempre lo mismo por año» = cambio constante por unidad. |
 | 4 | **B, parábola** | «subió, llegó a un máximo, ahora baja» = un punto de giro. |
 | 5 | **C, exponencial** | «casi no se notó y después se disparó sin freno» = crecimiento que se acelera **y no tiene techo**. |
@@ -244,10 +244,11 @@ Objeciones que se esperan (dos bien argumentadas alcanzan):
 
 | Objeción | Qué evidencia haría dudar menos |
 |---|---|
-| **Hablar mucho puede ser reacción, no prioridad.** Si el tema domina los diarios en febrero, el discurso del 1 de marzo lo va a tocar sí o sí. | Comparar la serie con la cobertura mediática del mes anterior. Si van juntas, la medida está capturando agenda mediática. |
+| **Hablar mucho puede ser reacción, no prioridad.** Si el tema domina los diarios en las semanas previas, el discurso de apertura lo va a tocar sí o sí. | Comparar la serie con la cobertura mediática del mes anterior. Si van juntas, la medida está capturando agenda mediática. |
 | **Un gobierno puede actuar mucho y hablar poco** (o al revés). | Contrastar con presupuesto ejecutado, leyes enviadas al Congreso o cargos creados en el área. |
 | **El discurso de apertura es un género con reglas propias.** Hay secciones obligadas; el espacio no se reparte libremente. | Ver si la proporción cambia cuando se compara con otros discursos del mismo gobierno (cadena nacional, campaña). |
-| **La lista de 23 palabras la escribimos nosotros.** Sacar «policía» o agregar «orden» mueve la serie. | Repetir el análisis con dos o tres léxicos alternativos y mostrar que las conclusiones no cambian (análisis de sensibilidad). |
+| **La lista de 24 palabras la escribimos nosotros.** Sacar «policía» o agregar «orden» mueve la serie. | Repetir el análisis con dos o tres léxicos alternativos y mostrar que las conclusiones no cambian (análisis de sensibilidad). |
+| **La palabra central es ambigua.** «Seguridad» aporta casi la mitad de los aciertos (228 de 461), y al menos 64 son «seguridad social», «jurídica», «alimentaria» o «vial»: alrededor del 14 % de la serie no habla de delito. Es la objeción más fuerte con estos datos. | Contar los bigramas «seguridad social» y «seguridad jurídica», sacarlos y recalcular la serie. Si la historia cambia, la medida estaba mezclando dos constructos. (Los números salen de `medir-referencias.py`, sección 5.) |
 | **El largo de los discursos cambió por un factor de nueve.** Normalizamos por palabras, pero un discurso de 25.000 palabras cubre más temas que uno de 2.900. | Comparar las series normalizadas contra las crudas y ver si la historia es la misma. |
 | **El discurso no lo escribe quien lo lee.** Lo escribe un equipo y se negocia con los ministerios. | Ninguna, y por eso hay que cambiar la afirmación: no es «lo que el presidente pensaba», es «la agenda que la Presidencia decidió mostrarle al Congreso». |
 
@@ -275,5 +276,5 @@ Ideas que suelen aparecer, y qué hacer con cada una:
   suma de rampas y merece que se lo digas en voz alta al aula.
 - *«Sumar dos de las formas del zoo»* → también correcto, y es la palabra clave:
   **sumar**. Es el título de la clase 2.
-- *«No se puede»* → «tenés razón con una sola forma. La semana que viene te muestro
+- *«No se puede»* → «tenés razón con una sola forma. En la clase 2 te muestro
   qué pasa con ocho.»

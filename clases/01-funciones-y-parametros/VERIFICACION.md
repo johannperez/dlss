@@ -1,8 +1,91 @@
 # Verificación adversarial — Clase 1
 
-**«Una función es una máquina con perillas»** · verificado el 2026-08-29
+**«Una función es una máquina con perillas»** · verificado el 2026-08-29 · revisado el 2026-09-29
 
-Todo lo que dice acá se comprobó **corriendo el material**, no leyéndolo: `nbconvert
+> **Leé primero la sección 0.** Resume la revisión del 2026-09-29: qué se corrigió, qué
+> números cambiaron y qué se volvió a comprobar (y qué no). Las secciones 1 a 6 son la
+> verificación original del 2026-08-29; donde algo de ahí dejó de ser cierto, está
+> marcado **[corregido el 2026-09-29]**.
+
+---
+
+## 0. Revisión del 2026-09-29
+
+### Qué se corrigió
+
+- **Datos.** El léxico de «seguridad» tiene **24** palabras, no 23 (`len(LEXICO["seguridad"])`);
+  corregido en slides, notebook, viz 1, notas, solucionario y referencias. Las sesiones
+  se abrían el **1 de mayo hasta 1994** y el 1 de marzo desde 1995 (el notebook decía
+  «cada 1 de marzo… misma fecha»). El duplicado **2005 = 2006** ahora se nombra en la
+  slide 4, el notebook §3, las notas §8 y las referencias, como gancho de la clase 4.
+- **La serie de inflación suavizada.** `serie_menciones(..., suavizada=True)` mezclaba en
+  1984 el discurso de 1975 (lo corrigió el arreglo de `_shared/ssdl/datos.py`). Se volvió a
+  correr `medir-referencias.py` y se propagaron los números: el primer valor pasa de
+  0.0762 a **0.1143** (los otros 35 no cambian); mejor recta **0.00156** (antes 0.00150),
+  raya en el promedio **0.00157** (antes 0.00152), pendiente 0.000260 y arranque 0.0665.
+  Cambió en la slide 31 (`INFLACION`, `INF_A`, `INF_B` y el pie), el notebook §6 (la copia
+  de emergencia y los textos) y las notas §9. El «empate» se mantiene.
+- **Validez.** Nueva salvedad: «seguridad» aporta 228 de los 461 aciertos del léxico, y
+  al menos 64 son «seguridad social» (44), «jurídica» (10), «alimentaria» (7) o «vial» (3),
+  el 14 % de los aciertos. Está en el notebook §3, las notas §6 y §8, la nota de la slide 4,
+  la viz 1 y el solucionario P10 (objeción nueva). Lo mide la sección 5 nueva de
+  `medir-referencias.py`.
+- **Conceptos.** La slide 11 ya no da el peso muestral como parámetro (es una variable:
+  cada encuestado tiene el suyo); ahora el ejemplo es el umbral de la línea de pobreza, y
+  las notas de la slide 10 y el notebook §1 usan el peso muestral como trampa. La analogía
+  del cuestionario en el notebook ahora es respuestas contra coeficiente. La amplitud del
+  seno en la viz 3 es «de la línea del medio a la cresta». «Está demostrado» pasó a «está
+  medido: con estas perillas no se puede» (el seno con fase y altura libres llega a 0,078,
+  todavía arriba del umbral de 0,02; medido). La slide 29 ya no dice «mil millones de
+  perillas en dos semanas» ni «ningún salto conceptual».
+- **Viz 2.** El texto prometía «todas las curvas que tu modelo podría dibujar», pero el
+  código sólo dibujaba las últimas 8 posiciones de `a`. Ahora dibuja la familia fija
+  (19 curvas, `a` de −0,6 a 1,2 cada 0,1) y encima el rastro. El texto dice «una cada 0,1;
+  entre medio hay infinitas».
+- **Promesas.** La sigmoide «vuelve en la 2, en la 3 y en la 9» pasó a «vuelve en la 2, y
+  en la 9 está adentro de la regresión logística» (en la 3 no aparece). Se sacó «esto vuelve
+  en la clase 8 con la temperatura» del `TODO 4` (la clase 8 no lo retoma).
+- **Calendario.** `[EL LUNES]` → `[EN TU INVESTIGACIÓN]`; «semana que viene», «15 días»,
+  «diez semanas» y «esta semana» se reemplazaron por plazos en clases. Lo que se pide para
+  antes de la clase 2 (a dos días) es el cuestionario y la sección 6 (menos de una hora);
+  lo demás es opcional. La slide 27 y las notas §2 dicen ahora qué sección del notebook
+  va en el bloque práctico 2 (la 4), y las notas §3 ya no ponen la pregunta del desajuste
+  en el minuto 45, cuando todavía no hay desajuste en el notebook.
+- **Notebook.** `revisar()` ya no devuelve un booleano y `probar()` se llama con `;`: no
+  quedan `False` ni `np.float64(…)` sueltos en la salida. La sigmoide recorta el exponente
+  (`np.clip`) y `k = 200` ya no da `RuntimeWarning: overflow`. El mensaje del `TODO 4`
+  explica por qué puede imprimirse 0.0000. El zoo tiene seis casillas (se sumó el escalón,
+  el mismo que en la slide 19). El ejercicio de inflación arranca lejos del óptimo
+  (`a=-0.002, b=0.12`, desajuste 0.00231) e imprime cinco decimales. Se corrigió el
+  comentario que decía que se baja el corpus si hay red (se lee la muestra del repo). Se
+  sacó `"accelerator": "GPU"` de la metadata: la clase 1 no usa GPU.
+- **Accesibilidad.** Todos los canvas de las slides y de las tres viz tienen `role="img"` y
+  un `aria-label` (en las viz se actualiza con las perillas); los SVG de la caja también.
+  Ningún signo depende sólo del color: los estados de la viz 3 llevan texto («¡esa es!»,
+  «techo»), y las curvas de las slides 6 y 26 llevan rótulo.
+- **Menores.** El comentario «0,0145» de la viz 1 pasó a 0,0146; el solucionario P2 ya no
+  dice que en la 6 «los datos se llaman `V`»; la descripción del capítulo 1 de *Essence of
+  Calculus* en `referencias.md` ahora dice de qué trata.
+
+### Qué se comprobó en esta revisión
+
+| Chequeo | Resultado |
+|---|---|
+| `medir-referencias.py` | corre en ~1,5 s; todos los números citados salen de ahí (tabla de la §2, actualizada) |
+| `nbconvert --execute` en una copia del repo | **0 errores**, 11 figuras, ~3,4 s; sin `False` ni `np.float64` sueltos |
+| Notebook con los `TODO` resueltos y `-W error::RuntimeWarning` | pasa: TODO 2 (0.004, 0.085) → 0.0146; TODO 3 → a = 0.0038, 0.0146; TODO 4 con k = 50, 200 y 1000 → 0.0415, 0.0005, 0.0000, **sin warnings** |
+| Notebook guardado | sin outputs, `execution_count` nulo, ids de celda iguales; la celda de arranque de Colab no se tocó |
+| Slides y 3 viz en Chrome headless (por CDP) | **0 excepciones y 0 errores de consola** al cargar; los `aria-label` aparecen; se probaron el slider de la viz 2 y el desafío 3 + «techo» de la viz 3, y se miraron capturas de las slides 4, 11, 27 y 31 y de la viz 2 |
+| Segunda pasada, independiente (misma fecha) | se repitieron en otra copia `medir-referencias.py`, `nbconvert` (0 errores, 11 figuras, salidas coinciden con los textos), el notebook con los `TODO` resueltos y warnings como error (k = 200 y 1000), `node --check` sobre los scripts de las 4 páginas y la carga por CDP con clics en la viz 2 y la viz 3: sin errores. Se ajustaron detalles: redacción de reproducibilidad en `medir-referencias.py` y notas §9, «en dos días» fuera del cuestionario y de la slide 30, «miles de millones» en el `TODO 3`, y el `aria-label` de la viz 2 cuando la familia está apagada |
+
+**Lo que no se volvió a hacer:** el recorrido slide por slide con capturas de las 35
+slides, el tema oscuro, las resoluciones de proyector y la prueba sin `datos/cache/` de
+la sección 1. Los cambios de esta revisión son de texto y de datos, más la familia de la
+viz 2, pero ese recorrido no se repitió.
+
+---
+
+Todo lo que sigue se comprobó el 2026-08-29 **corriendo el material**, no leyéndolo: `nbconvert
 --execute` con las variables de proxy borradas, `nbformat.validate`, Chromium por
 Playwright abriendo los archivos **en su ubicación real** con un
 `context.route('**/*')` que aborta cualquier `http(s)`, y mirando los PNG con los
@@ -50,7 +133,10 @@ y de una comprobación independiente contra `ssdl.datos.serie_menciones`.
 | Raya horizontal en el promedio | viz 1, notebook, solucionario 4 y 5 | **0,016490** → `0.0165` |
 | Arranque de la viz 1 (`a=-0.010, b=0.350`) | slide 15, viz 1 | **0,036842** → `0.0368` |
 | `desajuste(0, 0.10)` (arranque del TODO 2) | notebook | **0,019505** → `0.0195` |
-| Recta «inflación» suavizada vs. raya | slide 31, notebook | **0,00150** vs **0,00152** |
+| Recta «inflación» suavizada vs. raya | slide 31, notebook, notas §9 | **0,00156** vs **0,00157** **[corregido el 2026-09-29; antes 0,00150 vs 0,00152, con el 1984 mal suavizado]** |
+| Arranque del ejercicio de inflación (`a=-0.002, b=0.12`) | notebook §6 | **0,00231** |
+| Polisemia de «seguridad» | notebook §3, notas, solucionario P10 | 228 de 461 aciertos; 64 «social/jurídica/alimentaria/vial» (14 %) |
+| 2005 y 2006 | slide 4, notebook §3 | 0,1645 y 0,1645 (el mismo discurso) |
 | Recta «educación» (ítem 8) | cuestionario y solucionario | `a = 0.0037`, `b = 0.208`, desajuste `0.0175`, +0,131 en 35 años |
 | Ítem 5: R, P, Q | solucionario | `0.0146` · `0.0165` · `0.0766` |
 | Techos del zoo (6 formas × 3 desafíos) | viz 3 (botón) | los 18 coinciden con `TECHOS` |
@@ -60,7 +146,9 @@ y de una comprobación independiente contra `ssdl.datos.serie_menciones`.
 
 La serie de emergencia escrita a mano en el notebook (por si no hay corpus)
 coincide **dígito por dígito** con `serie_menciones("seguridad", 1984, 2019)`, y la
-de inflación con la versión **suavizada**, que es la que el notebook pide.
+de inflación con la versión **suavizada**, que es la que el notebook pide
+(**[corregido el 2026-09-29]**: el primer valor pasó a 0.1143 con el arreglo del borde).
+La sección 2 de `medir-referencias.py` no depende de los datos del corpus.
 
 Las dos URLs que `referencias.md` declara verificadas responden:
 
@@ -143,7 +231,8 @@ de la viz 3 («cuarenta años de discursos»). *Arreglado* en los tres lugares.
 
 **12. «Empatan»** para 0,00150 contra 0,00152 (slide 31 y notebook). Es cierto al
 cuarto decimal, pero conviene decir cuál es la precisión. *Arreglado*: «empatan
-hasta el cuarto decimal (0.00150 contra 0.00152)».
+hasta el cuarto decimal». **[corregido el 2026-09-29]**: con la serie bien suavizada
+son 0,00156 contra 0,00157.
 
 **13. Las tres frases de la slide 26 no describían las curvas dibujadas.** Decía
 «tardó **veinte** años en completarse» sobre un eje que llega a 12 (la sigmoide con
@@ -181,8 +270,9 @@ cuando son de (b). *Arreglado*.
   ejemplo concreto o pregunta.
 - **El aha de cada viz se ve de verdad.** Se movió cada control, se corrió cada
   animación y se miró la captura: en la viz 1 el desajuste baja de 0,0368 a 0,0146
-  y frena ahí; en la viz 2 el rastro violeta dibuja la familia; en la viz 3 el
-  desafío 1 lo sacan tres formas, el 2 una y el 3 ninguna.
+  y frena ahí; en la viz 3 el desafío 1 lo sacan tres formas, el 2 una y el 3 ninguna.
+  **[corregido el 2026-09-29]**: acá decía que «en la viz 2 el rastro violeta dibuja la
+  familia», y no era así: dibujaba sólo las últimas 8 posiciones de `a`. Ver §0.
 - **Las figuras del notebook** tienen ejes rotulados, leyendas y unidades («% de
   palabras del discurso»), y se entienden sin el texto.
 - **El cuestionario se puede contestar con lo que se dio.** Los distractores no son
@@ -204,10 +294,11 @@ cuando son de (b). *Arreglado*.
 |---|---|---|
 | 1 | **`.reveal pre code` no tiene `display:block` en `curso.css`.** Está parcheado a mano en las clases 1 y 4; las clases **2, 6, 7, 8, 9 y 10 también usan `<pre><code>`** y probablemente muestran el código cortado. Conviene arreglarlo **una vez** en `_shared/css/curso.css` y sacar los parches. | quien mantenga la espina |
 | 2 | 6 de las 8 referencias siguen `[VERIFICAR URL]` / `[VERIFICAR]`. Las citas son correctas; faltan los enlaces, y desde este contenedor no se llega a 3blue1brown, projecteuclid, annualreviews ni doi.org. **No se inventó ninguno.** | quien tenga red |
-| 3 | La slide 19 muestra el **escalón** como sexta forma del zoo y la viz 3 muestra la **rampa**; el escalón no se explica en ninguna slide. Las dos cosas las pide la spec (§2 slide 17 y §3.3), pero al aula le puede quedar la duda. Se arregla con una frase en la slide 19 o cambiando la miniatura. | equipo 1 o 2 |
+| 3 | La slide 19 muestra el **escalón** como sexta forma del zoo y la viz 3 muestra la **rampa**. La slide 19 y la 25 ya lo explican con una frase, y desde el 2026-09-29 el notebook también muestra el escalón como sexta forma. Queda la diferencia con la viz, que es a propósito (siembra de la clase 2). | — |
 | 4 | La slide 16 dice «abrí `notebook.ipynb`». Si el curso se publica con un link corto de Colab, hay que ponerlo ahí y en `notas-docente.md` §9. | el docente |
 | 5 | Los dos corpus de discursos **no declaran licencia** (trampa 13 del ESTADO-ESPINA). `referencias.md` y `datos/README.md` §1.1 lo dicen; si el curso se publica hay que escribirle al recopilador. | el docente |
-| 6 | `medir-referencias.py` no está enganchado a ningún test. Si cambian los datos o los pasos de los sliders, hay que correrlo a mano y actualizar los números en los cuatro archivos que lista su docstring. | equipo 1 |
+| 6 | `medir-referencias.py` no está enganchado a ningún test. Si cambian los datos o los pasos de los sliders, hay que correrlo a mano y actualizar los números en los archivos que lista su docstring (el 2026-09-29 pasó justamente eso con la serie de inflación). | equipo 1 |
+| 10 | ~~La clase 8 (`slides.html:176`) dice «40 puntos» al recordar esta clase: son 36.~~ **[resuelto 2026-09-29]**: la clase 8 ya dice «36 puntos» (`slides.html:183`). | — |
 | 7 | El ítem 6 del cuestionario **describe** la familia de curvas con palabras en vez de mostrarla. Se contesta igual, pero una imagen lo mediría mejor. | equipo 1 |
 | 8 | KaTeX se carga y el plugin inicializa sin error, pero **la clase no usa ninguna fórmula con delimitadores**: la única, `f(x) = a·x + b`, está escrita como HTML monoespaciado con las partes coloreadas. Es una decisión buena para esta audiencia; queda anotado para que nadie busque un renderizado que no existe. | — |
 | 9 | Embebidas en la slide, la viz 1 y la viz 3 van en **modo compacto** (la 3 esconde la frase y la fórmula de cada tarjeta). Es a propósito: no entran de otra forma en 610 px. Las notas ya piden **proyectarlas sueltas**, y sueltas están completas. | — |

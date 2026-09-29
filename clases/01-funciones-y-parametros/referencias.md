@@ -25,12 +25,15 @@ importancia académica.
 
 ## Si te quedaste con ganas
 
-*(Cosas cortas, en castellano cuando se puede, para hacer esta semana.)*
+*(Cosas cortas, en castellano cuando se puede. Ninguna es obligatoria: si te sobra un
+rato antes de la clase 2, empezá por la primera.)*
 
 **1. 3Blue1Brown, *Essence of Calculus*, capítulo 1.** `[VERIFICAR URL]`
-Veinte minutos de animación sobre qué es una función y qué significa que cambie.
-**Por qué te conviene:** es exactamente la intuición visual de la clase de hoy,
-contada por alguien que dibuja mejor que nosotros. Tiene subtítulos en español.
+Unos veinte minutos de animación. No es sobre «qué es una función»: presenta la idea
+de derivada y de integral a partir del área de un círculo, y muestra cómo se piensa una
+cantidad que cambia.
+**Por qué te conviene:** es la intuición visual que viene detrás de la clase de hoy
+(y de la 3), contada por alguien que dibuja mejor que nosotros. Tiene subtítulos en español.
 **En qué orden:** primero esto, antes que cualquier otra cosa de la lista.
 
 **2. Severance, C., *Python para todos* (py4e), capítulos 1 a 4.** `[VERIFICAR URL]`
@@ -48,10 +51,10 @@ hace falta saber Python para este curso, hace falta poder leerlo y cambiar núme
 **Por qué te conviene:** porque te va a dar ganas de seguir.
 **En qué orden: mirálo después de la clase 2, no ahora.** Lo anunciamos hoy para los
 ansiosos, pero si lo ves antes de haber visto la composición de funciones vas a
-entender la mitad y te vas a frustrar. Está la semana que viene igual.
+entender la mitad y te vas a frustrar. Va a seguir ahí después de la clase 2.
 
 **4. La documentación de tus propios datos.** Sin URL, porque es tuya.
-**Por qué te conviene:** el `[EL LUNES]` de hoy es graficar una serie tuya. Antes de
+**Por qué te conviene:** el `[EN TU INVESTIGACIÓN]` de hoy es graficar una serie tuya. Antes de
 hacerlo, andá a buscar cómo se construyó esa variable: quién la midió, con qué
 instrumento, qué decisiones se tomaron. Es media hora y te va a servir más que
 cualquier video.
@@ -60,7 +63,7 @@ cualquier video.
 
 ## Si te vas a meter en serio
 
-*(Lecturas de fondo. Ninguna es para esta semana.)*
+*(Lecturas de fondo. Ninguna es para antes de la clase 2.)*
 
 **5. Breiman, L. (2001), *Statistical Modeling: The Two Cultures*, Statistical
 Science 16(3), 199-231.** `[VERIFICAR URL]`
@@ -98,8 +101,8 @@ constructo que querés medir («prioridad del gobierno») y el número que sale
 («0,44 % de palabras») hay una cadena de decisiones, y cada eslabón puede romperse.
 El artículo da un vocabulario para discutir eso que se puede usar tal cual en la
 sección de métodos de un paper.
-**En qué orden:** después de la clase 10, o antes si vas a escribir metodología esta
-semana.
+**En qué orden:** después de la clase 10, o antes si ya estás escribiendo la sección
+de metodología.
 
 ---
 
@@ -117,13 +120,16 @@ declara licencia**: se usa acá con fines educativos y se cita. Si el curso se
 publica, hay que escribirle al autor. Los detalles, las trampas y las cinco series
 derivadas están en `datos/README.md`, sección 1.1.
 
-**El léxico de 23 palabras** con el que se construyó la serie de «seguridad» está
+**El léxico de 24 palabras** con el que se construyó la serie de «seguridad» está
 en `datos/preparar_corpus.py`, en el diccionario `LEXICO`. **Está a la vista a
 propósito.** Cambialo y mirá cómo se mueve la conclusión: es el ejercicio más barato
-y más honesto de todo el curso.
+y más honesto de todo el curso. Dos salvedades del corpus que conviene tener a mano: el
+discurso de 2006 es una copia del de 2005 en la fuente (36 puntos, 35 discursos
+distintos), y hasta 1994 las sesiones se abrían el 1 de mayo, no el 1 de marzo.
 
 **Los números de referencia** que aparecen en las slides y en las visualizaciones
-(el piso de la recta, los techos de cada forma del zoo) están medidos por
+(el piso de la recta, los techos de cada forma del zoo, el fracaso contra inflación, la
+polisemia de «seguridad») están medidos por
 `medir-referencias.py`, en esta misma carpeta. Corrélo si tocás algo.
 
 ---
@@ -136,5 +142,6 @@ y más honesto de todo el curso.
 | «Mover una perilla por vez» como estrategia | clase 3 (descenso por coordenadas y por gradiente) |
 | La línea que pasa por todos los puntos (slide 6) | clase 4 (sobreajuste) |
 | Ninguna forma sola puede con el desafío 3 | clase 2 (composición y suma de rampas) |
-| La sigmoide y su techo | clases 2, 3 y 9 |
+| La sigmoide y su techo | clase 2 (y en la 9, adentro de la regresión logística) |
+| El duplicado 2005 = 2006 | clase 4 (fuga) |
 | «¿La medida mide lo que dice medir?» | clase 10 (validez de constructo) |

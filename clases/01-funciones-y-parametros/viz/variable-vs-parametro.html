@@ -7,8 +7,14 @@
 
 <!-- ==========================================================================
      MOMENTO AHA:
-       "Ah: el rastro de la derecha son TODAS las funciones posibles.
+       "Ah: el abanico de la derecha es la FAMILIA de funciones posibles.
         Elegir el parámetro es elegir una de esa familia. Aprender es elegir."
+
+     El abanico es fijo: una curva cada 0,1 de `a` en todo el rango del slider
+     (-0,6 a 1,2). Encima, más marcado, el rastro de las últimas posiciones por
+     las que pasaste. Antes sólo se dibujaba el rastro (8 curvas), y arrastrando
+     el slider eso era un abanico chiquito alrededor del valor actual: no se veía
+     la familia que el texto prometía.
 
      Y el aha chiquito que va antes:
        "Son dos movimientos que no se parecen en nada, aunque en la fórmula
@@ -60,16 +66,17 @@
 
   <footer>
     <div class="aha">
-      <strong>Qué mirar.</strong> Mirá el <b>rastro violeta</b> del panel derecho: eso que
-      queda dibujado no es un adorno, son <em>todas las curvas que tu modelo podría dibujar</em>.
-      Elegir el parámetro es elegir una de esa familia, y nada más que una.
+      <strong>Qué mirar.</strong> Mirá el <b>abanico violeta</b> del panel derecho: no es un
+      adorno, es <em>la familia de curvas que tu modelo puede dibujar</em> (una cada 0,1 de
+      <code>a</code>; entre medio hay infinitas más). Las más marcadas son las últimas por
+      las que pasaste. Elegir el parámetro es elegir una de esa familia, y nada más que una.
       Aprender, en este curso entero, va a ser exactamente eso: elegir.
     </div>
     <p class="viz-pie">
-      <b>La regla del dedo</b>, para el lunes: agarrá tu base de datos y preguntate por cada
+      <b>La regla del dedo</b>, para usar en tu base: agarrá tus datos y preguntate por cada
       número «¿esto cambia de una fila a la otra?». Si cambia, es una <b>variable</b>
       (el año, la edad, el municipio). Si es el mismo para toda la base, es un
-      <b>parámetro</b> (un coeficiente, una tasa, un peso). Los dos son números y por eso
+      <b>parámetro</b> (un coeficiente, una tasa, un umbral). Los dos son números y por eso
       se confunden; pero uno lo pone el mundo y el otro lo elegís vos.
     </p>
   </footer>
@@ -83,7 +90,10 @@
    =========================================================================== */
 const A_FIJO   = 0.8;    // el parámetro del panel izquierdo: NO se toca
 const X_FIJO   = 2.0;    // la variable del panel derecho: NO se toca
-const RASTRO   = [];     // las últimas 8 posiciones de `a`, para el fantasma
+const RASTRO   = [];     // las últimas 8 posiciones de `a`, marcadas sobre la familia
+const FAMILIA  = [];     // la familia fija: una curva cada 0.1 de `a`, de -0.6 a 1.2
+for (let k = 0; k <= 18; k++) FAMILIA.push(-0.6 + 0.1 * k);
+let verFamilia = true;   // lo prende y apaga el checkbox (se lee en actualizar)
 let x = -2.2;            // la variable, panel izquierdo
 let a = 0.8;             // el parámetro, panel derecho
 
@@ -96,6 +106,9 @@ const pI = Viz.plano('#izq', Object.assign({}, LIM, {
   ejeX: 'x  (la variable: un caso)', ejeY: 'f(x)',
   titulo: 'Movés la variable  x', alto: 330
 }));
+
+// accesibilidad: los dos canvas son imágenes; la descripción sigue a los sliders
+pI.canvas.setAttribute('role', 'img');
 
 pI.alDibujar(() => {
   pI.fondo(); pI.grilla(); pI.ejes();
@@ -130,10 +143,18 @@ const pD = Viz.plano('#der', Object.assign({}, LIM, {
   titulo: 'Movés el parámetro  a', alto: 330
 }));
 
+pD.canvas.setAttribute('role', 'img');
+
 pD.alDibujar(() => {
   pD.fondo(); pD.grilla(); pD.ejes();
 
-  // el rastro: TODAS las curvas por las que pasaste. Es el corazón de la viz.
+  // la familia: las curvas que el modelo PUEDE dibujar. Es el corazón de la viz.
+  if (verFamilia) {
+    FAMILIA.forEach(av => {
+      pD.curva(t => av * t * t, { color: 'parametro', grosor: 1.1, opacidad: .16 });
+    });
+  }
+  // encima, más marcado, el rastro de las últimas curvas por las que pasaste
   RASTRO.forEach((av, i) => {
     const fuerza = (i + 1) / (RASTRO.length + 1);
     pD.curva(t => av * t * t, { color: 'parametro', grosor: 1.6, opacidad: .10 + .28 * fuerza });
@@ -162,6 +183,14 @@ const fI = document.getElementById('frase-izq');
 const fD = document.getElementById('frase-der');
 
 function frases() {
+  pI.canvas.setAttribute('aria-label', 'Panel izquierdo: la curva f(x) = ' + A_FIJO +
+    ' · x² queda quieta; una bolita marca el caso x = ' + Viz.num(x, 2) + ', que vale ' +
+    Viz.num(A_FIJO * x * x, 2) + '.');
+  pD.canvas.setAttribute('aria-label', 'Panel derecho: la bolita queda quieta en x = 2; la ' +
+    'curva f(x) = ' + Viz.num(a, 2) + ' · x² se abre o se cierra' +
+    (verFamilia ? ', sobre un abanico de curvas de la misma familia (a de -0,6 a 1,2)' : '') +
+    '. En x = 2 vale ' +
+    Viz.num(a * X_FIJO * X_FIJO, 2) + '.');
   fI.innerHTML =
     '<b class="titular">Estoy mirando <span class="c-acento">otro caso</span> de la misma teoría.</b>' +
     'La teoría es siempre la misma (<b>a = ' + A_FIJO + '</b>). Lo que cambia es a quién le pregunto: ' +
@@ -192,7 +221,7 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'slider', id: 'a', etiqueta: 'qué tan cerrada es la curva',
     sub: 'el parámetro a — deforma el dibujo', min: -0.6, max: 1.2, paso: 0.02,
     valor: a, decimales: 2, color: 'parametro' },
-  { tipo: 'checkbox', id: 'rastro', etiqueta: 'dejar el rastro de las curvas', valor: true },
+  { tipo: 'checkbox', id: 'rastro', etiqueta: 'mostrar la familia y el rastro', valor: true },
   { tipo: 'boton', texto: 'Borrar el rastro', alClic: () => { RASTRO.length = 0; actualizar(); } },
   { tipo: 'texto', id: 'ayuda', html:
       'Movelos de a uno. Primero el de arriba hasta el final, después el de abajo. ' +
@@ -228,7 +257,8 @@ Viz.controlesAnimacion('#panel', anim, {
 function actualizar() {
   x = ctl.valores.x;
   a = ctl.valores.a;
-  if (ctl.valores.rastro) guardarRastro(a); else RASTRO.length = 0;
+  verFamilia = ctl.valores.rastro;
+  if (verFamilia) guardarRastro(a); else RASTRO.length = 0;
   frases();
   // `redibujarYa` y no `redibujar`: si el dibujo se difiere un frame, durante la
   // animación el número del canvas y el de la frase de abajo no coinciden.

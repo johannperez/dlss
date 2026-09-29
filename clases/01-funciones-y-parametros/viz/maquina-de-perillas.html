@@ -13,7 +13,7 @@
 
      Segundo aha, escondido y honesto:
        "La mejor recta apenas le gana a una raya horizontal en el promedio."
-       (0,0145 contra 0,0165: los dos números están medidos, no estimados.)
+       (0,0146 contra 0,0165: los dos números están medidos, no estimados.)
 
      Datos REALES: % de palabras del discurso presidencial de apertura de
      sesiones dedicadas al léxico de "seguridad", 1984-2019.
@@ -72,10 +72,12 @@
     <p class="viz-pie">
       Datos <b>reales</b>: porcentaje de palabras del discurso presidencial de apertura de
       sesiones ordinarias dedicadas al léxico de «seguridad», 1984-2019 (36 años).
-      Recopilación de discursos: Lucas Ariel. El léxico de 23 palabras lo escribimos nosotros
+      Recopilación de discursos: Lucas Ariel. El léxico de 24 palabras lo escribimos nosotros
       y está a la vista en <code>datos/preparar_corpus.py</code>: si le sacás «policía», la
-      serie cambia. <b>Los dos ceros (2002 y 2009) no dicen que no hubo inseguridad</b>: dicen
-      que ese año, con ese léxico, no apareció ninguna de esas 23 palabras.
+      serie cambia; y la palabra «seguridad» también cuenta «seguridad social» o «jurídica».
+      <b>Los dos ceros (2002 y 2009) no dicen que no hubo inseguridad</b>: dicen
+      que ese año, con ese léxico, no apareció ninguna de esas 24 palabras. El punto de 2006
+      repite el discurso de 2005: así viene en la fuente.
     </p>
   </footer>
 
@@ -134,6 +136,15 @@ const p = Viz.plano('#lienzo', {
   alto: EMBEBIDO ? 288 : 400
 });
 
+// accesibilidad: el canvas es una imagen; su descripción se actualiza con las perillas
+p.canvas.setAttribute('role', 'img');
+function describirLienzo(d) {
+  p.canvas.setAttribute('aria-label',
+    'Menciones a seguridad, 1984-2019: 36 puntos entre 0 y 0,44 %. Encima, la recta del modelo, ' +
+    'que en 1984 vale ' + Viz.num(b, 3) + ' % y ' + (a >= 0 ? 'sube ' : 'baja ') +
+    Viz.num(Math.abs(a), 4) + ' por año. Desajuste: ' + Viz.num(d, 4) + '.');
+}
+
 p.alDibujar(() => {
   p.fondo();
   p.grilla();
@@ -182,6 +193,9 @@ if (EMBEBIDO) {
 }
 const SVG_W = EMBEBIDO ? 340 : 280, SVG_H = EMBEBIDO ? 150 : 200;
 const svgMaquina = Viz.svg.crear('#maquina', { ancho: SVG_W, alto: SVG_H });
+svgMaquina.setAttribute('role', 'img');
+svgMaquina.setAttribute('aria-label', 'La máquina: entra el año, sale el %, y arriba dos ' +
+  'perillas que giran con los sliders: qué tan empinada y dónde arranca.');
 
 function perilla(cx, cy, t, rotulo, valor) {
   const R = 24;
@@ -314,6 +328,7 @@ function actualizar() {
     ' % y de ahí ' + subeBaja + ' ' + Viz.num(Math.abs(a), 4) +
     ' puntos por año</b>. Esa oración, y no el número suelto, es lo que se escribe en un paper.';
 
+  describirLienzo(d);
   dibujarMaquina();
   p.redibujar();
 }

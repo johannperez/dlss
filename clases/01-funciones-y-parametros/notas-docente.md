@@ -4,7 +4,7 @@
 Prerrequisitos: ninguno. Nivel de código de la audiencia: cero previo.
 
 > **Lo único que no se puede perder hoy:** que se vayan sabiendo distinguir una
-> **variable** de un **parámetro**, y con ganas de volver la semana que viene.
+> **variable** de un **parámetro**, y con ganas de volver a la próxima clase.
 > Todo lo demás es negociable.
 
 ---
@@ -43,12 +43,18 @@ Prerrequisitos: ninguno. Nivel de código de la audiencia: cero previo.
 | 1:12 | 19-24 | Idea 2 | El zoo: la grilla y las cinco formas, una slide cada una. |
 | 1:22 | 25 | **Viz 3** | `zoo-de-funciones.html` y los tres desafíos. 3 minutos. |
 | 1:25 | 26 | La misma fórmula, otra historia | El corazón sustantivo de la clase. |
-| 1:27 | 27 | **Manos 2** | Ajuste a ojo de a dos. 18 minutos. |
+| 1:27 | 27 | **Manos 2** | Notebook, sección 4 (`TODO 2`; el `TODO 3` para quien vaya rápido). Ajuste a ojo de a dos. 18 minutos. Las secciones 5 y 6 quedan para después de clase. |
 | 1:45 | 28-29 | El ranking | La tabla y «lo que hicieron tiene nombre». |
-| 1:50 | 30-32 | Cierre | `[EL LUNES]` · el fracaso de la recta contra inflación · los dos caminos. |
+| 1:50 | 30-32 | Cierre | `[EN TU INVESTIGACIÓN]` · el fracaso de la recta contra inflación · los dos caminos. |
 | 1:57 | 33-35 | Salida | Qué te llevás · glosario · el puente a la clase 2. |
 
 Suma: 120 minutos exactos, con la pausa adentro.
+
+**Entre esta clase y la 2 hay dos días** (el curso va lunes, miércoles y viernes). Lo que
+se pide para antes de la clase 2 tiene que entrar en menos de una hora: el cuestionario
+(unos 20 minutos) y la sección 6 del notebook (unos 10). La sección 5, el `TODO 3` y el
+bonus del cuestionario son opcionales. El `[EN TU INVESTIGACIÓN]` no es tarea con fecha:
+es cómo se usa lo de hoy en su propio trabajo.
 
 ---
 
@@ -95,8 +101,11 @@ Respuestas típicas:
 reparto. Suele ganar **C** («las dos cosas»), que es la respuesta intuitiva y
 equivocada. No corrijas: pasá a la viz y dejá que la vean fallar.
 
-### Minuto 45 y 1:50 — «¿Cómo hiciste para bajar el número?»
+### Manos 2 y el ranking (1:27 a 1:48) — «¿Cómo hiciste para bajar el número?»
 
+Se pregunta mientras recorrés las parejas en el bloque práctico 2 y otra vez con la tabla
+del ranking (slide 28, a la 1:45). En el bloque práctico 1 (minuto 42) todavía no hay
+desajuste en el notebook: aparece en la sección 4.
 La pregunta **no** es cuánto sacaron. Es cómo buscaron. La respuesta que querés
 escuchar es «primero moví una y después la otra». Cuando alguien lo diga, repetilo
 en voz alta para todos: eso es **descenso por coordenadas** y se nombra en la clase 3.
@@ -147,7 +156,7 @@ Cortalo apenas lo veas: «no hay nada que memorizar. Quiero que reconozcan la
 **Confundir el eje: «0,44 % es poquísimo, entonces no le importaba la seguridad».**
 Es una lectura razonable y equivocada. La serie es **porcentaje de palabras de un
 discurso**, y un discurso habla de veinte cosas: 0,44 % de las palabras dedicadas a
-un solo léxico de 23 palabras es muchísimo en términos relativos. Lo que importa no
+un solo léxico de 24 palabras es muchísimo en términos relativos. Lo que importa no
 es el nivel absoluto sino **la variación entre años**. Si sale esta pregunta,
 felicitá: es exactamente el tipo de duda que hay que tener.
 
@@ -163,7 +172,8 @@ felicitá: es exactamente el tipo de duda que hay que tener.
 3. **Slide 11** («ustedes ya usan parámetros»). Se dice en una frase sobre la
    slide 10. Gana 1 minuto.
 4. **El bloque práctico 2** se recorta a 12 minutos y el `TODO 3` (la búsqueda por
-   grilla) pasa a ser tarea. Gana 6 minutos.
+   grilla) queda como opcional para después. Gana 6 minutos. No lo sumes como tarea
+   obligatoria: entre la clase 1 y la 2 hay dos días.
 5. **Slide 32** (los dos caminos). Se dice en dos frases sobre la slide 31.
 
 **Lo que NUNCA se recorta:**
@@ -175,7 +185,7 @@ felicitá: es exactamente el tipo de duda que hay que tener.
   segundos.
 - **El desafío 3 del zoo** (slide 25). Es el gancho de la clase 2. Si lo salteás, la
   clase que viene arranca sin motor.
-- **El `[EL LUNES]`** (slide 30). Es lo único que se llevan puesto.
+- **El `[EN TU INVESTIGACIÓN]`** (slide 30). Es lo único que se llevan puesto.
 
 ---
 
@@ -184,8 +194,10 @@ felicitá: es exactamente el tipo de duda que hay que tener.
 - Abrí `viz/maquina-de-perillas.html` **sola, a pantalla completa**, y hacé la
   ronda de «díganme dos números y los pongo». Sale una competencia sola.
 - En la slide 4, cambiá el léxico en vivo: abrí `datos/preparar_corpus.py`, mostrá
-  las 23 palabras de `LEXICO["seguridad"]`, y preguntá al aula cuál sacarían y cuál
-  agregarían. Es cinco minutos de oro y siembra la clase 10 entera.
+  las 24 palabras de `LEXICO["seguridad"]`, y preguntá al aula cuál sacarían y cuál
+  agregarían. Es cinco minutos de oro y siembra la clase 10 entera. Si nadie lo ve,
+  preguntá: «¿y "seguridad social"?». Esa sola palabra ambigua pesa más que «policía»
+  (ver §8).
 - En el zoo, poné el modo libre y pedí que **describan una serie de su propia
   investigación** eligiendo una de las seis formas. Que digan por qué.
 - Mostrá la serie de otro tema (`educacion`, `trabajo`, `salud`) en el notebook y
@@ -207,12 +219,13 @@ felicitá: es exactamente el tipo de duda que hay que tener.
 - **La receta y el plato.** La receta (la función) es la misma; las cantidades
   (los parámetros) definen el resultado; los ingredientes de hoy (las variables)
   cambian cada día.
-- **«Dos perillas contra mil millones.»** En la slide 29, con las manos. «Ustedes
-  acaban de hacer a mano, en diez minutos, lo mismo que hace GPT. Hay un salto de
-  tamaño, que es enorme, y una idea sobre cómo elegir la dirección. Nada más.»
+- **«Dos perillas contra miles de millones.»** En la slide 29, con las manos. «Ustedes
+  acaban de hacer a mano, en diez minutos, el corazón de lo que hace GPT: mover perillas
+  para bajar un número. Encima hay un salto de tamaño enorme, una idea sobre cómo elegir
+  la dirección y una arquitectura particular. Pero no hay magia escondida.»
 - **El error rojo.** «El error rojo no es un reto, es información.» Repetila cada
   vez que alguien levante la mano asustado.
-- **La lista de 23 palabras escrita un martes.** Funciona porque es humilde y es
+- **La lista de 24 palabras escrita un martes.** Funciona porque es humilde y es
   verdad: «entre el concepto "cuánto le importa la seguridad a este gobierno" y este
   número hay una lista de palabras que escribió una persona un martes».
 
@@ -233,7 +246,7 @@ felicitá: es exactamente el tipo de duda que hay que tener.
 ### «Pero esto es una regresión lineal de toda la vida. ¿Dónde está el deep learning?»
 
 La pregunta correcta, y la va a hacer quien más sabe. Respuesta honesta: **sí, es
-exactamente eso**, y a propósito. Lo que cambia en las diez semanas que vienen no es
+exactamente eso**, y a propósito. Lo que cambia en las nueve clases que vienen no es
 el procedimiento —elegir una familia de figuras y buscar los parámetros que mejor
 ajustan— sino **de qué familia estamos hablando**. En la clase 2 la familia pasa a
 tener miles de miembros y a poder dibujar cualquier cosa; en la 8, un millón y medio
@@ -264,7 +277,7 @@ error grande pese muchísimo más que varios chicos: estás decidiendo que falla
 en 1998 es peor que fallar poquito en diez años. El valor absoluto (MAE) los trata
 igual. **Las dos opciones son defendibles y dan modelos distintos.** En la clase 3
 hay una visualización dedicada a esto, con un caso atípico que se arrastra a la
-recta. Anotala como pregunta abierta: se cobra en 15 días.
+recta. Anotala como pregunta abierta: se cobra en la clase 3.
 
 ### «El “% de palabras dedicadas a seguridad”, ¿mide de verdad la prioridad del gobierno?»
 
@@ -274,10 +287,31 @@ mediática y no prioridad propia; (2) un gobierno puede **actuar mucho y hablar 
 o al revés; (3) el discurso de apertura es un **género** con reglas propias, no un
 volcado de prioridades; (4) el largo de los discursos cambió por un factor de nueve,
 y aunque normalizamos por palabras, eso cambia qué cabe adentro. Y encima está la
-lista de 23 palabras, que la escribimos nosotros. **Esto no invalida la medida: la
+lista de 24 palabras, que la escribimos nosotros, con un problema adentro: (5) la palabra
+«seguridad» aporta 228 de los 461 aciertos del léxico, y al menos 64 de esas 228 son
+«seguridad social» (44), «jurídica» (10), «alimentaria» (7) o «vial» (3). Alrededor del
+14 % de la serie mide jubilaciones, contratos, comida o tránsito, no delito
+(`medir-referencias.py`, sección 5). **Esto no invalida la medida: la
 vuelve discutible, que es distinto.** El trabajo es escribir en el paper la frase
 correcta: no «cuánto le importaba la seguridad» sino «cuánto espacio le dio la
 Presidencia al léxico de seguridad en el mensaje anual al Congreso».
+
+### «¿El peso muestral no es un parámetro?»
+
+No: es una **variable**. Cada encuestado tiene su propio peso y vive en una columna de la
+base. La regla del dedo lo resuelve sola. Lo que es igual para toda la muestra es el
+procedimiento que calculó los pesos: como el 0,05, es un parámetro **del procedimiento**,
+no del modelo (ver §3, minuto 21). Es una confusión buena: dejá que el aula la resuelva
+con la regla.
+
+### «¿Los discursos son todos iguales? ¿Misma fecha, todo parejo?»
+
+No del todo, y conviene saberlo antes de que lo pregunten. (1) Hasta 1994 las sesiones
+se abrían el **1 de mayo**; desde la reforma de 1994, el **1 de marzo**: 11 de los 36
+puntos son de mayo. (2) En el corpus fuente, **el discurso de 2006 es una copia del de
+2005** (mismas 18.234 palabras, mismo 0,1645 %): la serie tiene 36 puntos pero 35
+discursos distintos. En la clase 1 lo dejamos a la vista y no lo sacamos; en la clase 4
+vuelve como ejemplo de fuga. Los detalles están en `datos/README.md` §1.1.
 
 ### Bonus, por si aparece: «¿me tengo que aprender Python?»
 
@@ -296,6 +330,7 @@ la sintaxis por tu cuenta, en `referencias.md` está py4e en castellano.
 - [ ] Un temporizador para la pausa. En serio.
 - [ ] Los números de la clase, a mano: piso de la recta **0.0146**, raya horizontal
       **0.0165**, arranque de la viz **0.0368**, inflación (suavizada) mejor recta
-      **0.0015** contra raya horizontal **0.0015**.
+      **0.00156** contra raya horizontal **0.00157**. Si ves otros, corré
+      `medir-referencias.py`: lo más probable es que hayan cambiado los datos.
 - [ ] Saber que si algo del HTML no anda, `_shared/plantillas/demo.html` te dice si
       el problema es de la biblioteca o tuyo.
