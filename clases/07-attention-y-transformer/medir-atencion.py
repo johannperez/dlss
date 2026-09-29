@@ -20,15 +20,36 @@ ReLU, dos conexiones residuales. Si cambiás uno, cambiá el otro.
 
 Uso:
     PYTHONPATH=_shared python3 clases/07-attention-y-transformer/medir-atencion.py
-    ... --pasos 300            (corrida corta, para probar que anda)
+    ... --pasos 300            (corrida corta, para probar que anda: NO la dejes en el repo)
     ... --listar-candidatas    (todas las oraciones elegibles del corpus)
+    ... --verificar            (chequea los aha del JSON versionado, sin entrenar)
+    ... --rerotular            (rehace los rótulos de las cabezas, sin entrenar)
 
-Los valores por defecto (2000 pasos, lr 3e-3, semilla 1983) son EXACTAMENTE los que
-produjeron el `datos-atencion.js` que está en el repo. Si los cambiás, cambian los
-mapas de las cuatro visualizaciones y los números del notebook. Corrélo y te da los
-mismos números hasta el cuarto decimal: se verificó dos veces, en CPU, y lo único que
-cambia entre corridas es el campo `segundos` del `meta`. Tarda **entre 50 y 60 s** con
-la CPU libre (751 s la primera vez, con la máquina cargada por otros procesos).
+Los valores por defecto (2000 pasos, lr 3e-3, semilla 1983) son los que produjeron el
+`datos-atencion.js` que está en el repo. Si los cambiás, cambian los mapas de las cuatro
+visualizaciones y los números del notebook.
+
+**Qué tan reproducible es.** El entrenamiento es **determinista en la misma máquina y con
+las mismas versiones de las librerías**: dos corridas seguidas dan el mismo JSON salvo el
+campo `segundos`. Con **otra versión de torch** (o de la biblioteca de álgebra lineal que
+usa por debajo) los números cambian, y acá eso no es un detalle: en una revisión, con
+torch 2.14 en macOS, la loss final dio 4,572 en vez de 4,6013, «lo» dejó de mirar a
+«algo» y la «y» de la enumeración se fue a los artículos. **Se perdieron los dos momentos
+aha de la clase.** Por eso:
+
+  - la corrida guarda en `meta.versiones` con qué versiones se entrenó (la que está en el
+    repo es anterior a ese registro: sus versiones no quedaron anotadas);
+  - al terminar, `verificar_aha()` avisa en voz alta si los dos momentos no aparecieron;
+  - **no regeneres los datos como parte del flujo normal.** Si lo hacés y se perdió un
+    aha, el script **no sobrescribe** los archivos del repo (salvo que le pases
+    `--forzar`, y entonces hay que actualizar slides, notas y cuestionario).
+
+Tarda **entre 10 y 60 s** con la CPU libre, según la máquina.
+
+Otras opciones, que NO entrenan nada:
+    ... --verificar      revisa que los dos aha estén en el datos-atencion.json del repo
+    ... --rerotular      recalcula sólo los rótulos de las cabezas a partir de los mapas
+                         guardados (no toca los mapas) y los reescribe en .json y .js
 
 Se probó también una corrida más larga y más suave (--pasos 6000 con lr 1.2e-3): baja
 la loss de validación de 4,60 a 4,23 **y arruina la clase**. Las cabezas quedan
@@ -48,6 +69,7 @@ import math
 import os
 import pathlib
 import re
+import platform
 import sys
 import time
 
@@ -247,9 +269,6 @@ def entrenar(modelo, ids_train, ids_val, pasos, lr=3e-3):
 # 4. Elegir oraciones reales del corpus
 # =============================================================================
 
-# Cada oración busca un fenómeno lingüístico distinto. Se eligen del corpus
-# real: no se inventa ni una palabra. `buscar_oraciones` imprime candidatas
-# para que quien mantenga esto pueda cambiarlas con criterio.
 # Cada oración busca un fenómeno lingüístico distinto y **todas salen del corpus
 # real**: no se inventó ni una palabra. Se eligieron a mano de la lista que
 # imprime `--listar-candidatas`, y el script verifica que sigan estando ahí.
@@ -313,27 +332,34 @@ def buscar_oraciones(candidatas, listar=False):
 # =============================================================================
 
 def estadisticas_cabeza(mapas_por_oracion):
-    """Promedia, sobre todas las oraciones, en qué se fija una cabeza.
+    """Promedia, sobre las oraciones elegidas, en qué se fija una cabeza.
 
     - `anterior`: cuánta atención va a la ficha inmediatamente previa
     - `primera` : cuánta va a la primera ficha de la oración
     - `misma`   : cuánta se queda en sí misma
     - `entropia`: qué tan repartida está (0 = mira a una sola; 1 = mira a todas)
+
+    La fila 0 NO se cuenta: bajo la máscara causal la primera ficha no tiene a nadie
+    más a quien mirar y vale 1,0 sobre sí misma **por construcción**, no por lo que
+    aprendió la cabeza. Si se contara, sumaría a la vez a `primera` y a `misma`.
+
+    OJO con el tamaño de la muestra: son las cinco oraciones de las viz (unas 50
+    filas), no el corpus. Los rótulos son un resumen de ESAS oraciones.
     """
     ant = pri = mis = ent = 0.0
     n = 0
     for A in mapas_por_oracion:
         T = len(A)
-        for i in range(T):
+        for i in range(1, T):
             fila = A[i]
-            ant += fila[i - 1] if i > 0 else 0.0
+            ant += fila[i - 1]
             pri += fila[0]
             mis += fila[i]
             h = -sum(p * math.log(p + 1e-12) for p in fila[:i + 1])
-            ent += h / math.log(i + 1) if i > 0 else 0.0
+            ent += h / math.log(i + 1)
             n += 1
     return {"anterior": ant / n, "primera": pri / n,
-            "misma": mis / n, "entropia": ent / n}
+            "misma": mis / n, "entropia": ent / n, "filas": n}
 
 
 def describir(est):
@@ -352,10 +378,114 @@ def describir(est):
     if est["entropia"] > 0.80:
         return ("reparte parejo (difusa)",
                 "reparte su atención entre casi todas las palabras anteriores. "
-                "No es interpretable, y así funciona igual")
+                "No se deja leer como una regla simple, y el modelo funciona igual")
     return ("mezcla: mira atrás sin un patrón fijo",
-            "no se deja resumir en una regla simple. La mayoría de las cabezas "
-            "de un modelo real son así")
+            "no se deja resumir en una regla simple. En los modelos reales hay "
+            "cabezas así y hay otras, pocas, especializadas")
+
+
+def rotular(mapas_por_cabeza, n_oraciones):
+    """Los rótulos de todas las cabezas, medidos sobre los mapas guardados."""
+    descripciones = []
+    for c, fila_c in enumerate(mapas_por_cabeza):
+        fila = []
+        for h, mapas in enumerate(fila_c):
+            est = estadisticas_cabeza(mapas)
+            filas = est.pop("filas")
+            titulo, detalle = describir(est)
+            fila.append({"capa": c + 1, "cabeza": h + 1, "titulo": titulo,
+                         "detalle": detalle,
+                         "est": {k: round(v, 3) for k, v in est.items()}})
+            print(f"   bloque {c+1} cabeza {h+1}: {titulo}   "
+                  f"(anterior {est['anterior']:.2f} · primera {est['primera']:.2f} "
+                  f"· misma {est['misma']:.2f} · entropía {est['entropia']:.2f})")
+        descripciones.append(fila)
+    medido = {"oraciones": n_oraciones, "filas": filas, "excluye_fila_0": True,
+              "nota": "promedio sobre las oraciones de las viz, sin la primera "
+                      "ficha (bajo máscara vale 1,0 sobre sí misma por construcción)"}
+    return descripciones, medido
+
+
+# =============================================================================
+# 5b. Los dos momentos aha, verificados (no supuestos)
+# =============================================================================
+
+# Lo que las slides, las notas, el notebook y el cuestionario dan por hecho.
+# Si un reentrenamiento los pierde, hay que saberlo ANTES de ir al aula.
+SUSTANTIVOS_ENUMERACION = ("educación", "salud", "seguridad")
+
+
+def verificar_aha(paquete):
+    """Devuelve (todo_bien, lista de renglones para imprimir)."""
+    renglones, bien = [], True
+    oraciones = {o["clave"]: o for o in paquete["oraciones"]}
+
+    # 1. «lo» -> «algo» en el bloque 2. La viz central abre en b2 · cabeza 2.
+    o = oraciones.get("anafora")
+    if o is None:
+        return False, ["  ! falta la oración de la anáfora"]
+    f = o["fichas"]
+    i = f.index("lo")
+    cabezas_algo = []
+    for h, A in enumerate(o["atencion"][1]):
+        fila = A[i]
+        j = max((k for k in range(len(fila)) if k != i), key=lambda k: fila[k])
+        if f[j] == "algo":
+            cabezas_algo.append(h + 1)
+    if 2 in cabezas_algo:
+        renglones.append(f"  OK  «lo» -> «algo» en el bloque 2, cabezas {cabezas_algo} "
+                         "(incluida la 2, que es la que abre la viz central)")
+    else:
+        bien = False
+        renglones.append(f"  !!  «lo» ya NO mira a «algo» en b2 · cabeza 2 "
+                         f"(sí en las cabezas {cabezas_algo or 'ninguna'}). "
+                         "Se cae el aha de la slide 9 y del notebook (sección 9).")
+
+    # 2. La «y» de la enumeración reparte entre los sustantivos (b2 · cabeza 1).
+    o = oraciones.get("enumeracion")
+    if o is None:
+        return False, renglones + ["  ! falta la oración de la enumeración"]
+    f = o["fichas"]
+    i = f.index("y")
+    fila = o["atencion"][1][0][i]
+    en_sust = sum(p for p, t in zip(fila, f) if t in SUSTANTIVOS_ENUMERACION)
+    if en_sust >= 0.8:
+        renglones.append(f"  OK  la «y» pone {en_sust:.2f} de su atención en "
+                         "educación/salud/seguridad (b2 · cabeza 1)")
+    else:
+        bien = False
+        renglones.append(f"  !!  la «y» sólo pone {en_sust:.2f} en los sustantivos "
+                         "(b2 · cabeza 1). Se caen la receta de la slide 9 y el ítem 3 "
+                         "del cuestionario.")
+    return bien, renglones
+
+
+def versiones():
+    """Con qué se corrió esto: sin esto, «reproducible» no quiere decir nada."""
+    v = {"python": platform.python_version(), "torch": torch.__version__,
+         "plataforma": f"{platform.system()} {platform.machine()}"}
+    try:
+        import numpy
+        v["numpy"] = numpy.__version__
+    except ImportError:
+        pass
+    return v
+
+
+def escribir(paquete):
+    (SALIDA / "datos-atencion.json").write_text(
+        json.dumps(paquete, ensure_ascii=False), encoding="utf-8")
+    js = ("/* GENERADO por medir-atencion.py — no lo edites a mano.\n"
+          "   Mapas de atención de un transformer entrenado de verdad sobre los\n"
+          "   discursos de apertura de sesiones (1984-2019). Sin retoques. */\n"
+          "const DATOS_ATENCION = " + json.dumps(paquete, ensure_ascii=False) + ";\n")
+    (SALIDA / "datos-atencion.js").write_text(js, encoding="utf-8")
+    kb = (SALIDA / "datos-atencion.js").stat().st_size / 1024
+    print(f"\nListo. datos-atencion.js ({kb:.0f} KB) y datos-atencion.json escritos.")
+
+
+def leer_paquete():
+    return json.loads((SALIDA / "datos-atencion.json").read_text(encoding="utf-8"))
 
 
 # =============================================================================
@@ -367,7 +497,35 @@ def main():
     ap.add_argument("--pasos", type=int, default=2000)
     ap.add_argument("--listar-candidatas", action="store_true",
                     help="imprime todas las oraciones candidatas y sale")
+    ap.add_argument("--verificar", action="store_true",
+                    help="chequea los dos aha en el datos-atencion.json del repo y sale")
+    ap.add_argument("--rerotular", action="store_true",
+                    help="recalcula los rótulos de las cabezas sobre los mapas guardados")
+    ap.add_argument("--forzar", action="store_true",
+                    help="escribe los datos aunque se haya perdido un aha")
     args = ap.parse_args()
+
+    if args.verificar or args.rerotular:
+        paquete = leer_paquete()
+        if args.rerotular:
+            print("Recalculando los rótulos sobre los mapas guardados (sin entrenar)...")
+            capas, cabezas = paquete["meta"]["capas"], paquete["meta"]["cabezas"]
+            mapas = [[[o["atencion"][c][h] for o in paquete["oraciones"]]
+                      for h in range(cabezas)] for c in range(capas)]
+            paquete["cabezas"], paquete["meta"]["rotulos_medidos_sobre"] = rotular(
+                mapas, len(paquete["oraciones"]))
+            vers = paquete["meta"].get("versiones") or {}
+            vers.setdefault("entrenamiento",
+                            "sin registrar: la corrida que generó estos mapas es "
+                            "anterior a que el script guardara las versiones")
+            vers["rotulos"] = versiones()
+            paquete["meta"]["versiones"] = vers
+        bien, renglones = verificar_aha(paquete)
+        print("Los dos momentos aha de la clase:")
+        print("\n".join(renglones))
+        if args.rerotular:
+            escribir(paquete)
+        sys.exit(0 if bien else 1)
 
     utils.fijar_semilla(SEMILLA)
     print("1. Cargando el corpus real (discursos de apertura 1984-2019)...")
@@ -427,20 +585,8 @@ def main():
             "fichas": o["fichas"], "atencion": capas,
             "atencion_sin_mascara": capas_sin})
 
-    print("5. Midiendo qué hace cada cabeza...")
-    descripciones = []
-    for c in range(CAPAS):
-        fila = []
-        for h in range(CABEZAS):
-            est = estadisticas_cabeza(mapas_por_cabeza[c][h])
-            titulo, detalle = describir(est)
-            fila.append({"capa": c + 1, "cabeza": h + 1, "titulo": titulo,
-                         "detalle": detalle,
-                         "est": {k: round(v, 3) for k, v in est.items()}})
-            print(f"   bloque {c+1} cabeza {h+1}: {titulo}   "
-                  f"(anterior {est['anterior']:.2f} · primera {est['primera']:.2f} "
-                  f"· misma {est['misma']:.2f} · entropía {est['entropia']:.2f})")
-        descripciones.append(fila)
+    print("5. Midiendo qué hace cada cabeza (sobre las oraciones elegidas)...")
+    descripciones, medido = rotular(mapas_por_cabeza, len(salida_oraciones))
 
     # una muestra generada, para que se vea que el modelo aprendió algo
     print("6. Una muestra generada por el modelo...")
@@ -471,6 +617,8 @@ def main():
             "loss_inicial": historial[0]["val"],
             "loss_final": historial[-1]["val"],
             "semilla": SEMILLA,
+            "versiones": {"entrenamiento": versiones(), "rotulos": versiones()},
+            "rotulos_medidos_sobre": medido,
             "muestra_generada": muestra,
             "generado_por": "clases/07-attention-y-transformer/medir-atencion.py",
         },
@@ -479,15 +627,16 @@ def main():
         "cabezas": descripciones,
     }
 
-    (SALIDA / "datos-atencion.json").write_text(
-        json.dumps(paquete, ensure_ascii=False), encoding="utf-8")
-    js = ("/* GENERADO por medir-atencion.py — no lo edites a mano.\n"
-          "   Mapas de atención de un transformer entrenado de verdad sobre los\n"
-          "   discursos de apertura de sesiones (1984-2019). Sin retoques. */\n"
-          "const DATOS_ATENCION = " + json.dumps(paquete, ensure_ascii=False) + ";\n")
-    (SALIDA / "datos-atencion.js").write_text(js, encoding="utf-8")
-    kb = (SALIDA / "datos-atencion.js").stat().st_size / 1024
-    print(f"\nListo. datos-atencion.js ({kb:.0f} KB) y datos-atencion.json escritos.")
+    print("7. Verificando los dos momentos aha...")
+    bien, renglones = verificar_aha(paquete)
+    print("\n".join(renglones))
+    if not bien and not args.forzar:
+        print("\n!! NO escribo datos-atencion.{js,json}: esta corrida perdió un momento "
+              "aha\n   (probablemente otra versión de torch). Los archivos del repo "
+              "quedan como estaban.\n   Si igual los querés, corré con --forzar y "
+              "actualizá slides, notas y cuestionario.")
+        sys.exit(1)
+    escribir(paquete)
 
 
 if __name__ == "__main__":

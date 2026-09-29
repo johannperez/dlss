@@ -7,9 +7,9 @@
 
 <!-- ==========================================================================
      MOMENTO AHA: "las cuatro cabezas miran la MISMA oración y hacen cosas
-     distintas: una lee de a pares, otra se cuelga de la primera palabra...
-     y por lo menos una no se entiende. En un modelo real la mayoría no se
-     entiende. Y sin embargo el modelo funciona."
+     distintas, y a ninguna se la puede resumir en una regla simple. En los
+     modelos grandes hay unas pocas cabezas especializadas y muchas así. Y sin
+     embargo el modelo funciona."
 
      Esta viz existe para vacunar contra la narrativa de que «cada cabeza
      tiene un rol lingüístico claro». Los rótulos de abajo no los escribimos
@@ -64,7 +64,8 @@
     <h1>Cuatro cabezas leyendo la misma oración</h1>
     <p>Los cuatro mapas de abajo son de <b>la misma oración</b> y del <b>mismo modelo</b>.
        Lo único que cambia es la cabeza: cuatro juegos de perillas Q, K y V entrenados en
-       paralelo. Mirá qué distinto lee cada una — y buscá la que no se entiende.</p>
+       paralelo. Mirá qué distinto lee cada una — y preguntate: ¿alguna se deja resumir
+       en una regla?</p>
   </header>
 
   <div class="viz-frame" style="padding:8px">
@@ -82,9 +83,11 @@
       leen distinto: fijate cómo se corren las casillas oscuras de un mapa al otro.
       Ahora leé los rótulos: <b>a ninguna de las cuatro se la puede resumir en una regla
       simple</b>. No lo decidimos nosotros — lo calcula el script midiendo cuánta atención
-      va a la palabra anterior, a la primera y a sí misma. En un modelo de verdad
-      <em>la mayoría de las cabezas son así</em>, y el modelo funciona igual. Cuando leas
-      un paper que le pone un nombre lingüístico prolijo a cada cabeza, acordate de esto.
+      va a la palabra anterior, a la primera y a sí misma. En los modelos grandes se
+      encontraron unas pocas cabezas especializadas y <em>muchas</em> que no se dejan
+      resumir así (o que se pueden sacar sin que el modelo empeore mucho), y el modelo
+      funciona igual. Cuando leas un paper que le pone un nombre lingüístico prolijo a
+      cada cabeza, acordate de esto.
       <br>Después apretá <b>bloque 1</b>: ahí las cuatro se vuelven <b>la misma diagonal</b>
       —cada palabra mirándose a sí misma—. Cuatro juegos de perillas distintos que
       terminaron en el mismo lugar. Tampoco eso es lo que promete la divulgación.
@@ -95,8 +98,11 @@
     <p class="viz-pie">
       Los rótulos de cada cabeza <b>no los escribimos a mano</b>: los calcula
       <code>medir-atencion.py</code> midiendo cuánta atención va a la palabra anterior,
-      a la primera, a sí misma, y qué tan repartida está. Modelo real entrenado sobre los
-      discursos de apertura de sesiones (1984-2019).
+      a la primera, a sí misma, y qué tan repartida está. Ojo con el tamaño de la muestra:
+      se miden sobre <b>las cinco oraciones de esta viz</b> (<span id="pie-filas">50</span>
+      filas), sin contar la primera palabra de cada una, que bajo la máscara sólo puede
+      mirarse a sí misma. Son un resumen de esas oraciones, no del modelo entero. Modelo
+      real entrenado sobre los discursos de apertura de sesiones (1984-2019).
     </p>
   </footer>
 
@@ -106,7 +112,7 @@
 <script src="../../../_shared/js/viz.js"></script>
 <script>
 const D = DATOS_ATENCION;
-const estado = { oracion: 3, capa: 1, superponer: false };
+const estado = { oracion: 3, capa: 1, superponer: false, numeros: false };
 
 const opcionesOracion = D.oraciones.map((o, i) => ({ valor: String(i), texto: o.fenomeno }));
 
@@ -138,7 +144,8 @@ function dibujar() {
   // Embebida en la slide hay 610 px y hay que meter CUATRO mapas: la celda se
   // achica un par de píxeles. Suelta (que es como se explora) se ve grande.
   const emb = document.body.classList.contains('embebido');
-  const celda = emb ? (fs.length > 11 ? 9 : 10) : (fs.length > 11 ? 12 : 14);
+  let celda = emb ? (fs.length > 11 ? 9 : 10) : (fs.length > 11 ? 12 : 14);
+  if (estado.numeros) celda = Math.max(celda, 17);   // que entre «100»
 
   if (estado.superponer) {
     grilla.style.gridTemplateColumns = '1fr';
@@ -156,12 +163,13 @@ function dibujar() {
       'todo se vuelve suave y deja de decir nada.';
     caja.appendChild(det);
     grilla.appendChild(caja);
-    Viz.matrizCalor(cont, promedio(mapas), {
+    const tp = Viz.matrizCalor(cont, promedio(mapas), {
       etiquetas: fs, paleta: 'acento', celda: 26, min: 0, max: 1,
       alHover: (f, c, v) => leer('En el promedio de las cuatro, «<b>' + fs[f] +
         '</b>» le presta <b>' + Math.round(v * 100) + '%</b> a «<b>' + fs[c] + '</b>».'),
       alSalir: () => leer('Pasá el mouse por una celda.')
     });
+    accesible(tp, promedio(mapas), fs, 'el promedio de las cuatro cabezas');
     return;
   }
 
@@ -201,6 +209,29 @@ function dibujar() {
     // mismos; lo único que cambia es cuánto lugar ocupan.
     tabla.style.fontSize = emb ? '8.6px' : '9.5px';
     tabla.querySelectorAll('th').forEach(th => { th.style.padding = '1px 3px'; });
+    accesible(tabla, M, fs, 'bloque ' + (estado.capa + 1) + ', cabeza ' + (h + 1) +
+      ' (' + info.titulo + ')');
+  });
+}
+
+/* El color no puede ser la única manera de leer un mapa (daltonismo, proyector
+   lavado): cada celda dice su valor al pasar el mouse, la tabla tiene una
+   descripción en texto, y con «mostrar los números» se escribe el porcentaje en
+   las celdas donde hay algo. */
+function accesible(tabla, M, fs, nombre) {
+  tabla.setAttribute('aria-label', 'Mapa de atención, ' + nombre + ', sobre «' +
+    fs.join(' ') + '». Filas: quién pregunta; columnas: a quién mira.');
+  tabla.querySelectorAll('td').forEach(td => {
+    const f = +td.dataset.f, c = +td.dataset.c, v = M[f][c];
+    td.title = '«' + fs[f] + '» → «' + fs[c] + '»: ' + Math.round(v * 100) + '%';
+    if (estado.numeros && v >= 0.1) {
+      td.textContent = Math.round(v * 100);
+      td.style.fontFamily = Viz.colores().mono;
+      td.style.fontSize = '7.5px';
+      td.style.textAlign = 'center';
+      td.style.lineHeight = '1';
+      td.style.color = v > .6 ? Viz.color('papel') : Viz.color('tinta');
+    }
   });
 }
 
@@ -211,11 +242,13 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'botones', id: 'capa', etiqueta: 'qué bloque', valor: '1',
     opciones: [{ valor: '0', texto: 'bloque 1' }, { valor: '1', texto: 'bloque 2' }] },
   { tipo: 'checkbox', id: 'superponer', etiqueta: 'superponer las cuatro', valor: false },
+  { tipo: 'checkbox', id: 'numeros', etiqueta: 'mostrar los números (en %)', valor: false },
   { tipo: 'texto', id: 'nota', html: '' }
 ], (v) => {
   estado.oracion = +v.oracion;
   estado.capa = +v.capa;
   estado.superponer = v.superponer;
+  estado.numeros = v.numeros;
   actualizar();
 });
 
@@ -262,6 +295,16 @@ function actualizar() {
     'El triángulo vacío de arriba a la derecha es la máscara causal.</span>');
 }
 
+// Embebida en la slide no hay lugar para un control más (el alto del iframe está
+// justo): los números se ven en la viz suelta, y al pasar el mouse en las dos.
+if (document.body.classList.contains('embebido')) {
+  const n = ctl.nodos.numeros;
+  const caja = n && n.closest ? n.closest('.ctrl') : null;
+  if (caja) caja.style.display = 'none';
+}
+if (D.meta.rotulos_medidos_sobre) {
+  document.getElementById('pie-filas').textContent = D.meta.rotulos_medidos_sobre.filas;
+}
 actualizar();
 Viz.botonTema();
 new MutationObserver(() => { Viz.recargarColores(); actualizar(); })

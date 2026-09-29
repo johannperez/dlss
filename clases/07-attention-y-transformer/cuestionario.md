@@ -76,7 +76,8 @@ olvidás de poner la máscara causal.
 
 ### 5. [qué pasa si...] Le sacás el *positional encoding*
 
-Sacás el sellito de posición y dejás sólo attention.
+Sacás el sellito de posición y dejás sólo attention, **sin máscara causal** (como en los
+modelos tipo BERT de la clase 9).
 
 **a)** ¿Qué dos frases se volverían **indistinguibles** para el modelo? Dá un ejemplo
 tuyo, del área que investigás (no uses el de la clase).

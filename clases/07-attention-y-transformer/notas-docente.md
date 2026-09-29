@@ -26,10 +26,12 @@
 6. Recién entonces aparece la fórmula, ya vacía de misterio, y se traduce término a
    término a la analogía.
 7. Tres decisiones de diseño: no espiar el futuro (máscara), varias lecturas en paralelo
-   (cabezas), y el sellito de posición (sin él volvemos a la bolsa de palabras de la 6).
+   (cabezas), y el sellito de posición (sin él, y sin máscara, volvemos a la bolsa de
+   palabras de la 6).
 8. El bloque completo, como cuatro piezas con una función clara cada una, y la conexión
    residual contada como «el original del expediente sigue adjunto».
-9. Construyen la máquina entera **y no la encienden**. Encenderla es la clase 8, y esa
+9. Construyen la máquina entera **y no la encienden**. En la clase 8 se enciende un
+   mini-GPT hecho con estas mismas piezas (cuatro bloques, letra por letra), y esa
    expectativa es deliberada.
 10. Cierre en negativo: los mapas de atención se ven hermosos y se sobreinterpretan todo
     el tiempo. **Attention no es explicación.** Lo más útil que se llevan hoy es lo que
@@ -49,7 +51,7 @@
 | **1:10** | 9 | Las tres decisiones | 20-26 | Máscara, cabezas, posición. Dos viz. |
 | **1:19** | 6 | El bloque completo | 27-32 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
 | **1:25** | 20 | **Manos 2** | 33 | Notebook, secciones 4 a 8, de a dos. |
-| **1:45** | 15 | Cierre | 34-38 | La advertencia, el lunes, las tres ideas, el glosario y el puente. |
+| **1:45** | 15 | Cierre | 34-38 | La advertencia, «en tu investigación», las tres ideas, el glosario y el puente. |
 
 **Suma 120 exactos** y coincide con el plan minuto a minuto de `PROGRAMA.md`. Los quince
 minutos de 1:10 a 1:25 son para **trece slides**, así que van rápido y en bloque: es el
@@ -60,6 +62,14 @@ tramo que hay que ensayar. Si te comés cinco minutos ahí, se los sacás al blo
 > muestra el contador abajo a la derecha), no los de la especificación, que iba hasta 35.
 > La diferencia son tres slides que se agregaron: la de la pausa (19), la tabla de la
 > clase 5 (32) y «las tres cosas de hoy» (36).
+
+**La puesta en común opcional.** La clase 7 es una de las tres (4, 7 y 10) que se pueden
+abrir con diez minutos de puesta en común (`recursos/GUIA-DEL-DOCENTE.md` §3): dos o tres
+personas cuentan qué hicieron con el `[EN TU INVESTIGACIÓN]` de las clases anteriores, y es
+el lugar natural para el `TODO 5` de la clase 6 (¿defecto del modelo o dato sobre el
+corpus?), que las notas de la clase 6 mandan acá. Esos diez minutos **no están en la tabla
+de arriba**: si la hacés, salen de la sección 6 de estas notas (recortes 1 a 3), nunca de
+la pausa ni del cierre.
 
 **Los relojes que importan.** Si a las **0:45** no arrancaste el bloque práctico 1,
 estás atrasado. Si a la **1:25** no arrancaste el 2, recortá según la sección 6 de estas
@@ -84,10 +94,12 @@ risa.
 **Qué hacés con eso, y esto es lo importante:** elegí a alguien que votó A y preguntale
 **«¿releíste la oración entera para encontrarla?»**. Va a decir que no. Ese «no» es la
 clase. Repetilo en voz alta: «no releyó. **Saltó.**»
-**Si alguien vota D en serio** (no en chiste): es oro. Preguntale por qué, y vas a
-escuchar un argumento sintáctico legítimo (el sujeto más cercano). Usalo en la slide 34:
-«hasta nosotros, que somos hablantes nativos, tenemos ambigüedad acá. Y sin embargo un
-modelo con medio millón de perillas se juega por una».
+**Si alguien vota D en serio** (no en chiste): es oro. Preguntale por qué: casi siempre
+es «el sustantivo más cercano». Es un error comprensible, y justamente por eso sirve: en
+«el oficialismo **lo** aprobó», «lo» no puede ser el oficialismo (el que aprueba no es lo
+aprobado). El salto no es «al más cercano»: es al que tiene sentido. Usalo en la slide 34:
+«un modelo que mirara siempre lo más cercano se equivocaría acá; uno que salta al
+sustantivo que tiene sentido, no. Que salte bien tampoco prueba que haya entendido».
 
 ### Minuto 18 — slide 8, la cuenta a mano
 **Preguntá:** «Si le subo el peso a *proyecto* de 0,6 a 0,9, ¿para dónde se va la flecha
@@ -131,8 +143,8 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 | **«Q, K y V son tres cosas distintas»** | Creen que son tres entradas separadas. | Slide 13: las tres cajas salen del **mismo** embedding. Y la celda del notebook donde `Q = X @ W_q`, `K = X @ W_k`, `V = X @ W_v`: la misma `X` tres veces. Señalá la `X`. |
 | **Miedo al softmax** | La palabra los bloquea y dejan de escuchar. | «Convertir puntajes en porcentajes que suman 100.» Slide 16, con los cuatro números y las barras. **Nunca escribas la fórmula del softmax en esta clase**: se escribe en la 8, con la temperatura. |
 | **«La máscara es para ahorrar cómputo»** | Confunden su propósito. | Es para **no hacer trampa**. Analogía: el examen donde ves la hoja del compañero. Sacás diez y no aprendiste nada. |
-| **«Cada cabeza tiene un rol lingüístico claro»** | Sobreinterpretan; lo leyeron en algún lado. | `viz/cabezas.html`. Los rótulos de esa viz se **calculan midiendo**, y varias cabezas quedan rotuladas «no se deja resumir en una regla simple». Esa es la verdad del campo. |
-| **«El mapa explica la decisión»** | La confusión más importante para esta audiencia. | Slides 32-33. El argumento: se pueden construir mapas muy distintos que producen la **misma** salida (Jain & Wallace 2019). Si el mapa no determina la salida, no la explica. |
+| **«Cada cabeza tiene un rol lingüístico claro»** | Sobreinterpretan; lo leyeron en algún lado. | `viz/cabezas.html`. Los rótulos de esa viz se **calculan midiendo** (sobre las cinco oraciones de la viz, no sobre el corpus), y en el bloque 2 las cuatro quedan rotuladas «no se deja resumir en una regla simple». En modelos grandes la literatura encuentra unas pocas cabezas especializadas y muchas que no se dejan resumir o se pueden podar (Voita et al., 2019; Clark et al., 2019). |
+| **«El mapa explica la decisión»** | La confusión más importante para esta audiencia. | Slide 34. El argumento: se pueden construir mapas muy distintos que producen **casi la misma** salida (Jain & Wallace 2019, en modelos con RNN; en un transformer es peor, porque todo se mezcla entre capas). Si el mapa no determina la salida, no la explica. Y ni siquiera dice «cuánto llegó» de cada palabra: el peso se aplica al *value* de esa capa, que ya es una mezcla. |
 | **Perderse en las dimensiones** | Errores de forma constantes en el notebook. | La disciplina de `print(algo.shape)` **enseñada como método**, no como accidente. La tabla de formas está al final del notebook: proyectala durante el bloque práctico 2. |
 | **«¿Y esto es todo? ¿No hay nada más?»** | Decepción, o incredulidad. | **Sí, esto es todo.** Y contestarlo así es importante: la sensación de que «tiene que haber algo más escondido» es la que sostiene la mistificación de la IA. Lo que hay de más es **escala y datos**, no una idea oculta. |
 
@@ -179,7 +191,10 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
    apuntan dos flechas para el mismo lado».
 5. **El bloque práctico 2 se acorta a 12 minutos** y se les pide que hagan sólo las
    secciones 4 y 8 del notebook (máscara y bloque completo), dejando multi-head y
-   posición como tarea. El notebook está escrito para poder terminarse solo en casa.
+   posición para antes de la clase 8. El notebook está escrito para poder terminarse
+   solo en casa, y eso es media hora: entra en el tope de una hora entre clases. Decí
+   explícitamente que **no es requisito para arrancar la clase 8**, que enciende otro
+   modelo y no usa el código de éste.
 
 **Lo que NUNCA se recorta:**
 
@@ -188,8 +203,8 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
   trabajo— queda en tres minutos apurados.
 - **La slide 8 (la cuenta a mano).** Es la única aritmética explícita de la clase y es la
   que sostiene todo lo demás. Sin ella, la fórmula de la slide 17 es magia.
-- **Las slides 34-35 (attention no es explicación).** Es el `[EL LUNES]` de la clase y lo
-  más útil que se llevan. Si tenés que elegir entre terminar el bloque completo y hacer
+- **Las slides 34-35 (attention no es explicación).** Es el `[EN TU INVESTIGACIÓN]` de la
+  clase y lo más útil que se llevan. Si tenés que elegir entre terminar el bloque completo y hacer
   la advertencia, hacé la advertencia.
 - **El puente a la clase 8.** Treinta segundos, y son los que hacen que vuelvan.
 
@@ -212,6 +227,8 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 - **Mostrá `medir-atencion.py`** proyectado, la clase `BloqueTransformer`, y compará
   línea por línea con la del notebook. Que vean que es el mismo código, y que el modelo
   que produjo los mapas de las viz se entrenó con eso, en CPU, en menos de un minuto.
+  Y contá la otra mitad, que es contenido de la clase 10: con otra versión de torch el
+  mismo script da otros mapas, y los dos momentos aha desaparecen.
 
 ---
 
@@ -219,7 +236,7 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 
 ### «¿Y esto es todo? ¿No hay nada más adentro de ChatGPT?»
 **Sí, esto es todo.** Lo que hay de más es **escala** (más bloques, más cabezas, más
-números por palabra), **datos** (billones de palabras en vez de dos millones) y un
+números por palabra), **datos** (billones de palabras en vez de cuatrocientas mil) y un
 **entrenamiento posterior con humanos** que vemos en la clase 8. Pero el mecanismo es
 éste, sin una idea escondida. Y contestarlo así, sin adornos, es importante: la sensación
 de que tiene que haber algo más es lo que sostiene la mistificación. Lo asombroso no es la
@@ -259,7 +276,8 @@ esa palabra **causó** la salida, y ahí ustedes ya tienen todo el vocabulario: 
 correlación presentada como causa. La evidencia adecuada sería una **intervención**
 (cambiar esa palabra por otra y ver si cambia la predicción), o al menos una prueba de
 robustez sobre muchos casos. Y hay literatura específica que lo discute: Jain & Wallace
-(2019) muestran que se pueden construir mapas muy distintos con la misma salida; Wiegreffe
+(2019) muestran que se pueden construir mapas muy distintos con casi la misma salida (en
+modelos con RNN; en transformers la información además se mezcla entre capas); Wiegreffe
 & Pinter (2019) matizan. Citá las dos: **mostrar un debate abierto es más fuerte que
 elegir un bando**.
 
@@ -275,17 +293,31 @@ elegir un bando**.
   el otro **antes** de empezar, no durante.
 - **Los mapas de atención de las viz son de un modelo real y chiquito.** Si alguien
   pregunta si son «de verdad», la respuesta es sí, y `medir-atencion.py` está en la
-  carpeta: se corre en menos de un minuto en CPU y da **exactamente** lo mismo, porque la
-  semilla está fija (se verificó dos veces: sale igual hasta el cuarto decimal).
+  carpeta: se corre en menos de un minuto en CPU. Es **determinista en la misma máquina y
+  con las mismas versiones de las librerías**; con otra versión de torch da otros mapas
+  (se comprobó: con torch 2.14 en macOS «lo» deja de mirar a «algo» y la «y» se va a los
+  artículos). Las viz y el notebook leen los mapas **guardados**, así que en el aula los
+  aha están siempre. **No regeneres los datos antes de clase.** Si alguien lo hizo, el
+  chequeo es `python3 medir-atencion.py --verificar` (no entrena: revisa el JSON en un
+  segundo); el propio script, además, se niega a sobrescribir los datos si una corrida
+  nueva pierde un aha.
+- **Si querés contarlo como contenido** (es un anticipo de la clase 10): corré el script
+  en tu máquina antes de clase, proyectá **tu** corrida al lado de la guardada y decilo en
+  voz alta: «mismo código, misma semilla, otra versión: otros mapas».
 - **Si el bloque 1 del modelo te muestra cabezas que se miran casi sólo a sí mismas**, no
   es un error de la viz: es lo que aprendió. Decilo. Es una observación real sobre modelos
   chicos y poco entrenados, y sirve de antídoto contra la idea de que cada pieza hace algo
   interpretable.
-- **El notebook entero corre en menos de un minuto en CPU** (medido dos veces: 12 s y 15 s,
-  0 errores). La única celda que se hace esperar es la de los embeddings
+- **El notebook entero corre en menos de un minuto en CPU** (medido: entre 5 y 16 s según
+  la máquina, 0 errores). La única celda que se hace esperar es la de los embeddings
   de la clase 6, que recalcula PPMI + SVD sobre el corpus real sin red: entre 5 y 30
   segundos según la máquina. Avisalo antes de que arranquen el bloque práctico 1, o vas a
   tener cinco manos levantadas diciendo «se colgó».
+- **El `TODO 4` mide el parecido entre palabras, no la desviación estándar.** Si alguien
+  pregunta por qué: sin residual, la std de la salida queda igual con 1 o con 12 bloques
+  (cada bloque arranca normalizando). Lo que se pierde es la diferencia entre palabras:
+  con seis bloques sin residual todas son el mismo vector. La tabla que imprime la celda
+  muestra las dos columnas a propósito.
 - **No entrenes el modelo «un poco más» pensando que va a mejorar.** Se probó: con 6000
   pasos y una tasa de aprendizaje más baja la loss de validación mejora (4,60 → 4,23) y
   **la clase empeora**. Las cabezas se vuelven difusas, «lo» pasa a mirarse sobre todo a

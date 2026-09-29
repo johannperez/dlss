@@ -81,6 +81,10 @@
       <em>Cada palabra reparte su propio 100%; nadie garantiza que a vos te miren.</em>
       Si leíste alguna vez una matriz de adyacencia de una red de citas, es exactamente lo
       mismo: que A cite a B no implica que B cite a A.
+      <br><b>Ojo con leer esas sumas como importancia.</b> Con la máscara puesta, a la
+      primera palabra la pueden mirar <em>todas</em> las demás y a la última sólo ella
+      misma: las columnas de la izquierda juntan más suma <em>por construcción</em>, porque
+      más gente puede mirarlas. «Si» suma mucho, en buena parte, porque es la primera.
       <br>Ahora movés <b>«hasta qué palabra escribió»</b>: cuando el modelo va por la
       palabra 5, sólo existen 5 columnas. El triángulo no es un adorno de diseño, es el
       paso del tiempo.
@@ -130,6 +134,9 @@ function dibujar() {
   cont.innerHTML = '';
   const t = document.createElement('table');
   t.className = 'matriz-at';
+  t.setAttribute('aria-label', 'Matriz de atención de «' + fs.join(' ') + '». Filas: ' +
+    'la palabra que pregunta; columnas: la palabra mirada. Al borde, la suma de cada ' +
+    'fila (siempre 1) y de cada columna. Activá «mostrar los números» para leer cada celda.');
 
   // --- encabezado: las palabras miradas ---
   const thead = t.createTHead();
@@ -174,6 +181,9 @@ function dibujar() {
         td.style.color = v > .45 ? Viz.color('papel') : Viz.color('tinta');
       }
       td.dataset.f = f; td.dataset.c = c;
+      // el color no puede ser la única pista: cada celda dice su valor al pasar
+      td.title = dentro ? '«' + fs[f] + '» → «' + fs[c] + '»: ' + Math.round(v * 100) + '%'
+                        : (estado.mascara ? 'tapada: todavía no pasó' : 'fuera del recorte');
       celdas.push(td);
       td.addEventListener('mouseenter', () => resaltar(f, c, v, dentro));
     }

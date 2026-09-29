@@ -6,8 +6,8 @@
 <title>El aviso clasificado: query, key y value — Clase 7</title>
 
 <!-- ==========================================================================
-     MOMENTO AHA: "moví la perilla del AVISO y «lo» dejó de mirar a «algo» y se
-     puso a mirar a la coma. No cambió ni una palabra de la oración: cambiaron
+     MOMENTO AHA: "moví la perilla del AVISO hasta +75° y «lo» dejó de mirar a
+     «algo» y se puso a mirar a la coma (en +60° la coma y «lo» empatan: 36/36). No cambió ni una palabra de la oración: cambiaron
      las perillas. La atención no está dada en el texto — se APRENDE."
 
      Segundo aha, más chiquito y muy importante: el value no aparece en ninguna
@@ -89,10 +89,11 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Dejá a <b>«lo»</b> preguntando y apretá
-      <em>«así lo aprendió el modelo»</em>: la flecha naranja de «lo» y el aviso azul
+      <em>«volver a los valores de ejemplo»</em>: la flecha naranja de «lo» y el aviso azul
       de «algo» apuntan para el mismo lado (0° entre las dos), y «algo» se lleva el <b>40%</b> de la atención: más que ninguna otra.
-      Ahora movés <b>«cuánto gira el aviso»</b> hasta +60 y mirá los porcentajes:
-      «lo» ahora mira a <b>la coma</b>. La oración no cambió. Cambiaron las perillas.
+      Ahora movés <b>«cuánto gira el aviso»</b> hasta <b>+75</b> y mirá los porcentajes:
+      «lo» ahora mira a <b>la coma</b> (44%) y «algo» baja a 9%. La oración no cambió.
+      Cambiaron las perillas.
       Eso es lo que aprende un transformer: <em>a quién conviene mirar</em>.
       <br>Después prendé <b>«mostrar lo que aporta»</b>: aparecen las flechas verdes
       y los porcentajes <b>no se mueven</b>. El value no decide a quién mirás; decide
@@ -123,7 +124,9 @@ const PALABRAS = ['si', 'tenemos', 'que', 'corregir', 'algo', ',', 'lo'];
 const ANGULOS = [160, 120, -160, 60, 10, -100, -30];
 const NORMA = 1.55;
 
-// Los valores de las perillas "como los aprendió el modelo" de esta caricatura.
+// Los valores de ejemplo de las perillas. Son de la caricatura, puestos a mano para
+// que «lo» mire a «algo»: NO los aprendió ningún modelo. (Los mapas aprendidos de
+// verdad están en attention-como-mesa.html.)
 const APRENDIDO = { giroQuery: 25, giroKey: -15 };
 const GIRO_VALUE = 90;   // fijo: el value es otra transformación del mismo vector
 
@@ -164,6 +167,7 @@ const p = Viz.plano('#lienzo', {
   cuadrado: true,
   titulo: 'las flechas de cada palabra (d = 2)'
 });
+p.canvas.setAttribute('role', 'img');
 
 p.alDibujar(() => {
   p.fondo(); p.grilla();
@@ -245,7 +249,8 @@ function dibujarPesos() {
     const fila = document.createElement('div');
     fila.className = 'peso-fila' + (j === gan ? ' gana' : '');
     const a = document.createElement('div'); a.className = 'pal';
-    a.textContent = pal + (j === estado.pregunta ? ' (ella)' : '');
+    // la ganadora no se marca sólo con color: lleva también un ▸ adelante
+    a.textContent = (j === gan ? '▸ ' : '') + pal + (j === estado.pregunta ? ' (ella)' : '');
     const b = document.createElement('div'); b.className = 'barra';
     const i = document.createElement('i');
     i.style.width = (w[j] * 100) + '%';
@@ -279,7 +284,7 @@ const ctl = Viz.controles('#panel', [
     color: 'parametro', formato: v => v + '°' },
   { tipo: 'checkbox', id: 'verValues', etiqueta: 'mostrar lo que aporta cada palabra (value)',
     valor: false },
-  { tipo: 'boton', texto: 'Así lo aprendió el modelo', principal: true, alClic: () => {
+  { tipo: 'boton', texto: 'Volver a los valores de ejemplo', principal: true, alClic: () => {
       ctl.set('giroQuery', APRENDIDO.giroQuery, true);
       ctl.set('giroKey', APRENDIDO.giroKey, true);
       actualizar();
@@ -313,7 +318,11 @@ function actualizar() {
     ((ctl.valores.giroQuery !== APRENDIDO.giroQuery ||
       ctl.valores.giroKey !== APRENDIDO.giroKey)
       ? '<br><span style="font-size:.9em">Movida de su lugar. El botón de arriba ' +
-        'vuelve a los valores aprendidos.</span>' : ''));
+        'vuelve a los valores de ejemplo.</span>' : ''));
+  p.canvas.setAttribute('aria-label',
+    'Flechas de la caricatura en dos dimensiones. «' + PALABRAS[estado.pregunta] +
+    '» pregunta; reparte así: ' + PALABRAS.map((pal, j) => pal + ' ' +
+    Math.round(w[j] * 100) + '%').join(', ') + '. Gana «' + PALABRAS[g] + '».');
 }
 
 actualizar();

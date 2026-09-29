@@ -69,9 +69,12 @@ Machine Learning and the Social Sciences*. Princeton University Press.**
 `[VERIFICADA 2026-08-29]`
 > **Es el paper que sostiene las slides 34 y 35 y el ítem 11 del cuestionario.** El
 > argumento es limpio y te lo podés llevar entero: construyen mapas de atención
-> *adversarios* —muy distintos del original— que producen **la misma predicción**. Si dos
-> mapas contradictorios dan la misma salida, el mapa no determina la salida y no puede
-> explicarla por sí solo.
+> *adversarios* —muy distintos del original— que producen **casi la misma predicción**
+> (dentro de un margen chico). Si dos mapas contradictorios dan casi la misma salida, el
+> mapa no determina la salida y no puede explicarla por sí solo.
+> **Un matiz al citarlo:** lo estudiaron sobre todo en atención aditiva encima de redes
+> recurrentes (BiLSTM) para clasificar, no en transformers de muchas capas. En un
+> transformer el argumento no se debilita: la información además se mezcla entre capas.
 > **Si vas a citar una sola cosa de esta clase en un paper tuyo, es ésta.**
 
 **7. Wiegreffe, S. & Pinter, Y. (2019). *Attention is not not Explanation*. EMNLP.**
@@ -127,8 +130,15 @@ Anthropic.** `[VERIFICAR URL]`
 - **Los mapas de atención de las cuatro visualizaciones son reales.** Salen de un
   transformer de ~0,5 M de parámetros entrenado en CPU sobre los discursos de apertura de
   sesiones ordinarias del Congreso argentino (1984-2019), con el script
-  `clases/07-attention-y-transformer/medir-atencion.py` de esta misma carpeta. Corrélo y
-  te da los mismos números: la semilla está fija.
+  `clases/07-attention-y-transformer/medir-atencion.py` de esta misma carpeta. La semilla
+  está fija y el resultado es **determinista en la misma máquina y con las mismas
+  versiones de las librerías**; con otra versión de torch los mapas cambian (y se pueden
+  perder los dos momentos aha: el script avisa y no sobrescribe). Las versiones de la
+  corrida que está en el repo no quedaron registradas; las corridas nuevas las guardan en
+  `meta.versiones`.
+- **Los rótulos de las cabezas** (`viz/cabezas.html`) se miden sobre las cinco oraciones de
+  las viz, sin la primera palabra de cada una. Son un resumen de esas oraciones, no del
+  modelo entero.
 - **Recopilación del corpus:** Lucas Ariel, *discursos_presidenciales*.
   `https://raw.githubusercontent.com/lucariel/discursos_presidenciales/master/README.md`
   `[VERIFICADA 2026-08-29]`. Los textos son documentos oficiales del Congreso; la
@@ -136,6 +146,38 @@ Anthropic.** `[VERIFICAR URL]`
 - **Los vectores de `viz/qkv.html` no son reales**: son de juguete, de dos dimensiones y
   puestos a mano, para poder dibujarlos como flechas. Está rotulado en la propia página.
   Un modelo de verdad usa 64 o más dimensiones por cabeza, y ahí no hay dibujo posible.
+
+---
+
+## Las salvedades de esta clase, con su fuente
+
+Todas `[VERIFICAR URL]`: se encuentran buscando por título. No se asignan; están para quien
+quiera saber de dónde sale cada matiz de las slides y las notas.
+
+- **Dong, Y., Cordonnier, J.-B. & Loukas, A. (2021). *Attention is not all you need: pure
+  attention loses rank doubly exponentially with depth*. ICML.** (arXiv:2103.03404) — sin
+  conexión residual, apilar attention hace que todas las posiciones converjan al mismo
+  vector. Es lo que mide el `TODO 4`.
+- **Haviv, A., Ram, O., Press, O., Izsak, P. & Levy, O. (2022). *Transformer Language
+  Models without Positional Encodings Still Learn Positional Information*. Findings of
+  EMNLP.** (arXiv:2203.16634) — por qué «sin posiciones es una bolsa de palabras» vale
+  para attention **sin máscara**: con máscara causal, el modelo recupera algo del orden.
+- **Kobayashi, G., Kuribayashi, T., Yokoi, S. & Inui, K. (2020). *Attention is Not Only a
+  Weight: Analyzing Transformers with Vector Norms*. EMNLP.** (arXiv:2004.10102) — un
+  peso de atención alto sobre un *value* chico aporta poco: la salvedad de la slide 34.
+- **Voita, E., Talbot, D., Moiseev, F., Sennrich, R. & Titov, I. (2019). *Analyzing
+  Multi-Head Self-Attention: Specialized Heads Do the Heavy Lifting, the Rest Can Be
+  Pruned*. ACL.** (arXiv:1905.09418) y **Clark, K., Khandelwal, U., Levy, O. & Manning,
+  C. D. (2019). *What Does BERT Look At? An Analysis of BERT's Attention*. BlackboxNLP.**
+  (arXiv:1906.04341) — unas pocas cabezas especializadas, muchas prescindibles: el matiz
+  de `viz/cabezas.html`.
+- **Su, J. et al. (2021). *RoFormer: Enhanced Transformer with Rotary Position
+  Embedding*.** (arXiv:2104.09864) — las posiciones rotativas (RoPE) que usa hoy la
+  mayoría de los LLM.
+- **Grinsztajn, L., Oyallon, E. & Varoquaux, G. (2022). *Why do tree-based models still
+  outperform deep learning on tabular data?* NeurIPS (Datasets and Benchmarks).**
+  (arXiv:2207.08815) — el cartel de datos tabulares de `viz/supuestos-de-arquitectura.html`
+  (la ficha completa está en el `referencias.md` de la clase 5).
 
 ---
 

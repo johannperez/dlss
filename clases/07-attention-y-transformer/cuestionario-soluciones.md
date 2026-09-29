@@ -44,6 +44,11 @@ cualquier cosa porque **cada palabra reparte su propio 100%**, y nada obliga a q
 palabra sea *mirada*, en total, un 100%. Hay palabras que mira todo el mundo (la primera
 coma: 4,03) y palabras que no mira nadie (0,00).
 
+Y un matiz que conviene sumar: con la máscara causal, **a las primeras palabras las puede
+mirar más gente** (a la primera, todas; a la última, sólo ella misma). Las columnas de la
+izquierda juntan más suma en parte **por construcción**, no por «importancia». Por eso una
+suma de columna alta no se lee como ranking de nada.
+
 > **La respuesta que buscás en la parte b** es que la fila y la columna **no son
 > simétricas**. Si alguien contesta «las columnas también deberían sumar 1 pero hay error
 > de redondeo», ahí tenés a alguien que está leyendo el heatmap al revés. Es la confusión
@@ -79,9 +84,9 @@ cuánto puede valer una columna; el valor exacto lo pone el modelo.**
 
 ## 4. Sin máscara causal
 
-**a)** Aprende a **copiar**, no a predecir. Si para adivinar la palabra 5 puede mirar la
-palabra 5 (y la 6, y la 7), la tarea deja de tener dificultad: la respuesta está en la
-entrada. Aprende la función identidad desplazada, que no sirve para generar nada.
+**a)** Aprende a **copiar**, no a predecir. Si la posición 4, que tiene que adivinar la
+palabra 5, puede ver la palabra 5 (y la 6, y la 7), la tarea deja de tener dificultad: la
+respuesta está en la entrada. Aprende la función identidad desplazada, que no sirve para generar nada.
 
 **b)** Porque la loss mide exactamente lo que el modelo está haciendo bien: acertar la
 próxima palabra **con la información que le diste**. Y le diste la respuesta. La loss va a
@@ -102,7 +107,8 @@ el síntoma.
 
 ## 5. Sin *positional encoding*
 
-**a)** Cualquier par de frases con **las mismas palabras en distinto orden**. La del curso
+**a)** Cualquier par de frases con **las mismas palabras en distinto orden** (para
+attention **sin máscara**, que es lo que dice el enunciado). La del curso
 es *«la comisión rechazó al ministro»* / *«el ministro rechazó a la comisión»*. Se busca que
 den una propia: *«el sindicato denunció a la empresa»* / *«la empresa denunció al
 sindicato»*; *«el juez procesó al intendente»* / *«el intendente procesó al juez»*.
@@ -114,11 +120,18 @@ sindicato»*; *«el juez procesó al intendente»* / *«el intendente procesó a
 > **la misma oración con las palabras barajadas** da la misma salida, sólo que reordenada
 > (diferencia máxima ≈ 5·10⁻⁷, que es error de redondeo). Dale el punto y mostrá esa celda.
 
+> **Si alguien pregunta «¿y con la máscara causal?»**, tiene razón en preguntar: la
+> máscara ya sabe algo del orden (cada palabra ve a una cantidad distinta de palabras), y
+> con dos o más bloques causales un modelo sin posiciones puede reconstruir parte del
+> orden (Haviv et al., 2022). La equivalencia con la bolsa de palabras es exacta para
+> attention sin máscara, tipo BERT; para un GPT sin posiciones es «casi», y peor.
+
 > **El ejercicio real es que sea del área de quien responde**, porque ahí se ve que el
 > problema no es lingüístico sino sustantivo: en su investigación, **quién le hace qué a
 > quién** suele ser exactamente la variable.
 
-**b)** Queda equivalente a la **bolsa de palabras** (*bag of words*) de la clase 6. Es la
+**b)** Queda equivalente a la **bolsa de palabras** (*bag of words*) de la clase 6 (sin
+máscara, y con la salvedad de las palabras vacías de arriba). Es la
 técnica de análisis de texto más usada en ciencias sociales durante treinta años, y es
 justamente la que la clase 6 mostró rota. Sin posición, attention es **una bolsa de
 palabras carísima**.
@@ -178,9 +191,17 @@ sea un misterio sino un reencuentro.**
 
 **Respuesta completa que buscás:** `salida = entrada + lo_que_hizo_el_bloque`. Sirve para
 dos cosas: (1) la información original no se pierde al apilar muchos bloques, y (2) el
-gradiente de la clase 3 llega hasta abajo sin diluirse. El `TODO 4` del notebook lo muestra
-con números: sin residual, la desviación estándar de la salida se derrumba después de seis
-bloques.
+gradiente de la clase 3 llega hasta abajo sin diluirse. El `TODO 4` del notebook muestra la
+primera con números: sin residual, **todas las palabras terminan siendo el mismo vector**.
+El parecido entre palabras (similitud coseno media) pasa de 0,74 con un bloque a 0,999 con
+seis y 1,000 con doce; con residual va de 0,08 a 0,34. (Son números de una corrida
+del notebook: con otra semilla cambian un poco, no el patrón.)
+
+> **Ojo si alguien contesta con la desviación estándar.** No sirve para esto: cada bloque
+> arranca normalizando, así que sin residual la std de la salida queda en ~0,23 con 1, 6 o
+> 12 bloques. La profundidad no apaga la escala; borra la **diferencia entre palabras**
+> (el «colapso de rango» de Dong et al., 2021). Una versión anterior del notebook medía la
+> std y sugería que empeoraba con más bloques: no es así.
 
 ---
 
@@ -188,9 +209,9 @@ bloques.
 
 **Lo que tiene que aparecer en la primera parte:**
 
-- La RNN lee **en orden** y arrastra una única mochila de memoria. Todo lo que leyó tiene
-  que caber ahí, y lo viejo se va diluyendo. A treinta palabras del principio, del sujeto
-  ya no queda casi nada.
+- La RNN lee **en orden** y arrastra una única mochila de memoria, **de tamaño fijo**.
+  Todo lo que leyó tiene que caber ahí, y lo nuevo va pisando lo viejo. A treinta palabras
+  del principio, del sujeto ya no queda casi nada.
 - Attention **no arrastra nada**: cada palabra puede mirar directamente a cualquier otra,
   esté a dos palabras o a doscientas. **La distancia dejó de costar.** No hay camino que
   recorrer, hay un salto.
@@ -242,13 +263,16 @@ tiene doce pisos idénticos y no doce piezas distintas. **No hay una idea nueva 
 
 **a) Qué es defendible y qué no.**
 
-- **Defendible:** que al calcular la representación de esa nota, el modelo **tomó
-  información** de la palabra «inmigrante» en una proporción alta. Eso es lo que el mapa
-  describe: por dónde fluyó la información.
+- **Defendible (con cuidado):** que en esa capa, esa cabeza puso mucho peso en la
+  **posición** de «inmigrante». Eso es lo que el mapa describe. Ni siquiera alcanza para
+  decir cuánto de esa palabra llegó a la salida: en las capas altas cada posición ya es una
+  mezcla de otras, y el aporte depende también del tamaño del *value* y de la residual.
 - **No defendible:** que el modelo «se **basa** en» esa palabra **para decidir**. El mapa no
   determina la salida. Jain & Wallace (2019) muestran que se pueden construir mapas de
-  atención muy distintos que producen **la misma predicción**; si dos mapas contradictorios
-  dan la misma salida, mirar el mapa no alcanza para explicar la salida.
+  atención muy distintos que producen **casi la misma predicción**; si dos mapas
+  contradictorios dan casi la misma salida, mirar el mapa no alcanza para explicar la
+  salida. (Lo mostraron en modelos con RNN; en un transformer, donde todo se mezcla entre
+  capas, el problema es todavía mayor.)
 - **Tampoco defendible, y es un salto aparte:** que eso «evidencie el sesgo del modelo».
   Aunque la palabra sí causara la clasificación, faltaría mostrar que esa asociación es
   **injustificada** respecto de la tarea, y no simplemente un reflejo de cómo están

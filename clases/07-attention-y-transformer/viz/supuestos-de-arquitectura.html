@@ -11,9 +11,10 @@
      moderna: es afirmar algo sobre la forma de MIS datos, y esa afirmación
      puede ser falsa."
 
-     ESTA ES LA COPIA DE LA CLASE 7. Es el MISMO archivo de la clase 5 con
-     DESBLOQUEADAS = true: las filas de RNN y Transformer, que allá estaban
-     grises con el cartel "lo vemos en las clases 6 y 7", acá están abiertas.
+     ESTA ES LA COPIA DE LA CLASE 7. Es el mismo archivo de la clase 5 con las
+     filas de RNN (clase 6) y Transformer (hoy) desbloqueadas, cada una con su
+     propio interruptor en DESBLOQUEADAS: allá estaban grises con el cartel
+     "lo vemos en la clase 6 / 7", acá están abiertas.
      Se deja como copia (y no como enlace a la de la clase 5) para que cada
      clase abra con lo que su audiencia ya vio y nada más.
      ========================================================================== -->
@@ -128,7 +129,8 @@
     <p class="viz-pie">
       El cartel de datos tabulares se apoya en Grinsztajn, Oyallon &amp; Varoquaux (2022),
       <i>Why do tree-based models still outperform deep learning on tabular data?</i>
-      <span class="chip">[VERIFICAR URL]</span> — la cita está en <code>referencias.md</code>.
+      <span class="chip">[VERIFICAR URL]</span> — la cita está en el <code>referencias.md</code>
+      de esta clase y en el de la clase 5.
       Es la misma tabla de la clase 5, con las dos filas que allá estaban grises
       ya abiertas: <b>RNN</b> (clase 6) y <b>Transformer</b> (hoy). Prometido en la
       clase 5, cumplido.
@@ -140,9 +142,11 @@
 <script src="../../../_shared/js/viz.js"></script>
 <script>
 /* --------------------------------------------------------------------------
-   CLASE 7: las dos filas que en la clase 5 estaban grises, abiertas.
+   CLASE 7: las dos filas que en la clase 5 estaban grises, abiertas. Un
+   interruptor por fila (y no uno solo para las dos): así cada clase abre
+   exactamente lo que su audiencia ya vio.
    -------------------------------------------------------------------------- */
-const DESBLOQUEADAS = true;
+const DESBLOQUEADAS = { rnn: true, transformer: true };
 
 /* --------------------------------------------------------------------------
    1. Las cuatro arquitecturas
@@ -156,21 +160,21 @@ const ARQ = [
     ejemplo: 'Es el modelo de la clase 4. Su honestidad es su límite: <b>no supone nada, así que tampoco te regala nada</b>. Todo lo que sabe sobre la forma del dato lo tiene que descubrir con ejemplos, y descubrirlo cuesta datos.'
   },
   {
-    id: 'cnn', nombre: 'CNN (convolucional)', pie: 'la de hoy', gris: false,
+    id: 'cnn', nombre: 'CNN (convolucional)', pie: 'clase 5', gris: false,
     supone: 'Tres cosas: (1) lo que importa es <b>local</b> —los vecinos se relacionan—; (2) un patrón <b>vale igual en cualquier posición</b>; (3) lo grande está hecho de lo chico.',
     cierto: 'En imágenes, espectrogramas, mapas: hay una grilla real y la vecindad significa algo. Un píxel se parece a su vecino porque son el mismo objeto.',
     miente: 'Cuando no hay grilla (una tabla), cuando la posición <b>sí</b> cambia el significado (el norte y el sur de un país se ven distinto), o cuando el objeto aparece rotado y no sólo corrido.',
     ejemplo: 'La invariancia traslacional es el mismo tipo de supuesto que la <b>equivalencia de medición</b> en una encuesta: decir "este patrón significa lo mismo en cualquier parte de la imagen" es decir "esta pregunta significa lo mismo en todas las provincias". A veces es cierto y a veces es una fuente conocida de sesgo.'
   },
   {
-    id: 'rnn', nombre: 'RNN (secuencial)', pie: 'clase 6', gris: false,
+    id: 'rnn', nombre: 'RNN (secuencial)', pie: 'clase 6', gris: true,
     supone: 'Que los datos vienen en <b>orden</b> y que lo que importa se puede acumular leyendo de a uno y arrastrando una memoria.',
     cierto: 'Series temporales y texto leído de corrido: lo de recién pesa más que lo de hace rato.',
-    miente: 'Cuando lo que importa está lejos: el sujeto de la línea 1 y el verbo de la línea 30. La memoria se diluye por el camino.',
+    miente: 'Cuando lo que importa está lejos: el sujeto de la línea 1 y el verbo de la línea 30. La memoria es de tamaño fijo y lo nuevo va pisando lo viejo.',
     ejemplo: 'Se vio entera en la <b>clase 6</b>, con la frase larga donde el modelo se olvida de quién era el sujeto. Es exactamente la falla que hoy vinimos a arreglar.'
   },
   {
-    id: 'transformer', nombre: 'Transformer (atención)', pie: 'la de hoy', gris: false,
+    id: 'transformer', nombre: 'Transformer (atención)', pie: 'clase 7', gris: true,
     supone: 'Que cualquier parte puede depender de cualquier otra, y que el modelo puede aprender <b>a quién mirar</b> en vez de que se lo digamos nosotros.',
     cierto: 'Cuando las dependencias son largas e impredecibles: lenguaje, código, secuencias largas.',
     miente: 'Casi no supone nada, y eso se paga en datos: necesita muchísimos ejemplos, o alguien que ya lo haya entrenado por vos.',
@@ -220,7 +224,7 @@ const DATOS_POSIBLES = [
   {
     id: 'discursos', nombre: 'un corpus de discursos',
     v: {
-      densa: ['A', 'Sobre una bolsa de palabras funciona, pero la bolsa ya tiró el orden: "la comisión rechazó al ministro" y "el ministro rechazó a la comisión" son el mismo vector.'],
+      densa: ['A', 'Sobre una bolsa de palabras funciona, pero la bolsa ya tiró el orden: "la comisión rechazó al ministro" y "el ministro rechazó a la comisión" son el mismo vector (sacando las palabras vacías, que es lo que suele hacerse).'],
       cnn: ['A', 'Una CNN 1D detecta bien las frases hechas ("estado de derecho"), que son patrones locales. Lo lejano se le escapa.'],
       rnn: ['A', 'Lee en orden, que es lo correcto, pero se olvida del principio de los párrafos largos.'],
       transformer: ['V', 'Cada palabra puede mirar directamente a cualquier otra, sin importar la distancia. Es la arquitectura hecha para esto.']
@@ -243,9 +247,9 @@ const DATOS_POSIBLES = [
     id: 'archivo', nombre: 'un archivo fotográfico o de prensa gráfica',
     v: {
       densa: ['R', 'Mismo problema que siempre: aplanar tira la única estructura que había.'],
-      cnn: ['V', 'Es el caso ideal, y con transferencia (clase 9) alcanza con unos cientos de fotos etiquetadas.'],
+      cnn: ['V', 'Es el caso ideal, y con un modelo ya entrenado por otros (la transferencia que la clase 9 hace con texto) suelen alcanzar unos cientos de fotos etiquetadas.'],
       rnn: ['R', 'Una foto no es una secuencia.'],
-      transformer: ['A', 'Los modelos de imagen que ya vienen entrenados suelen ser transformers, y en la clase 9 vamos a usar uno sin entrenarlo nosotros.']
+      transformer: ['A', 'Muchos modelos de imagen que ya vienen entrenados son transformers. En la clase 9 usamos uno de texto sin entrenarlo nosotros; con imágenes la lógica es la misma.']
     },
     cartel: ['ok', 'El caso más concreto para esta sala',
       'Clasificar 40.000 fotos de archivo en tres categorías es imposible a mano y perfectamente factible con esto. Lo que necesitás antes de empezar: <b>etiquetas</b>, una <b>partición honesta</b> (que no mezcle las fotos del mismo álbum entre train y test) y un <b>baseline</b> contra el cual comparar.']
@@ -263,6 +267,8 @@ function icono(id, celda) {
   const W = 150, H = 46, dpr = window.devicePixelRatio || 1;
   cv.width = W * dpr; cv.height = H * dpr;
   cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.className = 'icono';
+  // es un dibujito decorativo: el nombre de la fila ya dice qué arquitectura es
+  cv.setAttribute('aria-hidden', 'true');
   const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
   const tinta = Viz.color('tinta3'), acento = Viz.color('acento');
   c.lineWidth = 1;
@@ -319,7 +325,7 @@ function pintar() {
   cuerpo.innerHTML = '';
   const D = datosElegidos();
   for (const a of ARQ) {
-    const gris = a.gris && !DESBLOQUEADAS;
+    const gris = a.gris && !DESBLOQUEADAS[a.id];
     const tr = document.createElement('tr');
     tr.className = 'fila' + (gris ? ' gris' : '');
 

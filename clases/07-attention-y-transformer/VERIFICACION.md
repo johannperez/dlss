@@ -6,6 +6,58 @@ Fecha: 2026-08-29 · Todo lo que dice acá se comprobó **corriendo el material*
 `context.route` abortando **cualquier** `http(s)`, `curl` contra cada URL, y mirando los PNG
 con los ojos (53 screenshots de slides, viz e interacciones).
 
+> **Leé primero la sección 0.** Las secciones 1 a 5 son la verificación original
+> (2026-08-29) y se dejan como registro; donde una afirmación suya resultó falsa o quedó
+> vieja, está corregida en el lugar y marcada **[corregido 2026-09-29]**.
+
+---
+
+## 0. Segunda revisión y arreglos (2026-09-29)
+
+Una revisión posterior encontró problemas que la verificación original no había visto. Esto
+es lo que se cambió y **cómo se comprobó**. Entorno: macOS arm64, Python 3.12.13, torch
+2.14.0, numpy 2.5.3, CPU.
+
+### Lo que estaba mal y se arregló
+
+| # | Problema | Arreglo | Cómo se comprobó |
+|---|---|---|---|
+| 1 | **El `TODO 4` medía la desviación estándar**, que con pre-norm no depende de la profundidad (sin residual ≈ 0,23 con 1, 6 o 12 bloques). «Subí a 12 y mirá cuánto empeora» era falso, y el ítem 8 de las soluciones decía que la std «se derrumba después de seis bloques». | El TODO mide ahora el **parecido entre palabras** (similitud coseno media) y muestra la std al lado, a propósito. La rama sin residual viene con las sumas puestas y hay que sacarlas; el `revisar` pide parecido > 0,95 sin residual y < 0,6 con residual a 6 bloques. Slides 28 y 33, soluciones (ítem 8) y notas actualizadas. | Notebook resuelto en una copia: sin residual 0,74 → 0,95 → 0,98 → 0,999 → 1,000 (1/2/3/6/12 bloques), std ≈ 0,23 constante; con residual 0,08-0,34. Sin resolver: `OJO`. Probado además con 4 semillas en un script aparte: el umbral de 6 bloques se cumple en las cuatro. |
+| 2 | **«Da los mismos números hasta el cuarto decimal»** (script, notas, referencias, este archivo). En torch 2.14 / macOS el script da otra loss (4,572 contra 4,6013) y **pierde los dos aha**. | Se dice «determinista en la misma máquina y con las mismas versiones». El script registra versiones en `meta.versiones`, tiene `verificar_aha()` y `--verificar`, y **se niega a sobrescribir** los datos si una corrida pierde un aha (salvo `--forzar`). | Corrida completa en una copia: el script imprimió los dos `!!` y no tocó los archivos (md5 igual antes y después). `--verificar` sobre el JSON del repo: los dos `OK`. **Los mapas NO se regeneraron.** |
+| 3 | Los rótulos de las cabezas contaban la fila 0 (que bajo máscara vale 1,0 sobre sí misma) y no decían que salen de 5 oraciones. | `estadisticas_cabeza` excluye la fila 0. Se corrió `--rerotular`, que recalcula **sólo** `cabezas` y agrega `meta.rotulos_medidos_sobre` y `meta.versiones` sin tocar mapas ni historial. Los pies de las viz dicen «medido sobre las cinco oraciones». | Comparado con el JSON anterior: `oraciones` e `historial` idénticos; cambian sólo `cabezas` y `meta`. Los ocho rótulos no cambian; los números sí (p. ej. auto-atención del bloque 1: 0,75 · 0,85 · 0,95 · 0,85, antes 0,77 · 0,86 · 0,95 · 0,86). |
+| 4 | Slide 25 y solución del ítem 5: «sin posición es una bolsa de palabras» sin la salvedad de la máscara. | «(sin máscara)» en la slide, en el enunciado y la solución del ítem 5, en el notebook (sección 7) y en las notas; Haviv et al. (2022) en referencias. | Lectura. |
+| 5 | Slide 34: «el modelo tomó un 34% del vector de aquella». | «Dónde puso el peso esta cabeza, en esta capa… en las capas altas cada posición ya es una mezcla», y la salvedad del *value* en las notas (Kobayashi et al., 2020). Mismo ajuste en la solución del ítem 11. | Captura de la slide: entra en 760 px. |
+| 6 | Jain & Wallace presentado como si fuera sobre transformers y con «la misma salida». | «Casi la misma salida» y «lo mostraron en modelos con RNN» en slide 34, notebook (TODO 5), notas, soluciones y referencias. | Lectura. |
+| 7 | Ejemplo de «lo» con «comisión» (femenino) recibiendo 0,30. | Se cambió por «sistema» (masculino, está en la misma oración) en las slides 5-8 y 16 y en el notebook. | Capturas de las slides 6 y 8. |
+| 8 | Calendario: el bloque de cierre llevaba como nombre un día (plazo ambiguo); «la clase 8 lo enciende» (la 8 entrena otro modelo, sobre otro corpus). | `[EN TU INVESTIGACIÓN]` en slide 35 y notebook. El puente dice que la 8 enciende un mini-GPT de cuatro bloques, letra por letra, hecho con estas piezas y entrenado sobre Aguasclaras, el corpus sintético de la clase 8 (no sobre los discursos 1984-2019, y no «más chico»: tiene ~1,5 M de parámetros) (slides 31 y 38, notebook, notas). Nota sobre la puesta en común opcional de la clase 7 (TODO 5 de la clase 6). | `grep` de nombres de días y plazos relativos: 0 apariciones en la carpeta. |
+| 9 | «Más de 100 bloques», «la mitad de lo que hace un transformer no es interpretable», «la mayoría de las cabezas…», posiciones aprendidas «lo que usan casi todos», «cuarenta años», «dos millones» de palabras, √d mal explicado en la celda 15. | «Decenas de bloques, hasta un centenar»; «mucho de lo que hace…»; «unas pocas cabezas especializadas y muchas que no se dejan resumir» (Voita/Clark); RoPE; 1984-2019; «cuatrocientas mil»; la celda 15 explica escala → afilado y que √d corrige el caso contrario. | Lectura. |
+| 10 | `qkv.html`: con +60° la coma y «lo» empatan (36/36); el botón decía «así lo aprendió el modelo». | La slide 14 y la viz piden **+75°** (coma 44%, «lo» 27%, «algo» 9%, recalculado); el botón dice «Volver a los valores de ejemplo». | Recalculado en Python con la misma fórmula de la viz; captura de la viz. |
+| 11 | Referencias internas: slide 18 «hasta la sección 4», slide 33 «secciones 5 a 8», notas «Slides 32-33», comentarios HTML con la numeración vieja, puntero a Grinsztajn en la viz de supuestos. | «Secciones 2 y 3», «4 a 8», «slide 34», comentarios renumerados 1-38, Grinsztajn agregado a `referencias.md`. | `grep` + conteo de `<section>`: 38. |
+| 12 | Viz de supuestos: el par de artículos, la promesa de un modelo de imagen en la clase 9, el pie de la CNN («la de hoy») y un solo interruptor para las dos filas. | «(sacando las palabras vacías)», clase 9 = texto («con imágenes la lógica es la misma»), CNN = clase 5, un interruptor por fila. | Captura de la viz. |
+| 13 | Accesibilidad: canvas sin descripción y mapas que dependen sólo del color. | `role="img"` + `aria-label` (que se actualiza) en los tres canvas de las slides, en `qkv.html` y en el SVG de `attention-como-mesa.html`; `aria-label` en las tablas y `title` con el porcentaje en cada celda de `matriz-de-atencion.html` y `cabezas.html`; `cabezas.html` suelta tiene «mostrar los números (en %)»; la palabra ganadora de `qkv` lleva ▸ además del color; los íconos decorativos de la viz de supuestos van `aria-hidden`. | Capturas con Chrome headless (incluida la de números). |
+| 14 | Celdas del notebook sin `id` (`MissingIDFieldWarning`). | Ids agregados a las 49 celdas que no tenían; la de bootstrap no se tocó (md5 de su código 4c9c6d9d…). | `nbformat.validate` con las advertencias como error: válido, 50 celdas, sin salidas. |
+
+### Lo que se midió en esta revisión
+
+- **Verificación independiente (2026-09-29).** Se repitió todo en otra copia: notebook sin
+  resolver (3 `OJO ·`, 0 errores, ~7 s) y resuelto (TODO 1, 2 y 4 en `OK ·`; parecido sin
+  residual 0,74 · 0,95 · 0,98 · 0,999 · 1,000, con residual 0,08 · 0,12 · 0,11 · 0,19 ·
+  0,34); `--verificar` (los dos `OK`); `--rerotular` idempotente (el JSON sale igual byte a
+  byte en este entorno); corrida completa: pierde los dos aha y **no escribe** (archivos
+  intactos). Slides y viz cargadas en Chrome headless sin errores de JavaScript. Se corrigió
+  el puente a la clase 8, que prometía entrenar sobre los discursos 1984-2019 y un modelo
+  «más chico que el de hoy»: la clase 8 usa el corpus sintético Aguasclaras y su modelo
+  tiene ~1,54 M de parámetros (el de hoy, ~1,25 M).
+
+- **Notebook**: `nbconvert --execute` en una copia del repo: 0 errores, ~5 s. Salen tres
+  `OJO ·` esperados (TODO 1, 2 y 4 sin resolver). Con los tres resueltos en otra copia: pasan
+  a `OK ·`.
+- **Viz y slides**: `node --check` sobre todos los `<script>` inline (0 errores) y capturas
+  con Chrome headless de las cinco viz sueltas y de las slides 6, 8, 24, 25, 28, 31, 34, 35 y
+  38 a 1280×760. **No** se repitió la pasada de interacción de la verificación original
+  (clics, sliders, tema oscuro, ventana angosta) ni se midió el alto de todas las slides.
+- **No se probó en Colab.**
+
 ---
 
 ## 1. Veredicto
@@ -26,7 +78,7 @@ le decía al aula que cuatro cabezas «hacen lo mismo» cuando sus mapas son cla
 | Iframes de viz dentro de las slides | los 5 cargan; los 4 propios **entran enteros** en su alto (antes 3 se cortaban) |
 | Alto de las slides | ninguna de las 38 supera los 760 px de diseño (antes: 3 lo hacían) |
 | Ventana angosta (820 px y 640 px) | ninguna viz desborda en horizontal, 0 errores |
-| Reproducibilidad del modelo | `medir-atencion.py` corrido **dos veces**: `datos-atencion.json` sale **idéntico** salvo el campo `segundos` |
+| Reproducibilidad del modelo | `medir-atencion.py` corrido **dos veces** en la misma máquina: `datos-atencion.json` sale idéntico salvo `segundos`. **[corregido 2026-09-29]** Eso vale sólo con las mismas versiones: con torch 2.14 en macOS da otros mapas y pierde los dos aha (ver §0). |
 | URLs | **8 verificadas con `curl` (HTTP 200)**; 5 hosts confirmados inalcanzables desde acá |
 | Presupuesto de tiempo | **120 min exactos**, coincide con `PROGRAMA.md` |
 
@@ -40,7 +92,7 @@ le decía al aula que cuatro cabezas «hacen lo mismo» cuando sus mapas son cla
 La tabla arrancaba bien y se desfasaba en el medio: «las tres decisiones» (15) + «el bloque
 completo» (10) se comían diez minutos que la especificación no tiene, y el cierre terminaba a
 las **2:10**. Un docente que siguiera esa tabla se quedaba sin la mitad del cierre, que es
-justamente el `[EL LUNES]`.
+justamente el bloque de «en tu investigación».
 *Arreglado:* la tabla ahora es 10+20+15+15+**10**+9+6+20+15 = **120**, mapeada a los números de
 slide reales, con una nota que avisa que el tramo 1:10–1:25 son trece slides y hay que ensayarlo.
 
@@ -113,8 +165,8 @@ los números reales de esa vista.
 **12. «751 s de CPU» era un número real pero engañoso.** Salía de una corrida hecha con la
 máquina cargada; con la CPU libre el mismo entrenamiento tarda **51 s** (medido dos veces: 58,5 y
 50,9). El notebook lo imprimía y el aula iba a entender «doce minutos». *Arreglado:* regeneré
-`datos-atencion.json`/`.js` con el script sin tocar nada más —el contenido es **idéntico byte a
-byte** salvo ese campo— y actualicé la docstring y las notas.
+`datos-atencion.json`/`.js` con el script sin tocar nada más —el contenido salió igual salvo
+ese campo, **en esa máquina y con esas versiones**— y actualicé la docstring y las notas.
 
 **13. El comentario del momento aha de `attention-como-mesa.html` decía «cinco palabras para
 atrás»** cuando el arco va **dos** palabras atrás. *Arreglado.*
@@ -141,10 +193,13 @@ clase construyó una viz entera. *Arreglado* en `recursos/glosario.md`, remitien
 
 ## 3. Lo que verifiqué y estaba bien
 
-- **Los mapas de atención son de un modelo real y son reproducibles.** Corrí
-  `medir-atencion.py` dos veces: `historial`, `oraciones` y `cabezas` salen **idénticos** al
-  archivo del repo (mismos 0,77 · 0,86 · 0,95 · 0,86 de auto-atención en el bloque 1, misma
-  muestra generada palabra por palabra). Lo único que cambia entre corridas es `segundos`.
+- **Los mapas de atención son de un modelo real.** Corrí `medir-atencion.py` dos veces:
+  `historial`, `oraciones` y `cabezas` salieron idénticos al archivo del repo (mismos
+  0,77 · 0,86 · 0,95 · 0,86 de auto-atención en el bloque 1, misma muestra generada). Lo
+  único que cambia entre corridas es `segundos`. **[corregido 2026-09-29]** Eso prueba
+  determinismo en *esa* máquina, no reproducibilidad en general: con otra versión de torch
+  los mapas cambian (§0). Y aquellos números de auto-atención contaban la fila 0; sin ella
+  son 0,75 · 0,85 · 0,95 · 0,85.
 - **Las cinco oraciones existen en el corpus.** Las busqué una por una en
   `datos/muestras/discursos-apertura/corpus-mini-gpt.txt`; las cinco están textuales (dos de
   ellas partidas por un salto de línea, por eso hay que normalizar los espacios antes de
@@ -161,7 +216,8 @@ clase construyó una viz entera. *Arreglado* en `recursos/glosario.md`, remitien
 - **Las cinco viz responden.** Cliqueé palabras, moví los dos giros, prendí y apagué la máscara,
   los values, «todas a la vez», «superponer», los dos bloques, el slider de posición y el de
   números, y las cinco oraciones. Los aha ocurren: «lo» → «algo» al 100%; al girar el aviso a
-  +60° «lo» se va a la coma (36% contra 14% de «algo»); los values **no** mueven los
+  +60° «lo» se va a la coma (36% contra 14% de «algo»; **[corregido 2026-09-29]** con un
+  empate 36/36 con la propia «lo»: ahora se pide +75°, 44% contra 9%); los values **no** mueven los
   porcentajes; el triángulo crece con el slider y las sumas de columna cambian con él.
 - **Las 7 figuras del notebook** tienen ejes rotulados, leyenda o números en las celdas, y el pie
   «cada fila suma 1,00 · las columnas no suman nada» en todos los heatmaps.
@@ -183,7 +239,10 @@ clase construyó una viz entera. *Arreglado* en `recursos/glosario.md`, remitien
 | 2 | **El modelo tiene la atención muy afilada** (varias filas dan 1,00 en una sola celda) y el bloque 1 colapsado en auto-atención. Está contado como contenido en las tres viz, en el notebook y en las notas. **Probé la corrida larga que sugería el equipo anterior** (`--pasos 6000`, lr 1,2e-3): la loss de validación mejora (4,60 → 4,23) y **la clase empeora** — las cabezas se vuelven difusas, «lo» se mira sobre todo a sí misma (35-41%) y en la enumeración la atención se va a los artículos. Se pierden los dos aha. **Recomendación: no cambiar el modelo.** Queda anotado en `medir-atencion.py`. | equipo 8, si reusa el modelo |
 | 3 | En la viz de las cabezas embebida, los rótulos de los heatmaps quedan en 8,6 px (se achicaron para que las cuatro matrices entraran). Se leen en un proyector de 1280, pero en un aula grande conviene abrir la viz suelta, donde van a 9,5 px y con celdas más grandes. | el docente |
 | 4 | El notebook **corre sin red** (lo probé bloqueando los sockets de Python), pero **nadie lo corrió en Colab de verdad**. La celda de bootstrap y la ruta de descarga siguen sin probarse contra internet. | el primer equipo que lo abra en Colab |
-| 5 | En `qkv.html`, con el aviso girado a +60°, la coma (36%) y la propia «lo» (36%) quedan empatadas al redondeo. El panel elige bien —nombra a la coma, que es la que gana entre las **otras** palabras— pero si alguien mira sólo las barras puede ver un empate. No lo toqué porque los números son los que son. | el docente, si se lo preguntan |
+| 5 | ~~En `qkv.html`, con el aviso girado a +60°, la coma y la propia «lo» quedan empatadas.~~ **Resuelto 2026-09-29:** la slide y la viz piden +75°. | — |
+| 7 | **Nuevo (2026-09-29).** Los mapas del repo no traen las versiones con que se entrenaron (la corrida es anterior a ese registro), y en otro entorno el script no los reproduce. Mientras no se regenere en la máquina original, la única garantía es `--verificar` sobre el JSON guardado. | quien mantenga el repo |
+| 8 | **Nuevo.** El `TODO 5` sigue siendo de escritura: la intervención («cambiar la palabra y ver si cambia la predicción») no se puede ejecutar porque el repo no guarda los pesos del modelo, y reentrenar acá daría otro modelo (fila 7). | el equipo que regenere los datos |
+| 9 | **Nuevo.** En `cabezas.html` embebida en la slide 24 el control «mostrar los números» se oculta (el alto del iframe está justo): ahí los valores se leen al pasar el mouse. Suelta, el control está. | el docente |
 | 6 | El entorno hace *snapshots* automáticos con `git commit`. Uno de ellos alcanzó a llevarse un directorio temporal que usé para reproducir el entrenamiento (`clases/00-verif/`). **Lo borré del working tree**; el borrado está sin commitear, porque el encargo prohíbe commitear. Que el próximo snapshot lo levante, o que alguien lo confirme a mano. | quien mantenga el repo |
 
 ---
@@ -196,8 +255,11 @@ python3 -c "import nbformat; nbformat.validate(nbformat.read('clases/07-attentio
 python3 -m nbconvert --to notebook --execute --output /tmp/out.ipynb \
         clases/07-attention-y-transformer/notebook.ipynb          # ~16 s, 0 errores, 7 figuras
 
-# el modelo de las viz (tiene que dar EXACTAMENTE el mismo JSON, salvo `segundos`)
-PYTHONPATH=_shared python3 clases/07-attention-y-transformer/medir-atencion.py   # ~51 s
+# los dos momentos aha, sobre el JSON guardado (no entrena; sale con código 1 si falta alguno)
+PYTHONPATH=_shared python3 clases/07-attention-y-transformer/medir-atencion.py --verificar
+
+# reentrenar: determinista sólo con las mismas versiones. Si pierde un aha, NO escribe nada.
+PYTHONPATH=_shared python3 clases/07-attention-y-transformer/medir-atencion.py   # 15-60 s
 
 # sin red: bloquear los sockets de Python y correr el notebook como script
 python3 -m nbconvert --to script --output-dir /tmp/sinred clases/07-attention-y-transformer/notebook.ipynb

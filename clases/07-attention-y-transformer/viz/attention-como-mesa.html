@@ -78,15 +78,17 @@
       justo entre los tres sustantivos enumerados. <em>Eso</em> es el promedio ponderado.
       <b>(3)</b> Ahora pasá a cualquier cabeza del <b>bloque 1</b>: se miran casi sólo a
       sí mismas y los arcos desaparecen. No está roto: es lo que aprendió este modelo, y
-      en modelos chicos pasa seguido. La mitad de lo que hace un transformer no es
-      interpretable, y funciona igual.
+      en modelos chicos pasa seguido. Mucho de lo que hace un transformer no se deja
+      leer como una regla simple, y funciona igual.
     </div>
     <p class="viz-pie">
       Los pesos salen de un transformer de <span id="pie-param">—</span> parámetros
       entrenado en CPU sobre los <b>discursos de apertura de sesiones de la Argentina,
       1984-2019</b> (corpus real). Sin retoques: si un patrón se ve feo, es porque el
-      modelo hace eso. Reproducible con
-      <code>clases/07-attention-y-transformer/medir-atencion.py</code>.
+      modelo hace eso. Generado con
+      <code>clases/07-attention-y-transformer/medir-atencion.py</code>, que es
+      determinista en la misma máquina y con las mismas versiones de las librerías; con
+      otra versión de torch los mapas cambian (y pueden perder el aha de «lo»).
     </p>
   </footer>
 
@@ -159,6 +161,14 @@ function dibujar() {
   cont.innerHTML = '';
   const s = Viz.svg.crear('#escena', { ancho: ANCHO, alto: ALTO, altoCss: 'auto' });
   s.style.height = 'auto';
+  // una descripción en texto del mapa: el grosor de los arcos no puede ser la única pista
+  s.setAttribute('role', 'img');
+  s.setAttribute('aria-label', estado.sel === null || estado.todas
+    ? 'La oración «' + fs.join(' ') + '» con los arcos de atención.'
+    : 'Cómo «' + fs[estado.sel] + '» reparte su atención: ' +
+      fs.map((f, j) => [f, A[estado.sel][j]])
+        .filter(x => x[1] >= 0.05)
+        .map(x => x[0] + ' ' + Math.round(x[1] * 100) + '%').join(', ') + '.');
   s.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
   // --- los arcos ---
