@@ -55,6 +55,12 @@
   ol.resultados li mark { background: var(--c-acento-suave); color: inherit; border-radius: 3px; }
   ol.resultados li .marca-fp { display: inline-block; font-size: .66rem; font-weight: 700;
     letter-spacing: .06em; text-transform: uppercase; color: var(--c-error); margin-right: .4em; }
+  ol.resultados li .marca-sp, ol.resultados li .marca-dud, ol.resultados li .marca-sr {
+    display: inline-block; font-size: .66rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; margin-right: .4em; }
+  ol.resultados li .marca-sp { color: var(--c-ok); }
+  ol.resultados li .marca-dud { color: var(--c-parametro); }
+  ol.resultados li .marca-sr { color: var(--tinta-3); }
   p.vacio { font-size: .82rem; color: var(--tinta-3); font-style: italic; margin: .4em 0; }
 </style>
 </head>
@@ -96,11 +102,12 @@
     <div class="aha">
       <strong>Qué mirar.</strong> Empezá por <b>fútbol</b>: la búsqueda por palabra
       encuentra <em>uno</em> (un cura que puso un televisor en el confesionario), y la
-      semántica te trae FIFA, Chivas, el Cruz Azul y la NFL, ninguno de los cuales dice
-      «fútbol». Después probá <b>protesta</b>: aparece
+      semántica te trae tres notas sobre la FIFA, ninguna de las cuales dice «fútbol»,
+      más varias dudosas (el negocio de Chivas, una sátira sobre el Cruz Azul) y la NFL,
+      que es otro fútbol. Después probá <b>protesta</b>: aparece
       <em>«Desmanes y ataques contra 10 CAI dejan varios heridos en Bogotá»</em>, que
-      tampoco tiene la palabra. Todo lo que está <span class="c-ok">en verde</span> es lo
-      que tu lista de palabras clave venía perdiendo <em>sin que te enteraras</em>.
+      tampoco tiene la palabra. Todo lo marcado <span class="c-ok">«sin la palabra»</span>
+      es lo que tu lista de palabras clave no podía encontrar <em>sin que te enteraras</em>.
       Ahora prendé <b>marcar los que no vienen al caso</b> y mirá el otro lado. Con
       «protesta» te trae una discoteca que cierra y una reforma de derechos de autor, con
       la misma cara de confianza. Y con <b>vacuna</b> es peor: de los ocho, cuatro no
@@ -111,7 +118,11 @@
     </div>
     <p class="viz-pie">
       Datos <b>reales</b>: 300 titulares del <i>Spanish Fake News Corpus 2.0</i>
-      (nov 2020 – mar 2021), CC BY 4.0 — ver <code>datos/README.md</code> §1.3.
+      (dos recolecciones: enero–julio de 2018 y noviembre de 2020 – marzo de 2021),
+      CC BY 4.0 — ver <code>datos/README.md</code> §1.3.
+      Las marcas «no viene al caso» y «dudoso» las pusimos a mano, leyendo los ocho
+      primeros de las seis consultas sugeridas; para cualquier otra consulta, o más
+      allá del octavo, dicen <b>sin revisar</b>.
       Los vectores son los del curso: coocurrencia → PPMI → SVD sobre el mismo corpus,
       con numpy y sin bajar ningún modelo (<code>medir-clase09.py</code>).
       Un modelo de embeddings de oración de verdad anda mejor que esto; la mecánica y
@@ -131,17 +142,26 @@ const B = DATOS_C9.busqueda;
 const PAL = B.palabras, VEC = B.vectores, DIM = B.dim;
 const INDICE = {}; PAL.forEach((p, i) => { INDICE[p] = i; });
 
-/* Los titulares que el equipo marcó a mano como "no viene al caso" para las
-   consultas sugeridas. Se leyeron uno por uno; no salen de ninguna regla.
-   La clave es la consulta, el valor son los índices del corpus. */
-const FALSOS_POSITIVOS = {
-  protesta: ['derechos de autor', 'discoteca', 'tribunal de cuentas',
-             'tribunal constitucional', 'chivas tv'],
-  vacuna: ['homosexualismo', 'cucuta', 'tarjetas sanitizantes', 'militares franceses'],
-  violencia: ['olga sanchez cordero', 'margarita zavala', 'facebook', 'pri compro'],
-  elecciones: ['miss universo'],
-  'futbol': ['nfl'],
-  coronavirus: []      // revisados uno por uno: los ocho vienen al caso
+/* La revisión a mano: los ocho primeros de cada consulta sugerida, leídos uno
+   por uno (no salen de ninguna regla). La clave es la consulta TAL CUAL (con
+   tilde: "futbol" sin tilde da otro ranking y no está revisada). Cada entrada
+   tiene los fragmentos (sin tildes) de los que "no vienen al caso" y de los
+   "dudosos", con el motivo. Más allá del octavo, o para otra consulta, se
+   muestra "sin revisar": no contamos como hallazgo lo que nadie leyó. */
+const REVISADOS_HASTA = 8;
+const REVISION_MANUAL = {
+  'protesta': { fp: ['derechos de autor', 'discoteca', 'tribunal de cuentas',
+                     'tribunal constitucional', 'chivas tv'], dudosos: {} },
+  'vacuna': { fp: ['homosexualismo', 'cucuta', 'tarjetas sanitizantes',
+                   'militares franceses'], dudosos: {} },
+  'violencia': { fp: ['olga sanchez cordero', 'margarita zavala', 'facebook',
+                      'pri compro'], dudosos: {} },
+  'elecciones': { fp: ['miss universo'], dudosos: {} },
+  'fútbol': { fp: ['nfl'],
+              dudosos: { 'chivas tv': 'el negocio de un club, no el fútbol jugado',
+                         'jorge vergara': 'el negocio de un club, no el fútbol jugado',
+                         'organizacion mundial de la salud': 'sátira sobre el Cruz Azul' } },
+  'coronavirus': { fp: [], dudosos: {} }     // los ocho vienen al caso
 };
 
 /** Normaliza para comparar: minúsculas y sin tildes. */
@@ -232,12 +252,17 @@ function escapar(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function esFalsoPositivo(consulta, titular) {
-  const clave = pelar(consulta.trim());
-  const lista = FALSOS_POSITIVOS[clave];
-  if (!lista) return false;
+/** Qué dice la revisión a mano de este titular en este puesto del ranking:
+    'fp' (no viene al caso), 'dudoso', 'ok' (leído y en tema) o 'sinrevisar'. */
+function juicio(consulta, titular, puesto) {
+  const r = REVISION_MANUAL[consulta.trim().toLowerCase()];
+  if (!r || puesto >= REVISADOS_HASTA) return { tipo: 'sinrevisar' };
   const t = pelar(titular);
-  return lista.some(m => t.indexOf(pelar(m)) >= 0);
+  if (r.fp.some(m => t.indexOf(pelar(m)) >= 0)) return { tipo: 'fp' };
+  for (const m of Object.keys(r.dudosos)) {
+    if (t.indexOf(pelar(m)) >= 0) return { tipo: 'dudoso', motivo: r.dudosos[m] };
+  }
+  return { tipo: 'ok' };
 }
 
 function pintarLista(destino, filas, consulta, op) {
@@ -249,20 +274,29 @@ function pintarLista(destino, filas, consulta, op) {
   }
   let sinPalabra = 0;
   let html = '<ol class="resultados">';
-  for (const f of filas) {
+  filas.forEach((f, puesto) => {
     const c = CORPUS[f.i];
     const tienePalabra = pelar(consulta).split(/\s+/).filter(Boolean)
       .every(p => c.plano.indexOf(p) >= 0);
-    const fp = op.marcarFP && esFalsoPositivo(consulta, c.t);
+    const j = op.marcarFP ? juicio(consulta, c.t, puesto) : { tipo: '' };
+    const fp = j.tipo === 'fp';
     let clase = '';
     if (op.semantica && fp) clase = 'malo';
     else if (op.semantica && !tienePalabra) { clase = 'sinpalabra'; sinPalabra++; }
+    // las marcas van en texto, no sólo en color
+    let marcas = '';
+    if (op.semantica && !tienePalabra) marcas += '<span class="marca-sp">sin la palabra</span>';
+    if (fp) marcas += '<span class="marca-fp">no viene al caso</span>';
+    else if (j.tipo === 'dudoso') marcas += '<span class="marca-dud" title="' + escapar(j.motivo) +
+      '">dudoso: ' + escapar(j.motivo) + '</span>';
+    else if (op.semantica && j.tipo === 'sinrevisar' && !tienePalabra)
+      marcas += '<span class="marca-sr">sin revisar</span>';
     html += '<li class="' + clase + '">' +
       '<span class="p">' + (op.semantica ? Viz.num(f.s, 2) : '✓') + '</span>' +
-      '<span>' + (fp ? '<span class="marca-fp">no viene al caso</span>' : '') +
+      '<span>' + marcas +
       resaltar(c.t, consulta) +
       '<span class="tm">' + c.tema + ' · ' + c.f + '</span></span></li>';
-  }
+  });
   html += '</ol>';
   cont.innerHTML = html;
   return sinPalabra;
@@ -329,16 +363,19 @@ function actualizar() {
   pintarLista('lista-sem', sem, q, { semantica: true, marcarFP: marcarFP });
   document.getElementById('cuenta-sem').textContent = 'los ' + k + ' más parecidos';
 
-  // Los tres números que importan, contados sobre el ranking entero (no sobre lo
-  // que quedó pintado): cuántos no tienen la palabra, cuántos revisamos y marcamos
-  // como fuera de tema, y cuántos son hallazgos de verdad.
+  // Los números que importan, contados sobre los k que quedaron pintados:
+  // cuántos no tienen la palabra y, de ésos, qué dijo la revisión a mano
+  // (fuera de tema, dudosos, en tema, o sin revisar).
   const partes = pelar(q).split(/\s+/).filter(Boolean);
-  const sinPalabra = sem.filter(f =>
-    !partes.every(p => CORPUS[f.i].plano.indexOf(p) >= 0)).length;
-  const fps = sem.filter(f => esFalsoPositivo(q, CORPUS[f.i].t)).length;
-  const hallazgos = sem.filter(f =>
-    !partes.every(p => CORPUS[f.i].plano.indexOf(p) >= 0) &&
-    !esFalsoPositivo(q, CORPUS[f.i].t)).length;
+  const nuevos = sem.map((f, puesto) => ({ f: f, puesto: puesto }))
+    .filter(o => !partes.every(p => CORPUS[o.f.i].plano.indexOf(p) >= 0));
+  const sinPalabra = nuevos.length;
+  const juicios = sem.map((f, puesto) => juicio(q, CORPUS[f.i].t, puesto).tipo);
+  const fps = juicios.filter(t => t === 'fp').length;
+  const jn = nuevos.map(o => juicio(q, CORPUS[o.f.i].t, o.puesto).tipo);
+  const hallazgos = jn.filter(t => t === 'ok').length;
+  const dudosos = jn.filter(t => t === 'dudoso').length;
+  const sinRevisar = jn.filter(t => t === 'sinrevisar').length;
 
   let txt = 'De los <b>' + sem.length + '</b> que trajo la búsqueda semántica, <b>' +
     sinPalabra + (sinPalabra === 1
@@ -346,17 +383,23 @@ function actualizar() {
       : '</b> no contienen la palabra que escribiste. Esos son los que') +
     ' tu lista de palabras clave <b>no podía encontrar</b>.';
   if (marcarFP) {
-    txt += '<br><br>De ese ranking, <b class="c-error">' + fps + '</b> ' +
-      (fps === 1 ? 'no viene' : 'no vienen') + ' al caso ' +
-      '(los leímos uno por uno para marcarlos: no hay ninguna regla automática que los ' +
-      'detecte, porque si la hubiera ya sería el clasificador) y ' +
-      (hallazgos === 1 ? 'queda <b class="c-ok">1</b> <span class="c-ok">hallazgo genuino</span>'
-                       : 'quedan <b class="c-ok">' + hallazgos + '</b> <span class="c-ok">hallazgos genuinos</span>') +
-      ': sin la palabra y en tema.';
-    if (!FALSOS_POSITIVOS[pelar(q)]) {
-      txt += '<br><br><i>Ojo: esta consulta no está entre las que revisamos a mano, ' +
-        'así que el conteo de arriba dice cero por omisión, no porque esté todo bien. ' +
-        'Probá con <b>protesta</b>, <b>vacuna</b>, <b>violencia</b> o <b>fútbol</b>.</i>';
+    const revisada = !!REVISION_MANUAL[q.toLowerCase()];
+    if (revisada) {
+      txt += '<br><br>De ese ranking, <b class="c-error">' + fps + '</b> ' +
+        (fps === 1 ? 'no viene' : 'no vienen') + ' al caso ' +
+        '(los leímos uno por uno para marcarlos: no hay ninguna regla automática que los ' +
+        'detecte, porque si la hubiera ya sería el clasificador). De los ' + sinPalabra +
+        ' sin la palabra, <b class="c-ok">' + hallazgos + '</b> ' +
+        (hallazgos === 1 ? 'es un hallazgo' : 'son hallazgos') + ' (en tema, según nuestra lectura)' +
+        (dudosos ? ', <b>' + dudosos + '</b> ' + (dudosos === 1 ? 'es dudoso' : 'son dudosos') : '') +
+        (sinRevisar ? ' y <b>' + sinRevisar + '</b> ' + (sinRevisar === 1 ? 'queda' : 'quedan') +
+          ' sin revisar (están después del puesto ' + REVISADOS_HASTA + ')' : '') +
+        '. Otra persona podría leerlos distinto: por eso se codifica de a dos.';
+    } else {
+      txt += '<br><br><i>Esta consulta no está entre las que revisamos a mano: los ' +
+        sinPalabra + ' sin la palabra quedan <b>sin revisar</b>. No los contamos como ' +
+        'hallazgos porque nadie los leyó: leelos vos. (Revisadas: ' +
+        Object.keys(REVISION_MANUAL).map(k => '<b>' + k + '</b>').join(', ') + '.)</i>';
     }
   } else {
     txt += '<br><br>Ahora prendé <b>marcar los que no vienen al caso</b>: la técnica también trae basura.';

@@ -11,6 +11,9 @@
 > citadas y se encuentran buscando por título y autor, pero **nadie abrió el enlace**, y
 > poner una URL sin haberla abierto sería inventarla. Éste es un curso sobre no inventar.
 > Quien tenga red que las complete y las pase a `[VERIFICADA]` con la fecha.
+> (En la revisión del 28-09-2026 sí hubo red hacia el Hub: se bajaron los modelos y se
+> anotaron sus revisiones exactas, más abajo. Las URL marcadas `[VERIFICAR URL]` no se
+> volvieron a probar.)
 
 ---
 
@@ -62,6 +65,8 @@ Repositorio: `https://raw.githubusercontent.com/dccuchile/beto/master/README.md`
 > argumento empírico de por qué conviene un modelo dedicado al idioma.
 > Identificadores exactos, verificados contra ese README:
 > `dccuchile/bert-base-spanish-wwm-uncased` y `dccuchile/bert-base-spanish-wwm-cased`.
+> Revisión del `uncased` que cita el notebook (el ejemplo de `Trainer`):
+> `d1c9c4565c9d6731e57ed7f027b802697bad861e` (anotada el 28-09-2026).
 > Media hora.
 
 **6. Pérez, J. M. et al., *pysentimiento*: A Python toolkit for Sentiment Analysis and
@@ -71,13 +76,18 @@ Repositorio: `https://raw.githubusercontent.com/pysentimiento/pysentimiento/mast
 `.../master/docs/TASKS.md` `[VERIFICADA 2026-08-29]` ·
 paquete: `https://pypi.org/project/pysentimiento/` `[VERIFICADA 2026-08-29]`
 > **La herramienta más pertinente para esta audiencia**: sentimiento, emoción, ironía y
-> discurso de odio en castellano, con modelos entrenados en tuits, incluidas variantes
-> rioplatenses. `pip install pysentimiento` y tres líneas.
+> discurso de odio en castellano, con modelos pre-entrenados sobre tuits en castellano de
+> muchos países (RoBERTuito). El de sentimiento se ajustó con el corpus TASS 2020, que trae
+> tuits de España, México, Perú, Costa Rica y Uruguay: rioplatense hay poco, y conviene
+> saberlo. `pip install pysentimiento` y tres líneas. Ojo: la biblioteca preprocesa los
+> tuits (usuarios, enlaces, emojis) antes de clasificar; el notebook usa el modelo "pelado"
+> con `pipeline`, sin ese paso.
 > Leé `docs/TASKS.md` y quedate con los números: el mejor modelo saca **70,2 de macro-F1**
 > en sentimiento. **Setenta, no noventa y cinco.** Es la mejor vacuna contra el
 > entusiasmo, y es de la propia gente que hizo la herramienta.
 > Identificador verificado contra el código fuente de la biblioteca:
-> `pysentimiento/robertuito-sentiment-analysis`.
+> `pysentimiento/robertuito-sentiment-analysis`. Revisión fijada en el notebook:
+> `a2cc0f67ebd705c55191e25a05ba23d885fcc09b` (bajada y corrida el 28-09-2026).
 
 ---
 
@@ -107,7 +117,9 @@ biblioteca: `https://raw.githubusercontent.com/UKPLab/sentence-transformers/mast
 `[VERIFICADA 2026-08-29]`
 > Identificador del modelo multilingüe que usa el camino A del notebook, verificado
 > contra `docs/sentence_transformer/pretrained_models.md` de ese mismo repositorio
-> `[VERIFICADA 2026-08-29]`: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`.
+> `[VERIFICADA 2026-08-29]`: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`,
+> revisión fijada en el notebook `e8f8c211226b894fcb81acc59f3b34ba3efd5f42` (bajada y
+> corrida el 28-09-2026).
 > El paper que explica **por qué** promediar las salidas de BERT no es una buena manera de
 > representar una oración, y qué hay que hacer en cambio. Es directamente relevante para
 > lo que hicimos hoy: nuestro camino B promedia vectores de palabra, y esto te dice
@@ -119,8 +131,10 @@ biblioteca: `https://raw.githubusercontent.com/UKPLab/sentence-transformers/mast
 Procesamiento del Lenguaje Natural 67, 223-231.**
 Corpus: `https://raw.githubusercontent.com/jpposadas/FakeNewsCorpusSpanish/master/README.md`
 `[VERIFICADA 2026-08-29]` · **CC BY 4.0**
-> **El corpus con el que trabajaste hoy.** Citalo si usás estos datos, y leé el *overview*
-> con los ojos de la clase: cuando veas los F1 que reportaron los equipos participantes,
+> **El corpus con el que trabajaste hoy.** Son dos recolecciones: la versión 1.0 (971 notas,
+> enero a julio de 2018, las particiones `train` y `dev`) y la de FakeDeS 2021 (500 notas,
+> noviembre de 2020 a marzo de 2021, la partición `test`, donde están todas las de
+> Covid-19). Citalo si usás estos datos, y leé el *overview* con los ojos de la clase: cuando veas los F1 que reportaron los equipos participantes,
 > preguntate cuántos de esos puntos vienen de detectar la fuente y no la desinformación.
 > No es una crítica al corpus —es un corpus excelente y sus autores documentan lo que
 > hicieron—, es la lectura que esta clase te enseñó a hacer.
@@ -133,7 +147,14 @@ Linguistics 50(1).** `[VERIFICAR URL]`
 > con validación humana**. Da los números por tipo de tarea y es honesto sobre dónde falla.
 > Es el puente entre la clase 8 y ésta.
 
-**12. Salganik, M. et al. (2020). *Measuring the predictability of life outcomes with a
+**12. Landis, J. R. & Koch, G. G. (1977). *The Measurement of Observer Agreement for
+Categorical Data*. Biometrics 33(1), 159-174.** `[VERIFICAR URL]`
+> De acá sale la escala de lectura del kappa que usa el notebook (leve, regular, moderado,
+> sustancial, casi perfecto). Leé cómo la justifican los autores: es una convención
+> propuesta "para la discusión", no un criterio de calidad. Diez minutos, y te ahorra
+> citarla como si fuera una ley.
+
+**13. Salganik, M. et al. (2020). *Measuring the predictability of life outcomes with a
 scientific mass collaboration*. PNAS 117(15).** `[VERIFICAR URL]`
 > No es sobre texto, y es la mejor lectura de humildad que hay: 160 equipos, los mismos
 > datos de panel, todas las técnicas disponibles, y **ninguno predijo bien**. Leelo cuando
@@ -149,7 +170,8 @@ sobre todo:
 
 - **§1.3 `prensa`** — el corpus de 1471 notas: la fuente predice la etiqueta al 96 %, las
   "falsas" son sobre todo sátira, las mayúsculas delatan, y el largo del texto también.
-  **La sección (a) es la clase de hoy en una página.**
+  **La sección (a) es la clase de hoy en una página.** La (e) cuenta que son dos épocas
+  pegadas (2018 y 2020-21) y que tema y época están confundidos.
 - **§3** — por qué las clases 9 y 10 necesitan Hugging Face y cuál es el plan B.
 - **La submuestra doblemente codificada** (`doble-codificacion-SIMULADA-100.csv`): los dos
   codificadores son **simulados**, está en el nombre del archivo, y usarlo como si fuera
@@ -158,14 +180,19 @@ sobre todo:
 ## Reproducir los números de esta clase
 
 ```bash
-# las curvas de las viz y los números de las slides
+# las curvas de las viz y los números de las slides (sin red; al final chequea que
+# los momentos de las slides 16 y 32 sigan apareciendo)
 PYTHONPATH=_shared python3 clases/09-modelos-preentrenados/medir-clase09.py
 
-# el notebook entero, sin red, en CPU (medido: ~20 s con la máquina libre, hasta 2 min si está cargada)
-python3 -m nbconvert --to notebook --execute \
-        --output /tmp/nb-09.ipynb clases/09-modelos-preentrenados/notebook.ipynb
+# el notebook entero, sobre una COPIA del repo (guarda figuras en figuras/ y, adentro
+# del repo, las pisaría). Sin red va por el camino B: medido, entre 6 y 20 s con la
+# máquina libre, hasta 2 min si está cargada.
+cp -R . /tmp/dlss-copia && cd /tmp/dlss-copia/clases/09-modelos-preentrenados
+python3 -m nbconvert --to notebook --execute --output nb-09-ejecutado.ipynb notebook.ipynb
 ```
 
-Semilla **1983** en todo. Si cambiás el corpus o la semilla, volvé a correr el script y
-**actualizá las slides**: un número desactualizado en un curso sobre no inventar es el
-peor error posible.
+Semilla **1983** en todo. Los resultados son deterministas en la misma máquina y con las
+mismas versiones de las librerías; con otras versiones algún número puede moverse en el
+4.º decimal (el JSON guarda con qué versiones se generó). Si cambiás el corpus o la
+semilla, volvé a correr el script y **actualizá las slides**: un número desactualizado en
+un curso sobre no inventar es el peor error posible.

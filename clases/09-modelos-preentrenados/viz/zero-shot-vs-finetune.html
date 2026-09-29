@@ -7,10 +7,12 @@
 
 <!-- ==========================================================================
      MOMENTO AHA (tarea "política"): "hasta las ~680 etiquetas, la estrategia
-     MÁS SOFISTICADA es la PEOR (el cruce medido está entre 400 y 800, en 681
-     interpolando en log). Aprender el vocabulario desde cero necesita
-     muchos ejemplos; usar vectores que ya venían hechos, no. Es la clase 4 otra
-     vez: capacidad contra datos."
+     con MÁS PERILLAS y NADA PRESTADO es la PEOR (el cruce medido está entre 400
+     y 800, en 681 interpolando en log). Aprender el vocabulario desde cero
+     necesita muchos ejemplos; usar vectores que ya venían hechos, no. Es la
+     clase 4 otra vez: capacidad contra datos."
+     OJO: "desde cero" (TF-IDF) NO es fine-tuning. El fine-tuning parte de un
+     modelo pre-entrenado; esto no parte de nada. Esta viz no mide fine-tuning.
 
      MOMENTO AHA (tarea "Covid-19"): "el diccionario de palabras clave, que
      cuesta CERO etiquetas y lo escribís en cinco minutos, le gana a las dos.
@@ -68,9 +70,9 @@
       <div id="lienzo"></div>
     </div>
     <ul class="leyenda" style="margin-top:.45rem">
-      <li><i style="background:var(--c-datos)"></i> cero etiquetas: diccionario de palabras clave</li>
-      <li><i style="background:var(--c-modelo)"></i> embeddings + regresión logística</li>
-      <li><i style="background:var(--c-parametro)"></i> aprender el vocabulario desde cero (TF-IDF)</li>
+      <li><i style="background:var(--c-datos)"></i> cero etiquetas: diccionario de palabras clave (línea punteada)</li>
+      <li><i style="background:var(--c-modelo)"></i> embeddings + regresión logística (puntos redondos, rótulo «prestado»)</li>
+      <li><i style="background:var(--c-parametro)"></i> aprender el vocabulario desde cero, TF-IDF (puntos cuadrados, rótulo «desde cero»)</li>
     </ul>
 
     <div id="recomendacion">
@@ -86,10 +88,10 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> En <b>«¿es una nota sobre política?»</b>, la estrategia
-      más sofisticada —aprender el vocabulario desde cero— es la <em>peor</em> hasta
-      cerca de las <b>680</b> etiquetas, y recién ahí alcanza a la simple. Con 25
-      etiquetas saca 0,14 contra 0,45. Más capacidad no es mejor cuando tenés pocos datos: es la
-      clase 4 otra vez, capacidad contra datos.
+      con más perillas y nada prestado —aprender el vocabulario desde cero— es la
+      <em>peor</em> hasta cerca de las <b>680</b> etiquetas, y recién ahí alcanza a la
+      de vectores prestados. Con 25 etiquetas saca 0,14 contra 0,45. Más capacidad sin
+      conocimiento previo necesita más datos: es la clase 4 otra vez.
       Ahora cambiá a <b>«¿es una nota sobre Covid-19?»</b>: el diccionario de palabras
       clave, que cuesta <b>cero</b> etiquetas y se escribe en cinco minutos, saca 0,87 y
       le gana a las dos estrategias con 800 etiquetas encima. Cuando tu categoría
@@ -102,12 +104,14 @@
       (1471 notas, CC BY 4.0), test fijo de 368 casos.
       El script está en <code>clases/09-modelos-preentrenados/medir-clase09.py</code> y
       el notebook de la clase reproduce la curva.
-      <b>Ojo con la traducción a Hugging Face:</b> acá el lugar del <i>zero-shot</i> lo
-      ocupa un diccionario, y el lugar del <i>fine-tuning</i> lo ocupa TF-IDF, porque
-      son las versiones que corren sin bajar ningún modelo. La <b>forma</b> de las curvas
-      es la que la literatura reporta para las tres estrategias reales; los <b>valores</b>
-      con modelos pre-entrenados son más altos. Está medido con lo que tenemos y dicho
-      como es.
+      <b>Ojo con lo que esta viz NO mide:</b> el lugar del <i>zero-shot</i> lo ocupa un
+      diccionario, y <b>no hay fine-tuning</b>. «Desde cero» (TF-IDF) no es fine-tuning:
+      es la otra punta, sin nada prestado, y sirve para ver cuánto vale lo prestado.
+      El fine-tuning parte de un modelo pre-entrenado; medido aparte (MiniLM
+      multilingüe, celda opcional del notebook) dio F1 0,53 con 25 etiquetas y 0,67
+      con 800: parecido a la curva de vectores prestados, e inestable con pocas
+      etiquetas. Con el camino A del notebook, la curva de vectores prestados arranca
+      más arriba (0,53 con 25).
     </p>
   </footer>
 
@@ -141,9 +145,9 @@ const ESTRATEGIAS = {
   tfidf: {
     nombre: 'aprender el vocabulario desde cero',
     color: 'parametro',
-    equivale: 'el lugar del <b>fine-tuning</b>: muchas más perillas, aprendidas de tus datos',
-    costo: 'más tiempo de cómputo y muchas más etiquetas',
-    cuidado: 'Con pocos ejemplos pierde feo. Sólo conviene cuando ya tenés muchos casos etiquetados.'
+    equivale: '<b>nada prestado</b>: una perilla por palabra, aprendidas sólo de tus datos (no es fine-tuning)',
+    costo: 'barato en cómputo, caro en etiquetas',
+    cuidado: 'Sin nada prestado, con pocos ejemplos pierde feo. Sólo conviene cuando ya tenés muchos casos etiquetados.'
   }
 };
 
@@ -173,6 +177,7 @@ const p = Viz.plano('#lienzo', {
   ejeX: 'casos etiquetados a mano', ejeY: 'F1',
   alto: EMBEBIDO ? 250 : 300, margen: { i: 58, d: 18, a: 26, b: 48 }
 });
+p.canvas.setAttribute('role', 'img');   // el aria-label se actualiza en cada dibujo
 
 const TICKS = [25, 50, 100, 200, 400, 800].map(L);
 
@@ -206,12 +211,26 @@ p.alDibujar(() => {
   p.linea([{ x: XMIN, y: fd }, { x: XMAX, y: fd }],
           { color: 'datos', grosor: 2.5, punteada: [7, 5] });
 
-  // las dos curvas medidas
+  // las dos curvas medidas. No sólo el color las distingue: los puntos de
+  // "desde cero" son cuadrados y cada curva lleva su rótulo al final.
   for (const clave of ['embeddings', 'tfidf']) {
     const pts = serieComoPuntos(T[clave]);
     p.linea(pts, { color: ESTRATEGIAS[clave].color, grosor: 3 });
-    p.puntos(pts, { color: ESTRATEGIAS[clave].color, r: 4 });
+    if (clave === 'embeddings') {
+      p.puntos(pts, { color: ESTRATEGIAS[clave].color, r: 4 });
+    } else {
+      const c = p.ctx;
+      c.save(); c.fillStyle = Viz.color(ESTRATEGIAS[clave].color);
+      for (const q of pts) c.fillRect(p.px(q.x) - 4, p.py(q.y) - 4, 8, 8);
+      c.restore();
+    }
   }
+  const ultE = T.embeddings[T.embeddings.length - 1], ultT = T.tfidf[T.tfidf.length - 1];
+  const tfidfArriba = ultT.f1 >= ultE.f1;
+  p.texto(L(ultE.n), ultE.f1, 'prestado', { color: ESTRATEGIAS.embeddings.color, tam: 11,
+          peso: '700', alinear: 'right', dx: -8, dy: tfidfArriba ? 14 : -10, caja: true });
+  p.texto(L(ultT.n), ultT.f1, 'desde cero', { color: ESTRATEGIAS.tfidf.color, tam: 11,
+          peso: '700', alinear: 'right', dx: -8, dy: tfidfArriba ? -10 : 14, caja: true });
 
   // el rótulo del diccionario va DESPUÉS de las curvas (si no, la curva se le
   // dibuja encima) y del lado contrario a la línea vertical. A la izquierda va
@@ -231,6 +250,13 @@ p.alDibujar(() => {
 
   // marcar el ganador en ese punto
   const g = ganador();
+  p.canvas.setAttribute('aria-label', 'Curva de F1 según cuántas etiquetas, tarea «' +
+    T.etiqueta + '». Diccionario (cero etiquetas): ' + Viz.num(fd, 2) +
+    '. Embeddings + logística: de ' + Viz.num(T.embeddings[0].f1, 2) + ' con 25 a ' +
+    Viz.num(T.embeddings[T.embeddings.length - 1].f1, 2) + ' con 800. Desde cero: de ' +
+    Viz.num(T.tfidf[0].f1, 2) + ' con 25 a ' + Viz.num(T.tfidf[T.tfidf.length - 1].f1, 2) +
+    ' con 800. Con ' + estado.n + ' etiquetas conviene ' + ESTRATEGIAS[g.clave].nombre +
+    ' (F1 ' + Viz.num(g.f1, 2) + ').');
   if (g.clave !== 'diccionario' && estado.n >= 25) {
     p.punto(X, g.f1, { color: 'acento', r: 7, halo: true });
   } else if (g.clave === 'diccionario') {
@@ -324,9 +350,9 @@ const ctl = Viz.controles('#panel', [
   { tipo: 'checkbox', id: 'banda', etiqueta: 'mostrar la incertidumbre', valor: true },
   { tipo: 'botones', id: 'atajos', etiqueta: 'tres presupuestos típicos',
     opciones: [
-      { texto: 'una tarde (50)', alClic: () => { ctl.set('n', 50, true); actualizar(); } },
-      { texto: 'una semana (200)', alClic: () => { ctl.set('n', 200, true); actualizar(); } },
-      { texto: 'un becario (800)', alClic: () => { ctl.set('n', 800, true); actualizar(); } }
+      { texto: 'media hora (50)', alClic: () => { ctl.set('n', 50, true); actualizar(); } },
+      { texto: 'una tarde (200)', alClic: () => { ctl.set('n', 200, true); actualizar(); } },
+      { texto: 'un día entero (800)', alClic: () => { ctl.set('n', 800, true); actualizar(); } }
     ] },
   { tipo: 'texto', id: 'lectura', html: '' }
 ], () => {

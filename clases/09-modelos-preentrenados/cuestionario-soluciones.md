@@ -23,9 +23,13 @@ Quien elige esta opción está imaginando una base de datos adentro del modelo, 
 creerle todo hay un paso. Es el mismo error que la clase 8 desarmó con la alucinación.
 
 **Por qué tienta c):** *"los modelos grandes generalizan mejor"*. Suena a sentido común y
-está mal como principio general: si generalizaran mejor **sin importar la tarea**, no
-existiría la curva de la clase — y esa curva muestra que con 25 etiquetas la estrategia
-con más capacidad es **la peor**. El tamaño ayuda cuando hay datos para aprovecharlo.
+está mal como principio general: el tamaño solo no garantiza nada, y cuánto ayuda depende
+de la tarea, del idioma y de cuántos datos tenés. Ojo con qué evidencia usás acá: la curva
+de la clase **no** compara modelos grandes contra chicos, compara vectores prestados contra
+aprender el vocabulario desde cero (TF-IDF, sin nada prestado). Lo que muestra es que **más
+perillas sin conocimiento previo necesitan muchos más datos** (con 25 etiquetas, 0,14
+contra 0,45). Justamente por eso b) es la correcta: lo que hace andar a un modelo
+pre-entrenado con pocos datos es lo que ya aprendió, no su tamaño.
 
 **Por qué tienta d):** confunde pre-entrenamiento con validación. Son dos cosas distintas
 y la segunda la tenés que hacer vos, con tus datos. Quien elige esta opción cree que el
@@ -106,9 +110,14 @@ slider de prevalencia: es exactamente ese movimiento.
 - el **recall sube** (agarra más de los que sí eran; se le escapan menos),
 - la **precisión baja** (entre los que marcó hay más falsas alarmas).
 
-Y no hay ningún umbral donde suban las dos: es el gráfico de la sección 9 del notebook y
-la viz `matriz-de-confusion.html`. Si alguien contesta "depende del modelo", medio punto:
-la *magnitud* depende del modelo, la *dirección* no.
+Con más precisión: el recall **nunca baja** al bajar el umbral (sólo sube o se queda
+igual). La precisión **tiende** a bajar, pero no es monótona: si el caso que entra al
+bajar el umbral es un acierto, sube un poco. En el gráfico de la sección 9 del notebook se
+ven esos saltitos (el propio código los cuenta). Lo que no hay es un umbral que mejore las
+dos **de forma sostenida**: es un trade-off.
+Si alguien contesta "depende del modelo", es **parcialmente correcta para la precisión**
+(tramo a tramo puede subir o bajar); para el recall, no. Dale el punto si lo justifica así;
+medio punto si sólo dice "depende".
 
 **(b) Las situaciones.** Se busca concreción. Ejemplos que valen:
 
@@ -128,9 +137,13 @@ No vale: *"cuando querés más recall"*. Eso es repetir la definición, no aplic
 
 **(a) Con 60 (y 100 como máximo).** Embeddings + un clasificador simple, o directamente un
 diccionario / zero-shot como primer pase. Razón: con esa cantidad, aprender la
-representación desde cero pierde feo — en el corpus del curso, con 25 etiquetas la
-estrategia de más capacidad saca **F1 0,14** contra **0,45** de la simple, y sigue
-perdiendo hasta cerca de las 680.
+representación desde cero (sin nada prestado) pierde feo — en el corpus del curso, con 25
+etiquetas TF-IDF desde cero saca **F1 0,14** contra **0,45** de embeddings + logística, y
+sigue perdiendo hasta cerca de las 680. Si alguien propone fine-tuning, no está mal, pero
+tiene que saber que con tan pocas etiquetas es inestable (en la medición opcional del
+notebook, con 50 etiquetas dio de 0,22 a 0,57 según la semilla) y que hay que compararlo
+contra la opción del medio. La curva de la clase no mide fine-tuning: no la uses como
+argumento contra él.
 **Respuesta aún mejor:** *"con 100 etiquetas mi problema no es qué modelo usar, es que no
 me alcanza ni para evaluar bien. Primero consigo 200-300 para tener un test decente."*
 Si alguien contesta eso, tiene diez.
@@ -220,7 +233,9 @@ pero faltar el 2 o el 5 sí.
   concluyente que existe, y toma cinco minutos.
 - **Evaluá a un codificador humano contra el otro con la misma métrica que usás para el
   modelo** (F1, no kappa). Si el humano saca 0,80 y el modelo 0,92, el modelo está por
-  encima del techo humano y hay que buscar el problema.
+  encima del techo humano y hay que buscar el problema. Comparar el 0,92 con el kappa 0,65
+  directamente es mezclar escalas: el kappa está corregido por azar y un F1 no. Si alguien
+  lo hace, marcáselo; es el error más común de esta pregunta.
 - **Partí por grupo** (por medio, por período, por codificador) y mirá si el número se
   desploma. Es la prueba de fuga estándar de la clase 4.
 - **Mirá los errores.** Si el modelo acierta sospechosamente en un subconjunto homogéneo
@@ -281,9 +296,12 @@ Ejemplo de respuesta completa, para mostrar en clase:
 > que el modelo aprendiera a identificar la fuente en lugar del fenómeno: 210 titulares
 > para entrenamiento y 90 para test. Sobre el conjunto de test, el clasificador alcanzó
 > una precisión de 0,74 y un recall de 0,71 (F1 = 0,72); la clase mayoritaria por sí sola
-> alcanza una accuracy de 0,79 frente a 0,84 del clasificador. La matriz de confusión y
+> alcanza una accuracy de 0,79 frente a 0,89 del clasificador. La matriz de confusión y
 > una muestra de errores de ambos tipos están en el Anexo B. El código, las etiquetas y la
 > semilla (1983) están disponibles en `<repositorio>`.
+
+*(Los números del ejemplo cierran entre sí: con 21 % de positivos, precisión 0,74 y recall
+0,71, la accuracy da 0,89. Hacé la cuenta con el aula: es justo lo que un revisor chequea.)*
 
 **El error más común:** reportar sólo accuracy y F1, sin baseline y sin acuerdo entre
 codificadores. Sin esos dos, un revisor informado no puede evaluar nada, y con razón.

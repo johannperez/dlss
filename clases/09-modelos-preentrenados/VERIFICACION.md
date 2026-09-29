@@ -1,228 +1,179 @@
-# Verificación adversarial — Clase 9
+# Verificación — Clase 9
 
 **Usar modelos que ya existen, sin creerles** · `clases/09-modelos-preentrenados/`
-Fecha: **2026-08-29**. Todo lo que dice acá se comprobó **corriendo el código y mirando las
-imágenes**, no leyendo los archivos. Segunda pasada: la clase ya venía construida y
-"verificada"; esta revisión desconfió de ese informe y volvió a medir todo desde cero.
+
+Este archivo tiene dos partes: **el estado actual** (revisión del 28/29-09-2026, que es la
+que vale) y, más abajo, **el historial** de la verificación anterior (29-08-2026), con sus
+afirmaciones corregidas donde la revisión encontró que decían de más.
 
 ---
 
-## 1. Veredicto
+## 1. Estado actual (29-09-2026)
 
-**Se puede dar.** Se encontraron **11 problemas** y **se arreglaron los 11**. Tres eran
-serios: una viz que decía lo contrario de lo que mostraba en el momento aha, una slide de
-código que se comía su propio título al avanzar, y una slide que narraba cuatro números
-reales de una tarea con las palabras de **otra** tarea. El resto son precisión de
-lenguaje, legibilidad en proyector y tiempos declarados que no coincidían con los medidos.
+**Se puede dar.** La revisión del 28-09 encontró errores conceptuales (el más serio:
+presentar TF-IDF desde cero como si fuera el fine-tuning) y textos que sólo valían para el
+camino sin red. Están corregidos; el detalle, en la sección 2.
+
+Qué se comprobó en esta pasada, y cómo:
 
 | Chequeo | Resultado |
 |---|---|
-| Entregables completos | 6/6 (+ `medir-clase09.py`, datos medidos y figuras) |
-| `nbformat` | válido · 54 celdas (23 código, 31 markdown) |
-| `nbconvert --execute`, sin red | **0 errores**, 5 corridas |
-| Tiempo del notebook (medido hoy, 5 corridas) | **19 · 20 · 20 · 21 s** con la máquina libre, **65 s** con la máquina ocupada |
-| Figuras del notebook | 3, reproducibles **byte a byte** (`md5sum` idéntico) |
-| `medir-clase09.py` | reproducible **byte a byte**: `datos-clase09.js` y `.json` idénticos |
-| Consola del navegador | **0 errores** en `slides.html` y en las 3 viz |
-| Requests externas (con `context.route` abortando `http(s)`) | **0** |
-| Desbordes en las 40 slides | **0** a 1280×720 y a 1024×640, con los fragments revelados |
-| Tema claro y oscuro | las 3 viz, sin colores hardcodeados (`grep` de `#hex`: 0) |
-| Rutas absolutas o `https://` en `src`/`href` | **0** |
-| Plan de tiempos | suma **120 min exactos** y es continuo |
-| URLs marcadas `[VERIFICADA]` | **10/10 dan 200** con `curl`, hoy |
-| Números de las slides | todos verificados contra la corrida del notebook o del script |
+| `nbformat` | válido · 58 celdas (25 de código, 33 de markdown) · guardado **sin salidas** |
+| Celda de bootstrap | intacta: idéntica a la de los otros nueve notebooks (md5 del `source` `4c9c6d9d…`) |
+| Notebook, **camino B** forzado (`FORZAR_CAMINO_B = True`), `nbconvert --execute` en una copia | **0 errores**, 3 corridas, 6-8 s de pared con la máquina libre |
+| Notebook tal cual, **camino A** (con red, modelos ya en caché) | **0 errores**, 21 s de pared |
+| Camino A con la celda opcional de fine-tuning prendida | **0 errores**, 30 s de pared (el fine-tuning con 200 etiquetas, 12 s) |
+| Camino A sin caché | no se volvió a medir en esta pasada; la revisión del 28-09 lo corrió: 66 s y ~0,9 GB de descarga |
+| Números de las slides (camino B) | se reproducen todos en la corrida de hoy: piso 0,72 · diccionario 0,75 / 0,40 · A 0,78 / 0,65 (P 0,59, R 0,72) · desde cero 0,83 / 0,67 · matriz 74/51/29/214 · trampa 0,73/0,68 contra 0,44/0,22 · pisos 0,53 y 0,60 · 332 de 346 medios · kappa 0,46, acuerdo 0,73, F1 humano 0,71 |
+| `medir-clase09.py` | corrido dos veces en la misma máquina: salida **idéntica** entre las dos (md5). Contra la versión anterior del archivo, tres valores de la curva difieren en el 4.º decimal (0,5624 → 0,5628; 0,5864 → 0,5868; sd 0,0238 → 0,0237): otra versión de numpy/scikit-learn. Ningún número redondeado a 2 decimales cambió. Ahora el JSON guarda las versiones (`meta.versiones`) y el script chequea que aparezcan los momentos de las slides 16 y 32 (los cuatro dieron ok) |
+| Figuras | `umbral.png` y `curva-de-etiquetas.png` regeneradas desde la corrida del camino B (la primera ahora es de validación; la segunda distingue las curvas por forma además de color). `matriz-de-confusion.png` no se tocó |
+| Las 3 viz | abiertas con Chrome headless por `file://` y capturadas; se probaron a mano los estados nuevos (consultas revisadas, sin revisar, «futbol» sin tilde). No se registraron los errores de consola con una herramienta: se verificó que dibujan y responden |
+| Slides | capturas de las slides que cambiaron de tamaño (4, 9, 11, 29, 32, 35) a 1280×760 |
+| Verificación independiente (29-09, otra copia del repo) | camino B forzado y camino A con fine-tuning prendido: **0 errores**, mismos números (fine-tuning con 200: F1 0,64 en 10 s). `medir-clase09.py`: JSON y JS con el **mismo md5** que los del repo, los 4 chequeos ok. Slides y viz: HTML bien anidado, JS sin errores de sintaxis (`node --check`), y las 3 viz cargadas en Chrome headless sin errores de consola. Rankings de la viz de similitud simulados en node para las 6 consultas revisadas y «futbol»: las marcas coinciden con el texto |
+| URL `[VERIFICADA]` | **no** se volvieron a probar en esta pasada |
+| Colab real | **no** se probó |
+
+### Reproducibilidad: qué se puede prometer
+
+Los resultados son **deterministas en la misma máquina y con las mismas versiones de las
+librerías**. Con otras versiones algún número cambia un poco (se vio en el 4.º decimal).
+Las figuras **no** son reproducibles byte a byte entre máquinas: cambian los metadatos. Y
+correr el notebook adentro del repo las pisa: por eso las instrucciones dicen de correrlo
+sobre una copia.
 
 ---
 
-## 2. Lo que estaba mal, y qué se hizo
+## 2. Qué se arregló en la revisión del 28/29-09-2026
 
-### Serios
+**Conceptuales**
+1. **TF-IDF no es fine-tuning.** La viz de la curva, el notebook (sección 7 y tabla), las
+   notas y las soluciones (1c, 6a) decían que TF-IDF "ocupa el lugar del fine-tuning" y
+   sacaban de ahí conclusiones sobre el fine-tuning. Ahora se llama "aprender desde cero
+   (nada prestado)", se dice que la curva no mide fine-tuning y que TF-IDF es barato en
+   cómputo. Se agregó una **celda opcional y medida** de fine-tuning a mano (MiniLM
+   multilingüe, las cinco estaciones de la clase 4). Con tres semillas por tamaño dio F1
+   0,53 (25 etiquetas), 0,39 (50, de 0,22 a 0,57), 0,58 (100), 0,59 (200), 0,66 (400) y
+   0,67 (800). Los números están en el notebook y en `notas-docente.md` §10.
+2. **El "nunca" del umbral.** Al bajar el umbral el recall no baja nunca, pero la
+   precisión no es monótona. Ahora lo dicen así el notebook (que cuenta los tramos donde
+   suben las dos), la slide 25, las notas de la slide 24, la viz y la solución 5, donde
+   "depende del modelo" pasa a ser parcialmente correcta.
+3. **El "sube" de la accuracy.** En la viz la accuracy no se mueve (0,882 → 0,875). Se
+   cambió en las notas de la slide 24, en `notas-docente.md` §4 y §5 y en el comentario
+   de la viz.
+4. **El kappa como techo.** Ahora se compara F1 con F1: el notebook calcula el F1 de un
+   codificador contra el otro (0,71). Se cambió en la slide 29, las notas y el TODO 7, y
+   se bajó el absoluto ("no hay modelo que pueda...").
+5. **La época del corpus.** Son 971 notas de 2018 y 500 de 2020-21. Se corrigió en el
+   notebook, `medir-clase09.py` (meta), la viz de similitud y referencias. Se agregó en la
+   sección 11 la trampa tema/época: Covid-19 está 0 contra 192. Al armarla apareció otro
+   detalle del CSV: el `id` se repite entre particiones, así que el notebook no lo usa
+   como llave.
+6. Escala de kappa según Landis y Koch (con cita), "rioplatense", "1471 titulares",
+   "meses y millones", "nueve clases", el espectro de congelar (A y C en la slide 9),
+   "Nada" del zero-shot (ahora "0 para entrenar, 200-300 para evaluar"), P11 (accuracy
+   0,89), referencias cruzadas a secciones y comentarios de `medir-clase09.py` y de la
+   viz de similitud.
 
-**1. La viz de la matriz decía lo contrario de su propio momento aha.**
-Con prevalencia al 5 % y el modelo bobo prendido —que es *el* momento de la clase— el panel
-imprimía: *"Tu modelo le gana por **-8 puntos** — o sea, prácticamente nada."* El modelo no
-le gana: **pierde**, y la slide y las notas dicen "el bobo te gana por 8 puntos". El aula
-iba a leer en pantalla lo contrario de lo que el docente estaba diciendo.
-*Arreglado* en `viz/matriz-de-confusion.html`: ahora hay tres redacciones según el signo
-(*pierde por N puntos contra algo que no mira nada* / *le gana por +N — prácticamente nada*
-/ *le gana por +N*). Reverificado moviendo los cuatro controles.
+**Ejecución y camino A**
+7. Las celdas del camino A fijan la revisión exacta (`revision=`), atrapan fallas de
+   descarga y caen al camino B. Además hay un interruptor `FORZAR_CAMINO_B`.
+8. Los textos fijos que sólo valían para el camino B ahora van condicionados
+   (`if not HAY_HF`): la búsqueda semántica, la pista del TODO 2 y el cierre de la sección 13.
+9. La búsqueda semántica avisa cuando la consulta cae fuera del vocabulario, en vez de
+   devolver un ranking arbitrario.
+10. La sección 9 elige el umbral en **validación** (validación cruzada sobre train) y
+    mira el test una sola vez.
+11. La tabla de la sección 11 y la slide 32 muestran el piso de cada test (0,53 y 0,60).
+12. "Mejores" pasa a "otros" para los números del camino A, con la tabla medida.
 
-**2. La slide 12 se comía su propio título al avanzar.**
-Es la única slide del curso que usa pasos de resaltado (`data-line-numbers="1-2|3-4|5-6"`).
-El plugin de reveal **clona el `<code>` y lo pone en `position:absolute`**; como
-`.reveal pre` no está posicionado en `curso.css`, el clon se anclaba a la `<section>` y
-tapaba el título y el bloque entero. Se veía perfecto en la slide quieta y se rompía al
-primer avance — o sea, exactamente en el aula.
-*Arreglado* con dos reglas locales en `slides.html` (`.reveal pre { position: relative }`
-y ocultar el bloque base mientras se ve un paso). Verificado paso por paso, con captura.
-**Ojo, equipos de otras clases:** el defecto está en `_shared/css/curso.css` y va a morder
-a cualquiera que use pasos de resaltado. Hoy no lo usa nadie más, por eso el arreglo se
-hizo acá y no en el archivo compartido.
+**Calendario y carga**
+13. `[EL LUNES]` pasa a `[EN TU INVESTIGACIÓN]` en la slide 35, el notebook y las notas.
+    La receta de siete pasos se presenta como proyecto de mediano plazo; antes de la
+    clase 10, a lo sumo el paso 1.
+14. Los botones de la viz de la curva decían "una semana (200)", que en realidad son
+    1,7 h. Ahora dicen media hora (50), una tarde (200) y un día entero (800).
 
-**3. Slide 23: los cuatro números eran de "política" y el texto decía "protesta".**
-La slide narraba *"74 notas de **protesta** que el modelo encontró…"* y aclaraba abajo que
-los cuatro números salen de la tarea *"¿es una nota sobre política?"*. Los números son
-correctos (74/51/29/214, test de 368, y cierran con la precisión 0,59 y el recall 0,72 de
-la slide 26), pero el sustantivo era de otra tarea. Quien fuera al notebook a buscarlos no
-los iba a encontrar.
-*Arreglado*: los cuatro casilleros hablan de "notas sobre política", y las notas del
-docente avisan que si se cambia el sustantivo hay que cambiar **también** los números.
-
-### Rigor
-
-**4. Slide 17: macro-F1 presentado como accuracy.**
-Decía *"el mejor modelo en castellano **acierta dos de cada tres**"* sobre un macro-F1 de
-70,2 — y la nota del docente remataba *"acierta 70 de cada 100"*. En **la clase que
-prohíbe decir una métrica sin su frase correcta**, confundir F1 con accuracy es el peor
-error posible. *Arreglado*: ahora dice **70 de macro-F1, no de accuracy**, en una tarea de
-tres clases, con el desvío (70,2 ± 0,2) y la instrucción explícita de no decir "acierta".
-Los seis números de la tabla se reverificaron bajando `docs/TASKS.md` de pysentimiento con
-`curl`: BETO 67,2 / 52,2 / 71,5 y RoBERTuito 70,2 / 55,3 / 74,1. **Coinciden exactamente.**
-
-**5. Slide 5: la lectura sustantiva de los titulares no estaba comprobada.**
-Los cuatro titulares existen en el corpus con la etiqueta y el medio que dice la slide
-(comprobado contra `titulares-prensa-es.csv`), pero la afirmación *"las dos primeras hablan
-de lo mismo"* estaba tomada del material previo sin leer las notas. Se leyeron: las dos son
-sobre **supuestos daños de la vacuna del covid**, una es el desmentido (`El Universo`,
-etiquetada VERDADERA) y la otra es **el texto de la afirmación desmentida, guardado con el
-nombre del chequeador** (`AFPFactual`, etiquetada FALSA). *Mejorado*: la slide ahora dice
-eso, que es más fuerte y es verificable. Dato agregado a las notas y comprobado:
-**AFPFactual aparece 32 veces en el corpus y las 32 con etiqueta "falsa"**, así que un
-modelo entrenado ahí puede terminar aprendiendo "¿esto lo publicó un chequeador?".
-
-**6. Tiempo del notebook mal declarado (otra vez).**
-`notas-docente.md` y `referencias.md` decían "entre 1 y 2 minutos", citando 58 s y 1 min
-49 s. Medido hoy cinco veces con `nbconvert --execute`: **19, 20, 20 y 21 segundos** con la
-máquina libre, y **65 s** en la única corrida que compartió CPU con otra cosa.
-También decían "el cómputo propio son ~25 s", que es el número del corpus de discursos de
-la clase 6, no el de este notebook: acá **los embeddings tardan 4 s y la curva entera 3 s**
-(los imprime el propio notebook). *Arreglado* con el rango real y la explicación de por qué
-varía (CPU libre contra CPU ocupada).
-
-### Lenguaje y legibilidad
-
-**7.** `viz/zero-shot-vs-finetune.html` escribía **"Le saca 0.05 de F1 a el diccionario"**.
-Ahora contrae: *"al diccionario"*.
-**8.** `viz/similitud-semantica.html` escribía **"quedan 1 hallazgos genuinos"** y
-**"1 no vienen al caso"**. Ahora concuerda en singular y plural en los tres lugares.
-**9.** El código de las slides 12 y 14 iba al `.5em` del CSS del curso: ilegible en un
-proyector, justo en las dos slides donde el código **es** el contenido. Subido a `.72em`,
-igual que la slide 4. **Reverificado que no desborda ninguna de las 40 slides.**
-**10.** La figura `umbral.png` no tenía rótulo en el eje Y. Se agregó (`de 0 a 1`) en el
-notebook y se regeneró.
-**11.** El bloque práctico 1 prometía **"20 minutos"** en pantalla cuando el plan le da 16
-(del minuto 26 al 42; los otros 4 son las consignas y la puesta en común). Un docente que
-lee la slide en voz alta se atrasa 4 minutos justo antes de la pausa. Alineado a **15
-minutos**, y la nota del docente explica de dónde sale.
-
-Además, un ajuste de puesta en página: embebida en la slide 25, la viz de la matriz dejaba
-el botón **"Copiar la oración"** —que es un entregable de la spec— 30 px por debajo del
-borde del `<iframe>`. Ahora, sólo en modo embebido, el botón va al costado del título del
-panel y **entra entero sin scrollear**, sin achicar el gráfico.
+**Accesibilidad**
+15. Los canvas de las viz de la curva y de la matriz tienen `role="img"` y un
+    `aria-label` que se actualiza con el estado. En la matriz, acierto y error ya no
+    dependen sólo del color: los aciertos son puntos llenos, los errores anillos huecos,
+    y las celdas dicen "✓ acierto" y "✗ error". En la curva, las dos estrategias se
+    distinguen además por la forma del punto y por un rótulo. En la búsqueda, "sin la
+    palabra", "dudoso" y "sin revisar" van escritos. Los emojis de la slide 9 van con
+    `aria-hidden`.
+16. La viz de similitud ya no cuenta como "hallazgos genuinos" lo que nadie revisó. Hay
+    tres casos: revisado a mano (sólo los 8 primeros de las 6 consultas sugeridas),
+    dudoso (con el motivo) y **sin revisar**.
 
 ---
 
-## 3. Lo que se verificó y estaba bien (no se tocó)
+## 3. Lo que queda abierto
 
-- **El notebook corre de punta a punta sin red y sin errores**, detectando solo que no hay
-  Hugging Face (prueba la biblioteca **y** hace un `urlopen` a huggingface.co con timeout)
-  y cayendo al camino B. Cinco corridas, 0 celdas con error, 3 figuras.
-- **Todos los números de las slides salen de corridas reales y coinciden**:
-  piso 0,72 · diccionario 0,75 / F1 0,40 · A 0,78 / 0,65 · C 0,83 / 0,67 · 1103 etiquetas ·
-  test 368 · 28 % de positivos · precisión 59 y recall 72 · matriz 74/51/29/214 ·
-  trampa del corpus 0,73/0,68 contra 0,44/0,22 · 332 de 346 medios con una sola clase ·
-  kappa 0,46 con acuerdo 0,73. **Cada uno se leyó en la salida del notebook ejecutado hoy.**
-- **`medir-clase09.py` es reproducible byte a byte**: se corrió de nuevo y `datos-clase09.js`
-  y `datos-clase09.json` salieron idénticos a los versionados (`diff` limpio).
-- **Los tres momentos aha ocurren de verdad**, comprobados moviendo los controles con
-  Playwright y leyendo el DOM resultante:
-  - *matriz*: prevalencia 50 % → 5 % sin tocar nada más: precisión **0,88 → 0,23**,
-    accuracy **queda en 0,88**, el bobo saca **0,96**. Y con el umbral en 0,80 la precisión
-    va a 0,99 y el recall se hunde a 0,42: **no hay corte donde suban las dos**.
-  - *similitud*: `fútbol` → 1 por palabra clave, **7 por significado sin la palabra**
-    (FIFA, Chivas, Cruz Azul), y el botón de falsos positivos marca 1. Contrapunto
-    obligatorio verificado: con `vacuna`, **4 de 8 son basura y quedan 0 hallazgos
-    genuinos**. Misma técnica, resultado opuesto.
-  - *curva*: con 25 etiquetas la sofisticada saca **0,14** contra **0,45**; el cruce está
-    cerca de las 680; y en la tarea Covid-19 el diccionario de **cero etiquetas** saca
-    **0,87** y le gana a las dos con 800 encima. Todo coincide con `datos-clase09.json`.
-- **Las 10 URLs `[VERIFICADA 2026-08-29]` devuelven 200** (probadas con `curl` hoy: los
-  README de HF course, BETO, pysentimiento, sentence-transformers y FakeNewsCorpusSpanish;
-  `docs/TASKS.md`; los tres paquetes de PyPI; y `chapters/es` del curso de HF).
-  **Ninguna URL inventada.** Las 12 citas se revisaron una por una: autores, año, revista,
-  volumen y páginas son plausibles y consistentes; ninguna parece fabricada.
-- **Los datos sintéticos están rotulados donde corresponde**: la viz de la matriz dice al
-  pie que sus 600 casos son simulados, y el kappa 0,46 lleva su chip *codificadores
-  simulados* en la slide 29, en el notebook (sección 12) y en las notas.
-- **La trampa central del corpus** (el detector de sátira) está dicha con todas las letras
-  en la slide 32, en la sección 11 del notebook y en las notas, con los números medidos.
-- **El cuestionario cierra**: las 12 preguntas cubren los 12 ítems de la spec, se pueden
-  contestar con lo que se dio, los distractores son los errores reales (no absurdos), y
-  **las cuentas de las soluciones son correctas** (rehechas a mano: precisión 0,67, recall
-  0,60, accuracy 0,86, F1 0,63, piso 0,80).
-- **El glosario de la clase 9 está completo** en `recursos/glosario.md` y coincide con la
-  slide 38, término por término.
-- **Los puentes están explícitos**: slide 2 hacia atrás (clases 1-8, el mini-GPT de ~1,5 M),
-  slides 39-40 hacia adelante (desempeño ≠ validez, clase 10).
-- **La clase no usa fórmulas**, así que KaTeX no tiene nada que renderizar; se cargó igual
-  sin errores de consola.
+1. **Colab real no se probó.** El camino A se corrió en una máquina con red y el
+   bootstrap está a cargo de otra revisión (`recursos/setup.md`).
+2. **Quedan marcas `[VERIFICAR URL]`** en `referencias.md`. Se agregó una nueva, Landis y
+   Koch 1977. No se les inventó URL.
+3. **La casilla de transfer learning (10-25 min, 11 slides) sigue siendo la más
+   apretada**, y la slide 9 ganó una línea (el espectro de congelar). Conviene
+   cronometrarla el primer dictado.
+4. **Embebida en la slide 25, la viz de la matriz mide más que su `<iframe>`.** Lo que
+   queda abajo es la caja "momento aha", que la slide ya repite en su `viz-pie`, y se
+   puede scrollear adentro.
+5. **La celda de fine-tuning es opcional y sólo corre con red.** La medición es de tres
+   semillas: alcanza para mostrar la inestabilidad, no para afirmar diferencias finas
+   contra embeddings + logística.
+6. **Los codificadores del archivo de kappa son simulados** y codifican "¿es falsa?". El
+   techo de 0,71 vale para esa tarea, no para la de política.
 
 ---
 
-## 4. Lo que queda abierto
+## 4. Historial: la verificación del 29-08-2026 (resumen, con correcciones)
 
-1. **Nadie corrió el camino A (Hugging Face).** `huggingface.co` da 403 desde este
-   contenedor. Los **tres identificadores de modelo existen y están bien escritos** —esta
-   pasada cerró el que faltaba: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
-   está en `docs/sentence_transformer/pretrained_models.md` del repositorio oficial, bajado
-   con `curl`—, pero **bajar los pesos no se pudo probar**. Tarea escrita en
-   `notas-docente.md` §10 para quien dé la clase por primera vez: correrlo en Colab y
-   **anotar la revisión exacta (el hash del commit)** de cada modelo en `referencias.md`.
-2. **Los números que están en pantalla son los del camino sin red.** Con Hugging Face van a
-   ser otros —mejores— y hay que volver a correr `medir-clase09.py` y actualizar las slides
-   28 y 32 y las figuras. Está dicho en `figuras/README.md`, en el pie de la viz de la
-   curva y ahora también en las notas del docente.
-3. **Quedan 8 marcas `[VERIFICAR URL]`** en `referencias.md` (Barberá 2021, Grimmer &
-   Stewart 2013, Grimmer/Roberts/Stewart 2022, Krippendorff, Reimers & Gurevych,
-   Ziems 2024, Salganik 2020, la página del curso de HF y el preprint de BETO). Las citas
-   están completas y bien; faltan los enlaces porque arxiv.org, doi.org y las editoriales
-   están bloqueados. **No se les inventó URL.**
-4. **La casilla de transfer learning (10-25 min, 11 slides) sigue siendo la más apretada**:
-   ~80 segundos por slide. Está marcada como tal en el plan y la lista de recortes ataca
-   ahí. Conviene cronometrarla el primer dictado.
-5. **Embebida en la slide 25, la viz de la matriz mide 806 px en un `<iframe>` de 610.**
-   Todo lo importante entra (gráfico, los cuatro casilleros, las cuatro métricas con sus
-   frases y el panel "traducción a tu paper" con su botón); lo que queda abajo es la caja
-   "momento aha", que la slide ya repite en su `viz-pie`. Se puede scrollear adentro del
-   iframe. Es la misma situación que las viz de la clase 6 (787 y 835 px), así que se dejó
-   como está.
-6. **`.reveal pre` no está posicionado en `_shared/css/curso.css`** (problema 2). Se arregló
-   localmente en esta clase. Si otra clase agrega pasos de resaltado, va a chocar con lo
-   mismo: conviene subir la regla al CSS compartido cuando no haya sesiones en paralelo
-   editándolo.
+Aquella pasada se hizo en un contenedor **sin acceso a `huggingface.co`**, así que sólo
+corrió el camino B. Encontró y arregló 11 problemas; los más serios fueron estos:
+
+- la viz de la matriz decía "le gana por -8 puntos" en el momento aha;
+- el plugin de resaltado de reveal tapaba el título de la slide 12 (el arreglo local
+  sigue en `slides.html`; el CSS compartido sigue sin `position: relative` en
+  `.reveal pre`);
+- la slide 23 tenía los números de "política" con el sustantivo de "protesta";
+- en la slide 17, un macro-F1 presentado como accuracy (los seis números de la tabla
+  coinciden con `docs/TASKS.md` de pysentimiento).
+
+También arregló la concordancia en las viz, el tamaño del código en las slides 12 y 14,
+el rótulo del eje Y de `umbral.png` y los tiempos declarados del notebook.
+
+**Correcciones a lo que afirmaba aquella pasada:**
+- *"Figuras reproducibles byte a byte" y "`medir-clase09.py` reproducible byte a byte".*
+  Valía sólo en aquel contenedor. En otra máquina, `datos-clase09.json` difiere en el
+  4.º decimal y las figuras cambian de md5 (ver §1).
+- *"No hay corte donde suban las dos".* Falso en general (ver §2, punto 2).
+- *"Nadie corrió el camino A" y "con Hugging Face los números van a ser mejores".* El
+  camino A se corrió el 28-09-2026. Sus números son otros: la misma F1 y otra accuracy.
+- *"La curva... dicha como es".* La viz decía que TF-IDF ocupaba el lugar del
+  fine-tuning (ver §2, punto 1).
+
+Lo que se verificó entonces y se sigue sosteniendo:
+- los cuatro titulares de la slide 5 están en el CSV con la etiqueta y el medio que dice
+  la slide;
+- AFPFactual aparece 32 veces, todas "falsas";
+- las viz no hacen requests externas;
+- el plan de tiempos suma 120 minutos;
+- las cuentas del cuestionario (P3: 0,67 / 0,60 / 0,86 / F1 0,63 / piso 0,80; P4: bobo 96 %).
 
 ---
 
 ## 5. Cómo reproducir esta verificación
 
 ```bash
-# el notebook entero, sin red (medido: ~20 s con la máquina libre)
-python3 -m nbconvert --to notebook --execute \
-        --output /tmp/nb-09.ipynb clases/09-modelos-preentrenados/notebook.ipynb
-git status --porcelain clases/09-modelos-preentrenados/figuras   # tiene que quedar limpio
+# sobre una COPIA del repo (el notebook guarda figuras en figuras/)
+cp -R dlss /tmp/dlss-copia && cd /tmp/dlss-copia/clases/09-modelos-preentrenados
+export PYTHONDONTWRITEBYTECODE=1
 
-# los datos de las viz, byte a byte
-PYTHONPATH=_shared python3 clases/09-modelos-preentrenados/medir-clase09.py
-git diff --stat clases/09-modelos-preentrenados/datos-clase09.*  # tiene que quedar limpio
+# camino A si hay red; para forzar el B, poné FORZAR_CAMINO_B = True en la sección 1
+python3 -m nbconvert --to notebook --execute --output nb-09-ejecutado.ipynb notebook.ipynb
+
+# los datos de las viz (determinista en la misma máquina y versiones)
+cd /tmp/dlss-copia && PYTHONPATH=_shared python3 clases/09-modelos-preentrenados/medir-clase09.py
 ```
-
-Para el HTML: Chromium por Playwright (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`,
-ejecutable `/opt/pw-browsers/chromium`), abriendo por `file://` **a la profundidad real**,
-con `context.route('**/*')` abortando cualquier `http(s)`, recorriendo las 40 slides con
-`Reveal.slide(i)` y revelando todos los fragments antes de medir `scrollHeight`, y moviendo
-los controles de las viz con `ctl.set(...)` para leer el DOM que resulta.
-
-> **Nota de proceso.** Mientras se hacía esta verificación había otra sesión trabajando en
-> la clase 7 en el mismo contenedor, que commiteó varias "Instantáneas de progreso" y se
-> llevó puestos archivos de la clase 9 en el camino. **Esta verificación no hizo ningún
-> commit**; los archivos en disco son los verificados.

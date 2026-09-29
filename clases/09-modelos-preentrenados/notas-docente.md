@@ -10,14 +10,16 @@
 ## 1. El arco narrativo, en diez líneas
 
 1. Ocho clases construyendo la máquina desde adentro. Se terminó lo que podemos entrenar.
-2. Tres líneas de código bajan un modelo que costó millones y clasifican tu corpus.
+2. Tres líneas de código bajan un modelo que costó mucho más de lo que tenés (semanas de
+   TPU para BETO; millones para los grandes) y clasifican tu corpus.
 3. Asombro genuino y merecido. **Y de inmediato: ¿cómo sabés que está bien?** Nadie tiene
    la respuesta. Ese hueco es la clase.
 4. Por qué funciona: alguien ya le enseñó castellano; vos le enseñás tu distinción.
    Es la jerarquía de la clase 5 con texto.
 5. Tres estrategias, y la regla de decisión no es "cuál es mejor" sino
    **"cuántas etiquetas puedo producir"**.
-6. La curva lo demuestra con datos medidos: con pocas etiquetas, lo simple gana.
+6. La curva lo demuestra con datos medidos: con pocas etiquetas, lo prestado gana, y
+   aprender desde cero (nada prestado) pierde feo. Ojo: esa curva no mide fine-tuning.
 7. Pausa. Cambio de registro.
 8. Evaluar de verdad: etiquetar a mano, la matriz con palabras, precisión y recall,
    el umbral, el piso, el techo humano.
@@ -78,7 +80,7 @@ va, lo recortás adentro de su casilla, **no le comés minutos a la siguiente**.
 | 104-109 | **La trampa del corpus** | 32 | **Lo más importante de la segunda mitad.** |
 | 109-111 | Mirá los errores | 33 | |
 | 111-113 | Qué reportar | 34 | Foto. |
-| 113-115 | `[EL LUNES]` | 35 | Foto también. Es lo único que se llevan escrito. |
+| 113-115 | `[EN TU INVESTIGACIÓN]` | 35 | Foto también. Es lo único que se llevan escrito. Aclarales que es un proyecto de mediano plazo, no tarea para la clase 10. |
 | 115-116 | Cuándo NO | 36 | El mejor consejo de la clase, en una frase. |
 | 116-118 | Qué te llevás | 37 | Tres ideas. Tres, no más. |
 | 118-119 | Glosario | 38 | Pasala. Está en `recursos/glosario.md`. |
@@ -124,13 +126,22 @@ otra. Ustedes ya saben esto."*
 **"Sobreajusta."** (Slide 9.) Perfecto, seguí: "¿y cómo lo evito con 200 ejemplos?".
 Van a llegar solos a "usar menos parámetros". Congelar es exactamente eso.
 
-**"La sofisticada."** (Slide 15, la apuesta.) Es la respuesta mayoritaria y es la
+**"La de más perillas."** (Slide 15, la apuesta.) Es la respuesta mayoritaria y es la
 equivocada, y por eso la viz funciona. Cuando vean 0,14 contra 0,45, dejá tres segundos de
-silencio antes de explicar.
+silencio antes de explicar. Y cuidá la conclusión: lo que pierde es **aprender sin nada
+prestado**, no "los modelos grandes" ni el fine-tuning, que acá no se midió en la curva.
 
 **"Baja."** (Slide 24, ¿qué le pasa a la accuracy con prevalencia 5 %?) También mayoritaria
-y también equivocada. Sube, o se queda igual mientras la precisión se derrumba. Es el
-momento más rentable de la clase entera.
+y también equivocada: en la viz **no se mueve** (0,88; en rigor baja una pizca, de 0,882 a
+0,875) mientras la precisión se derrumba de 0,88 a 0,23. Es el momento más rentable de la
+clase entera. Si alguien pregunta "¿y en general?": la accuracy es especificidad más
+prevalencia por (sensibilidad − especificidad). Según cuál de las dos sea mayor, al bajar la
+prevalencia puede subir, bajar o quedarse; en la viz son casi iguales, por eso no se mueve.
+
+**"D, depende del modelo."** (Slide 24, la del umbral.) No la descartes del todo: al bajar
+el umbral el recall nunca baja, pero la precisión no es monótona. Tiende a bajar y puede dar
+saltitos para arriba (en el notebook se ven, y el propio código los cuenta). Lo que no hay
+es un umbral que mejore las dos de forma sostenida.
 
 **"¿Entonces para qué sirve la accuracy?"** (Aparece siempre después de la viz.)
 Respuesta honesta: para clases balanceadas y para nada más. En el 90 % de los problemas de
@@ -149,8 +160,8 @@ el punto.
 
 **Accuracy = desempeño.**
 Desarme: la viz de la matriz con el slider de prevalencia. Es la lección más transferible
-de la clase, y funciona porque el número *sube* mientras el modelo empeora para su
-propósito.
+de la clase, y funciona porque el número *no se mueve* mientras el modelo se vuelve inútil
+para su propósito (la precisión cae de 0,88 a 0,23).
 
 **Confundir precisión con recall.**
 Desarme: prohibido decir el número sin la frase. Hacelos hablar. Si no pueden decir
@@ -158,8 +169,13 @@ Desarme: prohibido decir el número sin la frase. Hacelos hablar. Si no pueden d
 `g.frase_de_metricas()` del paquete del curso las escribe sola; mostrala.
 
 **"El modelo es mejor que los codificadores humanos."**
-Desarme: el techo del acuerdo humano. Un modelo que supera claramente el kappa
-inter-codificador está midiendo otra cosa, o hay fuga. Casi siempre es fuga.
+Desarme: el techo del acuerdo humano, **en la misma métrica**. Se calcula el F1 de un
+codificador contra el otro (en el archivo del curso, 0,71) y se lo compara con el F1 del
+modelo contra uno de ellos. El kappa (0,46) es otra escala: con la regla "si supera el
+kappa, hay fuga", hasta el F1 0,65 del notebook sería sospechoso. Un modelo que supera
+claramente el F1 humano casi siempre está midiendo otra cosa, o hay fuga. No es imposible
+sin trampa (un modelo promedia el ruido de cada codificador), pero es raro y hay que
+demostrarlo.
 
 **Modelos en inglés sobre texto en castellano.**
 Es frecuentísimo porque son los que aparecen primero en los tutoriales. Si tenés red,
@@ -167,8 +183,13 @@ la demo en vivo (misma oración, dos modelos) es la manera más rápida de termi
 discusión.
 
 **Fine-tuning como opción por defecto.**
-Desarme: la viz de la curva y la tabla del notebook. Con pocos datos pierde, y siempre
-cuesta más. Que lo vean medido, no dicho.
+Desarme: con datos, y sin exagerar. La curva de la clase **no mide fine-tuning**: compara
+vectores prestados contra aprender desde cero (TF-IDF, sin nada prestado). Lo que sí se
+midió en la revisión (celda opcional del notebook, MiniLM multilingüe, tres semillas):
+el fine-tuning da F1 0,53 con 25 etiquetas, 0,59 con 200 y 0,67 con 800. O sea, parecido a
+embeddings + logística, un poco mejor con 400-800, **más inestable** (con 50 etiquetas fue
+de 0,22 a 0,57 según la semilla) y más caro de correr. El mensaje honesto: probá primero la
+del medio, y si vas a hacer fine-tuning, medilo contra ella con varias semillas.
 
 **"Zero-shot no necesita validación porque no entrené nada."**
 Desarme: hay que validar **más**, no menos. Y probar cinco prompts y quedarse con el mejor
@@ -207,7 +228,7 @@ Se recorta **en este orden**, y no se improvisa:
   te queda tiempo para una cosa de toda la segunda mitad, es esta.
 - **La trampa del corpus** (slide 32). Es la clase entera condensada, con datos reales.
 - **Las dos apuestas** (slides 15 y 24). Sin la predicción fallida, las viz son decoración.
-- **El `[EL LUNES]`** (slide 35). Es lo único que se llevan escrito.
+- **El `[EN TU INVESTIGACIÓN]`** (slide 35). Es lo único que se llevan escrito.
 
 ---
 
@@ -231,7 +252,7 @@ Se recorta **en este orden**, y no se improvisa:
 - **El informante clave.** Sabe muchísimo, te ahorra meses, y tiene su posición y sus
   puntos ciegos. Se lo usa, se lo cita con precisión y se lo triangula. *"Nadie publicaría
   una etnografía diciendo «me lo contó un tipo». Tampoco publiques «usamos BERT»."*
-- **El equipo de codificadores.** El fine-tuning es entrenar un codificador: le mostrás
+- **El equipo de codificadores.** Entrenar un clasificador es entrenar un codificador: le mostrás
   ejemplos, aprende tu libro de códigos, y codifica el resto. Todo lo que ya saben sobre
   codificación humana aplica tal cual.
 - **El café.** "Tu mini-GPT costó el café que te tomaste mientras entrenaba."
@@ -241,7 +262,7 @@ Se recorta **en este orden**, y no se improvisa:
   analogía: es literalmente el mismo teorema.
 - **El detector de chistes.** "Entrenamos un detector de desinformación y nos salió un
   detector de sátira mexicana. Con un F1 lindísimo."
-- **La lista de palabras del martes.** "El diccionario lo escribiste vos un martes. Sacale
+- **La lista de palabras del martes.** "El diccionario lo escribiste vos un martes cualquiera. Sacale
   «gobierno» y volvé a correr: la conclusión se mueve." Es la clase 1, sembrada, cobrada.
 - Cuidado con uno: **no digas "esto es fácil"**. El que no lo logre la va a pasar peor.
 
@@ -304,44 +325,64 @@ el de la sátira. La prueba barata: partí por grupo y mirá si se cae.
 
 ## 10. Cosas de producción que conviene saber
 
-- **Hugging Face no se pudo probar** en el contenedor donde se construyó este material
-  (`huggingface.co` da 403; ver `datos/README.md` §2). En consecuencia:
-  - El **camino B** (embeddings PPMI+SVD propios + scikit-learn) está corrido y verificado
-    entero: el notebook completo corre de punta a punta **en menos de dos minutos** en CPU
-    y sin red. Cinco corridas medidas con `nbconvert --execute`: **19, 20 y 21 segundos**
-    con la máquina libre, y 58 s y 1 min 49 s con la máquina cargada. O sea: **contá
-    medio minuto si estás sola/o en la máquina y hasta dos minutos si el aula entera está
-    corriendo cosas.** El grueso de ese tiempo es levantar el kernel e importar torch; el
-    cómputo propio del notebook es poco: construir los embeddings con numpy tarda **4 s**
-    y la curva de etiquetas entera, **3 s** (los dos números los imprime el propio
-    notebook con `utils.medir_tiempo`).
-  - El **camino A** está escrito con cuidado y **no ejecutado**. Las celdas están marcadas
-    `# ── CAMINO A ──`.
-  - El identificador `pysentimiento/robertuito-sentiment-analysis` está **verificado
-    contra el código fuente** de la biblioteca (`pysentimiento/analyzer.py`), no contra el
-    servidor de modelos. Los de BETO (`dccuchile/bert-base-spanish-wwm-uncased` y
-    `-cased`) están verificados contra el README oficial del repositorio. Y el de
-    embeddings de oración, `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`,
-    está verificado contra la documentación oficial de `sentence-transformers`
-    (`docs/sentence_transformer/pretrained_models.md`, bajado con `curl`, línea 140).
-    Los tres identificadores existen y están bien escritos; lo que no se pudo probar es
-    **bajar los pesos**, porque el Hub está bloqueado acá.
-  - **Tarea para quien dé esta clase por primera vez:** correr el notebook en un Colab con
-    red, confirmar que los tres modelos bajan, **anotar la revisión exacta de cada uno**
-    (el hash del commit en el Hub, que es lo que la slide 34 pide reportar) en
-    `referencias.md`, y reemplazar esta viñeta por el resultado. Ojo también con los
-    números: los del camino A van a ser **otros —mejores— que los del camino B** que están
-    hoy en las slides 28 y 32 y en las viz. Si vas a dar la clase por el camino A,
-    volvé a correr `medir-clase09.py` y actualizá los números, o decí en voz alta que
-    los de pantalla son los del camino sin red.
+- **Los dos caminos, y qué se corrió de cada uno.**
+  - El material se construyó en un contenedor donde `huggingface.co` daba 403. Ahí se
+    corrió y se verificó entero el **camino B** (embeddings PPMI+SVD propios +
+    scikit-learn): sin red, en CPU. Medido en la revisión del 28-09-2026: **6 s** de
+    pared con `nbconvert --execute` en una máquina libre (antes se habían medido 19-21 s
+    en el contenedor, y hasta dos minutos con la máquina cargada). Contá entre medio
+    minuto y dos minutos en el aula.
+  - El **camino A** se corrió por primera vez en esa revisión, con red. Terminó sin
+    errores. Los modelos quedaron fijados con su revisión exacta en el notebook
+    (`REVISION`, sección 1) y en `referencias.md`:
+    - `pysentimiento/robertuito-sentiment-analysis` @ `a2cc0f67ebd705c55191e25a05ba23d885fcc09b`
+    - `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` @ `e8f8c211226b894fcb81acc59f3b34ba3efd5f42`
+    - `dccuchile/bert-base-spanish-wwm-uncased` @ `d1c9c4565c9d6731e57ed7f027b802697bad861e`
+      (sólo aparece en el ejemplo de `Trainer`, no se baja).
+  - El camino A **baja casi 1 GB** la primera vez (435 MB el de sentimiento y 471 MB el de
+    embeddings). Con treinta personas en el mismo wifi, eso pesa. Si la red del aula es
+    dudosa, que pongan `FORZAR_CAMINO_B = True` en la sección 1. Con los modelos ya en
+    caché, el notebook entero tarda unos 30 s (con la celda opcional de fine-tuning
+    prendida).
+  - Si una descarga falla a mitad de camino (límite de pedidos, modelo renombrado,
+    proxy), las celdas del camino A avisan y caen solas al camino B. Hugging Face avisa
+    "unauthenticated requests": es esperable y no rompe nada.
+- **Los números del camino A son otros, no "mejores".** Medido en la revisión, tarea
+  «¿es una nota sobre política?», el mismo test de 368:
+
+  | | camino B (slides) | camino A |
+  |---|---|---|
+  | A · embeddings + logística: accuracy / precisión / recall / F1 | 0,78 / 0,59 / 0,72 / **0,65** | 0,77 / 0,56 / 0,78 / **0,65** |
+  | curva con 25 / 200 / 800 etiquetas (embeddings) | 0,45 / 0,59 / 0,63 | 0,53 / 0,63 / 0,65 |
+  | umbral elegido en validación → F1 en test | 0,50 → 0,65 | 0,55 → 0,67 |
+  | desde cero, diccionario, trampa del corpus, kappa | iguales en los dos caminos | |
+
+  O sea: con pocas etiquetas el modelo pre-entrenado ayuda; con las 1103, la misma F1.
+  Las slides 26 y 28, la matriz de la slide 23 y las figuras son del camino B. Si das la
+  clase con el camino A en vivo, decí en voz alta que los de pantalla son los del camino
+  sin red (o proyectá tu corrida).
+- **El fine-tuning (celda opcional, apagada).** MiniLM multilingüe, 3 épocas, lr 5e-5, en
+  CPU, el mismo test. Tres semillas por tamaño: F1 0,53 (25 etiquetas), 0,39 (50: de 0,22
+  a 0,57), 0,58 (100), 0,59 (200), 0,66 (400), 0,67 (800). Con 200 tarda unos 12 s y con
+  800, un minuto. Es la evidencia para la discusión de la slide 14: con pocas etiquetas
+  no "pierde feo" como aprender desde cero, pero es inestable.
 - **Todos los números de las slides están medidos**, no estimados. Salen de
   `medir-clase09.py` (que produce `datos-clase09.js`, lo que leen las viz) y del propio
   notebook. Si cambiás el corpus o la semilla, **volvé a correr el script y actualizá las
   slides**: un número inventado en un curso sobre no inventar es el peor error posible.
+  El script es determinista en la misma máquina y con las mismas versiones de las
+  librerías (quedan registradas en `meta.versiones`); con otras versiones algún número
+  se mueve en el 4.º decimal. Al final chequea que los momentos de las slides 16 y 32
+  sigan apareciendo y avisa si no.
+- **Corré el notebook sobre una copia**, no adentro del repo: guarda las tres figuras en
+  `figuras/` y las pisa (aunque el contenido sea el mismo, cambian los bytes). En Colab no
+  importa: es un clon.
 - **Las tres viz abren con `file://`, sin internet, y sin una sola request externa.**
-  Verificado con Chromium interceptando y abortando cualquier `http(s)`.
 - **La viz de la matriz de confusión usa 600 casos simulados** con semilla fija. Está
   dicho al pie de la viz y conviene decirlo también en voz alta: sirve para ver la mecánica
   del umbral, no para afirmar nada. Los números sobre datos reales están en el notebook.
 - **Los dos codificadores del archivo de kappa son SIMULADOS** y está en el nombre del
-  archivo. Repetilo cada vez que aparezca el número 0,46.
+  archivo. Repetilo cada vez que aparezca el número 0,46 (o el F1 humano, 0,71).
+- **El corpus son dos épocas.** 971 notas de la recolección de enero a julio de 2018 y 500
+  de la de noviembre de 2020 a marzo de 2021; las 192 de Covid-19 están todas en la
+  segunda (`datos/README.md` §1.3(e)). El notebook lo muestra en la sección 11.

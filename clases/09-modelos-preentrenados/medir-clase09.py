@@ -34,9 +34,16 @@ Tres mediciones:
 3. **La trampa del corpus**: qué pasa con verdadero/falso cuando se parte al
    azar y qué pasa cuando se parte por fuente. Los números van a las slides.
 
-Todo offline. Hugging Face está bloqueado en el contenedor de construcción, así
-que el camino que se mide acá es el camino B (embeddings propios PPMI+SVD), que
-es exactamente el que el notebook corre cuando no hay red.
+Todo offline, a propósito: el camino que se mide acá es el camino B
+(embeddings propios PPMI+SVD), que es exactamente el que el notebook corre
+cuando no hay red. Así los números de las slides no dependen de que Hugging
+Face esté arriba ni de qué revisión de un modelo bajaste.
+
+Reproducibilidad: el resultado es determinista en la misma máquina y con las
+mismas versiones de las librerías. Con otra versión de numpy/scikit-learn (o
+de la BLAS que usan) algún número puede moverse en el 4.º decimal; los que
+van a las slides, redondeados a 2, no cambian. Por eso `meta.versiones`
+registra con qué versiones se generó cada archivo.
 """
 
 from __future__ import annotations
@@ -59,6 +66,15 @@ from sklearn.metrics import (accuracy_score, f1_score,               # noqa: E40
 from sklearn.model_selection import train_test_split                 # noqa: E402
 
 from ssdl import datos                                               # noqa: E402
+
+
+def versiones():
+    """Con qué se generó esto. Determinista en la misma máquina y con estas
+    versiones; con otras, algún número puede moverse en el 4.º decimal."""
+    import platform
+    import sklearn
+    return {"python": platform.python_version(), "numpy": np.__version__,
+            "scikit-learn": sklearn.__version__}
 
 SALIDA = pathlib.Path(__file__).resolve().parent
 SEMILLA = 1983
@@ -250,8 +266,9 @@ def main():
     # --- el corpus de la búsqueda semántica --------------------------------
     print("\n--- corpus para viz/similitud-semantica.html ---")
     rng = np.random.default_rng(SEMILLA)
-    # 300 titulares al azar, pero garantizando que entren los de Covid-19 y los
-    # de política, que son los temas con los que la viz se demuestra.
+    # 300 titulares al azar, con semilla fija. No se fuerza ningún tema: con 300
+    # de 1471 entran de todo (política, Covid-19, deportes...), que es lo que la
+    # viz necesita para que las consultas sugeridas tengan con qué jugar.
     elegidos = sorted(rng.choice(len(notas), size=300, replace=False).tolist())
     corpus_viz = []
     usadas = set()
@@ -267,7 +284,7 @@ def main():
         })
 
     # el vocabulario que la viz necesita: las palabras de esos 300 titulares más
-    # las 700 más frecuentes del corpus, para que una consulta libre encuentre
+    # las 900 más frecuentes del corpus, para que una consulta libre encuentre
     # sus vectores. Recortamos a 32 dimensiones: alcanza para el ranking y el
     # archivo pesa un tercio.
     extra = [p for p in palabras[:900]]
@@ -293,7 +310,11 @@ def main():
     paquete = {
         "meta": {
             "corpus": "Spanish Fake News Corpus 2.0 — 1471 notas de prensa en "
-                      "castellano, noviembre 2020 a marzo 2021",
+                      "castellano: 971 (train+dev) de la recolección de enero a "
+                      "julio de 2018 y 500 (test) de la de noviembre de 2020 a "
+                      "marzo de 2021; las 192 de Covid-19 están todas en la "
+                      "segunda (ver datos/README.md §1.3(e))",
+            "versiones": versiones(),
             "fuente_archivo": "datos/muestras/prensa/titulares-prensa-es.csv",
             "real": True,
             "licencia": "CC BY 4.0",
@@ -318,6 +339,30 @@ def main():
     (SALIDA / "datos-clase09.js").write_text(js, encoding="utf-8")
     kb = (SALIDA / "datos-clase09.js").stat().st_size / 1024
     print(f"\nListo. datos-clase09.js ({kb:.0f} KB) y datos-clase09.json escritos.")
+    chequear_momentos(paquete)
+
+
+def chequear_momentos(paquete):
+    """Los momentos de la clase dependen de resultados concretos. Si con
+    otras versiones alguno deja de aparecer, avisamos fuerte: hay que revisar
+    las slides 15-16 y 32 antes de dar la clase."""
+    pol, cov, tr = paquete["tareas"]["politica"], paquete["tareas"]["covid"], paquete["trampa"]
+    chequeos = [
+        ("con 25 etiquetas, desde cero pierde contra embeddings (slide 16)",
+         pol["tfidf"][0]["f1"] < pol["embeddings"][0]["f1"]),
+        ("con 800 etiquetas, desde cero alcanza o pasa a embeddings (el cruce)",
+         pol["tfidf"][-1]["f1"] >= pol["embeddings"][-1]["f1"]),
+        ("en Covid-19 el diccionario le gana a las dos con 800 (slide 16)",
+         cov["diccionario"]["f1"] > max(cov["tfidf"][-1]["f1"], cov["embeddings"][-1]["f1"])),
+        ("la partición por medio hace caer el F1 de la trampa (slide 32)",
+         tr["por_fuente"]["f1"] < tr["al_azar"]["f1"] - 0.2),
+    ]
+    print("\nChequeo de los momentos de la clase:")
+    for texto, ok in chequeos:
+        print(f"  [{'ok' if ok else '!!'}] {texto}")
+    if not all(ok for _, ok in chequeos):
+        print("  >> ATENCIÓN: algún momento no apareció con estas versiones. Revisá "
+              "las slides antes de dar la clase y proyectá tu propia corrida.")
 
 
 if __name__ == "__main__":

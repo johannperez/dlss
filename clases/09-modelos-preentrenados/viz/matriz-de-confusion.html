@@ -8,12 +8,17 @@
 <!-- ==========================================================================
      MOMENTO AHA (el principal, con el slider de "cuán raro es"):
      "El modelo es EXACTAMENTE el mismo. Bajé la prevalencia del 50 % al 5 % y
-      la accuracy SUBIÓ mientras la precisión se derrumbaba. O sea: la accuracy
-      me estaba felicitando por no encontrar nada."
+      la accuracy NI SE MOVIÓ (0,882 -> 0,875) mientras la precisión se
+      derrumbaba de 0,88 a 0,23. O sea: la accuracy no me avisaba nada."
+      (Con estas dos nubes simétricas y umbral 0,5, sensibilidad y especificidad
+      son parecidas, así que acc = spec + prev·(sens − spec) casi no cambia. En
+      un caso real puede subir, bajar o quedarse, según spec contra sens.)
 
-     MOMENTO AHA (con el umbral): "no hay ningún umbral que suba la precisión y
-     el recall al mismo tiempo. Elegir el umbral es elegir qué error prefiero
-     cometer, y eso no lo decide el modelo: lo decido yo, por mi pregunta."
+     MOMENTO AHA (con el umbral): "cuando sube la precisión, el recall tiende a
+     bajar, y al revés. Al bajar el umbral el recall nunca baja; la precisión
+     tiende a bajar, con algún saltito. No hay un umbral que mejore las dos de
+     forma sostenida: elegir el umbral es elegir qué error prefiero cometer, y
+     eso no lo decide el modelo: lo decido yo, por mi pregunta."
      ========================================================================== -->
 
 <link rel="stylesheet" href="../../../_shared/css/curso.css">
@@ -89,8 +94,8 @@
       <div id="lienzo"></div>
     </div>
     <ul class="leyenda" style="margin-top:.45rem">
-      <li><i style="background:var(--c-ok)"></i> el modelo acertó</li>
-      <li><i style="background:var(--c-error)"></i> el modelo se equivocó</li>
+      <li><i style="background:var(--c-ok)"></i> el modelo acertó (punto lleno)</li>
+      <li><i style="background:var(--c-error)"></i> el modelo se equivocó (anillo hueco)</li>
       <li><i style="background:var(--c-parametro)"></i> el umbral (arrastralo)</li>
     </ul>
 
@@ -115,11 +120,12 @@
   <footer>
     <div class="aha">
       <strong>Qué mirar.</strong> Primero movés el umbral: cuando sube la precisión
-      baja el recall, y al revés. No hay lugar donde ganen los dos: el modelo es el
+      tiende a bajar el recall, y al revés. Puede haber algún saltito donde suben las
+      dos, pero no un lugar donde ganen las dos de forma sostenida: el modelo es el
       mismo, sólo cambiaste qué error preferís pagar.
       Después dejá el umbral quieto y bajá <em>cuán raro es el fenómeno</em> del 50 %
       al 5 %. La <b>precisión se desploma</b> (de 0,88 a 0,23) mientras la
-      <b>accuracy ni se entera</b>: sigue en 0,88. Y si prendés <em>mostrar el modelo
+      <b>accuracy ni se entera</b>: queda en 0,88 (en rigor baja una pizca). Y si prendés <em>mostrar el modelo
       bobo</em>, el que dice «no» siempre y no mira nada saca 0,96 y te gana por
       8 puntos. El modelo no cambió ni un poquito: cambió cuán raro es lo que buscás.
       Por eso detectar cosas raras es muchísimo más difícil de lo que la accuracy
@@ -231,6 +237,7 @@ const p = Viz.plano('#lienzo', {
   ejeX: 'puntaje que le puso el modelo', ejeY: '',
   alto: EMBEBIDO ? 188 : 250, margen: { i: 128, d: 18, a: 24, b: 46 }
 });
+p.canvas.setAttribute('role', 'img');   // el aria-label se actualiza en cada dibujo
 
 const BANDA_SI = 0.70, BANDA_NO = 0.28, ALTO_BANDA = 0.15;
 
@@ -250,14 +257,21 @@ p.alDibujar(() => {
   p.poligono([[estado.umbral, 0], [1.02, 0], [1.02, 1], [estado.umbral, 1]],
              { relleno: Viz.alfa('parametro', .07), borde: false });
 
-  // los puntos, coloreados por si el modelo ACERTÓ o no con este umbral
-  const pts = casos.map(c => {
+  // los puntos, por si el modelo ACERTÓ o no con este umbral. No sólo el color:
+  // los aciertos son puntos llenos y los errores, anillos huecos.
+  const aciertos = [], errores = [];
+  for (const c of casos) {
     const pred = c.x >= estado.umbral ? 1 : 0;
     const base = c.real === 1 ? BANDA_SI : BANDA_NO;
-    return { x: c.x, y: base + c.jit * ALTO_BANDA,
-             color: pred === c.real ? 'ok' : 'error', r: 3 };
-  });
-  p.puntos(pts, { borde: false });
+    (pred === c.real ? aciertos : errores).push({ x: c.x, y: base + c.jit * ALTO_BANDA });
+  }
+  p.puntos(aciertos, { color: 'ok', r: 3, borde: false });
+  p.puntos(errores, { color: 'error', r: 3.2, hueco: true, grosor: 1.6 });
+  p.canvas.setAttribute('aria-label', 'Puntaje del modelo para ' + N + ' casos simulados: ' +
+    'arriba los que sí son ' + F.corto + ' (' + m.positivos + '), abajo los que no. Umbral en ' +
+    Viz.num(estado.umbral, 2) + '. Aciertos (puntos llenos): ' + (m.vp + m.vn) +
+    '; errores (anillos): ' + (m.fp + m.fn) + '. Precisión ' + Viz.num(m.prec, 2) +
+    ', recall ' + Viz.num(m.rec, 2) + ', accuracy ' + Viz.num(m.acc, 2) + '.');
 
   // el umbral
   p.segmento(estado.umbral, 0, estado.umbral, 1, { color: 'parametro', grosor: 3 });
@@ -301,11 +315,11 @@ function pintarMatriz(m) {
     '<table class="mc">' +
     '<tr><th></th><th>el modelo dijo <b>SÍ</b></th><th>el modelo dijo <b>NO</b></th></tr>' +
     '<tr><th class="lado">SÍ era</th>' +
-      '<td class="bien"><b class="n">' + m.vp + '</b><span class="q">' + F.vp + '</span></td>' +
-      '<td class="mal"><b class="n">' + m.fn + '</b><span class="q">' + F.fn + '</span></td></tr>' +
+      '<td class="bien"><b class="n">' + m.vp + '</b><span class="q">✓ acierto · ' + F.vp + '</span></td>' +
+      '<td class="mal"><b class="n">' + m.fn + '</b><span class="q">✗ error · ' + F.fn + '</span></td></tr>' +
     '<tr><th class="lado">NO era</th>' +
-      '<td class="mal"><b class="n">' + m.fp + '</b><span class="q">' + F.fp + '</span></td>' +
-      '<td class="bien"><b class="n">' + m.vn + '</b><span class="q">' + F.vn + '</span></td></tr>' +
+      '<td class="mal"><b class="n">' + m.fp + '</b><span class="q">✗ error · ' + F.fp + '</span></td>' +
+      '<td class="bien"><b class="n">' + m.vn + '</b><span class="q">✓ acierto · ' + F.vn + '</span></td></tr>' +
     '</table>';
 }
 
@@ -431,7 +445,7 @@ function actualizar() {
     '<b>' + F.porque + '</b><br><br>' +
     'Con este umbral el modelo marcó <b>' + (m.vp + m.fp) + '</b> notas. ' +
     (m.prec < 0.5 && m.vp + m.fp > 0
-      ? 'Más de la mitad de esas marcas son <span class="c-error">falsas alarmas</span>: si las vas a leer una por una, vas a leer mucha basura.'
+      ? 'Más de la mitad de esas marcas son <b class="c-error">falsas alarmas</b>: si las vas a leer una por una, vas a leer mucha basura.'
       : 'De esas marcas, la mayoría da en el blanco.') +
     ' Se le escaparon <b>' + m.fn + '</b>.');
   p.redibujar();

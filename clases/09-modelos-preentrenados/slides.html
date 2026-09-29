@@ -105,13 +105,15 @@ clasificador = pipeline("sentiment-analysis",
                         model="pysentimiento/robertuito-sentiment-analysis")
 clasificador(titulares[:20])
 </code></pre>
-    <p>Eso baja un modelo entrenado en castellano rioplatense y te clasifica
-       <strong>1471 titulares</strong> mientras se enfría el café.</p>
+    <p>Eso baja un modelo entrenado con tuits en castellano (de varios países, Uruguay
+       incluido) y te clasifica los titulares mientras se enfría el café.</p>
     <div class="ojo compacta">El notebook de hoy <strong>detecta solo</strong> si tenés
       Hugging Face. Si no hay red, cae a un camino que corre con numpy y no baja nada.
-      Todo lo que importa de esta clase —la evaluación— es idéntico en los dos caminos.</div>
+      Lo que importa de esta clase —la evaluación— se hace con el mismo código en los dos
+      caminos; los números cambian un poco.</div>
     <aside class="notes">
-      3 min. Corrélo en vivo si tenés red. Si no, mostrá la salida guardada.
+      3 min. Corrélo en vivo si tenés red (la primera vez baja unos 400 MB: hacelo antes
+      de clase para que quede en caché). Si no, mostrá la salida guardada.
       Mientras corre, contá que `pipeline` es una cañería: texto crudo entra, etiqueta sale,
       y adentro hay un tokenizador, un modelo y una capa de clasificación.
       Cuando termine, quedate callado/a dos segundos y mirá la cara de asombro.
@@ -183,7 +185,8 @@ clasificador(titulares[:20])
     <h2>¿Por qué funciona, si nadie le enseñó tu tarea?</h2>
     <div class="intuicion">
       Alguien ya le enseñó <strong>castellano</strong>: gramática, qué palabras van juntas,
-      que "renunció" y "dimitió" son casi lo mismo. Eso costó meses y millones.
+      que "renunció" y "dimitió" son casi lo mismo. En un modelo grande eso cuesta
+      millones; en BETO, semanas de una TPU. Igual, mucho más de lo que tenés vos.
       Vos sólo le tenés que enseñar <strong>tu distinción</strong>, que es una capita fina
       arriba de todo eso.
     </div>
@@ -227,12 +230,15 @@ clasificador(titulares[:20])
   <section>
     <h3>Qué se congela y qué se toca</h3>
     <div class="tarjetas">
-      <div><h4>🔒 Capas de abajo</h4>Congeladas. Ya saben castellano.
+      <div><h4><span aria-hidden="true">🔒</span> Capas de abajo</h4>Congeladas. Ya saben castellano.
         <strong>Cero</strong> perillas que mover.</div>
-      <div><h4>🔧 Capa de arriba</h4>La única que entrenás. Unas pocas miles de perillas.</div>
-      <div><h4>📉 Consecuencia</h4>Menos perillas = <strong>menos datos necesarios</strong>.
+      <div><h4><span aria-hidden="true">🔧</span> Capa de arriba</h4>La única que entrenás. Unas pocas miles de perillas.</div>
+      <div><h4><span aria-hidden="true">📉</span> Consecuencia</h4>Menos perillas = <strong>menos datos necesarios</strong>.
         Eso es la clase 4, otra vez.</div>
     </div>
+    <p style="font-size:.74em; margin:.3em 0">Es un espectro: <strong>congelar todo y
+      entrenar sólo la de arriba</strong> (la estrategia A, slide 12) → descongelar las
+      últimas capas → <strong>entrenar todo</strong> (el fine-tuning completo, la C, slide 14).</p>
     <div class="aha compacta">
       Congelar no es una optimización técnica: es <strong>bajar la capacidad del modelo
       a propósito</strong>, para que 200 ejemplos alcancen. La misma decisión que tomaste
@@ -241,8 +247,10 @@ clasificador(titulares[:20])
     <aside class="notes">
       3 min. Esta es la slide donde se cobra la clase 4. Preguntá:
       "si dejo TODAS las capas libres y tengo 200 ejemplos, ¿qué pasa?"
-      Respuesta que van a dar: sobreajuste. Exacto. Fine-tuning completo con pocos datos
-      calca. Congelar es el freno.
+      Respuesta que van a dar: sobreajuste. Es el riesgo, sí: el fine-tuning completo con
+      pocos datos puede calcar, y sobre todo es inestable (cambia mucho con la semilla).
+      Con learning rate bajo y pocas épocas suele andar razonable; congelar es el freno
+      más fuerte. Ubicá la A y la C (slides 12 y 14) en el espectro de la línea de abajo.
     </aside>
   </section>
 
@@ -251,9 +259,9 @@ clasificador(titulares[:20])
     <span class="marca">callback dibujo</span>
     <h2>El informante clave</h2>
     <div class="aha compacta">
-      Nueve clases dibujando. Hoy <strong>no dibujamos desde cero</strong>: agarramos a
-      alguien que ya sabe dibujar —le enseñaron castellano durante meses y con millones de
-      dólares— y le corregimos el estilo con cuatro trazos. Las perillas de abajo quedan
+      Ocho clases dibujando. Hoy <strong>no dibujamos desde cero</strong>: agarramos a
+      alguien que ya sabe dibujar —le enseñaron castellano con mucho más texto y cómputo
+      del que vamos a tener nunca— y le corregimos el estilo con cuatro trazos. Las perillas de abajo quedan
       como estaban; las de arriba, esas pocas, son las tuyas.
     </div>
     <div class="ss">
@@ -268,7 +276,7 @@ clasificador(titulares[:20])
        <strong>Tampoco publiques "usamos BERT".</strong></p>
     <aside class="notes">
       2 min. La caja de arriba es el <b>[CALLBACK DIBUJO]</b> de la clase: decila en voz
-      alta, es lo que engancha el módulo 3 con las nueve clases anteriores.
+      alta, es lo que engancha el módulo 3 con las ocho clases anteriores.
       La metáfora del informante es la que se llevan. Usala cada vez que aparezca un modelo
       nuevo en el resto del curso.
       La segunda frase entra fuerte: dejá el fragment para el final y hacé silencio.
@@ -285,7 +293,8 @@ clasificador(titulares[:20])
         <td><strong>0 etiquetas</strong></td>
         <td><strong>zero-shot</strong> / diccionario</td>
         <td>Le describís la categoría con palabras. Clasifica sin ejemplos.</td>
-        <td>Nada. Y <em>no tenés con qué saber si anda</em>.</td>
+        <td>0 etiquetas para entrenar; <strong>200-300 para evaluarlo</strong>, como
+          todo. Sin esas, <em>no tenés con qué saber si anda</em>.</td>
       </tr>
       <tr class="destaca">
         <td><strong>50 a 500</strong></td>
@@ -297,7 +306,8 @@ clasificador(titulares[:20])
         <td><strong>300 y más</strong></td>
         <td><strong>fine-tuning</strong></td>
         <td>Seguís entrenando el modelo entero con tus ejemplos.</td>
-        <td>GPU, horas, y muchas más etiquetas.</td>
+        <td>Más cómputo (GPU si el modelo es grande) y más cuidado: con pocas etiquetas
+          es inestable. Hay que medirlo contra la del medio.</td>
       </tr>
     </table>
     <p style="font-size:.8em">La pregunta no es <em>"cuál es la mejor"</em>. Es
@@ -316,7 +326,7 @@ clasificador(titulares[:20])
   <section>
     <h3>A · Embeddings + clasificador simple</h3>
     <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
-X = vectorizar(titulares)          # texto -> un punto en 100 dimensiones
+X = vectorizar(titulares)          # texto -> un punto en cientos de dimensiones
                                    # (clase 6: el mapa donde viven las palabras)
 modelo_a = LogisticRegression(max_iter=2000, class_weight="balanced")
 modelo_a.fit(X[i_train], y[i_train])
@@ -388,7 +398,9 @@ for epoca in range(3):
       3 min. Slide de empoderamiento. Regla de la casa: ninguna abstracción se muestra
       sin la versión a mano al lado.
       Preguntá: "¿qué pasa si le dejo todas las capas libres y tengo 80 ejemplos?"
-      Que lo digan ellos: calca.
+      Que lo digan ellos: puede calcar, y sobre todo se vuelve inestable. Dato medido en la
+      revisión (MiniLM multilingüe, celda opcional del notebook): con 50 etiquetas el F1
+      fue de 0,22 a 0,57 según la semilla; con 800, 0,67 de promedio.
     </aside>
   </section>
 
@@ -396,15 +408,15 @@ for epoca in range(3):
   <section class="pregunta">
     <h2>Con <span class="c-acento">25</span> ejemplos etiquetados,<br>¿cuál gana?</h2>
     <div class="opciones">
-      <div><b>A</b> la más sofisticada (aprender todo desde cero)</div>
+      <div><b>A</b> la de más perillas (aprender el vocabulario desde cero)</div>
       <div><b>B</b> la del medio (embeddings + logística)</div>
       <div><b>C</b> el diccionario de palabras, que es gratis</div>
     </div>
     <aside class="notes">
       1 min. VOTACIÓN OBLIGATORIA, a mano alzada, antes de mostrar la viz.
       Sin la predicción fallida, mover el slider es un dibujito lindo.
-      Muchos votan A porque "es la mejor técnica". Ese error es el contenido de la
-      próxima slide.
+      Muchos votan A porque "tiene más capacidad". Ese error es el contenido de la
+      próxima slide. Ojo: la A de acá NO es el fine-tuning; es aprender sin nada prestado.
     </aside>
   </section>
 
@@ -415,9 +427,10 @@ for epoca in range(3):
     <div class="viz-frame" data-alto="grande">
       <iframe src="viz/zero-shot-vs-finetune.html" title="cuántas etiquetas hacen falta" loading="lazy"></iframe>
     </div>
-    <p class="viz-pie"><b>Qué mirar:</b> con 25 etiquetas, la estrategia más sofisticada
-      saca <b>0,14</b> y la simple <b>0,45</b>. Recién cerca de las <b>680</b> se cruzan.
-      Y si cambiás la tarea a Covid-19, el diccionario gratis le gana a las dos.</p>
+    <p class="viz-pie"><b>Qué mirar:</b> con 25 etiquetas, aprender desde cero (nada
+      prestado) saca <b>0,14</b> y los vectores prestados <b>0,45</b>. Recién cerca de las
+      <b>680</b> se cruzan. Y si cambiás la tarea a Covid-19, el diccionario gratis le gana
+      a las dos.</p>
     <aside class="notes">
       5 min. Movelo vos primero, despacio. Empezá en 25 y subí de a poco.
       Cuando llegues al cruce, pará y decí: "los primeros 100 ejemplos valen muchísimo.
@@ -427,6 +440,9 @@ for epoca in range(3):
       de todo. Frase: "acá el diccionario, que cuesta cero, le gana a las dos. Y sólo lo
       saben porque midieron el piso."
       Las curvas están MEDIDAS sobre el corpus del curso (medir-clase09.py). Decilo.
+      Y decí qué NO muestran: la curva compara vectores prestados contra nada prestado.
+      No mide el fine-tuning, que también parte de algo prestado (lo medido está en la
+      celda opcional del notebook y en notas-docente.md §10).
     </aside>
   </section>
 
@@ -436,8 +452,9 @@ for epoca in range(3):
     <div class="tarjetas">
       <div><h4>BETO</h4>BERT entrenado en castellano por la Universidad de Chile.
         El caballito de batalla.</div>
-      <div><h4>RoBERTuito / pysentimiento</h4>Entrenado en tuits en castellano, con
-        variantes rioplatenses. Muy pertinente para nosotros.</div>
+      <div><h4>RoBERTuito / pysentimiento</h4>Entrenado con tuits en castellano de muchos
+        países; el de sentimiento se ajustó con tuits de España, México, Perú, Costa Rica y
+        Uruguay. Pertinente para nosotros.</div>
       <div><h4>Multilingües</h4>XLM-R, mBERT, MiniLM multilingüe. Andan en muchos idiomas
         y en ninguno tan bien como uno dedicado.</div>
     </div>
@@ -463,11 +480,10 @@ for epoca in range(3):
       clase donde prohibimos confundirlas: no digas "acierta 70 de cada 100". Decí:
       "el mejor modelo en castellano llega a 70 de macro-F1 en una tarea de tres clases.
       Cuando alguien te muestre 0,95, preguntá qué métrica, en qué corpus y en qué idioma."
-      IMPORTANTE: los nombres de modelo cambian y los modelos se despublican. Antes de dar
-      la clase verificá que existan y **anotá la revisión exacta**. El identificador
-      `pysentimiento/robertuito-sentiment-analysis` está verificado contra el código
-      fuente de la biblioteca; los pesos en huggingface.co no se pudieron probar desde el
-      contenedor donde se armó el material. Ver notas-docente.md.
+      IMPORTANTE: los nombres de modelo cambian y los modelos se despublican. El notebook
+      fija la revisión exacta de cada modelo (`revision=`); los tres se bajaron y
+      corrieron en la revisión del 28-09-2026. Antes de dar la clase, corré el camino A
+      una vez para confirmar que siguen ahí. Ver notas-docente.md §10.
     </aside>
   </section>
 
@@ -505,8 +521,8 @@ for epoca in range(3):
       <iframe src="viz/similitud-semantica.html" title="búsqueda semántica" loading="lazy"></iframe>
     </div>
     <p class="viz-pie"><b>Qué mirar:</b> buscá <b>fútbol</b>. Por palabra clave hay
-      <b>uno</b>; por significado aparecen la FIFA, Chivas y el Cruz Azul, y ninguno dice
-      "fútbol". Después prendé <b>marcar los que no vienen al caso</b>: también trae basura.</p>
+      <b>uno</b>; por significado aparecen tres notas sobre la FIFA, y ninguna dice
+      "fútbol" (más algunas dudosas, como el negocio de Chivas). Después prendé <b>marcar los que no vienen al caso</b>: también trae basura.</p>
     <aside class="notes">
       5 min. Esto solo ya les cambia el trabajo con corpus grandes, y decílo:
       "la lista de palabras clave siempre deja afuera lo que no se te ocurrió.
@@ -615,7 +631,12 @@ for epoca in range(3):
     <aside class="notes">
       1 min. Votación. Después, la segunda pregunta, que es la buena:
       "y si el fenómeno pasa de ser la mitad del corpus a ser el 5 %, ¿qué le pasa a la
-      accuracy?" Que apuesten. Casi todos dicen "baja". Sube. Ese es el aha.
+      accuracy?" Que apuesten. Casi todos dicen "baja". Mirá: no se mueve (0,88), mientras
+      la precisión se derrumba de 0,88 a 0,23. Ese es el aha.
+      Sobre la primera: la respuesta es B, y "D, depende del modelo" tiene su parte de
+      razón. El recall nunca baja al bajar el umbral; la precisión tiende a bajar, pero
+      puede dar saltitos para arriba. No hay un umbral que mejore las dos de forma
+      sostenida.
     </aside>
   </section>
 
@@ -626,12 +647,13 @@ for epoca in range(3):
     <div class="viz-frame" data-alto="grande">
       <iframe src="viz/matriz-de-confusion.html" title="matriz de confusión y umbral" loading="lazy"></iframe>
     </div>
-    <p class="viz-pie"><b>Qué mirar:</b> no hay umbral donde suban las dos.
+    <p class="viz-pie"><b>Qué mirar:</b> cuando una sube, la otra tiende a bajar.
       Y después, sin tocar nada más, bajá <b>cuán raro es el fenómeno</b> al 5 %:
       la precisión cae de 0,88 a 0,23, la accuracy no se mueve, y el modelo bobo te gana.</p>
     <aside class="notes">
       8 min. LA VIZ CENTRAL DE LA CLASE. No la apures.
-      1) Movés el umbral despacio. Que vean precisión y recall pelearse.
+      1) Movés el umbral despacio. Que vean precisión y recall pelearse. (Si alguien ve
+         que en un tramito suben las dos: es cierto, pasa. Son saltitos, no tendencia.)
          "Elegir el umbral es elegir qué error preferís, y eso es una decisión de
          investigación, no una métrica que se optimiza sola." (Y es la clase 3 otra vez:
          elegir la loss también era elegir qué error te importa.)
@@ -700,7 +722,7 @@ for epoca in range(3):
       <tr><td>el bobo: decir siempre «no»</td><td>0,72</td><td class="c-error">0,00</td><td>0</td></tr>
       <tr><td>diccionario de palabras clave</td><td>0,75</td><td>0,40</td><td>0</td></tr>
       <tr><td>A · embeddings + logística</td><td>0,78</td><td>0,65</td><td>1103</td></tr>
-      <tr><td>C · vocabulario desde cero</td><td>0,83</td><td>0,67</td><td>1103</td></tr>
+      <tr><td>desde cero · TF-IDF + logística</td><td>0,83</td><td>0,67</td><td>1103</td></tr>
     </table>
     <div class="aha">
       Si tu clase mayoritaria es el 92 %, un <strong>93 % de accuracy es un desastre</strong>
@@ -712,6 +734,8 @@ for epoca in range(3):
       "¿es una nota sobre política?", 28 % de positivos.
       Fijate en la columna F1 del bobo: cero. Encontró CERO notas de política y acertó
       el 72 % de las veces. Ese contraste es la slide entera.
+      Son los números del camino B (sin red). Con Hugging Face (camino A) la fila A da
+      0,77 / 0,65: la misma F1, otra accuracy. Si corrés el A en vivo, decilo.
     </aside>
   </section>
 
@@ -719,28 +743,34 @@ for epoca in range(3):
   <section>
     <h2>El techo humano</h2>
     <div class="intuicion compacta">
-      Si dos codificadores entrenados coinciden en el <strong>73 %</strong> de los casos
-      (kappa 0,46), ese es tu <strong>techo realista</strong>. No hay modelo que pueda
-      hacer mejor una distinción que dos personas no saben hacer igual.
+      Dos codificadores coinciden en el <strong>73 %</strong> de los casos (kappa 0,46).
+      Medidos con <strong>la misma métrica que tu modelo</strong>, uno contra el otro dan
+      <strong>F1 0,71</strong>: ese es tu <strong>techo realista</strong>. Es muy raro que
+      un modelo haga mejor una distinción que dos personas no saben hacer igual.
     </div>
     <p style="font-size:.72em; color:var(--tinta-2); margin:.2em 0 .4em">
       <span class="chip sintetico">codificadores simulados</span>
-      el 73 % y el 0,46 salen del archivo del curso, donde las dos codificaciones se
-      generaron con una semilla. Sirven para practicar la cuenta; reportarlos como
+      el 73 %, el 0,46 y el 0,71 salen del archivo del curso, donde las dos codificaciones
+      se generaron con una semilla. Sirven para practicar la cuenta; reportarlos como
       acuerdo humano real sería fraude.
     </p>
     <div class="ojo compacta">
-      Y si tu modelo saca <strong>0,95</strong> donde dos humanos coinciden en 0,73:
-      <strong>no festejes. Buscá el error.</strong> Casi siempre hay una fuga, o el modelo
-      aprendió el estilo de <em>un</em> codificador en particular.
+      Y si tu modelo saca <strong>F1 0,95</strong> contra uno de ellos donde entre ellos dan
+      0,71: <strong>no festejes. Buscá el error.</strong> Casi siempre hay una fuga, o el
+      modelo aprendió el estilo de <em>un</em> codificador. Comparás F1 con F1:
+      <strong>el kappa es otra escala</strong>.
     </div>
     <p class="fragment"><strong>Este es el aporte más valioso que un cientista social
       hace en un equipo de ML.</strong> El kappa no es un detalle de calidad: es un
       <em>límite epistemológico</em>.</p>
     <aside class="notes">
       4 min. Terreno conocido: acá ellos saben más que el ingeniero.
-      El número 0,73/0,46 sale del archivo del curso, y los dos codificadores son
-      SIMULADOS: está en el nombre del archivo y hay que decirlo. Sirve para practicar
+      El número 0,73/0,46/0,71 sale del archivo del curso, y los dos codificadores son
+      SIMULADOS: está en el nombre del archivo y hay que decirlo. Insistí en comparar
+      métrica con métrica: el kappa no es un techo para un F1 (con esa regla, hasta el
+      F1 0,65 del notebook "superaría" el kappa 0,46). Y bajá el absoluto: un modelo
+      puede, a veces, coincidir con un codificador más que el otro, porque promedia el
+      ruido de cada uno. Es raro, y si pasa, se sospecha primero. Sirve para practicar
       la cuenta, no para afirmar nada sobre el corpus.
       Cerrá con la frase que se llevan: "si dos codificadores no se ponen de acuerdo,
       no tenés un problema de modelo. Tenés un problema de concepto."
@@ -764,8 +794,8 @@ for epoca in range(3):
       <strong>25 minutos.</strong>
     </div>
     <aside class="notes">
-      25 min. Circulá y buscá activamente a quién le ganó la regresión logística al
-      modelo grande: eso se pone en común después.
+      25 min. Circulá y buscá activamente a quién le ganó la regresión logística sobre
+      vectores prestados a aprender desde cero: eso se pone en común después.
       A los 20 min avisá. Si van muy atrasados, saltá el punto 2 (la curva ya la vieron
       en la viz) y no toques el 3 ni el 4.
     </aside>
@@ -775,8 +805,8 @@ for epoca in range(3):
   <section>
     <h2>Poné en común</h2>
     <ul>
-      <li>¿A quién le ganó la <strong>regresión logística</strong> a la estrategia
-          sofisticada? Levanten la mano.</li>
+      <li>¿A quién le ganó la <strong>regresión logística sobre vectores prestados</strong>
+          a aprender desde cero? Levanten la mano.</li>
       <li>¿A quién le ganó el <strong>diccionario</strong>, que es gratis?</li>
       <li>¿Quién encontró en los errores <strong>una etiqueta humana equivocada</strong>?</li>
       <li>¿A quién le bajó el número al partir por medio?</li>
@@ -795,9 +825,9 @@ for epoca in range(3):
     <span class="marca">el corpus de hoy</span>
     <h3>El detector de desinformación que era un detector de chistes</h3>
     <table class="numeros">
-      <tr><th>cómo partí los datos</th><th>accuracy</th><th>F1</th></tr>
-      <tr><td>al azar, como en los tutoriales</td><td>0,73</td><td class="c-ok">0,68</td></tr>
-      <tr><td>por medio (ningún diario en los dos lados)</td><td>0,44</td><td class="c-error">0,22</td></tr>
+      <tr><th>cómo partí los datos</th><th>piso</th><th>accuracy</th><th>F1</th></tr>
+      <tr><td>al azar, como en los tutoriales</td><td>0,53</td><td>0,73</td><td class="c-ok">0,68</td></tr>
+      <tr><td>por medio (ningún diario en los dos lados)</td><td>0,60</td><td>0,44 <span style="font-size:.8em">(debajo del piso)</span></td><td class="c-error">0,22</td></tr>
     </table>
     <p><strong>332 de los 346 medios (96 %) aparecen con una sola clase.</strong>
        Y las notas "falsas" vienen sobre todo de <em>El Dizque</em> y
@@ -813,6 +843,11 @@ for epoca in range(3):
       del curso (medidos en el notebook, no inventados).
       Regla que se llevan, dictala: "entrená dos veces, con y sin el atajo sospechoso
       disponible, y mostrá la diferencia. **Si no cae, algo está mal en tu evaluación.**"
+      El piso es la accuracy de decir siempre la clase mayoritaria de ESE test: partiendo
+      por medio, el test queda con 60 % de falsas, y el modelo ni le gana al bobo.
+      Si hay tiempo, la otra trampa del notebook (sección 11): las 192 notas de Covid-19
+      son todas de la recolección 2020-21, y las demás mayormente de 2018. Tema y época
+      están confundidos.
       Y sembrá la clase 10: "esto tiene nombre —validez de constructo— y es la clase que
       viene entera."
     </aside>
@@ -866,10 +901,10 @@ for epoca in range(3):
     </aside>
   </section>
 
-  <!-- =========================== 35 · EL LUNES =========================== -->
+  <!-- =========================== 35 · EN TU INVESTIGACIÓN =========================== -->
   <section>
-    <span class="marca">el lunes</span>
-    <h2>Qué te llevás para el lunes</h2>
+    <span class="marca">en tu investigación</span>
+    <h2>Qué te llevás a tu investigación</h2>
     <ol style="font-size:.86em">
       <li><strong>Definí la categoría</strong> por escrito, con los casos límite resueltos.</li>
       <li><strong>Etiquetá 300 al azar</strong>, a ciegas. Son unas 2,5 horas.</li>
@@ -880,11 +915,14 @@ for epoca in range(3):
       <li><strong>Evaluá en test</strong>, una sola vez, y <strong>leé 30 errores</strong>.</li>
       <li><strong>Reportá</strong> los siete puntos de la slide anterior.</li>
     </ol>
-    <div class="manos compacta">Con esto, el lunes clasificás tu corpus. En serio.
-      La función <code>clasificar_corpus(textos)</code> está en la sección 13 del notebook,
-      lista para que le pases tus datos.</div>
+    <div class="manos compacta">Con esto, la próxima vez que te sientes con tu corpus, lo
+      clasificás. En serio. La función <code>clasificar_corpus(textos)</code> está en la
+      sección 13 del notebook, lista para que le pases tus datos.</div>
     <aside class="notes">
-      3 min. Insistí en el paso 3: es el más barato y el que más disgustos evita.
+      3 min. Decilo explícito: no es tarea para la clase que viene. Es un proyecto de
+      mediano plazo (sólo el paso 2 son unas 2,5 horas, más la otra persona del paso 3).
+      Si alguien quiere adelantar algo antes de la clase 10, que sea el paso 1.
+      Insistí en el paso 3: es el más barato y el que más disgustos evita.
       "Sesenta casos codificados por dos personas cuestan media hora y te pueden ahorrar
       seis meses de medir algo que no existe."
     </aside>
