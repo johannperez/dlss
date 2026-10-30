@@ -171,7 +171,7 @@ const ALTO_PANEL = EMBEBIDO ? 390 : 300;
 const mapa = Viz.plano('#caja-mapa', {
   xmin: -0.405, xmax: 0.495, ymin: -0.135, ymax: 0.445,
   ejeX: 'qué tan empinada (puntos por década)',
-  ejeY: 'dónde arranca',
+  ejeY: 'dónde arranca (valor a mitad de 2001-2002)',
   titulo: 'el mapa: cada punto es una recta entera',
   alto: ALTO_PANEL
 });
@@ -234,7 +234,7 @@ mapa.arrastrables([puntoP], {
   }
 });
 mapa.tooltip(function (w) {
-  return 'esta es la recta\ny = ' + Viz.num(w.x, 3) + '·x + ' + Viz.num(w.y, 3) +
+  return 'esta es la recta\ny = ' + Viz.num(w.x, 3) + '·(año − 2001,5)/10 + ' + Viz.num(w.y, 3) +
          '\ndesajuste ' + Viz.num(loss(w.x, w.y), 4);
 });
 mapa.alClic(function (w) {
@@ -275,6 +275,13 @@ datos.alDibujar(function () {
     datos.puntos(ANIOS.map(function (t, i) { return { x: t, y: Y[i] }; }),
                  { color: 'datos', r: 4, borde: false });
     datos.curva(recta, { color: 'modelo', grosor: 3.5 });
+    // el ancla de la recta: la perilla «dónde arranca» es su altura en 2001,5,
+    // no en 1984 ni en el año 0. Sin esta marca el mapa y los años no se leen juntos.
+    datos.linea([[2001.5, datos.ymin], [2001.5, datos.ymax]],
+                { color: 'parametro', grosor: 1.2, punteada: true, opacidad: .6 });
+    datos.punto(2001.5, estado.b, { color: 'parametro', r: 5 });
+    datos.texto(2001.5, estado.b, 'dónde arranca', { color: 'parametro', tam: 11,
+                peso: '700', dx: 8, dy: -12, caja: true });
     datos.textoPx(datos.R - 8, datos.T + 8,
       'desajuste ' + Viz.num(lossDatos(estado.a, estado.b), 4),
       { color: 'error', tam: 16, peso: '700', alinear: 'right', caja: true });
