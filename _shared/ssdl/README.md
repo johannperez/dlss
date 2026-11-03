@@ -303,6 +303,16 @@ g.curvas_de_entrenamiento(train=[...], val=[...])    # o listas sueltas
 Azul lo que el modelo vio, naranja lo que no, y una marca verde en la mejor
 época de validación.
 
+```python
+g.diagrama_de_red(modelo)            # un nn.Sequential de capas Linear
+g.diagrama_de_red([1, 16, 1])        # o sólo los tamaños, sin pesos
+```
+
+La red como en el pizarrón: un círculo por neurona, una línea violeta por peso
+(grosor = cuánto pesa, punteada = negativo). Las ocultas llevan su rampa
+dibujada adentro. Si una capa tiene más de `max_neuronas` (20), se dibujan las
+de los bordes y un «⋮».
+
 ### Clase 5 — imágenes
 
 ```python

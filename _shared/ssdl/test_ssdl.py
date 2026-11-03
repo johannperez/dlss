@@ -756,6 +756,19 @@ class TestGraficos(unittest.TestCase):
         ax = g.curvas_de_entrenamiento(train=[3, 2, 1])
         self.assertEqual(len(ax.lines), 1)
 
+    def test_diagrama_de_red_desde_tamanos(self):
+        ax = g.diagrama_de_red([1, 4, 1])
+        self.assertEqual(len(ax.patches), 6)                # un círculo por neurona
+        self.assertIn("13 perillas", ax.texts[-1].get_text())
+
+    @unittest.skipUnless(HAY_TORCH, "sin torch")
+    def test_diagrama_de_red_desde_sequential(self):
+        m = torch.nn.Sequential(torch.nn.Linear(1, 300), torch.nn.ReLU(),
+                                torch.nn.Linear(300, 1))
+        ax = g.diagrama_de_red(m, max_neuronas=10)
+        self.assertEqual(len(ax.patches), 12)               # 1 + 10 visibles + 1
+        self.assertIn("901 perillas", ax.texts[-1].get_text())
+
     def test_metricas_binarias(self):
         y_true = [1, 1, 1, 0, 0, 0, 0, 0]
         y_pred = [1, 1, 0, 1, 0, 0, 0, 0]

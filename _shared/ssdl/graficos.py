@@ -764,6 +764,120 @@ def curvas_de_entrenamiento(historial=None, train=None, val=None, ax=None,
     return ax
 
 
+def _capas_de(modelo):
+    """
+    De un `nn.Sequential` (o una lista de tamaños) saca lo que hace falta para
+    dibujarlo: los tamaños de cada columna, los pesos de cada capa (o None) y el
+    nombre del doblez que va después de cada capa (o None).
+    """
+    if isinstance(modelo, (list, tuple)):
+        tamanos = [int(n) for n in modelo]
+        return tamanos, [None] * (len(tamanos) - 1), ["ReLU"] * (len(tamanos) - 2) + [None]
+
+    tamanos, pesos, dobleces = [], [], []
+    for capa in modelo:
+        w = getattr(capa, "weight", None)
+        if w is not None and getattr(w, "ndim", 0) == 2:      # una capa lineal
+            if not tamanos:
+                tamanos.append(int(w.shape[1]))
+            tamanos.append(int(w.shape[0]))
+            pesos.append(_a_numpy(w).astype(float))
+            dobleces.append(None)
+        elif pesos:                                           # un doblez después
+            dobleces[-1] = type(capa).__name__
+    if not pesos:
+        raise ValueError("No encontré capas lineales (nn.Linear) en el modelo.")
+    return tamanos, pesos, dobleces
+
+
+def diagrama_de_red(modelo, ax=None, titulo=None, max_neuronas=20,
+                    nombres=("entrada", "salida")):
+    """
+    La red dibujada como en el pizarrón: una columna de círculos por capa y una
+    línea por cada peso. Las líneas son VIOLETA porque son perillas; el grosor
+    es cuánto pesa cada una, y las punteadas son pesos negativos.
+
+        g.diagrama_de_red(modelo)            # un nn.Sequential de capas Linear
+        g.diagrama_de_red([1, 16, 1])        # o sólo los tamaños, sin pesos
+
+    Las neuronas ocultas llevan dibujada su rampa adentro: cada círculo azul es
+    una de las rampas de la clase 2. Si una capa tiene más de `max_neuronas`,
+    se dibujan las de los bordes y un «⋮» en el medio.
+    """
+    tamanos, pesos, dobleces = _capas_de(modelo)
+    n_capas = len(tamanos)
+    ax = _ejes(ax, ancho=max(6, 2.8 * n_capas), alto=6.5, titulo=titulo)
+    ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
+    for lado in ax.spines.values():
+        lado.set_visible(False)
+
+    # Qué neuronas se dibujan de cada capa y a qué altura.
+    visibles, alturas = [], []
+    for n in tamanos:
+        if n > max_neuronas:
+            mitad = max_neuronas // 2
+            idx = list(range(mitad)) + list(range(n - mitad, n))
+            ys = np.r_[np.arange(mitad), np.arange(mitad) + mitad + 1]
+        else:
+            idx, ys = list(range(n)), np.arange(n, dtype=float)
+        ys = ys - (ys.max() if len(ys) else 0) / 2
+        visibles.append(idx)
+        alturas.append(ys)
+    alto = max(float(np.abs(ys).max()) for ys in alturas) + 1
+    paso = 2.2 * alto / max(n_capas - 1, 1)       # distancia entre columnas
+    radio = 0.36
+
+    # Las líneas: un peso cada una.
+    for k in range(n_capas - 1):
+        w = pesos[k]
+        tope = float(np.abs(w).max()) if w is not None else 1.0
+        for j, yj in zip(visibles[k], alturas[k]):
+            for i, yi in zip(visibles[k + 1], alturas[k + 1]):
+                fuerza = abs(w[i, j]) / tope if w is not None else 0.5
+                ax.plot([k * paso, (k + 1) * paso], [yj, yi],
+                        color=C["parametro"], linewidth=0.4 + 2.6 * fuerza,
+                        alpha=0.25 + 0.6 * fuerza, zorder=1,
+                        linestyle="--" if w is not None and w[i, j] < 0 else "-")
+
+    # Los círculos.
+    for k, (idx, ys) in enumerate(zip(visibles, alturas)):
+        oculta = 0 < k < n_capas - 1
+        x = k * paso
+        for y in ys:
+            ax.add_patch(plt.Circle((x, y), radio,
+                                    facecolor=C["fondo"], zorder=3,
+                                    edgecolor=C["modelo"] if oculta else C["datos"],
+                                    linewidth=1.8))
+            if oculta and dobleces[k - 1] == "ReLU":          # la rampita adentro
+                s = radio * 0.6
+                ax.plot([x - s, x, x + s], [y - s * 0.5, y - s * 0.5, y + s * 0.8],
+                        color=C["modelo"], linewidth=1.4, zorder=4,
+                        solid_capstyle="round")
+        if len(idx) < tamanos[k]:
+            ax.text(x, 0, "⋮", ha="center", va="center", fontsize=16,
+                    color=C["tinta_2"], zorder=4)
+
+        if k == 0:
+            nombre = f"{nombres[0]}\n{tamanos[k]}"
+        elif k == n_capas - 1:
+            nombre = f"{nombres[1]}\n{tamanos[k]}"
+        else:
+            doblez = dobleces[k - 1]
+            nombre = (f"{tamanos[k]} rampas\n({doblez})" if doblez == "ReLU"
+                      else f"{tamanos[k]} neuronas" + (f"\n({doblez})" if doblez else ""))
+        ax.text(x, -alto - 0.3, nombre, ha="center", va="top", color=C["tinta_2"])
+
+    perillas = sum(a * b + b for a, b in zip(tamanos[:-1], tamanos[1:]))
+    recortada = any(len(idx) < n for idx, n in zip(visibles, tamanos))
+    _nota(ax, f"{perillas} perillas: una por línea violeta,\n"
+              f"más un sesgo por cada círculo después de la entrada"
+              + ("\n(con «⋮» no se dibujan todas)" if recortada else ""), arriba=True)
+    ax.set_xlim(-2, (n_capas - 1) * paso + 2)
+    ax.set_ylim(-alto - 3.2, alto + 2.6)
+    ax.set_aspect("equal")         # para que los círculos salgan redondos
+    return ax
+
+
 # ===========================================================================
 # CLASE 9-10: evaluación
 # ===========================================================================
