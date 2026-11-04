@@ -11,7 +11,9 @@
      y 2006 son el MISMO discurso repetido."
 
      El aha se cobra cambiando UN control: el selector de estrategia. Con
-     «al azar» hay anillos rojos; con «por grupo» desaparecen todos. El
+     «al azar» hay anillos rojos; con «por grupo» desaparecen todos (en los
+     discursos; en los titulares quedan los duplicados, y esa es la segunda
+     lección). El
      estudiante no cambió los datos ni el modelo: cambió una decisión
      metodológica que en los papers ocupa media línea.
      ========================================================================== -->
@@ -102,6 +104,11 @@
       reconociendo un estilo que ya vio. Y hay algo peor: <b>2005 y 2006 son el mismo discurso</b>, palabra por
       palabra, en el corpus original. Al azar, esa copia cae de los dos lados. Pasá a
       <b>por grupo</b>: se apagan todos los anillos.
+      <br><br>
+      <strong>Después, pasá a los titulares.</strong> Ahí cada diario publica todos los años, así
+      que <b>por tiempo</b> no separa diarios. Y los cables de agencia aparecen idénticos en dos
+      diarios distintos, así que <b>por grupo</b> tampoco los junta: quedan anillos punteados.
+      Ninguna estrategia te salva de buscar duplicados <em>antes</em> de partir.
     </div>
     <p class="viz-pie">
       Datos: los 36 discursos presidenciales de apertura de sesiones 1984-2019 (<b>reales</b>;
@@ -156,8 +163,12 @@ function titulares() {
     cs.push({ id: i, orden: 2010 + Math.floor(i / 12), grupo: DIARIOS[i % 12],
               rotulo: String(i + 1), sub: String(2010 + Math.floor(i / 12)).slice(2), gemelo: null });
   }
-  // ocho cables reproducidos tal cual por otro diario (pasa todo el tiempo)
-  const pares = [[3, 51], [7, 88], [14, 62], [21, 105], [30, 77], [44, 96], [58, 113], [66, 101]];
+  // Ocho cables de agencia reproducidos tal cual por dos diarios (pasa todo el
+  // tiempo). El caso i es del año 2010 + floor(i / 12) y del diario i % 12, así
+  // que cada par es del MISMO año y de diarios DISTINTOS, como un cable de verdad.
+  // Consecuencia buscada: por tiempo los pares no se parten (salvo que el corte
+  // caiga a mitad de un año); por grupo sí, porque cruzan diarios.
+  const pares = [[3, 7], [14, 22], [27, 33], [40, 45], [50, 58], [64, 69], [85, 90], [110, 116]];
   for (const [i, j] of pares) { cs[i].gemelo = j; cs[j].gemelo = i; cs[i].sub = '='; cs[j].sub = '='; }
   return cs;
 }
@@ -368,6 +379,12 @@ function pintar() {
          : ctl.valores.estrategia === 'tiempo'
            ? 'Partir <b>por tiempo</b> contesta: <i>¿sirve para el año que viene?</i> ' +
              'Es la partición honesta cuando tu pregunta es predictiva.' +
+             (ctl.valores.conjunto === 'titulares'
+               ? ' <br>Ojo: acá cada diario publica todos los años, así que cortar por tiempo ' +
+                 '<b>no separa diarios</b>: todo el test comparte diario con el entrenamiento. ' +
+                 'Si tu pregunta es «el año que viene, en estos mismos diarios», puede estar bien; ' +
+                 'si es «un diario que no vi nunca», no. Para eso hacen falta las dos particiones a la vez.'
+               : '') +
              (ctl.valores.conjunto === 'discursos'
                ? ' <br>Ojo: acá el corte sale de los porcentajes. Con 60/20/20 cae justo ' +
                  'entre 2005 y 2006, y los gemelos quedan partidos entre entrenamiento y ' +
@@ -378,7 +395,12 @@ function pintar() {
                : '')
            : 'Partir <b>por grupo</b> contesta: <i>¿sirve para un ' + conj.nombreGrupo +
              ' que no vi nunca?</i> Fijate el precio: el test se queda con ' + nTest +
-             ' casos.') + '</div>';
+             ' casos.' +
+             (ctl.valores.conjunto === 'titulares'
+               ? ' <br>Y fijate los <b>=</b>: un cable de agencia sale idéntico en dos diarios ' +
+                 'distintos, así que separar diarios no junta las copias. Los duplicados se buscan ' +
+                 '<b>antes</b> de partir, con cualquier estrategia.'
+               : '')) + '</div>';
   Viz.nodo('#veredicto').innerHTML = v;
 }
 

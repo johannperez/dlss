@@ -164,6 +164,9 @@ configuraciones probaste. Las dos son aceptables; esconderlo no.
 - Poné la viz de partición en «120 titulares» + «por tiempo» y preguntá por qué siguen
   quedando fugas de grupo. (Respuesta: cada diario publica todos los años, así que partir por
   tiempo no separa diarios. Hay problemas que necesitan **las dos** particiones a la vez.)
+  Después pasá a «por grupo»: los anillos de diario se apagan, pero pueden quedar los
+  punteados. Son cables de agencia reproducidos por dos diarios el mismo año, y separar
+  diarios no los junta. Los duplicados se buscan antes de partir, con cualquier estrategia.
 - Discutan un paper que hayan traído: *¿dice cómo partió los datos?* Casi nunca dice.
 
 ---
