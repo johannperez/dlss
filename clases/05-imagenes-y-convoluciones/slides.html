@@ -101,7 +101,8 @@
   <span class="marca">gancho</span>
   <h2>¿Cuánta gente hay en esta foto?</h2>
   <div class="viz-frame" style="padding:10px"><div class="cuadro-medio" id="gancho-foto" role="img" aria-label="esquema sintético de una multitud: muchas cabecitas oscuras sobre un fondo claro"></div></div>
-  <p class="viz-pie">Una foto de archivo, en baja resolución.
+  <p class="viz-pie">Una multitud <b>vista desde arriba</b>, en muy baja resolución (28×28
+    píxeles): <b>cada crucecita oscura es una cabeza</b>, el fondo es el piso.
     <span class="chip sintetico">esquema sintético</span> Estimá a ojo. Nadie va a controlar.</p>
   <div class="intuicion fragment">Contestaste en dos segundos y sin pensar.
     <strong>Guardá eso</strong>: lo que acabás de hacer sin esfuerzo es exactamente
@@ -121,6 +122,9 @@
       <figure style="margin:0"><figcaption style="font-size:.5em;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.04em;text-align:center;margin-bottom:.3em">la misma foto, corrida 3 píxeles</figcaption><div id="g-b" role="img" aria-label="el mismo esquema, corrido 3 píxeles a la derecha"></div></figure>
     </div>
   </div>
+  <p class="viz-pie">La <b>línea punteada</b> está en el mismo lugar en las dos. A la derecha,
+    la cabeza del borde (y todas las demás) quedó <b>3 píxeles más allá</b>; la franja vacía
+    de la izquierda es lo que quedó sin dibujo.</p>
   <div class="intuicion">¿Cambió algo para vos? No. Para el modelo de la clase 4
     <strong>le cambiaron todas las variables de entrada al mismo tiempo</strong>.</div>
   <aside class="notes">
@@ -135,10 +139,12 @@
 <section>
   <h3>Una imagen es una tabla de números</h3>
   <div class="viz-con-panel">
-    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto" role="img" aria-label="una prenda de FashionMNIST de 28 por 28 píxeles, con un recuadro de 8 por 8 marcado"></div></div>
+    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto" role="img" aria-label="un pullover de FashionMNIST de 28 por 28 píxeles, con un recuadro de 8 por 8 marcado"></div></div>
     <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-zoom" role="img" aria-label="el recuadro de 8 por 8 ampliado, con el número de 0 a 255 de cada casilla escrito adentro"></div></div>
   </div>
-  <p class="viz-pie">Cada casilla es un número de <b>0 a 255</b>: cuánta luz hay en ese punto.
+  <p class="viz-pie"><b>Izquierda:</b> un <b>pullover</b> de FashionMNIST (el dataset de hoy),
+    con un logo en el pecho; el recuadro verde marca un pedazo de 8×8. <b>Derecha:</b> ese
+    pedazo ampliado, con su número. Cada casilla es un número de <b>0 a 255</b>: cuánta luz hay en ese punto.
     Acá lo dibujamos como <b>tinta sobre papel</b> —más número, más oscuro— para que se lea
     en el proyector; en el archivo original el 255 es blanco. <b>Esto es lo único que ve la
     computadora:</b> el dibujo no está "adentro", el dibujo <em>es</em> la tabla.</p>
@@ -953,8 +959,10 @@
 
   // --- slide 3 y 4: el gancho -----------------------------------------------
   imagen('#gancho-foto', MULT);
-  imagen('#g-a', MULT);
-  imagen('#g-b', corrida(MULT, 3));
+  // línea de referencia fija (mismo x en las dos) para que se vea el corrimiento
+  const referencia = p => p.segmento(1.5, 0, 1.5, 28, { color: 'acento', grosor: 2, punteada: true });
+  imagen('#g-a', MULT, referencia);
+  imagen('#g-b', corrida(MULT, 3), referencia);
 
   // --- slide 5: la imagen es una tabla --------------------------------------
   imagen('#tabla-foto', FOTO, p => ventana(p, 28, 10, 8, 8, 'acento'));
