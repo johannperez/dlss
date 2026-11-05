@@ -2,14 +2,14 @@
 
 **La forma de los datos manda (I): imágenes**
 
-Doce preguntas. Las de opción múltiple tienen **una** respuesta correcta.
+Trece preguntas. Las de opción múltiple tienen **una** respuesta correcta.
 Las abiertas se responden en tres o cuatro oraciones: no se busca extensión, se busca criterio.
 
 Podés tener el notebook abierto. De hecho, para algunas conviene.
 
-**Cuánto lleva y para cuándo.** Todo, unos 40 minutos. **Para la clase que viene alcanzan
-las preguntas 1 a 7 y la 10** (unos 25 minutos); las otras (8, 9, 11 y 12) son de criterio
-sobre tu propio trabajo y se pueden hacer después, cuando las necesites.
+**Cuánto lleva y para cuándo.** Todo, unos 45 minutos. **Para la clase que viene alcanzan
+las preguntas 1 a 7, la 10 y la 13** (unos 30 minutos); las otras (8, 9, 11 y 12) son de
+criterio sobre tu propio trabajo y se pueden hacer después, cuando las necesites.
 
 ---
 
@@ -39,13 +39,17 @@ En una CNN, **un filtro (o *kernel*)** es:
 
 ### 3. (qué pasa si…)
 
-Tomás las 12.000 imágenes de entrenamiento y las 4.000 de prueba y le aplicás a **todas** la
-**misma** permutación de los 784 píxeles. Reentrenás desde cero.
+En el notebook entrenaste tres máquinas con los mismos dígitos y el mismo loop: la red densa,
+la CNN con el máximo al final y la CNN aplanada del `TODO 3`. Después corriste las fotos de
+validación **4 píxeles a la derecha**, sin reentrenar nada.
 
-**a)** ¿Qué le pasa a la exactitud de la red densa? ¿Por qué?
-**b)** ¿Qué le pasa a la de la CNN? ¿Por qué la diferencia?
-**c)** ¿Qué pasaría si en vez de una permutación fija usaras **una permutación distinta para
-cada imagen**? (Esta parte no la corrimos en clase: pensala.)
+**a)** ¿Qué le pasa a la exactitud de la red densa? Explicalo con lo que viste que aprendió
+cada una de sus neuronas.
+**b)** La CNN aplanada tiene exactamente los mismos pinceles que la CNN con máximo, y sin
+embargo se cae bastante más. ¿Por qué? ¿Qué pieza de la arquitectura es la que pone la
+invariancia?
+**c)** Con la foto **quieta**, la aplanada acierta un poquito más que la CNN con máximo. ¿Cómo
+lo explicás, y qué te dice sobre los supuestos de una arquitectura?
 
 ---
 
@@ -158,7 +162,26 @@ por variables?
 **b)** Escribí **una** afirmación sobre el mundo que estarías haciendo si eligieras un modelo que
 supone esa forma.
 **c)** ¿Cómo comprobarías si esa afirmación es cierta en tu caso? Pensá una prueba concreta,
-del estilo de la que hicimos hoy con el barajado.
+del estilo de las que hicimos hoy: correr la foto, o sacarle al modelo la pieza que pone el
+supuesto (el `TODO 3`).
 
 *(Esta pregunta no tiene una respuesta correcta. Tiene respuestas honestas y respuestas
 apuradas.)*
+
+---
+
+### 13. (leer una figura)
+
+En la sección 7 del notebook, el mapa de «tapar» de una foto de **follaje** que el modelo
+clasificó como «hay movilización» se enciende sobre **las copas de los árboles**.
+
+**a)** ¿Qué podés concluir de ese mapa?
+
+- **A.** Que el modelo «piensa» que los árboles son personas.
+- **B.** Que en esa foto, tapar las copas baja mucho la confianza del modelo en «hay
+  movilización»: las copas son parte de lo que lo convenció.
+- **C.** Que el modelo no sirve y hay que tirarlo.
+- **D.** Que el modelo mira siempre la parte de arriba de las fotos.
+
+**b)** En una o dos oraciones: ¿qué harías con ese hallazgo si este modelo fuera parte de tu
+investigación?

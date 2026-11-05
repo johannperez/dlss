@@ -5,9 +5,10 @@ revela cada distractor**, porque esa confusión reaparece en las clases 6, 7 y 1
 la respuesta, por qué cada opción incorrecta es tentadora, y qué hacer con quien la eligió.
 
 Los números que se citan son los de la corrida de referencia de la clase
-(`medir-experimentos.py`, semilla 1983, torch 2.14; están en `datos-experimentos.json`):
-densa 85,7 % / barajada 85,5 %; CNN 87,7 % / barajada 83,1 %; con la foto corrida 3 píxeles,
-densa 32,2 % y CNN 74,4 %. Con otra versión de las librerías pueden cambiar unas décimas:
+(`medir-mnist.py`, que corre el notebook tal cual; semilla 1983, torch 2.15; están en
+`datos-mnist.json`). Aciertos en validación con la foto quieta: densa 95,8 %, CNN con máximo
+98,1 %, CNN aplanada 98,7 %. Con la foto corrida 4 píxeles: densa 29,0 %, aplanada 71,8 %,
+CNN con máximo 97,8 %. Con otra versión de las librerías pueden cambiar unas décimas:
 **no corrijas por el dígito**, corregí por el patrón.
 
 ---
@@ -47,40 +48,40 @@ El filtro son los números. El pincel.
 
 ### 3.
 
-**a) La red densa queda prácticamente igual: 85,7 % → 85,5 %.**
-La razón: para una capa densa, cada píxel de entrada es una variable con su propio peso, y el
-orden en que estén las variables no significa nada. Aplicar siempre la misma permutación equivale
-a renombrar las variables; la red puede aprender los mismos pesos, sólo que en otras posiciones.
-La información está intacta —la permutación es reversible— y la densa nunca usó la vecindad, así
-que no tiene nada que perder. (Las dos décimas de diferencia son ruido: con la misma semilla, los
-pesos iniciales caen sobre píxeles distintos. Si se barajaran también los pesos iniciales, daría
-lo mismo salvo el redondeo. Con otras semillas, la diferencia va y viene: a veces la barajada saca más.)
+**a) La densa se desploma: de 95,8 % a 29,0 %** (el azar, con diez dígitos, es 10 %).
+La razón está en sus plantillas: cada neurona tiene **una perilla por píxel**, y lo que
+aprendió es "tinta en esta zona, nada en esta otra", atado a un lugar fijo de la hoja. Correr
+la foto 4 píxeles no cambia el dígito, pero le cambia **todas las variables de entrada a la
+vez**: el trazo ya no cae sobre la plantilla. Para la densa, el píxel de la columna 10 y el de
+la 11 no son vecinos: son la variable 346 y la 347, tan vecinas como la 3 y la 700.
 
-**b) La CNN baja: 87,7 % → 83,1 %** (entre 2 y 5 puntos según la semilla).
-Baja porque sus filtros de 3×3 miran **vecinos en la grilla**, y después del barajado los nueve
-píxeles de una ventana son nueve píxeles cualesquiera de la foto. Esos puntos de caída son,
-literalmente, lo que la CNN estaba sacando de la estructura espacial.
+**b) La aplanada cae a 71,8 %; la CNN con máximo se queda en 97,8 %.** Los pinceles son los
+mismos y, como son los mismos en toda la foto, los mapas de activación **se corren con la
+foto** (eso lo comprobaron en la sección 3: diferencia cero). Pero la aplanada estira los 64
+mapas de 7×7 en 3.136 números y se los da a una capa densa, que vuelve a tener **una perilla
+por lugar**: el problema de (a) reaparece al final. Aguanta más que la densa porque los
+`MaxPool2d` del medio ya perdonan corrimientos chiquitos, pero se cae igual. La pieza que pone
+la invariancia es **el máximo del final** (`AdaptiveMaxPool2d(1)`): de cada mapa se queda con
+un número, "¿apareció esta pieza en ALGÚN lado?", y tira el *dónde*.
 
-*Se acepta —y se valora— que noten que la caída es chica.* La lectura honesta es: lo contundente
-no es cuánto pierde la CNN, sino que la densa **no pierde nada**. La prueba más fuerte de que la
-CNN usa la grilla es la foto corrida: 32,2 % contra 74,4 %.
+*Se valora mucho* que distingan las dos cosas con sus nombres (o sin ellos): la convolución
+**acompaña** el corrimiento (equivariancia) y el máximo final lo **ignora** (invariancia).
 
-**c) Con una permutación distinta por imagen, se caen las dos muchísimo, cerca del azar.**
-Ahí sí se destruye la relación entre posición y contenido: la variable número 30 ya no significa
-lo mismo en dos imágenes distintas. Lo medimos aparte (`medir-experimentos.py`,
-parte D, 6 pasadas): la densa queda en **20,7 %** y la CNN en **33,3 %**, contra un azar del
-10 %. No llegan al azar porque sobrevive lo que no depende de la posición: **cuánta tinta tiene
-la foto y qué tan clara es** (un pantalón y un abrigo no tienen la misma cantidad de píxeles
-encendidos), y la CNN, con su máximo final, aprovecha un poco mejor esas estadísticas de
-conjunto. Es la mejor forma de mostrar la diferencia entre *cambiar de nombre a las variables*
-(inocuo) y *cambiarles el significado caso por caso* (casi letal).
+**c) Porque el supuesto no es gratis.** En MNIST los dígitos vienen centrados, y ahí el lugar
+**sí** dice algo (un trazo arriba a la derecha no es lo mismo que abajo a la izquierda). La
+aplanada puede usar esa información y la CNN con máximo la tira a la basura. Cuando el
+supuesto ("me da igual dónde") es un poco falso, cuesta un poco de exactitud; lo que compra
+es robustez ante un cambio que **vos sabés** que va a pasar (fotos que no vienen centradas).
+Elegir es una decisión sobre el mundo, no sobre la técnica. *(Ojo además con el detalle de
+las perillas: la aplanada tiene 54.666, más que la densa, porque su última capa recibe 3.136
+números.)*
 
-*Nota extra* para quien diga que «algo queda» y explique qué: es exactamente lo que pasa.
-
-> **Qué revela cada error.** Quien contesta que la densa «empeora un poco» no terminó de aceptar
-> el resultado y está razonando desde su propia visión (a nosotros el revoltijo nos parece ruido).
-> Quien contesta que la CNN «queda igual» confundió cuál es cuál. Quien en (c) contesta «lo mismo
-> que en (a)» no entendió que lo que importaba era que la permutación fuera **la misma para todas**.
+> **Qué revela cada error.** Quien contesta en (a) que la densa «empeora un poco» está
+> razonando desde su propia visión (para nosotros, correr 4 píxeles no es nada). Quien
+> contesta en (b) «porque tiene convoluciones» no vio que **las dos** tienen las mismas
+> convoluciones: repreguntá *«¿y qué tiene una que la otra no?»*. Quien en (c) contesta
+> «ruido» no está del todo equivocado (son seis décimas), pero se pierde la idea: aceptalo
+> si además dice qué información tira el máximo.
 
 ---
 
@@ -88,18 +89,19 @@ conjunto. Es la mejor forma de mostrar la diferencia entre *cambiar de nombre a 
 
 **a) Sí, anda razonablemente bien**, y eso es precisamente la invariancia traslacional: los mismos
 nueve números recorren toda la imagen, así que un patrón aprendido en el centro se detecta en la
-esquina. Lo medimos tal cual (`medir-experimentos.py`, parte D): prendas centradas en un lienzo de
-56×56 para entrenar y puestas en una esquina para probar. La CNN pasa de **84,6 %** a **73,1 %** y
-**72,4 %** (las dos esquinas); la densa, de **84,5 %** a **9,3 %** y **11,2 %**: el azar. En clase
-vimos lo mismo en chiquito: corriendo la foto 3 píxeles, la CNN pasó de 87,7 % a 74,4 % y la
-densa se desplomó de 85,7 % a 32,2 %.
+esquina. Lo medimos tal cual (`medir-mnist.py`): dígitos centrados en un lienzo de 56×56 para
+entrenar (12.000 fotos, 4 épocas) y puestos en una esquina para probar. La CNN pasa de
+**95,5 %** a **92,4 %** y **92,2 %** (las dos esquinas); la densa, de **91,6 %** a **15,3 %** y
+**13,3 %**: casi el azar. En clase vimos lo mismo en chiquito: corriendo la foto 4 píxeles, la
+CNN pasó de 98,1 % a 97,8 % y la densa se desplomó de 95,8 % a 29,0 %.
 
 **Matiz que hay que premiar:** la CNN **también** baja. La invariancia no es perfecta ni infinita
 —el *pooling* y el máximo global la dan de a poco, y si el objeto se sale del encuadre no hay
 arquitectura que lo salve—. Es un supuesto que se cumple *hasta cierto punto*, no una garantía.
 
 **b) Con las fotos rotadas 90° la respuesta cambia: la CNN se cae** (medido: la CNN de la clase
-pasa de 87,7 % a **7,5 %** con las fotos de prueba rotadas, por debajo del azar).
+pasa de 98,1 % a **16,0 %** con las fotos de validación rotadas, apenas arriba del azar; la
+densa, a 10,5 %).
 La arquitectura supone que un patrón vale igual **trasladado**, no **rotado**. Un detector de
 bordes verticales rotado 90° es un detector de bordes horizontales: es otro filtro. La invariancia
 rotacional **no viene gratis**; se compra con datos (*data augmentation*: entrenar con copias
@@ -121,7 +123,7 @@ rotadas) o con arquitecturas diseñadas para eso.
 - **C → mapa 3 (borroneada).** Los nueve números son iguales y suman 1: es un promedio de la
   vecindad, y promediar borronea.
 - **D → mapa 1 (igual).** Un 1 en el centro y ceros alrededor: se queda con el píxel del medio.
-  Es el `TODO 3` del notebook.
+  Es el filtro opcional de la sección 3 del notebook.
 
 **Los dos errores frecuentes:**
 1. **Confundir A con B.** Revela que están leyendo el filtro como «tiene positivos y negativos»
@@ -297,8 +299,9 @@ No tiene respuesta correcta. **Sí tiene un criterio de corrección**, y son tre
 2. **En (b), que la afirmación esté escrita como afirmación sobre el mundo**, no como
    especificación técnica. Bien: *«estoy afirmando que lo que pasó el año pasado importa más que
    lo que pasó hace ocho»*. Mal: *«uso una RNN»*.
-3. **En (c), que la prueba sea del mismo tipo que la del barajado**: romper deliberadamente la
-   estructura supuesta y ver si el modelo se entera. Ejemplos que aparecen y funcionan:
+3. **En (c), que la prueba sea del mismo tipo que las de la clase**: romper deliberadamente la
+   estructura supuesta (correr la foto) o sacarle al modelo la pieza que la supone (el
+   `TODO 3`), y ver si el modelo se entera. Ejemplos que aparecen y funcionan:
    barajar el orden temporal de las observaciones de cada unidad; reordenar las columnas;
    permutar las etiquetas de los grupos; entrenar en una región y evaluar en otra.
 
@@ -307,3 +310,34 @@ No tiene respuesta correcta. **Sí tiene un criterio de corrección**, y son tre
 > filas son independientes, que las variables son intercambiables, que un caso es un caso—, y
 > algunos son falsos (¡datos de panel!). La pregunta no es si tus datos tienen *esta* forma:
 > es si tenés claro **qué forma les estás atribuyendo**.
+
+---
+
+### 13.
+
+**a) Correcta: B.** El mapa dice una cosa, chiquita y verificable: en *esa* foto, tapar las
+copas baja mucho la confianza del modelo en «hay movilización». O sea, las copas son parte de
+lo que lo convenció.
+
+- **A («piensa que los árboles son personas»)** le atribuye al modelo una intención y una
+  categoría que no tiene. El modelo no tiene «personas» ni «árboles»: tiene pinceles que
+  responden a manchitas chiquitas. Es la lectura más tentadora y la que hay que desarmar,
+  porque es la que después aparece en los papers y en la prensa.
+- **C («no sirve, hay que tirarlo»)** confunde *encontrar una limitación* con *invalidar el
+  modelo*. Acierta el 98 % y se equivoca de una forma que ahora conocés: eso es información, no
+  un veredicto. Es el mismo rechazo global de la pregunta 10.
+- **D («mira siempre arriba»)** generaliza desde un caso. El mapa es de **una** foto; en las de
+  multitud, las cabecitas están abajo y el mapa se enciende abajo. Además, la CNN con máximo
+  final es justamente la que no sabe dónde está cada cosa.
+
+**b) Respuesta esperada:** reportarlo como **limitación de validez** («el modelo responde a
+la textura de manchitas chiquitas, y confunde follaje con multitudes»), medir el desempeño
+**por tipo de escena** y no sólo el global, y —si se puede— agregar fotos de follaje (u otras
+texturas parecidas) etiquetadas como «no» para entrenar y para evaluar. Merece nota alta quien
+diga además que **en otro archivo** (otra ciudad, más árboles) el error va a ser más grande, y
+que eso hay que decirlo antes de aplicarlo.
+
+> **Error a corregir:** tratar el mapa como prueba de qué «entiende» el modelo. Es una pista:
+> depende del tamaño del cuadradito y de con qué se tapa, y otra herramienta (la pendiente por
+> tinta del notebook) puede marcar otra cosa. Sirve para hacer preguntas y encontrar
+> disparates, no para cerrar la discusión. Se retoma en la clase 10.

@@ -24,7 +24,7 @@ En el orden en que conviene leerlas.
 *Combining satellite imagery and machine learning to predict poverty*. Science, 353(6301),
 790-794.** `[VERIFICAR URL]` · DOI: 10.1126/science.aaf7894
 > **La lectura recomendada de esta clase** (no es para la clase que viene: una hora, cuando
-> puedas). Es el caso de las slides 29-31, y es el mejor ejemplo
+> puedas). Es el caso de las slides 30-32, y es el mejor ejemplo
 > disponible de una CNN haciendo algo que a las ciencias sociales le importa de verdad: producir
 > estimaciones de bienestar en regiones donde no hay encuestas. Leelo con las tres preguntas al
 > lado y prestá especial atención a **cómo describen la validación**: qué partición usaron y hasta
@@ -118,7 +118,7 @@ Hsiang, S. (2021). *A generalizable and accessible approach to machine learning 
 satellite imagery*. Nature Communications, 12, 4392.** `[VERIFICAR URL]` · DOI `[VERIFICAR]`
 > **La continuación crítica del punto 1.** Proponen un método mucho más simple y barato para
 > predecir variables socioeconómicas desde satélites, y —lo que a nosotros nos importa— discuten
-> explícitamente **la generalización entre regiones**, que es la pregunta 3 de la slide 30.
+> explícitamente **la generalización entre regiones**, que es la pregunta 3 de la slide 31.
 > Leelo después de Jean et al. y la conversación se te arma sola.
 > Dos horas.
 
