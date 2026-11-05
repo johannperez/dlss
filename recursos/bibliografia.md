@@ -148,6 +148,7 @@ Detalle completo, licencias y trampas en **`datos/README.md`**.
 | Discursos de apertura de sesiones (Argentina, 1854-2019) | `github.com/lucariel/discursos_presidenciales` | **sin licencia declarada**; los textos son actos oficiales | `[VERIFICADA · 2026-08-29]` vía `raw.githubusercontent.com/…/README.md` |
 | Discursos de Casa Rosada (2015-2024) | `github.com/jmdieguez/discursos` | **sin licencia declarada** | `[VERIFICADA · 2026-08-29]` vía `raw.githubusercontent.com/…/README.md` |
 | Fake News Corpus Spanish (FakeDeS @ IberLEF 2021) | `github.com/jpposadas/FakeNewsCorpusSpanish` | **CC BY 4.0** | `[VERIFICADA · 2026-08-29]` vía `raw.githubusercontent.com/…/README.md` |
+| MNIST | LeCun, Cortes y Burges; espejo en `github.com/fgnt/mnist` | se cita como **CC BY-SA 3.0** (el espejo no declara licencia) | `[VERIFICADA · 2026-11-05]` el espejo y el md5; la licencia `[VERIFICAR]` |
 | Fashion-MNIST | Zalando Research | **MIT** | `[VERIFICADA · 2026-08-29]` |
 | **Aguasclaras** | **sintético, generado para este curso** | del curso, usalo | — |
 
@@ -155,6 +156,7 @@ Citas formales de los corpus:
 
 - **Ariel, L.** — *discursos_presidenciales*: recopilación y digitalización de los mensajes presidenciales de apertura de sesiones al Congreso de la Nación Argentina. Sin licencia declarada. `[VERIFICADA · 2026-08-29]`
 - **Gómez-Adorno, H., Posadas-Durán, J. P., Bel-Enguix, G. & Porto-Capetillo, C.** (2021), *Overview of FakeDeS at IberLEF 2021: Fake News Detection in Spanish Shared Task*, Procesamiento del Lenguaje Natural 67, 223-231. **CC BY 4.0.** `[VERIFICAR URL]` — el repositorio del corpus sí abre `[VERIFICADA · 2026-08-29]` · *clases 4, 9, 10*
+- **LeCun, Y., Bottou, L., Bengio, Y. & Haffner, P.** (1998), la cita del paper de LeNet-5 de arriba es también la cita de **MNIST**, el sandbox del notebook de la clase 5. Los archivos se bajan del espejo `https://raw.githubusercontent.com/fgnt/mnist/master/README.md` `[VERIFICADA · 2026-11-05]` · *clase 5*
 - **Xiao, H., Rasul, K. & Vollgraf, R.** (2017), *Fashion-MNIST: a Novel Image Dataset for Benchmarking Machine Learning Algorithms* (arXiv:1708.07747), Zalando Research. **MIT.** `https://raw.githubusercontent.com/zalandoresearch/fashion-mnist/master/README.md` `[VERIFICADA · 2026-08-29]` · *clase 5*
 
 > **Pendiente para el docente (bloqueante si el curso se publica).** Los **dos**

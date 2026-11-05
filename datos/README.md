@@ -514,10 +514,40 @@ pésimo benchmark. Para clasificación de verdad está (1.3), que es real.
 
 ---
 
-### 1.6 `fashion-mnist` — el sandbox de la clase 5
+### 1.6 `mnist` — el sandbox del notebook de la clase 5
+
+**Qué es.** 70.000 dígitos escritos a mano, de 28×28 en escala de grises (60.000 de
+entrenamiento y 10.000 de test). **Es un sandbox técnico explícitamente rotulado como tal**:
+sirve para entrenar en CPU, en menos de un minuto, una red densa y una CNN y ver la diferencia.
+Lo escribieron empleados de la Oficina del Censo de EE.UU. y estudiantes secundarios (los
+conjuntos 3 y 1 del NIST), y LeCun, Cortes y Burges los mezclaron porque la partición original
+los separaba: un buen ejemplo para la clase 4.
+
+**Cómo se baja.** `descargar.mnist()` baja los cuatro `.gz` originales desde el espejo
+`raw.githubusercontent.com/fgnt/mnist` (el md5 del archivo de train coincide con el de
+`yann.lecun.com/exdb/mnist`, comprobado el 2026-11-05) y los parsea con numpy. No usa
+torchvision, por la misma razón que FashionMNIST (abajo). No se versiona en `muestras/`.
+
+**Licencia.** Se suele citar como **CC BY-SA 3.0**; el espejo no declara licencia y la página
+original no siempre está en línea. `[VERIFICAR]` antes de publicar el curso.
+
+#### Trampas de este dataset
+**(a) Es todavía más fácil que FashionMNIST.** Una densa chica ya acierta el 96 %. Por eso el
+notebook no compara exactitudes solas: el argumento de la clase es el **corrimiento** (la densa
+cae al 29 % con la foto corrida 4 píxeles; la CNN se queda en 98 %).
+
+**(b) Los dígitos vienen centrados por su centro de masa.** Ese preprocesamiento es la razón
+de que una densa ande bien con la foto quieta, y la razón de que el lugar sí importe un poco
+(la CNN aplanada del `TODO 3` acierta un poco más que la que ignora el lugar).
+
+---
+
+### 1.7 `fashion-mnist` — las imágenes de las viz de la clase 5
 
 **Qué es.** 70.000 imágenes de 28×28 en escala de grises, 10 categorías de
-prendas. **Es un sandbox técnico explícitamente rotulado como tal**: sirve
+prendas. Era el sandbox del notebook de la clase 5 hasta que se pasó a MNIST; hoy lo usan
+las **visualizaciones** de la clase (las prendas de muestra, el barajado y los filtros que
+dibujan, medidos por `medir-experimentos.py`). **Es un sandbox técnico explícitamente rotulado como tal**: sirve
 para ver qué hace una convolución en dos minutos de CPU, y después se vuelve
 al dominio. No es un dato de ciencias sociales y no hay que pretender que lo sea.
 
@@ -620,7 +650,7 @@ los dos enseñan lo mismo, que es evaluación.
 | 2 · componer funciones | serie de `inflacion_suave` | `descargar.serie_menciones()` |
 | 3 · loss y gradiente | **la misma serie de la clase 1** | `descargar.serie_menciones()` |
 | 4 · entrenar de verdad | **la misma otra vez**, ahora particionada · + titulares para el gancho | `serie_menciones()` · `prensa_titulares()` |
-| 5 · imágenes | FashionMNIST (sandbox) | `descargar.fashion_mnist()` |
+| 5 · imágenes | MNIST (sandbox del notebook) · FashionMNIST (las viz) | `descargar.mnist()` · `descargar.fashion_mnist()` |
 | 6 · texto y embeddings | discursos 1984-2019, por décadas | `corpus_discursos_texto()` |
 | 7 · attention | oraciones del corpus de la clase 6 · pesos del modelo de la clase 8 | `corpus_discursos_texto()` |
 | 8 · mini-GPT | **Aguasclaras** (para la alucinación) · discursos reales (para comparar) | `aguasclaras()` · `corpus_discursos_texto()` |
@@ -674,6 +704,9 @@ archivos ahí "porque sí".
   Porto-Capetillo, C. (2021). *Overview of FakeDeS at IberLEF 2021*.
   Procesamiento del Lenguaje Natural, 67, 223-231. **CC BY 4.0.**
 - **Casa Rosada:** `github.com/jmdieguez/discursos`. Sin licencia declarada.
+- **MNIST:** LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). *Gradient-based
+  learning applied to document recognition*. Proceedings of the IEEE, 86(11), 2278-2324.
+  Espejo de los archivos: `github.com/fgnt/mnist`. Licencia a verificar (ver 1.6).
 - **FashionMNIST:** Xiao, H., Rasul, K., & Vollgraf, R. (2017).
   *Fashion-MNIST: a novel image dataset…* arXiv:1708.07747. **MIT.**
 - **Aguasclaras:** corpus sintético del curso, `datos/generar_aguasclaras.py`,

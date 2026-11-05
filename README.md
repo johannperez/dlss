@@ -150,7 +150,8 @@ capas:
 | **Discursos de apertura de sesiones** (Argentina, 1854-2019) | El hilo conductor de las clases 1 a 4 y el corpus del mini-GPT. Recopilación de Lucas Ariel. | Los textos son actos oficiales del Estado argentino. **La recopilación no declara licencia.** |
 | **Discursos de Casa Rosada** (2015-2024) | Complemento reciente. | **Sin licencia declarada.** |
 | **Fake News Corpus Spanish** (FakeDeS @ IberLEF 2021) | 1.471 notas de prensa reales con etiqueta. Es el corpus de las clases 9 y 10. | **CC BY 4.0** |
-| **Fashion-MNIST** | El sandbox técnico de la clase 5, declarado como tal. | **MIT** |
+| **MNIST** | El sandbox técnico del notebook de la clase 5, declarado como tal. | **CC BY-SA 3.0** (según la fuente original; verificar) |
+| **Fashion-MNIST** | Las imágenes de muestra de las viz de la clase 5. | **MIT** |
 | **Aguasclaras** | Corpus **sintético** de un país que no existe, generado por `datos/generar_aguasclaras.py` con semilla fija. Se usa para todo lo que necesita volumen. | Del curso. Usalo. |
 
 > **Pendiente, y es serio.** Los **dos** corpus de discursos no declaran licencia

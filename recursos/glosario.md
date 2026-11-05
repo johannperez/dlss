@@ -122,7 +122,7 @@ Al final hay un [índice alfabético](#índice-alfabético) y una tabla de
 | **parameter sharing** | compartir parámetros | Usar los **mismos** nueve números en toda la imagen. | De ahí sale que una capa convolucional tenga muchísimas menos perillas que una densa. |
 | **receptive field** | campo receptivo | Qué pedazo de la foto original influye sobre una unidad. | Crece al apilar capas, no al agrandar el filtro. |
 | **stride / padding** | paso / relleno | Cada cuántos píxeles salta el filtro, y cuánto borde se agrega para que entre. | Detalles de plomería: se googlean el día que armes una red. No los estudies. |
-| **sandbox** | sandbox, banco de pruebas | Un conjunto de datos neutro que se usa sólo para ver funcionar la técnica. | FashionMNIST es el sandbox de la clase 5. Se rotula como tal y se vuelve al dominio antes de cerrar. |
+| **sandbox** | sandbox, banco de pruebas | Un conjunto de datos neutro que se usa sólo para ver funcionar la técnica. | MNIST (dígitos escritos a mano) es el sandbox de la clase 5. Se rotula como tal y se vuelve al dominio antes de cerrar. |
 
 ## Clase 6 — La forma de los datos manda: texto, secuencias y embeddings
 

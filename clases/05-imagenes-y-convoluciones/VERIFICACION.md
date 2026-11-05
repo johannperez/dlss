@@ -2,18 +2,92 @@
 
 **«La forma de los datos manda (I): imágenes»** · `clases/05-imagenes-y-convoluciones/`
 
-Este archivo junta tres pasadas. La **primera** fue la del equipo que construyó la
+Este archivo junta cuatro pasadas. La **primera** fue la del equipo que construyó la
 clase. La **segunda** la hizo alguien que no la construyó, con `nbconvert`,
 Chromium por Playwright y capturas de pantalla (2026-08-29; resumida en §3). La
 **tercera** (2026-09-29, §1 y §2) aplicó los arreglos de la revisión general del
-curso. Cada afirmación dice **en qué pasada** se comprobó y **cómo**. Lo que no se
-volvió a comprobar en la tercera pasada está dicho como tal.
+curso. La **cuarta** (2026-11-05, §0) acompaña la reescritura del notebook sobre
+MNIST. Cada afirmación dice **en qué pasada** se comprobó y **cómo**.
 
-**Veredicto: la clase se puede dar.** El argumento central (la densa no pierde
-nada al barajar; la CNN sí; con la foto corrida la densa se desploma y la CNN
-aguanta) se sostiene con otras semillas y en dos entornos distintos. Los
-dígitos exactos, en cambio, **no** son los mismos en cualquier máquina, y la
-clase ya no lo promete.
+**Veredicto: la clase se puede dar.** El argumento central ahora es el
+corrimiento: con la foto corrida 4 píxeles la densa se desploma (95,8 → 29,0 %),
+la CNN con máximo final aguanta (98,1 → 97,8 %) y la CNN aplanada queda en el
+medio (71,8 %). Medido en un entorno y con una semilla; los dígitos exactos
+**no** son los mismos en cualquier máquina, y la clase no lo promete.
+
+> **Ojo al leer §1 a §4:** describen el notebook anterior (FashionMNIST, el
+> barajado de píxeles) y siguen valiendo para las **visualizaciones**, que usan
+> esos datos (`datos-experimentos.js`, `medir-experimentos.py`). Lo del notebook,
+> las slides y el cuestionario actuales está en §0.
+
+---
+
+## 0. La cuarta pasada (2026-11-05): el notebook sobre MNIST
+
+**Qué cambió.** El notebook se reescribió: MNIST como sandbox, `Dataset` /
+`DataLoader`, los modelos como `nn.Module`; la densa de la clase 4 como repaso
+(con sus plantillas y la apuesta del corrimiento); la convolución en cámara lenta
+y el mapa que se corre con la foto; la CNN con la misma función de entrenamiento;
+el `TODO 3` (máximo global contra aplanar); una sección para mirar adentro
+(filtros, mapas, fotos que más encienden un pincel, oclusión, pendiente × tinta);
+el test abierto una vez; y el archivo sintético con mapas de oclusión sobre los
+errores. El barajado salió del notebook y queda en la viz como extra. Se
+alinearon las slides (una nueva, la 29: «¿Dónde miró?»), el cuestionario (la 3
+reescrita, la 4 con números de MNIST, la 13 nueva), `notas-docente.md`,
+`referencias.md`, la especificación, `PROGRAMA.md`, los README de datos, el
+glosario, la bibliografía y el callback de la slide 2 de la clase 6.
+
+**Los números salen de un solo lugar.** `medir-mnist.py` **ejecuta las celdas del
+notebook tal cual** (con el `TODO 3` en `"aplanar"`) y escribe
+`datos-mnist.{js,json}`; las slides leen los números y las figuras de ahí. Mide
+además dos experimentos para la pregunta 4 que el notebook no corre (la esquina
+en un lienzo de 56×56 y la rotación de 90°).
+
+Entorno: python 3.12.13 · torch 2.15.0 · numpy 2.5.4 · macOS arm64 (guardado en
+`datos-mnist.json`). Todo corrido con un entorno virtual en el scratchpad.
+
+| | perillas | errores cada 1000 | foto quieta (val.) | corrida 4 px | test |
+|---|---|---|---|---|---|
+| red densa | 50.890 | 42 | 95,8 % | **29,0 %** | 96,2 % |
+| CNN aplanada (`TODO 3`) | 54.666 | 13 | 98,7 % | 71,8 % | — |
+| CNN con máximo | 23.946 | 19 | 98,1 % | **97,8 %** | 98,3 % |
+
+Archivo sintético: 98,0 % global; follaje 91,8 % (5 errores), multitud 99,0 %
+(2), edificio 99,3 % (1). Esquina (12.000 dígitos, 4 épocas): CNN 95,5 → 92,4 /
+92,2 %; densa 91,6 → 15,3 / 13,3 %. Rotación de 90°: CNN 98,1 → 16,0 %, densa
+10,5 %.
+
+**Qué se corrió, y cómo.**
+- El notebook con `nbclient`, con MNIST en cache: **0 errores, 85-90 s**, tres
+  veces (antes y después de los arreglos); los números son los de la tabla, dígito
+  a dígito, en las tres.
+- El notebook con el `TODO 3` en `"aplanar"`: 0 errores; aplanada 71,8 % con 4 px.
+- El notebook **sin red y sin cache** (copia del repo con `git archive`, proxy a
+  un puerto cerrado): cae al plan B. La primera vez **explotó** (la densa no tenía
+  ningún error que mostrar y la galería de errores dividía por cero); se arregló
+  con un chequeo, y ahora corre entero, 0 errores, 22 s. En el plan B la densa
+  acierta 100 % quieta y cae a 84,5 % con 4 px; la CNN, 100 % en todos: el
+  corrimiento se ve también sin red.
+- `medir-mnist.py` completo, dos veces: los mismos números.
+- Las slides en Chrome headless: capturas de la 5, 7, 8, 17, 28 y 29 (entran en
+  pantalla; la 29 se rehízo en una sola pasada opaca porque dos capas
+  semitransparentes dejaban costuras entre casillas), y `--dump-dom` con la
+  consola a stderr: 0 errores, los `data-num`, `data-entero` y `data-miles` se
+  llenan desde el JSON y el entorno aparece al pie de la 28.
+- La descarga: `descargar.mnist()` baja del espejo `fgnt/mnist`; el md5 del
+  archivo de train coincide con el original (`f68b3c2d…`).
+
+**Lo que no se comprobó en esta pasada.**
+- El notebook **en Colab**: la celda de arranque clona la rama
+  `claude/fixes-revision-clases`, que no tiene `descargar.mnist()`; desde esa rama
+  caería al plan B. Hay que probarlo cuando el cambio esté en la rama que clona.
+- Otras semillas para los números nuevos (la tercera pasada lo hizo para
+  FashionMNIST; acá no).
+- La licencia de MNIST: se cita como CC BY-SA 3.0, pero el espejo no la declara.
+- Las slides que no cambiaron, en tema oscuro, y el resto de las capturas.
+- Que las notas de cada slide sumen exactamente 120 minutos: la tabla de
+  `notas-docente.md` §2 sí suma 120.
+
 
 ---
 
@@ -200,12 +274,12 @@ revista) y no se encontró ninguna inventada; eso no cambió.
 3. **La slide 3 usa un esquema sintético de multitud.** Se lee como un montón de
    crucecitas, no como una foto; una foto real con licencia libre funcionaría
    mejor (`notas-docente.md` §11).
-4. **El plan B sin internet no reproduce el barajado** (sí el corrimiento). Para
-   que cierre también sin red haría falta un conjunto sintético que una red densa
-   no pueda resolver sin mirar la grilla.
-5. **Los números dependen del entorno.** Si se cambian `N_TRAIN`, `EPOCAS` o la
-   versión de torch del entorno de referencia, hay que volver a correr
-   `medir-experimentos.py`; las slides y las viz toman los números del JSON, pero
+4. **El plan B sin internet no reproduce el barajado** (sí el corrimiento). Con el
+   notebook sobre MNIST esto dejó de importar para el notebook (ya no baraja), y
+   sigue valiendo para la viz.
+5. **Los números dependen del entorno.** Si se cambia el notebook o la versión de
+   torch del entorno de referencia, hay que volver a correr `medir-mnist.py` (y
+   `medir-experimentos.py` para las viz); las slides y las viz toman los números del JSON, pero
    los textos de `notas-docente.md`, `cuestionario-soluciones.md` y este archivo
    los citan escritos.
 6. **La viz de supuestos embebida puede recortar la última fila** (el `iframe`
