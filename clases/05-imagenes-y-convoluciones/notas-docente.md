@@ -172,7 +172,7 @@ Es la viz central y conviene tenerlo pautado. Seis minutos.
   desinfla entera.
 - **Las slides 25-26** (la arquitectura es una teoría + cuándo es falsa). Es el objetivo real de
   la clase; las CNN son el vehículo.
-- **Las slides 29-31** (el caso y las tres preguntas). Es lo que hace que esta sea una clase de
+- **Las slides 30-32** (el caso y las tres preguntas). Es lo que hace que esta sea una clase de
   ciencias sociales y no de visión por computadora.
 
 Si tenés que elegir entre terminar el práctico 2 y hacer el bloque 29-31, hacé el bloque 29-31.
@@ -265,12 +265,12 @@ mundo, exactamente igual.
       Anotá tus números: con otra versión de PyTorch pueden diferir en unas décimas de los
       de las slides, y conviene que lo digas antes de que alguien lo descubra.
 - [ ] Tenés la alarma de la pausa puesta.
-- [ ] Sabés de memoria el patrón de la slide 28, más que los dígitos: la densa **85,7 → 85,5**
-      (no pierde nada), la CNN **87,7 → 83,1** (pierde unos 4 o 5 puntos), y la foto corrida
-      3 píxeles: densa **32,2** contra CNN **74,4**. Son los de la corrida de referencia
-      (torch 2.14, en `datos-experimentos.json`, que guarda las versiones). **No prometas que
-      les va a dar idéntico**: la semilla fija la corrida en la misma máquina y con las mismas
-      versiones; con otras, cambian unas décimas. Con otras semillas la densa se mueve menos de
-      un punto y la CNN pierde entre 2 y 5 al barajar: el patrón se sostiene.
+- [ ] Sabés de memoria el patrón de la slide 28, más que los dígitos: con la foto quieta,
+      densa **95,8** y CNN **98,1** (42 contra 19 errores cada mil, con menos de la mitad de
+      las perillas); con la foto corrida 4 píxeles, densa **29,0**, CNN aplanada **71,8** y
+      CNN con máximo **97,8**. Son los de la corrida de referencia (`medir-mnist.py`, que
+      corre el notebook tal cual y guarda las versiones en `datos-mnist.json`). **No
+      prometas que les va a dar idéntico**: la semilla fija la corrida en la misma máquina y
+      con las mismas versiones; con otras, cambian unas décimas. El patrón se sostiene.
 - [ ] Si conseguiste una foto real de una movilización con licencia libre, ponela en la slide 3
       en lugar del esquema sintético. El esquema funciona, pero una foto de verdad funciona mejor.

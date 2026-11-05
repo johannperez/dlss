@@ -139,19 +139,23 @@
 <section>
   <h3>Una imagen es una tabla de números</h3>
   <div class="viz-con-panel">
-    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto" role="img" aria-label="un pullover de FashionMNIST de 28 por 28 píxeles, con un recuadro de 8 por 8 marcado"></div></div>
+    <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-foto" role="img" aria-label="un 5 escrito a mano, de MNIST, de 28 por 28 píxeles, con un recuadro de 8 por 8 marcado"></div></div>
     <div class="viz-frame" style="padding:8px"><div class="cuadro-chico" id="tabla-zoom" role="img" aria-label="el recuadro de 8 por 8 ampliado, con el número de 0 a 255 de cada casilla escrito adentro"></div></div>
   </div>
-  <p class="viz-pie"><b>Izquierda:</b> un <b>pullover</b> de FashionMNIST (el dataset de hoy),
-    con un logo en el pecho; el recuadro verde marca un pedazo de 8×8. <b>Derecha:</b> ese
-    pedazo ampliado, con su número. Cada casilla es un número de <b>0 a 255</b>: cuánta luz hay en ese punto.
+  <p class="viz-pie"><b>Izquierda:</b> un <b>5 escrito a mano</b>, de MNIST (el sandbox de hoy:
+    70.000 dígitos); el recuadro verde marca un pedazo de 8×8. <b>Derecha:</b> ese
+    pedazo ampliado, con su número. Cada casilla es un número de <b>0 a 255</b>: cuánta tinta hay en ese punto.
     Acá lo dibujamos como <b>tinta sobre papel</b> —más número, más oscuro— para que se lea
     en el proyector; en el archivo original el 255 es blanco. <b>Esto es lo único que ve la
     computadora:</b> el dibujo no está "adentro", el dibujo <em>es</em> la tabla.</p>
   <aside class="notes">
-    2 min. Señalá un número del recorte y preguntá qué es. Respuesta: cuánta luz hay en
+    2 min. Señalá un número del recorte y preguntá qué es. Respuesta: cuánta tinta hay en
     ese punto. Nada más. Si alguien pregunta por color: son tres tablas apiladas (rojo,
     verde, azul) y les vamos a decir "canales". Todo lo demás es igual.
+    Decí en voz alta que MNIST es un SANDBOX técnico, no un dato de ciencias sociales, y
+    que volvemos al dominio en la segunda mitad. El dato que engancha: los dígitos los
+    escribieron empleados del Censo de EE.UU. y estudiantes secundarios, y la primera
+    partición los separaba (unos en train, otros en test): la escena de la clase 4.
   </aside>
 </section>
 
@@ -161,8 +165,10 @@
   <div class="viz-frame" style="padding:10px"><div id="desenrollada" role="img" aria-label="la grilla de 28 por 28 a la izquierda y, a la derecha, los mismos 784 números estirados en una sola fila"></div></div>
   <p class="viz-pie"><b>Aplanar</b> (<code>nn.Flatten</code>): agarrás la grilla de 28×28 y la
     estirás en una fila de <b>784 números</b>. Y ahí adentro le metemos <b>la misma máquina de
-    la clase 4</b>: dos capas densas con un doblez en el medio. Lo único que cambia es que
-    ahora entran 784 números en vez de uno.</p>
+    la clase 4</b>: dos capas densas con un doblez en el medio, entrenada con el mismo loop de
+    cinco líneas. Entran 784 números en vez de uno y salen 10 (un puntaje por dígito).
+    <b>Anda bien:</b> acierta el <b><span data-num="densa.val">95,8</span>&nbsp;%</b> de los
+    dígitos que nunca vio.</p>
   <div class="ojo compacta">Al estirarla, la fila 1 y la fila 2 quedan a 28 lugares de
     distancia. Dos píxeles que en la foto están pegados, para el modelo son las variables
     número 30 y 58. <strong>Y ahí se perdió algo enorme.</strong></div>
@@ -175,37 +181,46 @@
 
 <!-- ================= 7 · LA APUESTA ================= -->
 <section class="pregunta">
-  <h2>Si barajo los píxeles de <em>todas</em> las imágenes con la misma
-    permutación y reentreno, ¿qué pasa?</h2>
+  <h2>Corro las fotos 4 píxeles a la derecha. Nadie reentrena nada.
+    La densa acertaba el <span data-num="densa.val">95,8</span>&nbsp;%. ¿Y ahora?</h2>
   <div class="opciones">
-    <div><b>A</b> el modelo empeora muchísimo</div>
-    <div><b>B</b> empeora un poco</div>
-    <div><b>C</b> queda igual</div>
+    <div><b>A</b> casi lo mismo: más del 90 %</div>
+    <div><b>B</b> baja bastante: alrededor del 60 %</div>
+    <div><b>C</b> se desploma: menos del 30 %</div>
   </div>
   <aside class="notes">
     2 min. VOTACIÓN A MANO ALZADA, EN SERIO. Contá los votos en voz alta y anotalos en el
-    pizarrón. La mayoría vota A. Sin esta apuesta, la viz que viene es un dibujito lindo.
-    Aclará dos veces: es UNA sola permutación, la misma para todas las imágenes, y se
-    reentrena desde cero.
+    pizarrón. Suele ganar A o B: "4 píxeles no es nada". Sin esta apuesta, la curva que
+    viene es un dibujito lindo. Aclará dos veces: son los MISMOS dígitos, el mismo modelo
+    ya entrenado, y sólo se corre la foto. En el notebook la vuelven a hacer ellos (TODO 1).
   </aside>
 </section>
 
-<!-- ================= 8 · VIZ BARAJADO ================= -->
+<!-- ================= 8 · LA CURVA Y LAS PLANTILLAS ================= -->
 <section>
-  <span class="marca">viz</span>
-  <h3>Barajemos</h3>
-  <div class="viz-frame" data-alto="grande">
-    <iframe src="viz/vecindad-de-pixeles.html" title="barajar los píxeles" loading="lazy"></iframe>
+  <span class="marca">medido</span>
+  <h3>Corrámosla, y miremos por qué</h3>
+  <div class="comparacion">
+    <div>
+      <div class="viz-frame" style="padding:8px"><div id="curva-corr" role="img" aria-label="aciertos de la red densa según cuántos píxeles se corre la foto: cae de casi 96 por ciento a menos de 30 con 4 píxeles"></div></div>
+      <p class="viz-pie">Con <b>4 píxeles</b>, de <b><span data-num="densa.corrimiento.0">95,8</span>&nbsp;%</b>
+        a <b><span data-num="densa.corrimiento.4">29,0</span>&nbsp;%</b>. El azar, con diez
+        dígitos, es 10&nbsp;%.</p>
+    </div>
+    <div>
+      <div class="viz-frame" style="padding:8px"><div id="plantillas" role="img" aria-label="ocho plantillas de 28 por 28: los pesos de ocho neuronas de la red densa, manchas rojas y azules borrosas"></div></div>
+      <p class="viz-pie"><b>Lo que aprendió la densa.</b> Cada neurona tiene una perilla
+        <b>por píxel</b>: dibujadas en la grilla, son plantillas borrosas (rojo: "acá quiero
+        tinta"; azul: "acá no") <b>pegadas a un lugar de la hoja</b>.</p>
+    </div>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> las dos tiras de abajo tienen los mismos 784 números.
-    La red densa saca <b><span data-num="resultados.densa_barajada.exactitud">85,5</span>&nbsp;%</b> con la foto revuelta y <b><span data-num="resultados.densa_normal.exactitud">85,7</span>&nbsp;%</b> con la
-    foto entera. Ni se enteró.</p>
   <aside class="notes">
-    6 min. Movelo vos. Orden: (1) apretá "Barajar" y dejá correr la animación —marcá que
-    no se pierde ni un píxel, sólo se mudan; (2) mostrá las dos tiras; (3) recién ahí
-    revelá las barras. Preguntá quién había votado A. Después pasá a la pestaña
-    "correrla unos píxeles": ahí la densa se cae a 32,2 % y la CNN se queda en 74,4 %.
-    Esa segunda pestaña responde la foto corrida del principio.
+    4 min. Primero la curva, en silencio: dejá que vean la caída. Preguntá quién había
+    votado C. Después las plantillas: "cada uno de estos cuadraditos es UNA neurona; sus
+    784 perillas dibujadas donde está cada píxel". Si el dígito se corre, ya no cae sobre
+    la plantilla. Esto es calcar sobre un molde fijo, la palabra de la clase 4.
+    Si sobra tiempo (no suele): la viz vecindad-de-pixeles.html muestra otra cara del mismo
+    problema, barajar los píxeles, con FashionMNIST. No es parte del recorrido de hoy.
   </aside>
 </section>
 
@@ -214,12 +229,13 @@
   <h2>La conclusión incómoda</h2>
   <div class="aha">La red densa <strong>nunca supo que había una grilla</strong>.
     Para ella, los 784 números eran 784 variables sueltas, como las columnas de un CSV.</div>
-  <p>Vos reconocés una cara en cualquier parte de la foto. La red densa tendría que
-     aprender <em>"cara arriba a la izquierda"</em>, <em>"cara en el medio"</em>,
-     <em>"cara en la esquina"</em> por separado, con muchísimos ejemplos de cada posición.</p>
-  <div class="ojo compacta">Honestidad: la CNN también pierde <em>poco</em> (unos 4 o 5 puntos).
-    Lo contundente no es cuánto pierde la CNN — es que la densa <b>no pierde nada</b>.
-    Y la prueba más fuerte es la foto corrida: <span data-num="resultados.densa_normal.exactitud">85,7</span>&nbsp;% → <span data-num="corrimiento.densa.3">32,2</span>&nbsp;%.</div>
+  <p>Vos reconocés un 5 en cualquier parte de la hoja. La red densa tendría que
+     aprender <em>"5 arriba a la izquierda"</em>, <em>"5 en el medio"</em>,
+     <em>"5 en la esquina"</em> por separado, con muchísimos ejemplos de cada posición.</p>
+  <div class="ojo compacta">Para ella, el píxel de la columna 10 y el de la columna 11 son las
+    variables 346 y 347: tan vecinas como la 3 y la 700. Correr la foto le cambió
+    <b>todas</b> las variables a la vez: <span data-num="densa.corrimiento.0">95,8</span>&nbsp;% →
+    <span data-num="densa.corrimiento.4">29,0</span>&nbsp;%.</div>
   <aside class="notes">
     2 min. Este es el corazón de la primera mitad. No lo apures. Si alguien dice "entonces
     la CNN es mejor", frená: la CNN es mejor PARA DATOS CON GRILLA. Sobre una tabla de
@@ -291,7 +307,8 @@
     le ponemos un marco de ceros alrededor (padding) para que no se achique: es plomería.
     El 28 → 14 → 7 del diagrama de la slide 24 viene del pooling, no de esto.
     Para quien lea Goodfellow: si corrés la foto, el mapa se corre igual (eso se llama
-    equivariancia); la invariancia, "me da igual dónde", la pone recién el máximo del final.
+    equivariancia, y en el notebook lo comprueban: diferencia cero); la invariancia, "me da
+    igual dónde", la pone recién el máximo del final (lo comprueban en el TODO 3).
   </aside>
 </section>
 
@@ -398,19 +415,24 @@
   <div class="manos">
     Abrí <code>notebook.ipynb</code>, secciones <b>1 a 3</b>. Quince minutos.
     <ol>
-      <li>Mirá la imagen y su tabla de números.</li>
-      <li>Corré el experimento del barajado y escribí el <code>TODO 1</code>.</li>
+      <li>Mirá los dígitos, su tabla, y cómo los reparte el <code>DataLoader</code> de a 64.</li>
+      <li>Entrená la densa de la clase 4 (tarda segundos) y hacé el <code>TODO 1</code>:
+        <strong>apostá</strong> y después corré las fotos.</li>
+      <li>Mirá la ventana recorriendo el dígito, y el mapa que <strong>se corre con la foto</strong>.</li>
       <li><code>TODO 2</code>: <strong>inventá un filtro que detecte diagonales</strong>.</li>
-      <li><code>TODO 3</code>: ¿qué filtro deja la imagen igual?</li>
     </ol>
   </div>
   <p class="viz-pie">Los chequeos del notebook <b>nunca explotan</b>: si no sale, te dicen qué
     mirar. Si algo se rompe de verdad, levantá la mano.</p>
   <aside class="notes">
-    2 min para leer las consignas en voz alta y 15 de trabajo. Recorré el aula. Los dos atascos previsibles: (a) confunden filtro
-    con mapa de activación —repetí el vocabulario—; (b) errores de forma. Enseñales a LEER
-    el error: "expected 4-dimensional input" te está diciendo que falta la cuaterna
+    2 min para leer las consignas en voz alta y 15 de trabajo. Recorré el aula. La sección 2
+    es repaso y se lee rápido: lo único nuevo es que el modelo está escrito como clase
+    (__init__ = las perillas, forward = el dibujo) y la loss de clasificación. Si alguien se
+    traba ahí, que siga: no es el objetivo de hoy. Los atascos previsibles: (a) confunden
+    filtro con mapa de activación —repetí el vocabulario—; (b) errores de forma. Enseñales a
+    LEER el error: "expected 4-dimensional input" te está diciendo que falta la cuaterna
     (batch, canales, alto, ancho). Anotá quién hizo un filtro lindo: lo proyectamos después.
+    El filtro identidad quedó como opcional: si alguien llega, que lo haga.
   </aside>
 </section>
 
@@ -605,6 +627,8 @@
     igual). El que lo ignora es este máximo. Es también por qué esta misma red
     después va a poder comer imágenes de 32×32 sin cambiarle una línea.
     Este es el modelo exacto del notebook: 23.946 perillas contra 50.890 de la densa.
+    En el TODO 3 lo ponen a prueba: cambian la caja "¿apareció?" por un aplanar común
+    y miden qué pasa con la foto corrida.
   </aside>
 </section>
 
@@ -658,25 +682,32 @@
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2 — de a dos</h2>
   <div class="manos">
-    Notebook, secciones <b>4 y 5</b>. Trece minutos, de a dos.
+    Notebook, secciones <b>4 a 7</b>. Trece minutos, de a dos.
     <ol>
-      <li>Verificá que <code>nn.Conv2d</code> da <strong>lo mismo</strong> que tu doble <code>for</code>.</li>
-      <li>Mirá los <strong>16 filtros que la CNN aprendió sola</strong> (<code>TODO 4</code>):
-        ¿alguno se parece a los tuyos?</li>
-      <li>Entrená el clasificador sobre el archivo fotográfico y hacé el
-        <code>TODO 5</code>: <strong>mirá los errores</strong> y escribí qué tienen en común.</li>
+      <li>Entrená la CNN con <strong>la misma función</strong> que la densa y comparalas,
+        con la foto quieta y con la foto corrida.</li>
+      <li><code>TODO 3</code>: cambiá el máximo del final por <code>"aplanar"</code>.
+        <strong>¿Qué pieza pone la invariancia?</strong></li>
+      <li>Sección 7: entrená el clasificador del archivo fotográfico y hacé el
+        <code>TODO 5</code>: <strong>mirá los errores</strong>, con su mapa de "tapar", y
+        escribí qué tienen en común.</li>
+      <li>Si te sobra tiempo: sección 5, mirar adentro (<code>TODO 4</code>).</li>
     </ol>
   </div>
   <div class="ojo compacta">El <code>TODO 5</code> es el más importante del notebook y el que
     más se saltea. Es un hábito profesional, no un ejercicio técnico:
     <strong>el conocimiento está en los errores, no en los aciertos</strong>.</div>
   <aside class="notes">
-    13 min (y 1 para leer las consignas). Pasá por las mesas y preguntá una sola cosa: "¿qué tienen en común los errores?"
+    13 min (y 1 para leer las consignas). La CNN tarda menos de un minuto y la aplanada del
+    TODO 3 otro medio: que lancen la celda y mientras tanto lean. Si alguien se atrasa,
+    que saltee la sección 5 y vaya directo a la 7: el TODO 5 no se negocia. Pasá por las
+    mesas y preguntá una sola cosa: "¿qué tienen en común los errores?"
     Si contestan "son difíciles", repreguntá: "¿difíciles para vos o para el modelo?".
     La respuesta que buscamos: los errores se amontonan en las escenas con manchitas
-    (sobre todo el follaje, que es el que peor sale), casi nunca en los edificios. Si en
-    alguna máquina el que peor sale es «multitud», es la misma confusión mirada del otro
-    lado: el notebook lo avisa.
+    (sobre todo el follaje, que es el que peor sale), casi nunca en los edificios; y el
+    mapa de "tapar" se enciende sobre las copas de los árboles. Si en alguna máquina el
+    que peor sale es «multitud», es la misma confusión mirada del otro lado: el notebook
+    lo avisa.
   </aside>
 </section>
 
@@ -684,28 +715,56 @@
 <section>
   <h3>Lo que midieron</h3>
   <table class="comp">
-    <thead><tr><th>modelo</th><th>perillas</th><th>foto normal</th><th>píxeles barajados</th><th>foto corrida 3 px</th></tr></thead>
+    <thead><tr><th>modelo</th><th>perillas</th><th>errores cada 1000</th><th>foto quieta</th><th>foto corrida 4 px</th></tr></thead>
     <tbody>
-      <tr><td>red densa (clase 4)</td><td>50.890</td><td><span data-num="resultados.densa_normal.exactitud">85,7</span>&nbsp;%</td><td class="mal"><span data-num="resultados.densa_barajada.exactitud">85,5</span>&nbsp;% ✗</td><td class="mal"><span data-num="corrimiento.densa.3">32,2</span>&nbsp;% ✗</td></tr>
-      <tr><td>CNN (clase 5)</td><td>23.946</td><td class="bien"><span data-num="resultados.cnn_normal.exactitud">87,7</span>&nbsp;% ✓</td><td><span data-num="resultados.cnn_barajada.exactitud">83,1</span>&nbsp;%</td><td class="bien"><span data-num="corrimiento.cnn.3">74,4</span>&nbsp;% ✓</td></tr>
+      <tr><td>red densa (clase 4)</td><td data-miles="densa.parametros">50.890</td><td data-entero="densa.errores_cada_1000">42</td><td><span data-num="densa.val">95,8</span>&nbsp;%</td><td class="mal"><span data-num="densa.corrimiento.4">29,0</span>&nbsp;% ✗</td></tr>
+      <tr><td>CNN, aplanada al final (<code>TODO 3</code>)</td><td data-miles="aplanada.parametros">54.666</td><td data-entero="aplanada.errores_cada_1000">13</td><td class="bien"><span data-num="aplanada.val">98,7</span>&nbsp;%</td><td><span data-num="aplanada.corrimiento.4">71,8</span>&nbsp;%</td></tr>
+      <tr><td>CNN, con «¿apareció?» al final</td><td data-miles="cnn.parametros">23.946</td><td data-entero="cnn.errores_cada_1000">19</td><td class="bien"><span data-num="cnn.val">98,1</span>&nbsp;%</td><td class="bien"><span data-num="cnn.corrimiento.4">97,8</span>&nbsp;% ✓</td></tr>
     </tbody>
   </table>
-  <p style="font-size:.78em;color:var(--tinta-2)">FashionMNIST · 12.000 imágenes de
-    entrenamiento · 12 pasadas · semilla 1983 · corrida real, <code>medir-experimentos.py</code>
-    <span id="entorno-exp"></span>. Con otras semillas la densa se mueve menos de un punto
-    (para arriba o para abajo) y la CNN pierde entre 2 y 5 al barajar.</p>
-  <div class="aha">Menos de la mitad de perillas, mejor resultado, y encima
-    <strong>aguanta que le muevas la foto</strong>. Eso último es lo que se compró con el supuesto.</div>
-  <div class="ojo compacta">Leelo bien: que la densa saque <b><span data-num="resultados.densa_barajada.exactitud">85,5</span>&nbsp;%</b> con los píxeles
-    barajados no es un logro. Es la confesión de que nunca los miró como grilla.</div>
+  <p style="font-size:.78em;color:var(--tinta-2)">MNIST · aciertos en validación (10.000 dígitos) ·
+    50.000 de entrenamiento · 4 épocas · semilla 1983 · corrida real del notebook,
+    <code>medir-mnist.py</code> <span id="entorno-exp"></span>. Y el test, abierto
+    <b>una sola vez</b> al final: densa <span data-num="densa.test">96,2</span>&nbsp;%, CNN
+    <span data-num="cnn.test">98,3</span>&nbsp;%.</p>
+  <div class="aha">Menos de la mitad de perillas, menos de la mitad de errores, y encima
+    <strong>aguanta que le muevas la foto</strong>. Eso último es lo que se compró con el supuesto,
+    y el <code>TODO 3</code> dice <strong>qué pieza</strong> lo compra: el máximo del final.</div>
+  <div class="ojo compacta">Leelo bien: con la foto quieta, la aplanada acierta un poco
+    <em>más</em>. El supuesto no es gratis: en dígitos centrados el lugar sí importa un poco, y
+    tirarlo a la basura cuesta. Lo que compra es robustez ante un cambio que vos sabés que va a pasar.</div>
   <aside class="notes">
-    2 min. Los números son de la corrida real. Si el aula corrió el notebook, les tienen
+    2 min. Los números son de la corrida real del notebook. Si el aula lo corrió, les tienen
     que haber dado casi iguales, no idénticos: la semilla fija la corrida en la misma
     máquina y con las mismas versiones de las librerías, y en Colab o con otra versión de
-    PyTorch cambian unas décimas (el notebook imprime las dos cosas lado a lado). Lo que
-    tiene que repetirse es el patrón: la densa no pierde nada al barajar, la CNN pierde
-    varios puntos; con la foto corrida, la densa se desploma y la CNN aguanta. Si tenés
-    tiempo, proyectá tu propia corrida y decilo en voz alta: es un anticipo de la clase 10.
+    PyTorch cambian unas décimas. Lo que tiene que repetirse es el patrón: con la foto
+    corrida, la densa se desploma, la aplanada se cae a la mitad del camino y la CNN con
+    máximo aguanta. Ojo con la columna de perillas: la aplanada tiene MÁS que la densa
+    (su última capa recibe 3.136 números). Si tenés tiempo, proyectá tu propia corrida y
+    decilo en voz alta: es un anticipo de la clase 10.
+  </aside>
+</section>
+
+<!-- ================= 29 · DÓNDE MIRÓ ================= -->
+<section>
+  <span class="marca">mirar adentro</span>
+  <h3>¿Dónde miró? Tapar y ver</h3>
+  <div class="viz-frame" style="padding:10px"><div id="oclusion" role="img" aria-label="cuatro dígitos con el mapa de dónde miró la CNN, y tres fotos de follaje que el modelo confundió con una movilización, con el mapa encendido sobre las copas de los árboles"></div></div>
+  <p class="viz-pie">Tapamos un cuadradito de la foto, lo movemos como la ventana de la
+    convolución, y medimos cuánto <b>baja</b> la confianza del modelo. <b>Más rojo = tapar
+    ahí dolió más.</b> A la izquierda, la CNN de dígitos. A la derecha, tres fotos de <b>follaje</b> que el
+    modelo del archivo llamó «hay movilización»: lo que lo convenció fueron <b>las copas de
+    los árboles</b>.</p>
+  <div class="ojo compacta">Son <strong>pistas, no la verdad</strong>: dependen del tamaño del
+    cuadradito y de con qué se tapa. Sirven para encontrar disparates y escribir la sección
+    de limitaciones, no para probar qué "entiende" un modelo.</div>
+  <aside class="notes">
+    3 min. Primero los dígitos: "¿miran el trazo que vos mirarías?" Casi siempre sí.
+    Después las tres de follaje, despacio: es el TODO 5 que acaban de hacer, pero con la prueba a la
+    vista. El modelo no aprendió "gente"; aprendió "manchitas chiquitas", y las copas son
+    manchitas. Esto es el puente directo a la slide que sigue: la misma pregunta, con
+    imágenes satelitales y en Science. La advertencia del recuadro es la clase 10 en una
+    línea: decila.
   </aside>
 </section>
 
@@ -890,6 +949,7 @@
 <script src="../../_shared/vendor/katex/katex.min.js"></script>
 <script src="../../_shared/vendor/katex/auto-render.min.js"></script>
 <script src="datos-experimentos.js"></script>
+<script src="datos-mnist.js"></script>
 <script src="../../_shared/js/viz.js"></script>
 <script>
   const MateLocal = () => ({
@@ -928,11 +988,13 @@
   // OJO: `const DATOS_EXP` de datos-experimentos.js NO queda colgado de window
   // (los const de un script clásico no son propiedades del objeto global).
   const D = (typeof DATOS_EXP !== 'undefined') ? DATOS_EXP : {};
+  // los números y figuras del recorrido de hoy (MNIST) salen de medir-mnist.py
+  const M = (typeof DATOS_MNIST !== 'undefined') ? DATOS_MNIST : {};
   const planos = [];
   const cero = () => { const m = []; for (let f = 0; f < 28; f++) m.push(new Array(28).fill(0)); return m; };
   const norm = px => px ? px.map(f => f.map(v => v / 255)) : cero();
 
-  const FOTO   = norm((D.muestras && D.muestras[1] && D.muestras[1].px) || null);   // una prenda
+  const FOTO   = norm(M.muestra || null);                                            // un 5 de MNIST
   const MULT   = norm((D.esquemas && D.esquemas.multitud) || null);                 // la multitud
   const AFICHE = norm((D.esquemas && D.esquemas.afiche) || null);
 
@@ -1058,13 +1120,105 @@
     }
   })();
 
+  // --- slide 8: la curva del corrimiento y las plantillas de la densa --------
+  (function () {
+    if (!M.densa) return;
+    const xs = M.desplazamientos, ys = M.densa.corrimiento;
+    const pts = xs.map((x, i) => [x, ys[i]]);
+    const p = Viz.plano('#curva-corr', { xmin: -0.3, xmax: xs[xs.length - 1] + 0.3, ymin: 0, ymax: 100,
+                                         ejeX: 'píxeles de corrimiento', ejeY: '% de aciertos',
+                                         relacion: 0.72 });
+    p.alDibujar(() => {
+      p.fondo(); p.grilla(); p.ejes();
+      p.segmento(-0.3, 10, xs[xs.length - 1] + 0.3, 10, { color: 'tinta3', punteada: true, grosor: 1.5 });
+      p.texto(xs[xs.length - 1], 13, 'azar', { color: 'tinta3', alinear: 'right', base: 'bottom' });
+      p.linea(pts, { color: 'datos', grosor: 3 });
+      p.puntos(pts, { color: 'datos', r: 5 });
+    });
+    p.redibujar(); planos.push(p);
+  })();
+  (function () {
+    const cont = document.querySelector('#plantillas');
+    if (!cont || !M.plantillas) return;
+    cont.style.display = 'grid';
+    cont.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    cont.style.gap = '6px';
+    let lim = 0;
+    for (const W of M.plantillas) for (const f of W) for (const v of f) lim = Math.max(lim, Math.abs(v));
+    M.plantillas.forEach((W, k) => {
+      const d = document.createElement('div');
+      d.id = 'plantilla-' + k;
+      cont.appendChild(d);
+      const p = Viz.plano('#' + d.id, { xmin: 0, xmax: 28, ymin: 0, ymax: 28, cuadrado: true,
+                                        margen: { i: 1, d: 1, a: 1, b: 1 } });
+      p.alDibujar(() => {
+        p.fondo({ marco: false });
+        p.celdas(W, { paleta: 'divergente', min: -lim, max: lim, borde: false });
+      });
+      p.redibujar(); planos.push(p);
+    });
+  })();
+
+  // --- slide 29: dónde miró (oclusión) ----------------------------------------
+  (function () {
+    const cont = document.querySelector('#oclusion');
+    if (!cont || !M.oclusion) return;
+    const casos = M.oclusion.map(o => ({ px: o.px, mapa: o.cnn, titulo: 'un ' + o.digito }))
+      .concat((M.oclusion_archivo || []).map(o => ({ px: o.px, mapa: o.mapa,
+                                                    titulo: 'follaje: dijo «hay»' })));
+    cont.style.display = 'grid';
+    cont.style.gridTemplateColumns = 'repeat(' + casos.length + ', 1fr)';
+    cont.style.gap = '10px';
+    const rojo = Viz.color('error');
+    casos.forEach((caso, k) => {
+      const fig = document.createElement('figure');
+      fig.style.margin = '0';
+      fig.innerHTML = '<figcaption style="font-size:.45em;color:var(--tinta-3);text-align:center;' +
+                      'margin-bottom:.25em">' + caso.titulo + '</figcaption><div id="ocl-' + k + '"></div>';
+      cont.appendChild(fig);
+      const n = caso.px.length;
+      let mx = 0;
+      for (const f of caso.mapa) for (const v of f) mx = Math.max(mx, v);
+      const p = Viz.plano('#ocl-' + k, { xmin: 0, xmax: n, ymin: 0, ymax: n, cuadrado: true,
+                                          margen: { i: 1, d: 1, a: 1, b: 1 } });
+      // una sola pasada opaca: el color de cada casilla ya mezcla la foto (gris)
+      // y el mapa (rojo). Dos capas semitransparentes dejan costuras entre casillas.
+      p.alDibujar(() => {
+        const papel = Viz.color('papel'), tinta = Viz.color('tinta');
+        const colores = [], indices = [];
+        for (let f = 0; f < n; f++) {
+          const fila = [];
+          for (let c = 0; c < n; c++) {
+            const gris = Viz.mezclarColor(papel, tinta, caso.px[f][c] / 255 * 0.6);
+            colores.push(Viz.mezclarColor(gris, rojo, Math.max(caso.mapa[f][c], 0) / (mx || 1) * 0.85));
+            fila.push(colores.length - 1);
+          }
+          indices.push(fila);
+        }
+        p.fondo({ marco: false });
+        p.celdas(indices, { paleta: t => colores[Math.round(t * (colores.length - 1))],
+                            min: 0, max: colores.length - 1, borde: false });
+      });
+      p.redibujar(); planos.push(p);
+    });
+  })();
+
   // --- los números marcados con data-num salen del JSON medido, no del HTML ---
+  const leer = (ruta) => ruta.split('.').reduce((o, k) => (o == null ? o : o[k]), M);
   document.querySelectorAll('[data-num]').forEach(el => {
-    const v = el.getAttribute('data-num').split('.').reduce((o, k) => (o == null ? o : o[k]), D);
+    const v = leer(el.getAttribute('data-num'));
     if (typeof v === 'number') el.textContent = v.toFixed(1).replace('.', ',');
   });
+  document.querySelectorAll('[data-entero]').forEach(el => {
+    const v = leer(el.getAttribute('data-entero'));
+    if (typeof v === 'number') el.textContent = String(Math.round(v));
+  });
+  document.querySelectorAll('[data-miles]').forEach(el => {
+    const v = leer(el.getAttribute('data-miles'));
+    if (typeof v === 'number') el.textContent = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  });
   const ent = document.querySelector('#entorno-exp');
-  if (ent && D.entorno) ent.textContent = '(torch ' + D.entorno.torch + ', numpy ' + D.entorno.numpy + ')';
+  if (ent && M.entorno) ent.textContent = '(torch ' + M.entorno.torch + ', numpy ' + M.entorno.numpy + ')';
 
   // los canvas se redibujan al cambiar de slide y al redimensionar el proyector
   const repintar = () => planos.forEach(p => { p.redimensionar && p.redimensionar(); p.redibujar(); });
