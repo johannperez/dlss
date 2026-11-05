@@ -85,6 +85,14 @@ FUENTES = {
         "archivos": ["train-images-idx3-ubyte.gz", "train-labels-idx1-ubyte.gz",
                      "t10k-images-idx3-ubyte.gz", "t10k-labels-idx1-ubyte.gz"],
     },
+    "mnist": {
+        # Espejo en GitHub de los archivos originales de LeCun (mismos md5).
+        "base": f"{RAW}/fgnt/mnist/master",
+        "repo": "https://github.com/fgnt/mnist",
+        "licencia": "CC BY-SA 3.0 (la de yann.lecun.com/exdb/mnist)",
+        "archivos": ["train-images-idx3-ubyte.gz", "train-labels-idx1-ubyte.gz",
+                     "t10k-images-idx3-ubyte.gz", "t10k-labels-idx1-ubyte.gz"],
+    },
 }
 
 # Los 108 discursos de apertura de sesiones. Manifiesto explicito para no
@@ -517,6 +525,31 @@ def fashion_mnist(split="train"):
     return X, y
 
 
+def mnist(split="train"):
+    """Devuelve (imagenes uint8 [N,28,28], etiquetas uint8 [N]) o None sin red.
+
+    Los digitos escritos a mano de MNIST. Igual que FashionMNIST, es un
+    SANDBOX TECNICO de la clase 5: rotularlo asi, y volver al dominio despues.
+    """
+    import gzip
+    import numpy as np
+    pre = "train" if split == "train" else "t10k"
+    base = FUENTES["mnist"]["base"]
+    px = _cache_path("mnist", f"{pre}-images-idx3-ubyte.gz")
+    py = _cache_path("mnist", f"{pre}-labels-idx1-ubyte.gz")
+    if not (bajar(f"{base}/{pre}-images-idx3-ubyte.gz", px)
+            and bajar(f"{base}/{pre}-labels-idx1-ubyte.gz", py)):
+        _log("  [x] MNIST no disponible. En Colab suele andar; "
+             "si no, la clase 5 usa figuras sinteticas.")
+        return None
+    with gzip.open(px, "rb") as fh:
+        X = np.frombuffer(fh.read(), np.uint8, offset=16).reshape(-1, 28, 28)
+    with gzip.open(py, "rb") as fh:
+        y = np.frombuffer(fh.read(), np.uint8, offset=8)
+    _log(f"  [ok] MNIST {split}: {X.shape[0]} imagenes")
+    return X, y
+
+
 ETIQUETAS_FASHION = ["remera/top", "pantalon", "pullover", "vestido", "abrigo",
                      "sandalia", "camisa", "zapatilla", "cartera", "botineta"]
 
@@ -533,6 +566,8 @@ URLS_A_VERIFICAR = [
     ("Casa Rosada (discursos 2015-2024)", FUENTES["casarosada"]["url"]),
     ("FashionMNIST (sandbox clase 5)",
      f"{FUENTES['fashion_mnist']['base']}/t10k-labels-idx1-ubyte.gz"),
+    ("MNIST (sandbox clase 5)",
+     f"{FUENTES['mnist']['base']}/t10k-labels-idx1-ubyte.gz"),
 ]
 
 
