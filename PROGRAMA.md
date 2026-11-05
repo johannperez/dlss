@@ -325,7 +325,8 @@ siendo el mismo objeto si está un poquito más a la derecha.
 - Explicar qué hace una convolución mostrando un filtro deslizándose, y qué detecta un filtro.
 - Decir en una frase qué **supuestos sobre el mundo** mete adentro una CNN (localidad, repetición
   del mismo patrón en todos lados, jerarquía) y en qué casos esos supuestos son falsos.
-- Entrenar una CNN chiquita y comparar su desempeño contra la red densa de la clase 4.
+- Entrenar una CNN chiquita con el mismo loop de la clase 4, compararla contra la red densa y
+  mirar adentro: qué filtros aprendió y qué parte de la foto miró para decidir.
 - Leer críticamente un paper de ciencias sociales que usa imágenes (satelitales, archivo
   fotográfico, prensa gráfica) y hacer las tres preguntas correctas.
 
@@ -338,12 +339,12 @@ Cuando esa teoría es cierta, la CNN necesita muchísimos menos datos. Cuando es
 | Min | Bloque | Qué pasa |
 |---|---|---|
 | 0-10 | Gancho | La foto corrida 20 píxeles. |
-| 10-25 | La imagen como grilla | `viz/vecindad-de-pixeles.html`: botón **"barajar los píxeles"**. La red densa da prácticamente el mismo resultado con los píxeles barajados (unas décimas de diferencia: ruido de inicialización); tu ojo no puede ni ver qué es. **Aha**: la red densa nunca supo que había una grilla. |
+| 10-25 | La imagen como grilla | Un dígito de MNIST (sandbox rotulado) como tabla de números; la red densa de la clase 4 lo aplana y acierta el 96 %. Apuesta: ¿y si corro las fotos 4 píxeles? Se desploma al 29 %, y sus plantillas muestran por qué: cada neurona es un molde pegado a un lugar de la hoja. **Aha**: la red densa nunca supo que había una grilla. (El barajado de píxeles de `viz/vecindad-de-pixeles.html` queda como extra.) |
 | 25-45 | La convolución | `viz/kernel-deslizante.html`: filtro 3x3 con 9 sliders sobre una foto de prensa; presets de borde vertical, horizontal, desenfoque. `[CALLBACK DIBUJO]`: "el filtro es un pincel; la red aprende sus pinceles". |
-| 45-60 | Manos 1 | Notebook: aplicar filtros a mano con numpy sobre una foto; después `nn.Conv2d`; ver los mapas de activación. |
+| 45-60 | Manos 1 | Notebook: MNIST con `Dataset`/`DataLoader`, la densa escrita como `nn.Module` y entrenada con el loop de la clase 4, la apuesta del corrimiento; después filtros a mano con numpy, el mapa que se corre con la foto, y `nn.Conv2d`. |
 | 60-70 | Pausa | |
 | 70-85 | Jerarquía y supuestos | `viz/jerarquia.html` (bordes → texturas → partes → objeto) y `viz/supuestos-de-arquitectura.html` (tabla interactiva: qué supone cada arquitectura, cuándo se rompe). |
-| 85-105 | Manos 2 | Entrenar una CNN chica en un sandbox rápido (FashionMNIST) y comparar contra la densa: menos de la mitad de los parámetros (23.946 contra 50.890), mejor resultado y mucho más robusta al corrimiento. Después, el caso de archivo: un clasificador binario (movilización / no movilización) sobre un archivo fotográfico **sintético** donde sabemos la verdad, con el follaje puesto a propósito como trampa. |
+| 85-105 | Manos 2 | Entrenar una CNN chica sobre MNIST con **la misma función** que la densa: menos de la mitad de los parámetros (23.946 contra 50.890), menos de la mitad de los errores, y aguanta el corrimiento (98 % contra 29 %). `TODO`: cambiar el máximo global del final por un aplanar común, para encontrar qué pieza pone la invariancia. Mirar adentro: filtros, mapas de activación y mapas de oclusión ("tapar y ver"). Después, el caso de archivo: un clasificador binario (movilización / no movilización) sobre un archivo fotográfico **sintético** donde sabemos la verdad, con el follaje puesto a propósito como trampa, y los mapas de oclusión mostrando que el modelo mira las copas de los árboles. |
 | 105-120 | Cierre | `[EN TU INVESTIGACIÓN]`: la lectura crítica de *Jean et al. 2016* (predecir pobreza desde imágenes satelitales) y las tres preguntas: ¿qué está midiendo realmente el modelo? ¿el supuesto de invariancia vale acá? ¿qué pasa fuera de la región de entrenamiento? **Puente**: "las imágenes tienen estructura espacial. El texto tiene otra estructura: el **orden**. Y el orden es más difícil, porque el significado de una palabra depende de las que están lejos." |
 
 **Conexión hacia atrás:** la red densa de la clase 4 muestra su límite. **Hacia adelante:** si la

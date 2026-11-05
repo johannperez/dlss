@@ -89,7 +89,8 @@ FUENTES = {
         # Espejo en GitHub de los archivos originales de LeCun (mismos md5).
         "base": f"{RAW}/fgnt/mnist/master",
         "repo": "https://github.com/fgnt/mnist",
-        "licencia": "CC BY-SA 3.0 (la de yann.lecun.com/exdb/mnist)",
+        "licencia": "CC BY-SA 3.0 segun la fuente original (sin verificar: el "
+                    "espejo no declara licencia)",
         "archivos": ["train-images-idx3-ubyte.gz", "train-labels-idx1-ubyte.gz",
                      "t10k-images-idx3-ubyte.gz", "t10k-labels-idx1-ubyte.gz"],
     },

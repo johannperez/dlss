@@ -126,15 +126,25 @@ satellite imagery*. Nature Communications, 12, 4392.** `[VERIFICAR URL]` · DOI 
 
 ## Datos y herramientas
 
-**11. FashionMNIST — Xiao, H., Rasul, K. & Vollgraf, R. (2017), Zalando Research.**
+**11. MNIST — LeCun, Y., Bottou, L., Bengio, Y. & Haffner, P. (1998), *Gradient-based learning
+applied to document recognition*, Proceedings of the IEEE 86(11).**
+`[VERIFICADA · 2026-11-05]` el espejo de los archivos: https://raw.githubusercontent.com/fgnt/mnist/master/README.md
+> El sandbox técnico del notebook: 70.000 dígitos escritos a mano, de 28×28. Es el paper de
+> LeNet-5, la primera CNN que leyó cheques de verdad. Licencia: se cita como CC BY-SA 3.0, pero
+> el espejo no la declara `[VERIFICAR]`. **Es un sandbox y hay que decirlo cada vez que
+> aparece:** no es un dato de ciencias sociales y ninguna conclusión sustantiva sale de ahí.
+> El paper es largo y técnico; para esta clase alcanza con saber de dónde salen los dígitos.
+
+**11b. FashionMNIST — Xiao, H., Rasul, K. & Vollgraf, R. (2017), Zalando Research.**
 `[VERIFICADA]` · https://raw.githubusercontent.com/zalandoresearch/fashion-mnist/master/README.md
-> El sandbox técnico del notebook: 70.000 imágenes de 28×28 de prendas de ropa, licencia MIT.
-> El README explica de dónde salió y por qué reemplaza al MNIST de dígitos (demasiado fácil).
-> **Es un sandbox y hay que decirlo cada vez que aparece:** no es un dato de ciencias sociales y
-> ninguna conclusión sustantiva sale de ahí.
+> 70.000 imágenes de 28×28 de prendas de ropa, licencia MIT. Ya no es el dataset del notebook,
+> pero las **visualizaciones** de la clase usan sus imágenes (las prendas de
+> `kernel-deslizante.html` y el barajado de `vecindad-de-pixeles.html`). El README explica por
+> qué se hizo: MNIST de dígitos es demasiado fácil para comparar exactitudes, que es justamente
+> por qué el notebook compara el **corrimiento** y no sólo la exactitud.
 > Diez minutos.
 
-**12. El corpus visual de la sección 5 del notebook.** *No hay enlace: se genera en el notebook.*
+**12. El corpus visual de la sección 7 del notebook.** *No hay enlace: se genera en el notebook.*
 > Es **sintético**, hecho con numpy, y está a la vista en la función `archivo_visual`. País
 > ficticio, proceso generador conocido, cero fotos de personas reales. Se usa precisamente porque
 > **sabemos la verdad**: por eso podemos mostrar que los errores del modelo se concentran en las
