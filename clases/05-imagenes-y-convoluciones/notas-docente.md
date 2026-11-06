@@ -81,8 +81,10 @@ de datos y más fácil de engañar.*
 > 5, mirar adentro, es la que más se presta: corre sola y se lee); **la lectura crítica no**.
 >
 > **Los tiempos de cómputo, para que no te sorprendan.** En el práctico 1 la densa entrena en
-> segundos. En el práctico 2 la CNN tarda menos de un minuto y la aplanada del `TODO 3` otro
-> medio en una laptop; en Colab, el doble. Que lancen la celda y lean mientras corre.
+> segundos. En el práctico 2 la CNN y la aplanada del `TODO 3` tardan menos de un minuto cada
+> una en una laptop y un par de minutos cada una en Colab sin GPU. Con la T4 tardan menos: el
+> notebook la usa si la encuentra, pero hay que elegirla **al empezar**, porque cambiar de
+> entorno reinicia la sesión, y Colab no siempre la da. Que lancen la celda y lean mientras corre.
 
 ---
 
@@ -291,8 +293,8 @@ mundo, exactamente igual.
       del notebook.
 - [ ] Probaste las viz **sueltas** en pantalla completa: son las que vas a proyectar.
 - [ ] Corriste el notebook entero después del último `git pull`, en la máquina (o el Colab)
-      desde donde vas a proyectar (**tarda un minuto y medio** en CPU; en Colab, 3-5 min).
-      Anotá tus números: con otra versión de PyTorch pueden diferir en unas décimas de los
+      desde donde vas a proyectar (**tarda un minuto y medio** en CPU; en Colab sin GPU, unos 5 min).
+      Anotá tus números: con GPU o con otra versión de PyTorch pueden diferir en unas décimas de los
       de las slides, y conviene que lo digas antes de que alguien lo descubra.
 - [ ] Tenés la alarma de la pausa puesta.
 - [ ] Sabés de memoria el patrón de la slide 28, más que los dígitos: con la foto quieta,

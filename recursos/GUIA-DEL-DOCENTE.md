@@ -110,7 +110,7 @@ GPU, el 2026-08-29:
 | **Tarda** | 8 s | 9 s | 9 s | 29 s | 1 min 21 s | 19 s | 15 s | **5 min 29 s** | 17 s | 15 s |
 
 En Colab gratis (2 vCPU compartidas) contá **entre una y dos veces** eso: la
-clase 5 puede irse a 3-4 minutos y la 8 a 8-10. Ninguna otra pasa del minuto.
+clase 5 puede irse a unos 5 minutos (menos con GPU) y la 8 a 8-10. Ninguna otra pasa del minuto.
 
 **El único notebook que hay que planificar es el de la clase 8**, y ya está
 planificado: se lanza el entrenamiento a los 20 minutos, **la pausa de 10 minutos

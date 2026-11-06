@@ -91,6 +91,24 @@ Archivo sintético: 98,0 % global; follaje 91,8 % (5 errores), multitud 99,0 %
 
 ---
 
+### Agregado (2026-11-05): el notebook usa la GPU si la encuentra
+
+Motivo: en Colab con T4, el `TODO 3` tardaba unos 2 minutos, porque el notebook
+corría entero en CPU. Ahora entrena en `cuda` si hay, y deja el modelo en CPU al
+terminar. Las celdas que lo miran después no cambian. En un Mac sigue en CPU a
+propósito (no elige `mps`), para mantener los números del JSON.
+
+Se corrió el notebook entero, con el `TODO 3` en `"aplanar"`, 0 errores en ambos casos:
+
+| Dispositivo | Total | CNN | Aplanada | Aciertos en validación (densa / CNN / aplanada) |
+|---|---|---|---|---|
+| CPU (Mac) | 100 s | 37 s | 38 s | 95,8 / 98,1 / 98,7: iguales al JSON |
+| `mps` forzado en una copia | 52 s | 16 s | 19 s | 95,8 / 98,0 / 98,6 |
+
+La corrida en `mps` prueba el camino del código fuera de la CPU (ningún tensor queda en
+otro dispositivo), **no** la velocidad de una T4. **Queda abierto:** correrlo en Colab
+con `cuda` y anotar el tiempo.
+
 ## 1. Lo que se midió en la tercera pasada, con el número real
 
 Entorno: python 3.12.13 · torch 2.14.0 · numpy 2.5.3 · macOS arm64 (queda

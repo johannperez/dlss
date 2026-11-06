@@ -116,7 +116,7 @@ El plan minuto a minuto de cada clase respeta esta forma, con variaciones declar
   Tienen que poder abrirse solas (el docente las proyecta) y también embeberse en un `<iframe>`
   dentro de la slide.
 - **Los notebooks abren en Colab**, instalan lo suyo en la primera celda, y corren enteros en CPU
-  en menos de 10 minutos (la GPU es opcional y sólo acelera la clase 8).
+  en menos de 10 minutos (la GPU es opcional y acelera las clases 5 y 8).
 - **Español rioplatense neutro-informal.** Voseo suave, humor, cero solemnidad. Términos técnicos
   en inglés se dejan en inglés (*loss*, *gradient descent*, *embedding*, *attention*, *overfitting*)
   pero **siempre** con su explicación en castellano la primera vez que aparecen, y con una entrada
