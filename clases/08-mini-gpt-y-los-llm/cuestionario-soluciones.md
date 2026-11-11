@@ -24,7 +24,7 @@ explicación que no funcionó, y ya sabés cuál.
 | **D** (clasificar oraciones por tema) | Es la tarea de ML que esta audiencia ya conoce (clases 4 y 9), así que es la plantilla que tienen a mano. | Confunden **modelo de lenguaje** con **clasificador**. Vale la pena señalar la diferencia económica: el clasificador necesita etiquetas humanas, el modelo de lenguaje no necesita ninguna. Ésa asimetría es por qué existen los LLM. |
 
 **Bandera roja:** si más de un tercio elige A, la segunda mitad de la clase no se entendió.
-Volvé a la slide 21 («por qué alucina») antes de seguir con la clase 9.
+Volvé a la slide 29 («por qué alucina») antes de seguir con la clase 9.
 
 ---
 

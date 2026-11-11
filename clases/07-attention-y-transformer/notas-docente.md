@@ -196,6 +196,13 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
    explícitamente que **no es requisito para arrancar la clase 8**, que enciende otro
    modelo y no usa el código de éste.
 
+> **Si el atraso fue grande** (pasó en la primera edición: el aula hizo sólo la primera
+> parte del notebook y el tramo de máscara, cabezas, posición y bloque quedó
+> entreverado), no lo arregles estirando la 7. La clase 8 abre con un **re-anclaje de
+> cinco minutos** (su slide 6, «el bloque de la clase 7, en una hoja») pensado para eso,
+> y después arma el modelo entre todos, en plenario. Decilo en el puente: «lo que hoy
+> quedó a medio armar, la clase que viene lo vemos funcionando».
+
 **Lo que NUNCA se recorta:**
 
 - **La pausa.** Diez minutos, a la hora en punto. Si se la come el entusiasmo, la segunda

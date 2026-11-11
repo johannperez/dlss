@@ -35,10 +35,14 @@ Uso:
                             dependen del corpus y del padron —casos de la
                             ventana, linea de base mayoritaria, pista, nombres
                             inventados en las muestras, textos de las viz—)
+    ... --guardar-modelo-del-curso
+                           (entrena y guarda modelo-del-curso.pt, el «plan B»
+                            del notebook, SIN rehacer los datos de las viz)
 
 Salidas (en esta misma carpeta):
     datos-mini-gpt.js     lo que leen las cuatro viz
     datos-mini-gpt.json   lo mismo, para el notebook
+    modelo-del-curso.pt   (solo con --guardar-modelo-del-curso) se versiona
 """
 
 import argparse
@@ -440,6 +444,10 @@ def main():
                     help="no entrena ni usa el modelo: recalcula sobre el "
                          "datos-mini-gpt.json existente los campos que dependen "
                          "solo del corpus y del padron")
+    ap.add_argument("--guardar-modelo-del-curso", action="store_true",
+                    help="entrena y guarda modelo-del-curso.pt (el plan B del "
+                         "notebook, que SI se versiona) sin rehacer los datos "
+                         "de las viz")
     args = ap.parse_args()
     CHECK = SALIDA / "mini-gpt.pt"     # gitignoreado (*.pt): es un artefacto local
 
@@ -525,6 +533,22 @@ def main():
           f"en CPU con {torch.get_num_threads()} hilos, {args.pasos} pasos")
 
     modelo.eval()
+    if args.guardar_modelo_del_curso:
+        # El formato que espera la celda «plan B» del notebook (sección 5).
+        destino = SALIDA / "modelo-del-curso.pt"
+        torch.save({"pesos": modelo.state_dict(),
+                    "vocabulario": tok.fichas,
+                    "config": {"CTX": CTX, "DIM": DIM, "CABEZAS": CABEZAS,
+                               "CAPAS": CAPAS, "pasos": args.pasos},
+                    "historial": {"paso": [h["paso"] for h in historial],
+                                  "train": [h["train"] for h in historial],
+                                  "val": [h["val"] for h in historial]},
+                    "muestras": muestras, "segundos": segundos,
+                    "entorno": {"torch": str(torch.__version__)}}, destino)
+        print(f"modelo del curso guardado en {destino} "
+              f"({destino.stat().st_size / 1e6:.1f} MB). No se rehicieron los "
+              "datos de las viz.")
+        return
     torch.save({"pesos": modelo.state_dict(), "historial": historial,
                 "muestras": muestras, "segundos": segundos}, CHECK)
     print(f"checkpoint guardado en {CHECK} (no se versiona: *.pt está en .gitignore)")

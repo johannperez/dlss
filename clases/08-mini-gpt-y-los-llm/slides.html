@@ -198,6 +198,90 @@
   </aside>
 </section>
 
+<!-- ======================= A. EL BLOQUE EN UNA HOJA (re-anclaje de la clase 7) ======================= -->
+<section>
+  <span class="marca">callback clase 7</span>
+  <h2>El bloque de la clase 7, en una hoja</h2>
+  <div class="comparacion">
+    <div style="font-size:.64em">
+      <p style="margin:.1em 0"><b class="c-modelo">① Attention</b> — <b>las fichas se pasan
+        información.</b> Cada una mira a las anteriores y se arma un promedio ponderado
+        (pesos que suman 1).</p>
+      <ul style="margin:.1em 0 .4em;font-size:.9em">
+        <li><b>Q, K, V:</b> tres lecturas de la <b>misma</b> <code>x</code>. Nada más.</li>
+        <li><b>Máscara:</b> una regla, no se aprende: <b>no se espía el futuro</b>.</li>
+        <li><b>Cabezas:</b> varias lecturas en paralelo, con otras perillas.</li>
+      </ul>
+      <p style="margin:.1em 0"><b class="c-modelo">② MLP</b> — <b>cada ficha piensa
+        sola</b>, con las rampas de la clase 2.</p>
+      <p style="margin:.1em 0"><b class="c-modelo">③ Residual</b> — el original del
+        expediente <b>sigue adjunto</b>: cada pieza <em>suma</em>, no reemplaza.</p>
+      <p style="margin:.1em 0"><b class="c-modelo">④ Norma</b> — plomería: que los
+        números no se disparen.</p>
+      <p style="margin:.4em 0 0;font-size:.9em">Y afuera del bloque, en la entrada:
+        <b>el sellito de posición</b> (sin él, bolsa de palabras).</p>
+    </div>
+    <div>
+      <pre style="font-size:.62em"><code class="language-python" data-trim>
+def forward(self, x):          # el bloque entero
+    x = x + self.atencion(self.norma1(x))  # ① ③ ④
+    return x + self.mlp(self.norma2(x))    # ② ③ ④
+      </code></pre>
+      <pre style="font-size:.62em"><code class="language-python" data-trim>
+# adentro de ①, las dos líneas que importan:
+puntajes = puntajes.masked_fill(mascara == 0, -inf)  # no se espía
+pesos = softmax(puntajes, dim=-1)        # filas que suman 1
+      </code></pre>
+    </div>
+  </div>
+  <div class="aha compacta">
+    <b>El bloque son dos líneas.</b> Hoy no lo volvemos a abrir: lo <b>apilamos</b>.
+  </div>
+  <aside class="notes">
+    <b>Este es el re-anclaje de la clase 7, y es a propósito.</b> La 7 metió seis ideas en
+    quince minutos; acá se ordenan en una sola hoja. No vuelvas a explicar Q/K/V ni la
+    fórmula: alcanza con «tres lecturas de la misma x».
+    <br><br>
+    Proyectá la celda del <code>BloqueTransformer</code> del notebook (sección 4) al lado
+    de esta slide y preguntá al aula: <b>«¿en qué línea está la máscara? ¿y el
+    residual?»</b>. Que lo encuentren ellos, en el chat. Si lo encuentran, la clase 7
+    quedó cerrada.
+    <br><br>
+    Frase de cierre: «la RNN se acuerda; attention mira. Y el bloque es mirar (①) y
+    pensar (②), con el original adjunto (③)».
+    (5 minutos.)
+  </aside>
+</section>
+
+<!-- ======================= 9. LA ARQUITECTURA ======================= -->
+<section>
+  <h2>La arquitectura completa</h2>
+  <div class="cadena">
+    <div class="paso"><b>fichas</b>«Señor pr» → [17, 45, ...]<span class="de">clase 6</span></div>
+    <div class="flecha">→</div>
+    <div class="paso"><b>embeddings</b>cada ficha, un lugar en el espacio<span class="de">clase 6</span></div>
+    <div class="flecha">+</div>
+    <div class="paso"><b>posición</b>una fila por lugar en la ventana<span class="de">clase 7</span></div>
+    <div class="flecha">→</div>
+    <div class="paso"><b>4 bloques transformer</b>attention + MLP + residual + norma<span class="de">clase 7</span></div>
+    <div class="flecha">→</div>
+    <div class="paso salida"><b>capa final</b>un puntaje por cada ficha del vocabulario<span class="de">lo único de hoy</span></div>
+  </div>
+  <div class="aha compacta">
+    <b>No hay ni una pieza nueva.</b> Todas las vimos. Hoy las apilamos y las prendemos.
+    Lo único que se agrega es la última caja: la que convierte «un vector por posición»
+    en «una probabilidad para cada ficha posible».
+  </div>
+  <aside class="notes">
+    Recorré la cadena con el dedo en la pantalla, nombrando la clase de la que sale cada
+    pieza. El efecto que buscás es «ah, ya sé todo esto».
+    <br><br>
+    Si alguien pregunta por qué 4 bloques y no 96: por tiempo de CPU, nada más. GPT-2
+    tiene 12 a 48. La arquitectura no cambia.
+    (1,5 minutos.)
+  </aside>
+</section>
+
 <!-- ======================= 6. EL OBJETIVO ======================= -->
 <section>
   <h2>El objetivo de entrenamiento más tonto del mundo</h2>
@@ -275,55 +359,67 @@
   </aside>
 </section>
 
-<!-- ======================= 9. LA ARQUITECTURA ======================= -->
+<!-- ======================= B. LAS CINCO PIEZAS EN PYTORCH ======================= -->
 <section>
-  <h2>La arquitectura completa</h2>
-  <div class="cadena">
-    <div class="paso"><b>fichas</b>«Señor pr» → [17, 45, ...]<span class="de">clase 6</span></div>
-    <div class="flecha">→</div>
-    <div class="paso"><b>embeddings</b>cada ficha, un lugar en el espacio<span class="de">clase 6</span></div>
-    <div class="flecha">+</div>
-    <div class="paso"><b>posición</b>una fila por lugar en la ventana<span class="de">clase 7</span></div>
-    <div class="flecha">→</div>
-    <div class="paso"><b>4 bloques transformer</b>attention + MLP + residual + norma<span class="de">clase 7</span></div>
-    <div class="flecha">→</div>
-    <div class="paso salida"><b>capa final</b>un puntaje por cada ficha del vocabulario<span class="de">lo único de hoy</span></div>
-  </div>
+  <span class="marca">la receta</span>
+  <h2>Las cinco piezas de <em>cualquier</em> modelo en PyTorch</h2>
+  <table class="traduccion" style="font-size:.7em">
+    <tr><th>Pieza</th><th>En el notebook de hoy</th><th>De dónde viene</th></tr>
+    <tr><td style="width:14%"><b>1. Datos</b></td><td><code>x</code> = una ventana · <code>y</code> = la misma ventana <b>corrida una ficha</b></td><td><b>Lo nuevo de hoy:</b> el dataset se arma solo</td></tr>
+    <tr><td style="width:14%"><b>2. Modelo</b></td><td><code>class MiniGPT(nn.Module)</code>: embeddings → 4 bloques → capa final</td><td>Clases 6 y 7</td></tr>
+    <tr><td style="width:14%"><b>3. Loss</b></td><td><code>F.cross_entropy(logits, y)</code></td><td>Clase 3 (cambia la fórmula, no la idea)</td></tr>
+    <tr><td style="width:14%"><b>4. Loop</b></td><td>predecir · comparar · <code>zero_grad</code> · <code>backward</code> · <code>step</code></td><td>Clase 4, <b>sin tocar una línea</b></td></tr>
+    <tr><td style="width:14%"><b>5. Generar</b></td><td>recortar a la ventana → puntajes → <code>softmax(·/T)</code> → sortear → pegar → repetir</td><td><b>Lo nuevo de hoy</b></td></tr>
+  </table>
   <div class="aha compacta">
-    <b>No hay ni una pieza nueva.</b> Todas las vimos. Hoy las apilamos y las prendemos.
-    Lo único que se agrega es la última caja: la que convierte «un vector por posición»
-    en «una probabilidad para cada ficha posible».
+    De las cinco piezas, <b>sólo la 1 y la 5 son nuevas</b>. Si mañana querés entrenar otra
+    cosa en PyTorch, cambiás la 1 y la 2 y el resto queda igual.
   </div>
   <aside class="notes">
-    Recorré la cadena con el dedo en la pantalla, nombrando la clase de la que sale cada
-    pieza. El efecto que buscás es «ah, ya sé todo esto».
+    <b>Ésta es la slide que vuelve.</b> Dejala a mano y volvé a ella cada vez que el
+    notebook pase de una pieza a la siguiente: «estamos en la 2», «ésta es la 4, la de la
+    clase 4». Es la respuesta a «¿cómo lo hago yo en PyTorch?».
     <br><br>
-    Si alguien pregunta por qué 4 bloques y no 96: por tiempo de CPU, nada más. GPT-2
-    tiene 12 a 48. La arquitectura no cambia.
+    No la expliques fila por fila ahora: leela en voz alta en 60 segundos y arrancá el
+    code-along. Cada fila se va a ver funcionando en el notebook.
     (1,5 minutos.)
   </aside>
 </section>
 
-<!-- ======================= 10. LA SALIDA ES UNA DISTRIBUCIÓN ======================= -->
+<!-- ======================= 12. A ENTRENAR, TODOS JUNTOS ======================= -->
 <section>
-  <span class="marca">callback dibujo</span>
-  <h3>Esto es lo que el modelo dibuja</h3>
-  <div class="viz-con-panel angosto">
-    <div class="viz-frame" style="padding:8px" id="caja-dist"></div>
-    <div class="panel" id="panel-dist"></div>
+  <span class="marca">code-along</span>
+  <h2>Bloque práctico 1: a entrenar, todos juntos</h2>
+  <div class="manos">
+    <b>Nadie escribe código hoy: leemos, apostamos y corremos.</b><br>
+    <b>1.</b> Yo comparto pantalla y corro una celda. <b>Ustedes corren la misma</b>, en su
+    notebook.<br>
+    <b>2.</b> Antes de las celdas marcadas <b>🎲</b>, apostamos qué va a salir.<br>
+    <b>3.</b> Cuando te salga, <b>👍 en el chat</b>. Si te da error, pegalo en el chat:
+    lo miramos entre todos.<br>
+    <b>4.</b> Saltamos las secciones marcadas <b>🏠 para casa</b>.
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> son las 12 fichas más probables después de
-    «El bloque del », según el modelo entrenado hoy. Suman 1 con todas las demás.
-    <b>Esta figura es la que el modelo dibuja, en cada posición del texto.</b></p>
+  <div class="ojo compacta">
+    <b>El entrenamiento tarda entre 4 y 7 minutos en CPU</b> (seis cronometrajes de los
+    mismos 1200 pasos: <b>243 a 432 s</b>). Si tu máquina es lenta, poné
+    <code>PLAN_CORTO = True</code> antes de arrancar (600 pasos). Y si se colgó o lo
+    cortaste: <b>la celda del plan B carga el modelo del curso</b> y seguís igual.
+  </div>
   <aside class="notes">
-    <b>La slide del callback grande.</b> Decila así:
-    «En la clase 1 dibujábamos una recta. En la 2, una curva con codos. En la 5, un mapa
-    sobre una imagen. Hoy dibujamos <i>esto</i>: una distribución de probabilidad, en
-    cada una de las posiciones del texto. Es la misma máquina de dibujar.»
+    <b>EL HITO QUE NO SE NEGOCIA: el entrenamiento arranca en el minuto 33.</b> Si vas
+    atrasado, sacá el bigrama y arrancalo.
     <br><br>
-    Los números son reales: salen de la corrida del curso (<code>entrenar-mini-gpt.py</code>,
-    el mismo modelo del notebook). En otra máquina pueden cambiar en los decimales.
-    (1,5 minutos.)
+    Ritmo del code-along: celda → «👍 en el chat» → siguiente. No esperes al último:
+    cuando hay unos dos tercios de pulgares, seguí, y decí «si te quedaste, corré todo
+    hasta acá con Entorno de ejecución → Ejecutar anteriores». Los errores pegados en el
+    chat se resuelven en voz alta: el error de uno le sirve a todos.
+    <br><br>
+    Antes de arrancar el entrenamiento, anticipalo: «esto va a escribir cosas que suenan a
+    debate parlamentario y no dicen nada. Ése es el punto».
+    <br><br>
+    <b>Ojo: las muestras de las slides que siguen son de la corrida del curso.</b> En otra
+    máquina salen otras. Proyectá <b>tu</b> corrida y usá las slides de respaldo.
+    (El code-along entero va de 0:15 a 0:33; esta slide cierra ese tramo.)
   </aside>
 </section>
 
@@ -354,60 +450,26 @@
   </aside>
 </section>
 
-<!-- ======================= 12. MANOS 1 ======================= -->
+<!-- ======================= 10. LA SALIDA ES UNA DISTRIBUCIÓN ======================= -->
 <section>
-  <span class="marca">a las manos</span>
-  <h2>Bloque práctico 1: a entrenar</h2>
-  <div class="manos">
-    <b>1.</b> Abrí <code>notebook.ipynb</code> y corré hasta la celda del entrenamiento
-    (sección 5).<br>
-    <b>2.</b> <b>Arrancala.</b><br>
-    <b>3.</b> <b>No la mires.</b> Seguí leyendo la sección 6 mientras corre.
+  <span class="marca">callback dibujo</span>
+  <h3>Esto es lo que el modelo dibuja</h3>
+  <div class="viz-con-panel angosto">
+    <div class="viz-frame" style="padding:8px" id="caja-dist"></div>
+    <div class="panel" id="panel-dist"></div>
   </div>
-  <div class="ojo compacta">
-    <b>Tarda entre 4 y 7 minutos en CPU.</b> Los mismos 1200 pasos se cronometraron
-    seis veces en la misma máquina de 4 hilos y dieron <b>243, 267, 280, 297, 360 y 432 s</b>:
-    la CPU se comparte con todo lo que tengas abierto —el navegador con las viz, sin ir
-    más lejos— y por eso el número casi se duplica. <b>Contá con siete minutos.</b>
-    Con GPU el notebook sube a 3000 pasos solo. Si te dio CPU, está perfecto: la clase
-    está calibrada para eso.
-  </div>
-  <p style="font-size:.85em">Cada tanto imprime una muestra de lo que escribiría.
-    <b>Volvé a mirarla tres o cuatro veces.</b> Es el momento más lindo del curso.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> son las 12 fichas más probables después de
+    «El bloque del », según el modelo entrenado hoy. Suman 1 con todas las demás.
+    <b>Esta figura es la que el modelo dibuja, en cada posición del texto.</b></p>
   <aside class="notes">
-    <b>ESTE ES EL HITO QUE NO SE NEGOCIA: el entrenamiento arranca en el minuto 20.</b>
-    Si a las 20 no arrancó, saltá lo que sea y arrancalo.
+    <b>La slide del callback grande.</b> Decila así:
+    «En la clase 1 dibujábamos una recta. En la 2, una curva con codos. En la 5, un mapa
+    sobre una imagen. Hoy dibujamos <i>esto</i>: una distribución de probabilidad, en
+    cada una de las posiciones del texto. Es la misma máquina de dibujar.»
     <br><br>
-    Escribí las tres consignas en el pizarrón, grandes. Después recorré el aula. Los
-    problemas, en orden de frecuencia: no corrieron el bootstrap; corrieron celdas
-    salteadas; Colab les dio CPU y se asustan. Está todo en las notas del docente §3.
-    <br><br>
-    Volvé al proyector con tu propia corrida en el paso 50, el 400 y el 800, y leé las
-    muestras en voz alta. Es teatro y hay que actuarlo.
-    <br><br>
-    <b>Ojo: las muestras de las slides 14 a 18 son de la corrida del curso.</b> En la misma
-    máquina y con las mismas versiones salen idénticas; en otra (otra CPU, otra versión de
-    torch, GPU) van a ser otras. Por eso conviene proyectar <b>tu</b> corrida. Si alguien
-    pregunta por qué su texto es distinto con la misma semilla, es un regalo: «misma semilla,
-    otra máquina, otro texto» es la clase 10.
-    (20 minutos.)
-  </aside>
-</section>
-
-<!-- ======================= 13. PAUSA ======================= -->
-<section class="pausa">
-  <h2>Pausa</h2>
-  <p class="minutos">10 minutos</p>
-  <p class="letra-chica">
-    El modelo entrena solo, no hace falta que lo mires. Estirá las piernas.
-    Si algo del bloque anterior no cerró, este es el momento de preguntarlo sin levantar
-    la mano delante de treinta personas.
-  </p>
-  <aside class="notes">
-    <b>No la negocies.</b> Si te la comés, la segunda mitad se atropella, y la segunda
-    mitad es la clase. Quedate cerca del escritorio: acá es donde se acercan los que no
-    preguntan en público.
-    (10 minutos.)
+    Los números son reales: salen de la corrida del curso (<code>entrenar-mini-gpt.py</code>,
+    el mismo modelo del notebook). En otra máquina pueden cambiar en los decimales.
+    (1,5 minutos.)
   </aside>
 </section>
 
@@ -429,7 +491,7 @@ ZpTB s ñU:iétAt9M.B7Tb:é;MF(4En0BomTJt—OAdMSld.hKRg(Ry079.r82d;éiCEO2sU5a,
   </aside>
 </section>
 
-<section>
+<section data-visibility="hidden" data-solo-completo>
   <span class="paso-etiq">paso 50 · corrida del curso</span>
   <h3>Aprendió que existen los espacios</h3>
   <div class="muestra"><span class="prompt">Señor presidente, </span>da0 ta. de de a dereto r do a lictentr eleben gren po lalo la die Labirenlecolo ue de r es lo cosetesio e soncis con endode en enacio r icalie larer cta sioracida nuantr prtue die deontiaren dir e varicir des men da ue Varo el lesay ude din era Ntrielassa har</div>
@@ -513,6 +575,23 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
   </aside>
 </section>
 
+<!-- ======================= 13. PAUSA ======================= -->
+<section class="pausa">
+  <h2>Pausa</h2>
+  <p class="minutos">10 minutos</p>
+  <p class="letra-chica">
+    Tu modelo ya está entrenado (o el plan B te cargó el del curso). Estirá las piernas.
+    Si algo del bloque anterior no cerró, este es el momento de preguntarlo sin levantar
+    la mano delante de treinta personas.
+  </p>
+  <aside class="notes">
+    <b>No la negocies.</b> Si te la comés, la segunda mitad se atropella, y la segunda
+    mitad es la clase. Quedate cerca del escritorio: acá es donde se acercan los que no
+    preguntan en público.
+    (10 minutos.)
+  </aside>
+</section>
+
 <!-- ======================= 19. LA CURVA ======================= -->
 <section>
   <h3>La curva de loss: la misma figura de la clase 4</h3>
@@ -549,97 +628,86 @@ Gracias, presidente. Antes de entrar en el fondo de la cuestion, Ahora bien, la<
     Ritmo del bloque: cada pieza es un mecanismo + una demostración, y
     <b>cada una termina en una frase que empieza con "por eso"</b>. Si una no termina
     en un "por eso", sacala.
-    (25 minutos para TODO el bloque, contando la curva de la slide 19. Los números
-    de cada slide de acá en adelante suman eso: si te pasás en una, sacale a otra.)
+    (35 minutos para TODO el bloque, en vivo sobre el notebook y en su orden:
+    temperatura, prompt, ventana, alucinación, letras. Cada pieza: apuesta → celda →
+    viz → frase con «por eso». Si te pasás en una, sacale a otra.)
   </aside>
 </section>
 
-<!-- ======================= 21. ALUCINA ======================= -->
+<!-- ======================= 28. LA TEMPERATURA ======================= -->
 <section>
-  <h2>1 · Por qué <span class="c-error">alucina</span></h2>
+  <h2>1 · Qué hace la <span class="c-parametro">temperatura</span></h2>
   <div class="intuicion">
-    La salida es <b>siempre</b> una distribución de probabilidad sobre la próxima ficha.
-    Siempre. Y adentro no hay nada que <b>detecte</b> que no sabe: si un asistente te dice
-    «no sé», eso también es una continuación que aprendió, no una verificación.
+    Antes de elegir la próxima ficha hay un <b>sorteo</b>. La temperatura decide qué tan
+    cargado está: a temperatura baja la distribución se <b>afila</b> y gana casi siempre
+    la primera; a temperatura alta se <b>aplana</b> y las opciones raras tienen chance.
   </div>
-  <p>Entonces, cuando le preguntás por algo que no está en el corpus, <b>no puede no
-    contestar</b>. Contesta lo plausible.</p>
-  <div class="aha compacta">
-    Y acá está lo que lo hace peligroso: <b>lo plausible y lo verdadero coinciden la
-    mayoría de las veces.</b> Por eso la excepción es tan difícil de detectar — y por eso
-    no sirve el olfato.
+  <p><b>Lo que casi todo el mundo entiende mal:</b> la temperatura
+    <span class="c-error">no cambia lo que el modelo sabe</span>.
+    El <b>orden</b> de las opciones no se mueve nunca. Sólo cambia cuánto se arriesga.</p>
+  <div class="ss compacta">
+    Un codificador humano cansado es de <b>alta temperatura</b>: más variable, menos
+    predecible. Uno rígido codifica siempre igual y pierde matices. Ni un extremo ni el
+    otro es «el correcto»: depende de la tarea. Y si tu instrumento tiene variabilidad,
+    <b>tenés que reportarla</b>.
   </div>
-  <p style="font-size:.82em"><b>No miente.</b> Mentir requiere saber la verdad. Produce
-    texto plausible, y eso es lo único que hace <em>siempre</em>: también cuando acierta.</p>
   <aside class="notes">
-    Decí la frase de «no miente» despacio. Es la que se llevan.
-    <br><br>
-    Si alguien dice «pero ChatGPT a veces dice que no sabe»: sí, lo entrenaron para
-    decirlo más seguido. Pero lo dice porque es una continuación plausible, no porque
-    chequeó algo: por eso puede decirlo cuando sí sabe, y no decirlo cuando inventa.
-    <br><br>
-    Ojo con la confusión típica: «alucina porque le faltan datos». No: alucina
-    <b>por diseño</b>. Con más datos alucina menos seguido, no cualitativamente distinto.
-    Eso se paga dos slides más adelante.
-    (2 minutos.)
+    <b>La apuesta va acá, antes de abrir la viz:</b>
+    «antes de que mueva el slider: ¿qué le va a pasar al ORDEN de las barras?»
+    Casi todos dicen «va a cambiar». No cambia nunca. Sin esa predicción fallida, la viz
+    es un dibujito lindo.
+    (1 minuto.)
   </aside>
 </section>
 
-<!-- ======================= 22. VIZ ALUCINA ======================= -->
+<!-- ======================= 29. VIZ TEMPERATURA ======================= -->
 <section>
   <span class="marca">viz</span>
-  <h3>Hacelo alucinar</h3>
-  <div class="viz-frame" data-alto="grande" style="height:600px">
-    <iframe src="viz/por-que-alucina.html" title="por qué alucina" loading="lazy"></iframe>
+  <h3>Movela</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/temperatura.html" title="la temperatura" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> alterná entre el primer prompt (un diputado que
-    existe) y el segundo (una que nos inventamos). Las dos distribuciones se ven iguales,
-    y las cuatro barras de seguridad miden lo mismo.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> las barras se aplastan pero <b>el orden no se
+    mueve</b>. Después apretá «5 veces con el mismo prompt»: en 0,0 son idénticas, en 1,2
+    son cinco textos distintos.</p>
   <aside class="notes">
-    <b>El momento clave de todo el módulo.</b> Hacelo así:
-    <br>1. Prompt 1 (existe). El modelo contesta. Mostrás el padrón: está.
-    <br>2. Prompt 2 (inventada). Contesta con la misma soltura. Mostrás el padrón: NO está.
-    <br>3. Pregunta, con pausa, y <b>no la contestes vos</b>:
-    <b>«¿cuál de las dos salidas se veía distinta?»</b> Que conteste alguien: ninguna.
+    Primero movés el slider vos, de 0,2 a 1,8 y de vuelta, señalando con el dedo que la
+    primera barra sigue siendo la primera.
     <br><br>
-    Después el prompt de la ley inventada (le pone título, tema y año) y el de la cita
-    (formato impecable, provincia que no existe). Ese último es letal con esta audiencia.
+    Después el botón de las cinco tiradas, a T=0 y a T=1,2. Ése es el botón que explica
+    la irreproducibilidad y es el que hay que apretar delante de todos.
     <br><br>
-    <b>Decí con precisión qué se ve:</b> en los tres casos falsos, la entidad falsa la
-    pusimos <b>nosotros</b> en el prompt. El modelo no la rechaza: <b>acepta la premisa
-    falsa</b> y la completa. Y la «cita» no la inventa: es una frase que está tal cual en el
-    corpus, recitada de memoria (por eso da 100 %) y pegada a una provincia que no existe.
-    La fabricación espontánea —que invente un nombre solo— es la de Nélida Falcón, y el
-    notebook la mide sobre 60 sorteos.
-    (4 minutos.)
+    Probá también el prompt «Quiero ser cl»: 100% en una sola ficha. Sirve para mostrar
+    que la distribución no siempre es ancha.
+    (3 minutos.)
   </aside>
 </section>
 
-<!-- ======================= 23. LA CONFIANZA ======================= -->
+<!-- ======================= 30. REPRODUCIBILIDAD ======================= -->
 <section>
-  <h3>La confianza no es conocimiento</h3>
-  <div class="comparacion contra">
-    <div><h4>El modelo sabe cosas</h4>
-      <p>De los <b>60</b> diputados que existen en el padrón, le acierta el bloque a
-        <span class="numerito">54</span> (en la corrida del curso). No es que no sepa
-        nada: sabe bastante.</p></div>
-    <div><h4>Y no podés saber cuál es cuál</h4>
-      <p>Mirando la salida, <b>no hay ninguna señal</b> que separe los 54 que sabe de los
-        6 que erra, ni de las diputadas que se inventa enteras.</p></div>
+  <h3>Por qué el mismo prompt da respuestas distintas</h3>
+  <div class="intuicion">
+    Porque hay un <b>sorteo</b>. No es que el modelo «cambió de opinión»: la distribución
+    fue la misma y salió otro número.
   </div>
-  <div class="aha">
-    Si no puedo distinguirlas mirando, entonces <b>no puedo usar la seguridad del modelo
-    como señal de verdad.</b> Ni la suya, ni la de un modelo muchísimo más grande.
+  <div class="comparacion contra">
+    <div><h4>Si querés reproducibilidad</h4>
+      <p>Temperatura <b>0</b> y semilla fija, si el proveedor te deja fijarla.
+        Y lo reportás.</p></div>
+    <div><h4>Y aun así no alcanza</h4>
+      <p>La versión del modelo cambia sin aviso, el hardware cambia, y hay no
+        determinismo en la infraestructura. <b>Un modelo cerrado no es reproducible.</b></p></div>
+  </div>
+  <div class="ss compacta">
+    Si en tu metodología usaste un LLM y no reportaste <b>modelo, versión, fecha,
+    temperatura y prompt exacto</b>, tu análisis no es reproducible. Anotalo: se cobra
+    entero en la clase 10.
   </div>
   <aside class="notes">
-    Esta slide ataja la sobrecorrección («entonces no sirve para nada»). El modelo sabe
-    cosas. El problema es epistemológico, no de capacidad: <b>no hay señal observable</b>.
-    (54 es el número de la corrida del curso; en otra máquina puede dar otro, por ejemplo
-    48. La lectura es la misma.)
+    Acá se siembra media clase 10. Decilo como un requisito, no como una recomendación.
     <br><br>
-    Analogía que funciona: el informante que nunca dice «no sé». Completa, redondea, arma
-    una historia coherente. No miente por maldad. Las técnicas de manejo son las mismas:
-    triangular, pedir fuentes, chequear contra otro registro.
+    Si preguntan si T=0 alcanza: ayuda mucho, no alcanza. Es una confusión frecuente y
+    está en el cuestionario.
     (1 minuto.)
   </aside>
 </section>
@@ -764,80 +832,92 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   </aside>
 </section>
 
-<!-- ======================= 28. LA TEMPERATURA ======================= -->
+<!-- ======================= 21. ALUCINA ======================= -->
 <section>
-  <h2>4 · Qué hace la <span class="c-parametro">temperatura</span></h2>
+  <h2>4 · Por qué <span class="c-error">alucina</span></h2>
   <div class="intuicion">
-    Antes de elegir la próxima ficha hay un <b>sorteo</b>. La temperatura decide qué tan
-    cargado está: a temperatura baja la distribución se <b>afila</b> y gana casi siempre
-    la primera; a temperatura alta se <b>aplana</b> y las opciones raras tienen chance.
+    La salida es <b>siempre</b> una distribución de probabilidad sobre la próxima ficha.
+    Siempre. Y adentro no hay nada que <b>detecte</b> que no sabe: si un asistente te dice
+    «no sé», eso también es una continuación que aprendió, no una verificación.
   </div>
-  <p><b>Lo que casi todo el mundo entiende mal:</b> la temperatura
-    <span class="c-error">no cambia lo que el modelo sabe</span>.
-    El <b>orden</b> de las opciones no se mueve nunca. Sólo cambia cuánto se arriesga.</p>
-  <div class="ss compacta">
-    Un codificador humano cansado es de <b>alta temperatura</b>: más variable, menos
-    predecible. Uno rígido codifica siempre igual y pierde matices. Ni un extremo ni el
-    otro es «el correcto»: depende de la tarea. Y si tu instrumento tiene variabilidad,
-    <b>tenés que reportarla</b>.
+  <p>Entonces, cuando le preguntás por algo que no está en el corpus, <b>no puede no
+    contestar</b>. Contesta lo plausible.</p>
+  <div class="aha compacta">
+    Y acá está lo que lo hace peligroso: <b>lo plausible y lo verdadero coinciden la
+    mayoría de las veces.</b> Por eso la excepción es tan difícil de detectar — y por eso
+    no sirve el olfato.
   </div>
+  <p style="font-size:.82em"><b>No miente.</b> Mentir requiere saber la verdad. Produce
+    texto plausible, y eso es lo único que hace <em>siempre</em>: también cuando acierta.</p>
   <aside class="notes">
-    <b>La apuesta va acá, antes de abrir la viz:</b>
-    «antes de que mueva el slider: ¿qué le va a pasar al ORDEN de las barras?»
-    Casi todos dicen «va a cambiar». No cambia nunca. Sin esa predicción fallida, la viz
-    es un dibujito lindo.
-    (1 minuto.)
+    Decí la frase de «no miente» despacio. Es la que se llevan.
+    <br><br>
+    Si alguien dice «pero ChatGPT a veces dice que no sabe»: sí, lo entrenaron para
+    decirlo más seguido. Pero lo dice porque es una continuación plausible, no porque
+    chequeó algo: por eso puede decirlo cuando sí sabe, y no decirlo cuando inventa.
+    <br><br>
+    Ojo con la confusión típica: «alucina porque le faltan datos». No: alucina
+    <b>por diseño</b>. Con más datos alucina menos seguido, no cualitativamente distinto.
+    Eso se paga en el cierre, en «qué no cambia con la escala».
+    (2 minutos.)
   </aside>
 </section>
 
-<!-- ======================= 29. VIZ TEMPERATURA ======================= -->
+<!-- ======================= 22. VIZ ALUCINA ======================= -->
 <section>
   <span class="marca">viz</span>
-  <h3>Movela</h3>
-  <div class="viz-frame" data-alto="grande">
-    <iframe src="viz/temperatura.html" title="la temperatura" loading="lazy"></iframe>
+  <h3>Hacelo alucinar</h3>
+  <div class="viz-frame" data-alto="grande" style="height:600px">
+    <iframe src="viz/por-que-alucina.html" title="por qué alucina" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> las barras se aplastan pero <b>el orden no se
-    mueve</b>. Después apretá «5 veces con el mismo prompt»: en 0,0 son idénticas, en 1,2
-    son cinco textos distintos.</p>
+  <p class="viz-pie"><b>Qué mirar:</b> alterná entre el primer prompt (un diputado que
+    existe) y el segundo (una que nos inventamos). Las dos distribuciones se ven iguales,
+    y las cuatro barras de seguridad miden lo mismo.</p>
   <aside class="notes">
-    Primero movés el slider vos, de 0,2 a 1,8 y de vuelta, señalando con el dedo que la
-    primera barra sigue siendo la primera.
+    <b>El momento clave de todo el módulo.</b> Hacelo así:
+    <br>1. Prompt 1 (existe). El modelo contesta. Mostrás el padrón: está.
+    <br>2. Prompt 2 (inventada). Contesta con la misma soltura. Mostrás el padrón: NO está.
+    <br>3. Pregunta, con pausa, y <b>no la contestes vos</b>:
+    <b>«¿cuál de las dos salidas se veía distinta?»</b> Que conteste alguien: ninguna.
     <br><br>
-    Después el botón de las cinco tiradas, a T=0 y a T=1,2. Ése es el botón que explica
-    la irreproducibilidad y es el que hay que apretar delante de todos.
+    Después el prompt de la ley inventada (le pone título, tema y año) y el de la cita
+    (formato impecable, provincia que no existe). Ese último es letal con esta audiencia.
     <br><br>
-    Probá también el prompt «Quiero ser cl»: 100% en una sola ficha. Sirve para mostrar
-    que la distribución no siempre es ancha.
-    (3 minutos.)
+    <b>Decí con precisión qué se ve:</b> en los tres casos falsos, la entidad falsa la
+    pusimos <b>nosotros</b> en el prompt. El modelo no la rechaza: <b>acepta la premisa
+    falsa</b> y la completa. Y la «cita» no la inventa: es una frase que está tal cual en el
+    corpus, recitada de memoria (por eso da 100 %) y pegada a una provincia que no existe.
+    La fabricación espontánea —que invente un nombre solo— es la de Nélida Falcón, y el
+    notebook la mide sobre 60 sorteos.
+    (4 minutos.)
   </aside>
 </section>
 
-<!-- ======================= 30. REPRODUCIBILIDAD ======================= -->
+<!-- ======================= 23. LA CONFIANZA ======================= -->
 <section>
-  <h3>Por qué el mismo prompt da respuestas distintas</h3>
-  <div class="intuicion">
-    Porque hay un <b>sorteo</b>. No es que el modelo «cambió de opinión»: la distribución
-    fue la misma y salió otro número.
-  </div>
+  <h3>La confianza no es conocimiento</h3>
   <div class="comparacion contra">
-    <div><h4>Si querés reproducibilidad</h4>
-      <p>Temperatura <b>0</b> y semilla fija, si el proveedor te deja fijarla.
-        Y lo reportás.</p></div>
-    <div><h4>Y aun así no alcanza</h4>
-      <p>La versión del modelo cambia sin aviso, el hardware cambia, y hay no
-        determinismo en la infraestructura. <b>Un modelo cerrado no es reproducible.</b></p></div>
+    <div><h4>El modelo sabe cosas</h4>
+      <p>De los <b>60</b> diputados que existen en el padrón, le acierta el bloque a
+        <span class="numerito">54</span> (en la corrida del curso). No es que no sepa
+        nada: sabe bastante.</p></div>
+    <div><h4>Y no podés saber cuál es cuál</h4>
+      <p>Mirando la salida, <b>no hay ninguna señal</b> que separe los 54 que sabe de los
+        6 que erra, ni de las diputadas que se inventa enteras.</p></div>
   </div>
-  <div class="ss compacta">
-    Si en tu metodología usaste un LLM y no reportaste <b>modelo, versión, fecha,
-    temperatura y prompt exacto</b>, tu análisis no es reproducible. Anotalo: se cobra
-    entero en la clase 10.
+  <div class="aha">
+    Si no puedo distinguirlas mirando, entonces <b>no puedo usar la seguridad del modelo
+    como señal de verdad.</b> Ni la suya, ni la de un modelo muchísimo más grande.
   </div>
   <aside class="notes">
-    Acá se siembra media clase 10. Decilo como un requisito, no como una recomendación.
+    Esta slide ataja la sobrecorrección («entonces no sirve para nada»). El modelo sabe
+    cosas. El problema es epistemológico, no de capacidad: <b>no hay señal observable</b>.
+    (54 es el número de la corrida del curso; en otra máquina puede dar otro, por ejemplo
+    48. La lectura es la misma.)
     <br><br>
-    Si preguntan si T=0 alcanza: ayuda mucho, no alcanza. Es una confusión frecuente y
-    está en el cuestionario.
+    Analogía que funciona: el informante que nunca dice «no sé». Completa, redondea, arma
+    una historia coherente. No miente por maldad. Las técnicas de manejo son las mismas:
+    triangular, pedir fuentes, chequear contra otro registro.
     (1 minuto.)
   </aside>
 </section>
@@ -901,7 +981,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
 </section>
 
 <!-- ======================= 33. CONTRADICE Y REPITE ======================= -->
-<section>
+<section data-visibility="hidden" data-solo-completo>
   <h2>6 y 7 · Por qué se <span class="c-error">contradice</span> y por qué <span class="c-error">repite</span></h2>
   <div class="comparacion">
     <div>
@@ -932,34 +1012,33 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   </aside>
 </section>
 
-<!-- ======================= 34. MANOS 2 ======================= -->
+<!-- ======================= 34. ROMPAN EL MODELO, EN PLENARIO ======================= -->
 <section>
-  <span class="marca">a las manos</span>
-  <h2>Bloque práctico 2: rompan el modelo</h2>
+  <span class="marca">entre todos</span>
+  <h2>Rompan el modelo (en plenario)</h2>
   <div class="manos">
-    <b>25 minutos, de a dos.</b> En el notebook, secciones 7 a 11:
-    <ol style="margin:.3em 0 0">
-      <li>Jugá con la <b>temperatura</b> y encontrá el techo de lo legible (TODO 2).</li>
-      <li>Generá 5 veces con el mismo prompt, a T=0,8 y a T=0,01 (TODO 3).</li>
-      <li><b>Rompé la ventana</b>: poné la pista a más de 128 fichas (TODO 4).</li>
-      <li>Hacelo <b>alucinar</b> y mirá la seguridad que le pone (TODO 5).</li>
-    </ol>
+    <b>2 minutos, cada uno solo:</b> escribí en el chat <b>un prompt</b> que creas que rompe
+    el modelo, y <b>qué temperatura</b> le pondrías.<br>
+    <b>Después, entre todos:</b> corro 4 o 5 en vivo, en la celda de la sección 11. Antes
+    de cada uno, <b>apostamos qué va a pasar</b>.
   </div>
   <div class="aha compacta">
-    <b>El desafío:</b> escribí <b>el prompt que rompe el modelo</b> de la manera más
-    interesante. Y después explicá <b>por qué</b> se rompió, en términos de las piezas
-    que vimos hoy. Esa segunda parte es la que vale.
+    Lo que vale no es romperlo: es decir <b>qué pieza lo explica</b>. ¿La distribución
+    que siempre contesta? ¿La ventana? ¿El sorteo? ¿Las fichas? ¿El condicionamiento del
+    prompt?
   </div>
   <aside class="notes">
-    Recorré y andá juntando los mejores hallazgos.
+    <b>Esto antes era 25 minutos de a dos.</b> Se pasó a plenario porque el aula pidió
+    resolver al menos parte de los ejercicios entre todos, y porque en una sub-sala sin
+    los conceptos asentados se espera al docente en vez de avanzar.
     <br><br>
-    <b>Guardá 5 minutos para la puesta en común</b> (minuto 95). Es la mejor parte y es
-    la que siempre se come el reloj. Elegí dos o tres pares y que cuenten qué rompieron
-    y por qué se rompió.
+    Elegí prompts <b>distintos entre sí</b> del chat (uno largo, uno con premisa falsa,
+    uno con T alta, uno que pide contar). Para cada uno: apuesta → correr → «¿qué pieza
+    lo explica?» → nombrá la fila de la tabla de traducción. Con cuatro alcanza.
     <br><br>
-    Si vas muy atrasado: bajá a 15 minutos y salteá el desafío. Queda como opcional,
-    antes de la clase 9, y no más de media hora.
-    (25 minutos.)
+    Los TODO 2 a 5 del notebook quedan como práctica para casa, opcional, antes de la
+    clase 9 (no más de media hora).
+    (15 minutos.)
   </aside>
 </section>
 
@@ -1025,7 +1104,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
 </section>
 
 <!-- ======================= 37. LA TABLA DE TRADUCCIÓN ======================= -->
-<section>
+<section data-visibility="hidden" data-solo-completo>
   <h3>La tabla de traducción, entera</h3>
   <table class="traduccion">
     <tr><th>Pieza del mini-GPT que entrenaste</th><th>Comportamiento de ChatGPT que explica</th></tr>
@@ -1049,7 +1128,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
 </section>
 
 <!-- ======================= 38. GLOSARIO ======================= -->
-<section>
+<section data-visibility="hidden" data-solo-completo>
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista">
     <li><b>token</b><span>ficha — el pedacito en el que se parte el texto; no es una palabra</span></li>
@@ -1181,6 +1260,12 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
     }
   });
 
+  // Deck ágil por defecto: las slides marcadas data-solo-completo se ocultan.
+  // Con ?completo en la URL (slides.html?completo) vuelve el deck entero.
+  if (new URLSearchParams(location.search).has('completo')) {
+    document.querySelectorAll('[data-solo-completo]').forEach(
+      (sl) => sl.removeAttribute('data-visibility'));
+  }
   Reveal.initialize({
     hash: true,
     slideNumber: 'c/t',
@@ -1202,7 +1287,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   const coma = (v) => Viz.num(v, 2).replace('.', ',');
 
   /* ================================================================
-     Slide 10 — la distribución que dibuja el modelo (datos reales)
+     Slide 14 (#caja-dist) — la distribución que dibuja el modelo (datos reales)
      ================================================================ */
   (function () {
     const pr = D.temperatura.prompts.find(p => p.id === 'bloque');
@@ -1245,7 +1330,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   })();
 
   /* ================================================================
-     Slide 11 — la curva de la cross-entropy
+     Slide 13 (#caja-ce) — la curva de la cross-entropy
      ================================================================ */
   (function () {
     const p = Viz.plano('#caja-ce', {
@@ -1282,7 +1367,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   })();
 
   /* ================================================================
-     Slide 19 — la curva de loss real del entrenamiento
+     Slide 20 (#caja-loss) — la curva de loss real del entrenamiento
      ================================================================ */
   (function () {
     const h = D.historial;
@@ -1338,7 +1423,7 @@ recorte = idx[:, -CTX:]      # sólo lo que entra en la ventana
   })();
 
   /* ================================================================
-     Slide 27 — el costo cuadrático de attention
+     Slide 28 (#caja-n2) — el costo cuadrático de attention
      ================================================================ */
   (function () {
     const p = Viz.plano('#caja-n2', {
