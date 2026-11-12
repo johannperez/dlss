@@ -253,11 +253,12 @@
   <span class="marca">viz · callback dibujo</span>
   <h3>Hacé clic en una palabra</h3>
   <div class="viz-frame" data-alto="medio" style="height:470px">
-    <iframe src="viz/attention-como-mesa.html" title="cada palabra arma su propio resumen" loading="lazy"></iframe>
+    <iframe src="viz/attention-como-mesa.html?simple" title="cada palabra arma su propio resumen" loading="lazy"></iframe>
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> hacé clic en «lo» y después en «si». Son mapas
     completamente distintos. <b>Cada palabra tiene el suyo.</b> Y los pesos no son
-    inventados: salen de un transformer entrenado sobre discursos de apertura reales.<br>
+    inventados: salen de un transformer entrenado sobre discursos de apertura reales.
+    Cómo se calculan lo vemos en un rato.<br>
     <b>Y seguimos dibujando:</b> en la clase 1 la máquina dibujaba una curva sobre unos
     puntos; en la 6, el mapa donde viven las palabras; hoy <b>cada palabra dibuja su propio
     mapa de a quién mira</b> — y ese mapa también tiene perillas.</p>
@@ -267,16 +268,39 @@
     curso.<br>
     Movelo vos primero, despacio, dos o tres palabras. Después dejá que lo toquen 2
     minutos. Pregunta al aula: «¿alguien encontró una palabra que mire a algo raro?».
-    Siempre aparece una, y es oro: sirve para la slide 34. (6 min con la exploración)
+    Siempre aparece una, y es oro: sirve para la slide 35. (5 min con la exploración)
     <br><b>El recorrido que conviene, en tres pasos</b> (está escrito entero en el pie de
     la viz suelta, que la slide no muestra):
     <b>(1)</b> así como abre: «lo» → «algo», dos palabras atrás, y le da el 100%.
-    <b>(2)</b> cambiá a la oración de la <b>enumeración</b> Y a la cabeza
-    <b>«bloque 2 · cabeza 1»</b>, hacé clic en la <b>«y»</b>: reparte 28% educación,
-    23% salud, 39% seguridad. Ése es el promedio ponderado en vivo. Ojo: si te quedás en
-    la cabeza 2, la «y» mira los artículos y no se ve nada.
-    <b>(3)</b> pasá a cualquier cabeza del <b>bloque 1</b>: los arcos desaparecen, se
-    miran a sí mismas. No está roto, es lo que aprendió.
+    <b>(2)</b> cambiá a la oración de la <b>enumeración</b> y hacé clic en la <b>«y»</b>:
+    reparte 28% educación, 23% salud, 39% seguridad. Ése es el promedio ponderado en vivo.
+    <br><b>Esta slide abre la viz en modo simple</b> (<code>?simple</code>): sin cabezas,
+    bloques, máscara ni heatmap, porque todavía no los presentamos. Por debajo, cada
+    oración usa la cabeza del bloque 2 que mejor muestra el reparto. Si alguien pregunta
+    «¿de qué modelo salen?»: «de uno chiquito, entrenado; cómo está armado por dentro lo
+    vemos en la segunda hora». Lo de que el bloque 1 se mira a sí mismo se cuenta en la
+    viz de cabezas (slide 25), cuando esas palabras ya existen.
+    <br><b>De dónde salen los números (para vos, no para decirlo acá).</b> Los genera
+    <code>medir-atencion.py</code>: un transformer de 2 bloques × 4 cabezas, vectores de
+    96, vocabulario de 3000 palabras, ~513 mil parámetros, entrenado 2000 pasos (~50 s en
+    CPU) a predecir la palabra siguiente en los discursos de apertura 1984-2019. Después
+    se le pasa cada oración y se guarda, sin retocar, la matriz
+    softmax(QKᵀ/√d) de cada cabeza: cada clic muestra <b>una fila</b> de esa matriz. En
+    la slide 18 se vuelve a esta viz para leerla con la fórmula.
+    <br><b>Ojo, honestidad:</b> los ejemplos están elegidos. Las cinco oraciones están
+    fijadas a mano en el script, y en modo simple cada oración usa la cabeza que mejor
+    muestra el reparto. Los números son reales, pero son la mejor vitrina, no un promedio.
+    Además el resultado es frágil: con otra versión de torch, o entrenando más, «lo»
+    deja de mirar a «algo». Por eso no se regeneran los datos (ver el docstring del
+    script). Si alguien pregunta «¿siempre sale tan lindo?», la respuesta es que no, y
+    eso se retoma en la advertencia de la slide 35.
+    <br><b>Si alguien hace clic en «salud» de la enumeración</b>: le da el 100% a la coma
+    (lo mismo «seguridad» y «justicia»; sólo la «y» reparte entre los sustantivos). Es
+    real, no un error. Para el modelo la coma es una palabra más, y en los transformers
+    grandes muchas cabezas descargan su atención en la puntuación y los separadores
+    cuando «no tienen nada que buscar» (Clark et al., 2019). Respuesta: «sí, mira la
+    coma, y eso es lo que aprendió; justamente por eso no hay que leer un mapa como una
+    explicación».
   </aside>
 </section>
 
@@ -413,27 +437,7 @@
   </aside>
 </section>
 
-<!-- ===================== 14. VIZ qkv ===================== -->
-<section>
-  <span class="marca">viz</span>
-  <h3>Movelo: las perillas cambian a quién mira cada palabra</h3>
-  <div class="viz-frame" data-alto="grande">
-    <iframe src="viz/qkv.html" title="query, key y value con flechas" loading="lazy"></iframe>
-  </div>
-  <p class="viz-pie"><b>Qué mirar:</b> con «lo» preguntando, girá <b>el aviso</b> hasta +75°:
-    «lo» deja de mirar a «algo» (baja a 9%) y se pone a mirar la coma (44%). <b>La
-    atención no está en el texto, se aprende.</b></p>
-  <aside class="notes">
-    Movelo vos. Es la slide donde se entiende que Q y K son parámetros. Frase:
-    «entrenar un transformer es, en buena medida, ajustar estas dos perillas hasta que
-    cada palabra encuentre a la que le sirve». (4 min)
-    Ojo: los vectores de esta viz son de juguete, puestos a mano; el botón vuelve a
-    «los valores de ejemplo», no a algo que haya aprendido un modelo. En +60° la coma y
-    la propia «lo» empatan (36% y 36%): por eso el recorrido pide +75°.
-  </aside>
-</section>
-
-<!-- ===================== 15. EL PUNTAJE ===================== -->
+<!-- ===================== 14. EL PUNTAJE ===================== -->
 <section>
   <h3>El puntaje es «cuánto apuntan para el mismo lado»</h3>
   <div style="display:grid;grid-template-columns:400px 320px minmax(0,1fr);gap:1.1rem;align-items:start">
@@ -452,42 +456,98 @@
   </aside>
 </section>
 
-<!-- ===================== 16. DE PUNTAJES A PORCENTAJES ===================== -->
+<!-- ===================== 15. DE PUNTAJES A PORCENTAJES ===================== -->
 <section>
   <h3>De puntajes a porcentajes: <span class="c-acento">softmax</span></h3>
   <div class="viz-con-panel">
     <div class="viz-frame" style="padding:8px" id="caja-softmax"></div>
     <div class="panel" id="panel-softmax"></div>
   </div>
-  <div class="intuicion compacta">
-    <strong>softmax = convertir puntajes en porcentajes que suman 100, exagerando un poco
-    al ganador.</strong> Eso es todo. Va a volver en la clase 8, con otro nombre:
-    <em>temperatura</em>.
+  <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.2rem;align-items:center;margin-top:.5rem">
+    <div style="font-size:1.05em">
+      $$\text{peso}_i=\frac{e^{\,s_i/\textcolor{#c2410c}{T}}}{\sum_j e^{\,s_j/\textcolor{#c2410c}{T}}}$$
+    </div>
+    <div class="intuicion compacta" style="margin:0">
+      <strong>softmax = puntajes → porcentajes que suman 100.</strong> La <em>e</em> hace
+      todo positivo y exagera al ganador; dividir por la suma hace que sume 1.
+      <b>T es la temperatura</b>: T chica afila (el ganador se lleva todo), T grande aplana
+      (reparto parejo). Vuelve en la clase 8.
+    </div>
   </div>
   <aside class="notes">
-    Nunca escribas la fórmula del softmax en esta clase. Con los cuatro números y las
-    barras alcanza. Si alguien pregunta «¿por qué exponencial?», la respuesta honesta es:
-    «porque hace que todo quede positivo y sume 1, y porque exagera al ganador de una
-    manera que se puede regular. Lo regulamos la clase que viene.» (3 min)
+    La fórmula está para que la <b>lean</b>, no para que la deriven. Leela en voz alta de
+    adentro hacia afuera: «a cada puntaje lo divido por T, le aplico e para que sea positivo
+    y para exagerar las diferencias, y divido por la suma de todos para que den 100».
+    Después mové la perilla de T: abajo de 1 afila, arriba de 1 aplana. Con T=1 es el
+    softmax «normal», el que usa attention.<br>
+    Si alguien pregunta «¿por qué e y no otra cosa?»: «porque hace todo positivo, es
+    cómoda de derivar y exagera al ganador de una manera que T regula».<br>
+    Anticipo: en la slide 17 el <b>÷ √d</b> es justamente una temperatura fija: achica los
+    puntajes para que el softmax no se afile de más. Y en la clase 8 esta misma T decide
+    qué tan arriesgado escribe el modelo. (3 min)
+  </aside>
+</section>
+
+<!-- ===================== 16. VIZ qkv ===================== -->
+<section>
+  <span class="marca">viz</span>
+  <h3>Movelo: las perillas cambian a quién mira cada palabra</h3>
+  <div class="viz-frame" data-alto="grande">
+    <iframe src="viz/qkv.html" title="query, key y value con flechas" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie"><b>Por qué girar:</b> las cajas W<sub>q</sub> y W<sub>k</sub> de
+    la slide 13 transforman cada flecha. En 2 dimensiones, lo más simple que puede hacer
+    una de esas cajas es <b>girar</b> todas las flechas el mismo ángulo. Y como el puntaje
+    es «cuánto apuntan para el mismo lado» (slide 14), girar los avisos cambia
+    <b>cuál queda alineado</b> con lo que busca «lo», y el softmax (slide 15) lo pasa a
+    porcentajes.<br>
+    <b>Qué mirar:</b> con «lo» preguntando, girá <b>el aviso</b> hasta +75°:
+    «lo» deja de mirar a «algo» (baja a 9%) y se pone a mirar la coma (44%). Las palabras
+    no cambiaron, cambió la perilla. <b>La atención no viene escrita en el texto: se
+    aprende.</b></p>
+  <aside class="notes">
+    Esta slide va <b>después</b> del producto punto y del softmax a propósito: girar una
+    flecha sólo tiene sentido si ya saben que el puntaje es la alineación. Arrancá
+    diciendo: «la caja W<sub>k</sub> de hace un rato, en 2D, es esta perilla de giro».
+    Si alguien pregunta «¿una matriz sólo gira?»: no. También estira, aplasta y cambia
+    de dimensión. Acá mostramos sólo el giro porque es lo que se puede dibujar.<br>
+    Movelo vos. Es la slide donde se entiende que W<sub>q</sub> y W<sub>k</sub> son parámetros (Q y K no: se recalculan para cada oración). Frase:
+    «entrenar un transformer es, en buena medida, ajustar estas dos perillas hasta que
+    cada palabra encuentre a la que le sirve». (4 min)
+    Ojo: los vectores de esta viz son de juguete, puestos a mano; el botón vuelve a
+    «los valores de ejemplo», no a algo que haya aprendido un modelo. En +60° la coma y
+    la propia «lo» empatan (36% y 36%): por eso el recorrido pide +75°.
   </aside>
 </section>
 
 <!-- ===================== 17. LA FÓRMULA ===================== -->
 <section>
   <h2>Recién ahora, la fórmula</h2>
-  <p style="text-align:center;font-size:1.35em;margin:.4em 0">
+  <p style="text-align:center;font-size:1.15em;margin:.1em 0">
     $$\text{Attention}(\textcolor{#e08519}{Q},\textcolor{#1f6fb5}{K},\textcolor{#2f8a56}{V})
     =\underbrace{\text{softmax}\!\left(\frac{\textcolor{#e08519}{Q}\textcolor{#1f6fb5}{K}^{\top}}{\sqrt{d}}\right)}_{\text{los pesos}}\;\textcolor{#2f8a56}{V}$$
   </p>
-  <ul style="font-size:.9em">
+  <ul style="font-size:.82em;margin-top:0">
     <li><b class="c-val">Q · </b><b class="c-modelo">Kᵀ</b> — cada búsqueda contra cada
       aviso. Salen todos los puntajes de una.</li>
-    <li><b>÷ √d</b> — lo único que no expliqué. Es un detalle de escala: con vectores
-      largos los puntajes se disparan, el softmax se satura y no aprende nada.
+    <li><b>÷ √d</b> — es una <b>temperatura fija</b> (la T de la slide 15): con vectores
+      largos los puntajes se disparan, el softmax se afila de más y no aprende nada.
       Se dividen y listo.</li>
     <li><b>softmax(...)</b> — puntajes → porcentajes que suman 100.</li>
     <li><b class="c-ok">· V</b> — el promedio ponderado de la slide 8, con esos porcentajes.</li>
   </ul>
+  <div class="cuenta" style="font-size:.6em;line-height:1.45;margin:.2em 0 .4em;padding:.4em .7em">
+    <b>Las formas</b> (la oración del notebook: 9 palabras × 100 números)<br>
+    X (9 × 100) · <b class="c-parametro">W<sub>q</sub> (100 × 16)</b> → <span class="c-val">Q (9 × 16)</span>
+    &nbsp;·&nbsp; igual con <b class="c-parametro">W<sub>k</sub></b> → <span class="c-modelo">K</span>
+    y <b class="c-parametro">W<sub>v</sub></b> → <span class="c-ok">V</span><br>
+    <span class="c-val">Q</span> · <span class="c-modelo">Kᵀ</span> → <b>(9 × 9)</b> → softmax
+    → los pesos: fila = quién pregunta, columna = a quién mira<br>
+    pesos (9 × 9) · <span class="c-ok">V (9 × 16)</span> → <b>salida (9 × 16)</b>: entran 9
+    palabras, salen 9, ya mezcladas<br>
+    <span class="c-parametro"><b>Perillas, sólo las tres W</b></span>: se aprenden una vez.
+    Q, K y V se recalculan para cada oración.
+  </div>
   <div class="aha compacta">
     No hay nada en esa línea que no hayamos hecho ya con flechas y con una cuenta de
     promedio. <strong>Eso es un transformer.</strong> Lo demás es apilarlo y darle datos.
@@ -495,11 +555,52 @@
   <aside class="notes">
     Frase: «esta es la ecuación más famosa de la década y la acaban de entender entera».
     Después de decirlo, esperá. Alguien se va a reír de alivio. (3 min)
-    Si preguntan «¿y esto es todo?», la respuesta es SÍ, y está en las notas del docente.
+    Si preguntan «¿y esto es todo?», la respuesta es SÍ, y está en las notas del docente.<br>
+    <b>La tira de formas</b> es el puente al bloque práctico: son exactamente los
+    <code>.shape</code> que van a imprimir en el notebook. Remarcá dos cosas: (1) la
+    matriz de pesos es <b>cuadrada</b>, palabras × palabras (es la que vuelven a ver en
+    la slide siguiente), y (2) las perillas son las <b>W</b>, no Q, K ni V: Q, K y V
+    cambian con cada oración, las W no. El 16 es una elección de diseño (cuántos números
+    usa para buscar y ofrecer); el modelo de la viz usa 24.
+</section>
+
+<!-- ===================== 18. VOLVER A LA VIZ DE LA SLIDE 9 ===================== -->
+<section>
+  <span class="marca">viz · otra vez</span>
+  <h3>Volvamos a la slide 9: ahora saben de dónde salen esos porcentajes</h3>
+  <div class="viz-frame" data-alto="medio" style="height:360px">
+    <iframe src="viz/attention-como-mesa.html?simple" title="cada palabra arma su propio resumen, leído con la fórmula" loading="lazy"></iframe>
+  </div>
+  <p class="viz-pie">Cada porcentaje es <b>una celda de
+    softmax(<span class="c-val">Q</span><span class="c-modelo">K</span>ᵀ/√d)</b>: la
+    <span class="c-val">búsqueda</span> de la palabra elegida contra el
+    <span class="c-modelo">aviso</span> de cada otra, y el softmax. El 100% de «lo» a
+    «algo» es una fila entera de la matriz. <b>Nadie escribió esos números:</b> el modelo
+    aprendió W<sub>q</sub> y W<sub>k</sub> adivinando la palabra siguiente en los discursos.</p>
+  <div class="ojo compacta">
+    <strong>Aclaración honesta:</strong> elegimos oraciones que muestran bien el mecanismo;
+    no todo el modelo da mapas tan claros. Y un mapa claro no <em>explica</em> lo que
+    hace el modelo: volvemos a eso al final.
+  </div>
+  <aside class="notes">
+    Es la misma viz de la slide 9, ahora leída con la fórmula. No la explores de nuevo:
+    hacé clic en «lo», señalá el 100% y decí «esto es una fila de lo que acabamos de
+    escribir». Después, la enumeración y la «y». (1 min, sacado de la exploración de la
+    slide 9.)<br>
+    Si preguntan por qué los arcos sólo van para atrás: «es la primera decisión de
+    diseño que vemos después de la pausa» (máscara causal, slide 22). Si preguntan qué
+    vector entra exactamente: el de «lo» <em>después</em> de pasar por una primera capa
+    del modelo, con la posición sumada, no el embedding pelado. Se entiende del todo con
+    el bloque completo (slide 28); acá alcanza con «la palabra, ya un poco mezclada con
+    su contexto».<br>
+    El recuadro anticipa la advertencia de la slide 35 (attention no es explicación).
+    Si alguien hace clic en «salud» y la ve mirando 100% a la coma, es el mejor ejemplo
+    del recuadro: es real, y la explicación está en las notas de la slide 9.
+    Detalle del modelo y de cómo se eligieron los ejemplos: en las notas de la slide 9.
   </aside>
 </section>
 
-<!-- ===================== 18. BLOQUE PRÁCTICO 1 ===================== -->
+<!-- ===================== 19. BLOQUE PRÁCTICO 1 ===================== -->
 <section>
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 1 — attention a mano</h2>
@@ -522,7 +623,7 @@
   </aside>
 </section>
 
-<!-- ===================== 19. PAUSA ===================== -->
+<!-- ===================== 20. PAUSA ===================== -->
 <section class="pausa">
   <h2>Pausa</h2>
   <p class="minutos">10 minutos</p>
@@ -536,7 +637,7 @@
   </aside>
 </section>
 
-<!-- ===================== 20. VOLVIMOS ===================== -->
+<!-- ===================== 21. VOLVIMOS ===================== -->
 <section>
   <h2>Volvimos: ¿les sumaron 1 las filas?</h2>
   <div class="comparacion contra">
@@ -563,7 +664,7 @@
   </aside>
 </section>
 
-<!-- ===================== 21. DECISIÓN 1: MÁSCARA ===================== -->
+<!-- ===================== 22. DECISIÓN 1: MÁSCARA ===================== -->
 <section>
   <h2>Decisión 1: no se espía el futuro</h2>
   <div class="comparacion">
@@ -591,26 +692,40 @@
   </aside>
 </section>
 
-<!-- ===================== 22. VIZ matriz ===================== -->
+<!-- ===================== 23. VIZ matriz ===================== -->
 <section>
   <span class="marca">viz</span>
   <h3>La matriz, y las dos sumas que hay que mirar</h3>
-  <div class="viz-frame" data-alto="medio" style="height:530px">
+  <div class="viz-frame" data-alto="medio" style="height:525px">
     <iframe src="viz/matriz-de-atencion.html" title="la matriz de atención" loading="lazy"></iframe>
   </div>
-  <p class="viz-pie"><b>Qué mirar:</b> la columna verde dice 1,00 en todas las filas; la
-    fila roja de abajo dice cualquier cosa. Después movés «hasta qué palabra escribió» y
-    <b>se ve crecer el triángulo</b>: cuando el modelo va por la palabra 5, sólo existen
-    5 columnas. Y por eso mismo, a las primeras palabras las puede mirar más gente: una
-    columna que suma mucho no es una palabra «importante».</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;font-size:.6em;line-height:1.4;margin:.35em 0 .2em">
+    <div><b>Cómo se lee (es un heatmap):</b> la matriz palabras × palabras de la slide 17,
+      pintada. <b>Fila</b> = la palabra que mira; <b>columna</b> = a quién mira; más oscuro =
+      más peso. Cada fila es un mapa de arcos de la slide 9.</div>
+    <div><b>Cabeza</b> = un juego de perillas W<sub>q</sub>, W<sub>k</sub>, W<sub>v</sub>: da
+      <em>un</em> mapa; hay 4 en paralelo (slide 24). <b>Bloque</b> = una pasada de attention;
+      hay 2 en fila y la 2 trabaja sobre lo que mezcló la 1 (slide 28).</div>
+  </div>
+  <p class="viz-pie" style="margin-top:.15em;font-size:.6em"><b>Qué mirar:</b> cada fila
+    suma 1,00 (columna verde); las columnas, cualquier cosa (fila roja). Movés «hasta qué
+    palabra escribió» y <b>crece el triángulo</b>: en la palabra 5 sólo existen 5 columnas.
+    Por eso a las primeras las mira más gente: una columna que suma mucho no es una
+    palabra «importante».</p>
   <aside class="notes">
+    <b>Antes de tocar nada, leé el recuadro de «cómo se lee»</b>: es la primera vez que la
+    viz muestra «bloque» y «cabeza» a la vista, y sin esas dos definiciones el selector
+    del panel es ruido. Una frase alcanza para cada una: «una cabeza es un juego de
+    perillas W, y da un mapa»; «un bloque es una pasada de attention; hay dos, una
+    después de la otra». No profundices: las cabezas se justifican en la slide 24 y el
+    bloque se arma entero en la 28.<br>
     Mostrá primero la matriz completa, después apagá la máscara y dejá que vean el
     cuadrado lleno, y volvé a prenderla. Después el slider de posición, despacio.
     Frase: «el triángulo no es un adorno, es el paso del tiempo». (5 min)
   </aside>
 </section>
 
-<!-- ===================== 23. DECISIÓN 2: CABEZAS ===================== -->
+<!-- ===================== 24. DECISIÓN 2: CABEZAS ===================== -->
 <section>
   <h2>Decisión 2: varias cabezas a la vez</h2>
   <p class="bajada">Una sola cabeza tiene que decidir una sola cosa: a quién mirar.
@@ -626,13 +741,15 @@
     después se juntan los resultados. Análisis de contenido multidimensional, tal cual.
   </div>
   <aside class="notes">
+    La palabra «cabeza» ya apareció en la slide 23 (un juego de perillas W, un mapa).
+    Acá se cuenta <b>por qué</b> conviene tener varias.<br>
     Ojo con la tentación de decir «cada cabeza aprende una función lingüística». Es una
     simplificación que circula mucho y que la literatura no sostiene. La viz siguiente
     existe justamente para vacunar contra eso. (2 min)
   </aside>
 </section>
 
-<!-- ===================== 24. VIZ cabezas ===================== -->
+<!-- ===================== 25. VIZ cabezas ===================== -->
 <section>
   <span class="marca">viz</span>
   <h3>Cuatro cabezas leyendo la misma oración</h3>
@@ -641,7 +758,8 @@
   </div>
   <p class="viz-pie"><b>Qué mirar:</b> los rótulos se calculan midiendo, no los
     escribimos nosotros — y a ninguna de las cuatro se la puede resumir en una regla
-    simple. Apretá «bloque 1»: las cuatro se vuelven la misma diagonal.</p>
+    simple. Apretá «bloque 1» (la primera pasada, slide 23): las cuatro se vuelven la
+    misma diagonal.</p>
   <aside class="notes">
     Frase clave, decila textual: «ninguna de estas cuatro se deja explicar en una
     frase. Y sin embargo el modelo funciona.» Si alguien pregunta por los modelos
@@ -653,7 +771,7 @@
   </aside>
 </section>
 
-<!-- ===================== 25. DECISIÓN 3: LA POSICIÓN ===================== -->
+<!-- ===================== 26. DECISIÓN 3: LA POSICIÓN ===================== -->
 <section>
   <h2>Decisión 3: attention sola <span class="c-error">no sabe qué viene antes</span></h2>
   <div class="comparacion">
@@ -687,7 +805,7 @@
   </aside>
 </section>
 
-<!-- ===================== 26. POSITIONAL ENCODING ===================== -->
+<!-- ===================== 27. POSITIONAL ENCODING ===================== -->
 <section>
   <h2>El sellito de posición</h2>
   <div class="fila-palabras" style="font-size:1.15em">
@@ -717,7 +835,7 @@
   </aside>
 </section>
 
-<!-- ===================== 27. EL BLOQUE COMPLETO ===================== -->
+<!-- ===================== 28. EL BLOQUE COMPLETO ===================== -->
 <section>
   <h2>El bloque completo: cuatro piezas</h2>
   <div class="viz-frame" style="padding:10px">
@@ -797,7 +915,7 @@
   </aside>
 </section>
 
-<!-- ===================== 28. LA CONEXIÓN RESIDUAL ===================== -->
+<!-- ===================== 29. LA CONEXIÓN RESIDUAL ===================== -->
 <section>
   <h2>La conexión residual: el original del expediente</h2>
   <div class="ss">
@@ -826,7 +944,7 @@
   </aside>
 </section>
 
-<!-- ===================== 29. EL MLP DE ADENTRO ===================== -->
+<!-- ===================== 30. EL MLP DE ADENTRO ===================== -->
 <section>
   <h2>El MLP de adentro: <span class="c-acento">viejos conocidos</span></h2>
   <pre><code class="language-python" data-trim>
@@ -848,7 +966,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 30. LA NORMALIZACIÓN ===================== -->
+<!-- ===================== 31. LA NORMALIZACIÓN ===================== -->
 <section>
   <h2>La normalización: plomería honesta</h2>
   <div class="comparacion">
@@ -873,7 +991,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 31. APILAR ===================== -->
+<!-- ===================== 32. APILAR ===================== -->
 <section>
   <h2>Y después… se apila el mismo bloque</h2>
   <div class="viz-frame" style="padding:10px">
@@ -908,7 +1026,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 32. LA SIEMBRA DE LA CLASE 5, CUMPLIDA ===================== -->
+<!-- ===================== 33. LA SIEMBRA DE LA CLASE 5, CUMPLIDA ===================== -->
 <section>
   <span class="marca">prometido en la clase 5, cumplido</span>
   <h3>Se llenaron las dos filas grises</h3>
@@ -924,7 +1042,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 33. BLOQUE PRÁCTICO 2 ===================== -->
+<!-- ===================== 34. BLOQUE PRÁCTICO 2 ===================== -->
 <section>
   <span class="marca">a las manos</span>
   <h2>Bloque práctico 2 — armar el bloque entero</h2>
@@ -949,7 +1067,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 34. LA ADVERTENCIA ===================== -->
+<!-- ===================== 35. LA ADVERTENCIA ===================== -->
 <section>
   <span class="marca">criterio</span>
   <h2>Un mapa hermoso, y una pregunta incómoda</h2>
@@ -988,7 +1106,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 35. EN TU INVESTIGACIÓN ===================== -->
+<!-- ===================== 36. EN TU INVESTIGACIÓN ===================== -->
 <section>
   <span class="marca">en tu investigación</span>
   <h2>Qué te llevás a tu investigación</h2>
@@ -1012,7 +1130,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 36. QUÉ TE LLEVÁS ===================== -->
+<!-- ===================== 37. QUÉ TE LLEVÁS ===================== -->
 <section>
   <h2>Las tres cosas de hoy</h2>
   <div class="tarjetas">
@@ -1038,7 +1156,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 37. GLOSARIO ===================== -->
+<!-- ===================== 38. GLOSARIO ===================== -->
 <section>
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista glosario-dos">
@@ -1062,7 +1180,7 @@ self.mlp = nn.Sequential(
   </aside>
 </section>
 
-<!-- ===================== 38. PUENTE ===================== -->
+<!-- ===================== 39. PUENTE ===================== -->
 <section class="portada">
   <p class="num-clase">La que viene</p>
   <h1>Clase 8: un mini-GPT propio, y la traducción a ChatGPT</h1>
@@ -1207,7 +1325,7 @@ self.mlp = nn.Sequential(
     });
   })();
 
-  /* ---------- slide 15: el producto punto como alineación ------------------ */
+  /* ---------- slide 14: el producto punto como alineación ------------------ */
   (function () {
     let ang = 25;   // grados entre la búsqueda y el aviso
     // OJO: `cuadrado` sólo funciona si NO le pasás `alto` (si se lo pasás, manda
@@ -1261,19 +1379,19 @@ self.mlp = nn.Sequential(
     ctl.disparar();
   })();
 
-  /* ---------- slide 16: softmax con cuatro puntajes ------------------------ */
+  /* ---------- slide 15: softmax con cuatro puntajes y temperatura --------- */
   (function () {
     // Puntajes elegidos para que el reparto quede parejo con la explicación oral.
     // Los porcentajes NO están escritos a mano: los calcula el softmax de acá abajo.
     const NOMBRES = ['proyecto', 'sistema', 'ministro', 'recinto'];
     const BASE = [2.0, 0.6, -0.5, 0.8];
-    let escala = 1;
+    let T = 1;          // temperatura: los puntajes se DIVIDEN por T
     const p = nuevoPlano('#caja-softmax', {
       xmin: 0, xmax: 1, ymin: 0, ymax: 1, alto: 330,
       titulo: 'los cuatro puntajes, antes y después'
     }, 'los cuatro puntajes, antes y después del softmax');
     function repartir() {
-      const s = BASE.map(v => v * escala);
+      const s = BASE.map(v => v / T);
       const m = Math.max.apply(null, s);
       const e = s.map(v => Math.exp(v - m));
       const t = e.reduce((a, b) => a + b, 0);
@@ -1283,7 +1401,7 @@ self.mlp = nn.Sequential(
       p.fondo();
       const r = repartir();
       const W = p.R - p.L, H = p.B - p.T;
-      p.textoPx(p.L + 4, p.T + 2, 'puntajes crudos', { color: 'tinta3', tam: 12, peso: '700' });
+      p.textoPx(p.L + 4, p.T + 2, 'puntajes ÷ T', { color: 'tinta3', tam: 12, peso: '700' });
       p.textoPx(p.L + W / 2 + 20, p.T + 2, 'después del softmax', { color: 'acento', tam: 12, peso: '700' });
       for (let i = 0; i < 4; i++) {
         const y = p.T + 42 + i * (H - 60) / 4;
@@ -1309,28 +1427,29 @@ self.mlp = nn.Sequential(
         { color: 'ok', tam: 13, peso: '700', base: 'bottom' });
     });
     const ctl = Viz.controles('#panel-softmax', [
-      { tipo: 'titulo', texto: 'Una perilla que vuelve en la clase 8' },
-      { tipo: 'slider', id: 'escala', etiqueta: 'qué tan marcada la diferencia',
-        sub: 'multiplicar todos los puntajes',
-        min: 0, max: 3, paso: 0.05, valor: 1, decimales: 2, color: 'acento' },
+      { tipo: 'titulo', texto: 'La perilla de temperatura' },
+      { tipo: 'slider', id: 'T', etiqueta: 'temperatura T',
+        sub: 'dividir todos los puntajes por T',
+        min: 0.25, max: 5, paso: 0.05, valor: 1, decimales: 2, color: 'acento' },
       { tipo: 'texto', id: 'lectura', html: '' }
     ], (v) => {
-      escala = v.escala;
+      T = v.T;
       const r = repartir();
       p.canvas.setAttribute('aria-label', 'Puntajes crudos y porcentajes después del ' +
         'softmax: ' + NOMBRES.map((nm, i) => nm + ' ' + Viz.num(r.s[i], 1) + ' → ' +
         Math.round(r.w[i] * 100) + '%').join('; ') + '.');
       ctl.texto('lectura',
-        escala < 0.25 ? 'Con los puntajes casi apagados, el reparto queda <b>parejo</b>: mira a todas por igual.'
-        : escala > 1.9 ? 'Con los puntajes exagerados, <b>el ganador se lleva casi todo</b>. Eso es una distribución afilada.'
-        : 'El ganador se lleva <b>' + Math.round(Math.max.apply(null, r.w) * 100) + '%</b>. ' +
-          'Movés la perilla y mirás cómo se afila o se aplana el reparto.');
+        T > 3.5 ? 'Temperatura alta: los puntajes se achican y el reparto queda casi <b>parejo</b>.'
+        : T < 0.55 ? 'Temperatura baja: los puntajes se agrandan y <b>el ganador se lleva casi todo</b>. Distribución afilada.'
+        : 'Con T = ' + Viz.num(T, 2) + ' el ganador se lleva <b>' +
+          Math.round(Math.max.apply(null, r.w) * 100) + '%</b>. ' +
+          (Math.abs(T - 1) < 0.03 ? 'T = 1 es el softmax de attention.' : 'Movés T y mirás cómo se afila o se aplana.'));
       p.redibujar();
     });
     ctl.disparar();
   })();
 
-  /* ---------- slide 31: la pila de seis bloques ---------------------------- */
+  /* ---------- slide 32: la pila de seis bloques ---------------------------- */
   (function () {
     const svg = document.getElementById('pila');
     if (!svg) return;

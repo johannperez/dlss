@@ -104,6 +104,17 @@ const D = (typeof DATOS_ATENCION !== 'undefined') ? DATOS_ATENCION : null;
 
 const estado = { oracion: 0, capa: 1, cabeza: 1, mascara: true, todas: false, sel: null };
 
+/* MODO SIMPLE (`?simple`): es el que abre la slide 9. Ahí todavía no se habló de
+   cabezas, bloques, máscara ni de la matriz, así que esos controles no aparecen y la
+   cabeza se elige sola, una por oración: la que mejor muestra el reparto. La versión
+   suelta, sin `?simple`, conserva todos los controles. */
+const SIMPLE = new URLSearchParams(location.search).has('simple');
+const CABEZA_SIMPLE = { 3: [1, 0] };          // enumeración → bloque 2 · cabeza 1
+function cabezaSimple(i) {
+  const c = CABEZA_SIMPLE[i] || [1, 1];       // el resto → bloque 2 · cabeza 2
+  estado.capa = c[0]; estado.cabeza = c[1];
+}
+
 const nombresOracion = D.oraciones.map((o, i) => ({ valor: String(i), texto: o.fenomeno }));
 const nombresCabeza = [];
 D.cabezas.forEach((fila, c) => fila.forEach((h, i) => {
@@ -296,23 +307,28 @@ function dibujarBarra() {
 const ctl = Viz.controles('#panel', [
   { tipo: 'titulo', texto: 'Qué mirar' },
   { tipo: 'select', id: 'oracion', etiqueta: 'oración (todas del corpus real)',
-    opciones: nombresOracion, valor: '0' },
+    opciones: nombresOracion, valor: '0' }
+].concat(SIMPLE ? [] : [
   { tipo: 'select', id: 'cabeza', etiqueta: 'qué cabeza mira',
     opciones: nombresCabeza, valor: '1:1' },
   { tipo: 'checkbox', id: 'mascara',
     etiqueta: 'máscara causal (no espiar el futuro)', valor: true },
   { tipo: 'checkbox', id: 'todas', etiqueta: 'mostrar todas las palabras a la vez',
-    valor: false },
-  { tipo: 'texto', id: 'lectura', html: '' },
+    valor: false }
+]).concat([
+  { tipo: 'texto', id: 'lectura', html: '' }
+], SIMPLE ? [] : [
   { tipo: 'texto', id: 'quehace', html: '' }
-], (v, id) => {
-  if (id === 'oracion') { estado.oracion = +v.oracion; estado.sel = null; }
+]), (v, id) => {
+  if (id === 'oracion') {
+    estado.oracion = +v.oracion; estado.sel = null;
+    if (SIMPLE) cabezaSimple(estado.oracion);
+  }
   if (id === 'cabeza') {
     const p = v.cabeza.split(':');
     estado.capa = +p[0]; estado.cabeza = +p[1];
   }
-  estado.mascara = v.mascara;
-  estado.todas = v.todas;
+  if (!SIMPLE) { estado.mascara = v.mascara; estado.todas = v.todas; }
   actualizar();
 });
 
@@ -321,7 +337,7 @@ function actualizar() {
   dibujarBarra();
 
   const info = infoCabeza();
-  ctl.texto('quehace',
+  if (!SIMPLE) ctl.texto('quehace',
     '<b>Esta cabeza:</b> ' + info.titulo + '.<br>' +
     '<span style="font-size:.92em">' + info.detalle + '.</span>');
 

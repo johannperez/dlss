@@ -45,12 +45,12 @@
 |---|---|---|---|---|
 | **0:00** | 10 | Gancho | 1-5 | La oración, el silencio, la votación a mano alzada. |
 | **0:10** | 20 | Attention a mano | 6-9 | El mecanismo sin fórmulas + la cuenta en el pizarrón + la viz central. |
-| **0:30** | 15 | Q, K, V | 10-17 | El aviso clasificado, el puntaje, softmax, y recién ahí la fórmula. |
-| **0:45** | 15 | **Manos 1** | 18 | Notebook, secciones 2 y 3. |
-| **1:00** | 10 | **PAUSA** | 19 | **No se toca.** |
-| **1:10** | 9 | Las tres decisiones | 20-26 | Máscara, cabezas, posición. Dos viz. |
-| **1:19** | 6 | El bloque completo | 27-32 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
-| **1:25** | 20 | **Manos 2** | 33 | Notebook, secciones 4 a 8, de a dos. |
+| **0:30** | 15 | Q, K, V | 10-18 | El aviso clasificado, el puntaje, softmax, la fórmula, y volver a la viz de la slide 9 para leerla con la fórmula. |
+| **0:45** | 15 | **Manos 1** | 19 | Notebook, secciones 2 y 3. |
+| **1:00** | 10 | **PAUSA** | 20 | **No se toca.** |
+| **1:10** | 9 | Las tres decisiones | 21-27 | Máscara, cabezas, posición. Dos viz. |
+| **1:19** | 6 | El bloque completo | 28-33 | Diagrama, residual, MLP, norm, apilar, y la tabla de la clase 5. |
+| **1:25** | 20 | **Manos 2** | 34 | Notebook, secciones 4 a 8, de a dos. |
 | **1:45** | 15 | Cierre | 34-38 | La advertencia, «en tu investigación», las tres ideas, el glosario y el puente. |
 
 **Suma 120 exactos** y coincide con el plan minuto a minuto de `PROGRAMA.md`. Los quince
@@ -58,10 +58,10 @@ minutos de 1:10 a 1:25 son para **trece slides**, así que van rápido y en bloq
 tramo que hay que ensayar. Si te comés cinco minutos ahí, se los sacás al bloque práctico
 2 (sección 6), nunca al cierre.
 
-> **Los números de slide de esta tabla son los del `slides.html`** (38 en total, los que
+> **Los números de slide de esta tabla son los del `slides.html`** (39 en total, los que
 > muestra el contador abajo a la derecha), no los de la especificación, que iba hasta 35.
-> La diferencia son tres slides que se agregaron: la de la pausa (19), la tabla de la
-> clase 5 (32) y «las tres cosas de hoy» (36).
+> La diferencia son cuatro slides que se agregaron: la vuelta a la viz de la slide 9
+> (18), la de la pausa (20), la tabla de la clase 5 (33) y «las tres cosas de hoy» (37).
 
 **La puesta en común opcional.** La clase 7 es una de las tres (4, 7 y 10) que se pueden
 abrir con diez minutos de puesta en común (`recursos/GUIA-DEL-DOCENTE.md` §3): dos o tres
@@ -97,7 +97,7 @@ clase. Repetilo en voz alta: «no releyó. **Saltó.**»
 **Si alguien vota D en serio** (no en chiste): es oro. Preguntale por qué: casi siempre
 es «el sustantivo más cercano». Es un error comprensible, y justamente por eso sirve: en
 «el oficialismo **lo** aprobó», «lo» no puede ser el oficialismo (el que aprueba no es lo
-aprobado). El salto no es «al más cercano»: es al que tiene sentido. Usalo en la slide 34:
+aprobado). El salto no es «al más cercano»: es al que tiene sentido. Usalo en la slide 35:
 «un modelo que mirara siempre lo más cercano se equivocaría acá; uno que salta al
 sustantivo que tiene sentido, no. Que salte bien tampoco prueba que haya entendido».
 
@@ -113,16 +113,16 @@ está ganada.
 ### Minuto 26 — slide 9, la viz central
 **Preguntá:** «¿Alguien encontró una palabra que mire a algo raro?»
 **Siempre aparece una.** Anotala en el pizarrón con el nombre de quien la encontró y
-volvé a ella en la slide 34. Es el mejor material que vas a tener para la advertencia
+volvé a ella en la slide 35. Es el mejor material que vas a tener para la advertencia
 final, porque es de ellos.
 
-### Minuto 62 — slide 20, «volvimos»
+### Minuto 62 — slide 21, «volvimos»
 **Preguntá:** «¿Les sumaron 1 las filas?»
 **Van a decir:** «sí», y alguno «a mí me dio 0,99».
 **Qué hacés:** «Eso es redondeo al imprimir, no un bug. Y ahora la pregunta que importa:
 ¿cuánto sumaron las columnas?» Silencio. «Cualquier cosa. Y está bien.»
 
-### Minuto 106 — slide 34, la advertencia
+### Minuto 106 — slide 35, la advertencia
 **Preguntá:** «¿Qué evidencia pedirían ustedes para afirmar que el modelo **usó** esa
 palabra?»
 **Van a decir, en este orden:** «que la mire mucho» (no alcanza), «que se repita en
@@ -141,10 +141,10 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 | **«Attention es un tipo de memoria»** | La asimilan a la RNN de la clase 6. | Es lo contrario: **no hay ningún estado que se arrastre**. Todas las palabras se miran en paralelo, de una. Por eso se entrena rápido en GPU, y por eso hay una ventana de contexto finita (clase 8). Frase: «la RNN se acuerda; attention mira». |
 | **Confundir filas con columnas** | Leen «esta palabra fue mirada» cuando dice «esta palabra miró». | La convención dicha en voz alta **cada vez**: **fila = quien pregunta**. Y `viz/matriz-de-atencion.html`, con la columna verde de sumas 1,00 y la fila roja de sumas cualquiera. Es la confusión número uno de la clase. |
 | **«Q, K y V son tres cosas distintas»** | Creen que son tres entradas separadas. | Slide 13: las tres cajas salen del **mismo** embedding. Y la celda del notebook donde `Q = X @ W_q`, `K = X @ W_k`, `V = X @ W_v`: la misma `X` tres veces. Señalá la `X`. |
-| **Miedo al softmax** | La palabra los bloquea y dejan de escuchar. | «Convertir puntajes en porcentajes que suman 100.» Slide 16, con los cuatro números y las barras. **Nunca escribas la fórmula del softmax en esta clase**: se escribe en la 8, con la temperatura. |
+| **Miedo al softmax** | La palabra los bloquea y dejan de escuchar. | «Convertir puntajes en porcentajes que suman 100.» Slide 15, con los cuatro números y las barras. La fórmula está en la slide, con la temperatura T: **se lee de adentro hacia afuera** (dividir por T, aplicar e, dividir por la suma), no se deriva. En la 8, la temperatura vuelve como reencuentro. |
 | **«La máscara es para ahorrar cómputo»** | Confunden su propósito. | Es para **no hacer trampa**. Analogía: el examen donde ves la hoja del compañero. Sacás diez y no aprendiste nada. |
 | **«Cada cabeza tiene un rol lingüístico claro»** | Sobreinterpretan; lo leyeron en algún lado. | `viz/cabezas.html`. Los rótulos de esa viz se **calculan midiendo** (sobre las cinco oraciones de la viz, no sobre el corpus), y en el bloque 2 las cuatro quedan rotuladas «no se deja resumir en una regla simple». En modelos grandes la literatura encuentra unas pocas cabezas especializadas y muchas que no se dejan resumir o se pueden podar (Voita et al., 2019; Clark et al., 2019). |
-| **«El mapa explica la decisión»** | La confusión más importante para esta audiencia. | Slide 34. El argumento: se pueden construir mapas muy distintos que producen **casi la misma** salida (Jain & Wallace 2019, en modelos con RNN; en un transformer es peor, porque todo se mezcla entre capas). Si el mapa no determina la salida, no la explica. Y ni siquiera dice «cuánto llegó» de cada palabra: el peso se aplica al *value* de esa capa, que ya es una mezcla. |
+| **«El mapa explica la decisión»** | La confusión más importante para esta audiencia. | Slide 35. El argumento: se pueden construir mapas muy distintos que producen **casi la misma** salida (Jain & Wallace 2019, en modelos con RNN; en un transformer es peor, porque todo se mezcla entre capas). Si el mapa no determina la salida, no la explica. Y ni siquiera dice «cuánto llegó» de cada palabra: el peso se aplica al *value* de esa capa, que ya es una mezcla. |
 | **Perderse en las dimensiones** | Errores de forma constantes en el notebook. | La disciplina de `print(algo.shape)` **enseñada como método**, no como accidente. La tabla de formas está al final del notebook: proyectala durante el bloque práctico 2. |
 | **«¿Y esto es todo? ¿No hay nada más?»** | Decepción, o incredulidad. | **Sí, esto es todo.** Y contestarlo así es importante: la sensación de que «tiene que haber algo más escondido» es la que sostiene la mistificación de la IA. Lo que hay de más es **escala y datos**, no una idea oculta. |
 
@@ -180,14 +180,14 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 
 **Se recorta en este orden. Lo de más arriba se saca primero.**
 
-1. **Slide 32 (`supuestos-de-arquitectura.html`).** Es un gesto de continuidad muy lindo
+1. **Slide 33 (`supuestos-de-arquitectura.html`).** Es un gesto de continuidad muy lindo
    y cuesta 2 minutos. Se muestra 20 segundos diciendo «acá está la tabla de la clase 5
    con las dos filas que estaban grises, abiertas» y se pasa. O se saca entera.
-2. **Slide 30 (la normalización).** Se resume en una frase al pasar: «hay una pieza más
+2. **Slide 31 (la normalización).** Se resume en una frase al pasar: «hay una pieza más
    que reescala los números para que no se disparen. Es plomería, importa que esté.»
-3. **Slide 23 + viz de cabezas (24) → dejá sólo la viz.** La idea de multi-head se dice
+3. **Slide 24 + viz de cabezas (25) → dejá sólo la viz.** La idea de multi-head se dice
    en 40 segundos mientras la viz está en pantalla.
-4. **Slide 15 (el producto punto).** Se puede decir sin la viz: «producto punto es cuánto
+4. **Slide 14 (el producto punto).** Se puede decir sin la viz: «producto punto es cuánto
    apuntan dos flechas para el mismo lado».
 5. **El bloque práctico 2 se acorta a 12 minutos** y se les pide que hagan sólo las
    secciones 4 y 8 del notebook (máscara y bloque completo), dejando multi-head y
@@ -203,7 +203,7 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
   trabajo— queda en tres minutos apurados.
 - **La slide 8 (la cuenta a mano).** Es la única aritmética explícita de la clase y es la
   que sostiene todo lo demás. Sin ella, la fórmula de la slide 17 es magia.
-- **Las slides 34-35 (attention no es explicación).** Es el `[EN TU INVESTIGACIÓN]` de la
+- **Las slides 35-36 (attention no es explicación).** Es el `[EN TU INVESTIGACIÓN]` de la
   clase y lo más útil que se llevan. Si tenés que elegir entre terminar el bloque completo y hacer
   la advertencia, hacé la advertencia.
 - **El puente a la clase 8.** Treinta segundos, y son los que hacen que vuelvan.
@@ -212,14 +212,14 @@ respuesta: una **intervención**, no una inspección. Si no sale sola, guialos:
 
 ## 7. Si vas adelantado
 
-- **Hacé la demostración de la bolsa de palabras en vivo**, en la slide 25: escribí las
+- **Hacé la demostración de la bolsa de palabras en vivo**, en la slide 26: escribí las
   dos oraciones («la comisión rechazó al ministro» / «el ministro rechazó a la comisión»)
   y preguntá qué le pasaría a la matriz de atención si permutaras las palabras. Después
   corré la celda del notebook que lo demuestra, proyectada.
 - **Abrí `viz/attention-como-mesa.html` y pediles oraciones.** Están las cinco del corpus;
   recorré la de la enumeración («la educación, la salud, la seguridad y la justicia») y
   preguntá qué esperan que mire cada sustantivo. Se arma una discusión buena.
-- **Detenete en el recuadro del costo cuadrático de la slide 31** en vez de pasarlo.
+- **Detenete en el recuadro del costo cuadrático de la slide 32** en vez de pasarlo.
   «Si cada palabra mira a todas, con 100 palabras hay 10.000 pares; con 1.000, un millón.
   Por eso existe la ventana de contexto y por eso cuesta plata que sea grande.» Es la
   puerta directa a la clase 8 y es lo que necesitan para el **ítem 9 del cuestionario**;

@@ -67,7 +67,7 @@ Machine Learning and the Social Sciences*. Princeton University Press.**
 `[VERIFICAR URL]` (el preprint es arXiv:1902.10186). **El código sí está verificado:**
 `https://raw.githubusercontent.com/successar/AttentionExplanation/master/README.md`
 `[VERIFICADA 2026-08-29]`
-> **Es el paper que sostiene las slides 34 y 35 y el ítem 11 del cuestionario.** El
+> **Es el paper que sostiene las slides 35 y 36 y el ítem 11 del cuestionario.** El
 > argumento es limpio y te lo podés llevar entero: construyen mapas de atención
 > *adversarios* —muy distintos del original— que producen **casi la misma predicción**
 > (dentro de un margen chico). Si dos mapas contradictorios dan casi la misma salida, el
@@ -91,7 +91,7 @@ Machine Learning and the Social Sciences*. Princeton University Press.**
 > La herramienta estándar para mirar la atención de un modelo pre-entrenado de verdad,
 > capa por capa y cabeza por cabeza, adentro de un notebook. En la clase 9 vas a tener
 > modelos pre-entrenados a mano: éste es el visor. **Usalo para explorar, con la
-> advertencia de la slide 34 puesta.**
+> advertencia de la slide 35 puesta.**
 > Se instala con `pip install bertviz` y corre en Colab.
 
 **9. Karpathy, A., *nanoGPT* — el código del modelo, comentado.**
@@ -164,7 +164,7 @@ quiera saber de dónde sale cada matiz de las slides y las notas.
   para attention **sin máscara**: con máscara causal, el modelo recupera algo del orden.
 - **Kobayashi, G., Kuribayashi, T., Yokoi, S. & Inui, K. (2020). *Attention is Not Only a
   Weight: Analyzing Transformers with Vector Norms*. EMNLP.** (arXiv:2004.10102) — un
-  peso de atención alto sobre un *value* chico aporta poco: la salvedad de la slide 34.
+  peso de atención alto sobre un *value* chico aporta poco: la salvedad de la slide 35.
 - **Voita, E., Talbot, D., Moiseev, F., Sennrich, R. & Titov, I. (2019). *Analyzing
   Multi-Head Self-Attention: Specialized Heads Do the Heavy Lifting, the Rest Can Be
   Pruned*. ACL.** (arXiv:1905.09418) y **Clark, K., Khandelwal, U., Levy, O. & Manning,

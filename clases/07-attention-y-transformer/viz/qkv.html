@@ -67,7 +67,11 @@
     <p>Cada palabra publica un aviso de lo que ofrece (<b>key</b>) y camina con un
        papelito de lo que busca (<b>query</b>). El peso es qué tan bien matchean.
        Las dos perillas de abajo son <b>las matrices que se aprenden</b>: giran todos
-       los avisos y todas las búsquedas a la vez.</p>
+       los avisos y todas las búsquedas a la vez. ¿Por qué girar? Porque el puntaje es
+       cuánto apuntan dos flechas para el mismo lado, y en 2 dimensiones lo más simple
+       que puede hacer una matriz es girarlas: el giro decide qué aviso queda alineado
+       con cada búsqueda. (Una matriz de verdad también estira y aplasta; el giro es lo
+       que se puede dibujar.)</p>
   </header>
 
   <div class="viz-frame" style="padding:10px">

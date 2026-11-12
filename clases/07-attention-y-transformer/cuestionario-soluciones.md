@@ -31,7 +31,7 @@ clase 8. Sin esto, el mini-GPT de la 8 no se entiende.
 |---|---|---|
 | **A** (tres entradas distintas) | Los nombres suenan a cosas separadas, y en una base de datos una *query* y una *key* **sí** son objetos distintos. | Es la confusión más común con Q, K y V: creer que son tres cosas que entran. Se desarma con la slide 13 (las tres cajas saliendo del mismo embedding) y señalando la `X` en `Q = X @ W_q`, `K = X @ W_k`, `V = X @ W_v`: la misma `X`, tres veces. |
 | **C** (query y key son lo mismo) | Es media verdad peligrosa: en *self*-attention las tres salen del mismo texto, así que se sienten iguales. | No distinguen **rol** de **origen**. El mismo origen, tres roles: qué busco, qué ofrezco, qué aporto. La analogía del aviso clasificado existe exactamente para esto. |
-| **D** (son las tres capas) | «Tres cosas con nombre raro» + «un modelo tiene capas» = conclusión razonable si te perdiste. | Se perdió en la arquitectura general. No es grave a esta altura; se recupera con el diagrama de la slide 27. |
+| **D** (son las tres capas) | «Tres cosas con nombre raro» + «un modelo tiene capas» = conclusión razonable si te perdiste. | Se perdió en la arquitectura general. No es grave a esta altura; se recupera con el diagrama de la slide 28. |
 
 ---
 
@@ -153,8 +153,8 @@ exponencial al cubo — las diferencias que ya existían se agrandan multiplicat
 **c)** Se **aplana**: **0,28 · 0,25 · 0,22 · 0,25**, casi un reparto parejo. Si los
 puntajes se achican, todas las exponenciales se parecen y el softmax pierde criterio.
 
-**La perilla de la clase 8 es la temperatura.** Es literalmente esto: dividir los puntajes
-por un número antes del softmax. Temperatura baja = puntajes agrandados = distribución
+**Es la perilla de temperatura de la slide 15, que vuelve en la clase 8.** Es literalmente
+esto: dividir los puntajes por T antes del softmax (multiplicar por 3 es T = 1/3). Temperatura baja = puntajes agrandados = distribución
 afilada = el modelo elige siempre lo más probable y escribe aburrido y repetitivo.
 Temperatura alta = puntajes achicados = distribución aplanada = el modelo se manda cosas
 raras. **Que lo descubran acá, con cuatro números, hace que en la clase 8 la temperatura no
