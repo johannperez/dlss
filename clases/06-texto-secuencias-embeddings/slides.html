@@ -706,7 +706,77 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 30 · Y AHORA EL ORDEN ==================================== -->
+<!-- ===== 30 · TRES PASOS, MISMO INSTRUMENTO ======================= -->
+<section>
+  <span class="marca">lo que encontraron</span>
+  <h2>El parecido entre discursos, en tres pasos</h2>
+  <table class="vecinos">
+    <tr><th>qué hicimos</th><th>qué salió</th><th>qué midió</th></tr>
+    <tr><td>promediar todas las palabras</td>
+        <td>todos los pares entre <span class="cifra">0,97</span> y <span class="cifra">1,00</span></td>
+        <td>«los dos están en castellano»</td></tr>
+    <tr><td>restar el discurso promedio</td>
+        <td>un corte en <b>2008</b> (antes contra después: <span class="cifra">−0,53</span>).
+            La crisis de 2001 no corta. Macri se parece a Cristina Fernández
+            (<span class="cifra">+0,52</span>) más que a cualquier gobierno anterior.
+            En 2010 sobran <em>yo, qué, si, eso, quiero</em></td>
+        <td><b>el registro</b>: oral contra escrito</td></tr>
+    <tr><td>quedarse con las palabras de contenido</td>
+        <td>Macri se aleja de Cristina Fernández (<span class="cifra">+0,52 → +0,26</span>)
+            y Néstor Kirchner se le acerca (<span class="cifra">−0,55 → −0,14</span>)</td>
+        <td><b>la agenda</b>: aparece la continuidad política</td></tr>
+  </table>
+  <div class="ss compacta">El instrumento es el mismo en los tres pasos.
+    <strong>Lo que cambió es la decisión de quien investiga</strong>, y cada una
+    responde una pregunta distinta.</div>
+  <aside class="notes">
+    Es la devolución del TODO 4. Preguntá primero: «¿dónde estaban los cortes?».
+    Alguien va a decir 2001 y no va a estar: el corte es 2008, y lo que cambia es
+    cómo se habla («yo» pasa de casi 0 a 4 por cada mil palabras en 2010), no de
+    qué ni desde dónde. Eso es un hallazgo, no un error: el instrumento encontró
+    solo una diferencia real que no le pedimos. El tercer paso (sacar las palabras
+    de función y las de 4 letras o menos antes de promediar) es la celda que
+    sigue al TODO 4 en el notebook. Ojo con venderlo de más: cada gobierno ya se
+    parece a sí mismo con todas las palabras (Macri +0,84, Cristina Fernández
+    +0,93). Lo que cambia es entre gobiernos: el corte de registro se afloja y
+    aparece la continuidad Néstor Kirchner–Cristina Fernández. 3 minutos.
+  </aside>
+</section>
+
+<!-- ===== 31 · PARA QUÉ SÍ, PARA QUÉ NO ============================== -->
+<section>
+  <h2>¿Entonces sirven? Para qué sí, y para qué no</h2>
+  <div class="comparacion">
+    <div><h4>Sirven para</h4>
+      <p><strong>Descubrir vocabulario</strong>: las vecinas de tus palabras clave
+         amplían un diccionario.<br>
+         <strong>Generalizar</strong>: acercan palabras que comparten compañía aunque
+         nunca aparezcan juntas.<br>
+         <strong>Medir asociaciones</strong>: ejes como el de hoy (Garg 2018,
+         Kozlowski 2019).<br>
+         <strong>Detectar cambios de discurso</strong> sin decirle al modelo qué
+         buscar.<br>
+         Y son <strong>la primera capa de todo transformer</strong>, GPT incluido.</p></div>
+    <div><h4>No sirven, solos, para</h4>
+      <p><strong>Postura o acuerdo</strong>: a favor y en contra usan las mismas
+         palabras (los antónimos dan 0,78).<br>
+         <strong>Quién le hizo qué a quién</strong>: promediar tira el orden.<br>
+         <strong>Corpus chicos</strong>: con menos de unos 300.000 tokens, sale
+         ruido. Ahí van los pre-entrenados (clase 9).<br>
+         <strong>Palabras raras</strong>: <code>cuidado</code> aparece 13 veces y
+         no entra al mapa.</p></div>
+  </div>
+  <div class="intuicion compacta">Un termómetro no es malo porque no mida la presión.
+    Este instrumento mide <strong>uso y contexto</strong>: las advertencias de hoy
+    no son contra los embeddings, son <strong>el manual de uso</strong>.</div>
+  <aside class="notes">
+    Después de tres secciones de advertencias, el aula puede salir pensando que
+    los embeddings no sirven. Esta slide lo desarma. Leé sólo los títulos en
+    negrita de cada columna y cerrá con la frase del termómetro. 2 minutos.
+  </aside>
+</section>
+
+<!-- ===== 32 · Y AHORA EL ORDEN ==================================== -->
 <section>
   <h2>Y ahora sí: el orden</h2>
   <p class="bajada">Tenemos un vector por palabra. Nos falta la mitad del problema.</p>
@@ -718,7 +788,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   <aside class="notes">1 minuto. Es una bisagra, no una slide de contenido.</aside>
 </section>
 
-<!-- ===== 31 · PROMEDIAR =========================================== -->
+<!-- ===== 33 · PROMEDIAR =========================================== -->
 <section>
   <h2>Opción 1: promediar</h2>
   <p>Sumás los vectores de todas las palabras y dividís. Es lo primero que se te
@@ -733,7 +803,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 32 · VIZ BOLSA VS ORDEN ================================== -->
+<!-- ===== 34 · VIZ BOLSA VS ORDEN ================================== -->
 <section>
   <span class="marca">viz</span>
   <h3>Dos frases, un solo vector</h3>
@@ -752,7 +822,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 33 · LEER EN ORDEN ====================================== -->
+<!-- ===== 35 · LEER EN ORDEN ====================================== -->
 <section>
   <h2>Opción 2: leer en orden, con una mochila</h2>
   <div class="intuicion">
@@ -772,7 +842,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 34 · VIZ MEMORIA ======================================== -->
+<!-- ===== 36 · VIZ MEMORIA ======================================== -->
 <section>
   <span class="marca">viz</span>
   <h3>…y lo del principio se va perdiendo</h3>
@@ -794,7 +864,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 35 · LAS RNN EN 30 SEGUNDOS ============================= -->
+<!-- ===== 37 · LAS RNN EN 30 SEGUNDOS ============================= -->
 <section>
   <h2>Las RNN en treinta segundos</h2>
   <p>Hubo veinte años de ingeniería para que la mochila olvidara mejor:
@@ -816,7 +886,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 36 · LA PREGUNTA ======================================== -->
+<!-- ===== 38 · LA PREGUNTA ======================================== -->
 <section class="pregunta">
   <h2>¿Y si en vez de <em>recordar</em>,<br>miramos directamente?</h2>
   <p style="font-size:.75em;color:var(--tinta-2);max-width:26em;margin:1em auto 0">
@@ -830,7 +900,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 37 · QUÉ TE LLEVÁS ===================================== -->
+<!-- ===== 39 · QUÉ TE LLEVÁS ===================================== -->
 <section>
   <h2>Qué te llevás de hoy</h2>
   <ol>
@@ -848,7 +918,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 38 · HERRAMIENTAS ====================================== -->
+<!-- ===== 40 · HERRAMIENTAS ====================================== -->
 <section>
   <h2>Herramientas que ya podés usar</h2>
   <div class="tarjetas">
@@ -867,7 +937,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 39 · GLOSARIO ========================================== -->
+<!-- ===== 41 · GLOSARIO ========================================== -->
 <section>
   <h2>Glosario de hoy</h2>
   <ul class="glosario-lista apretada">
@@ -888,7 +958,7 @@ datos.vecinos("pobreza", V, palabras, k=6)
   </aside>
 </section>
 
-<!-- ===== 40 · PUENTE =========================================== -->
+<!-- ===== 42 · PUENTE =========================================== -->
 <section class="portada">
   <p class="num-clase">La que viene</p>
   <h1>Clase 7: attention</h1>

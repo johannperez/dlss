@@ -3,7 +3,7 @@
 **La forma de los datos manda: texto, secuencias y embeddings**
 120 minutos · apertura del módulo de texto · prerrequisitos: clases 1 a 5
 
-> **Esta es la clase más apretada del curso.** 40 slides, cinco visualizaciones y un
+> **Esta es la clase más apretada del curso.** 42 slides, cinco visualizaciones y un
 > bloque de contenido nuevo *después* del segundo práctico. Leé la sección 6 antes
 > de entrar al aula: dice qué se recorta y qué no se recorta nunca.
 
@@ -65,12 +65,15 @@ usan parecido, no que signifiquen lo mismo.*
 | **80-83** | 25-26 | Problema o instrumento + código | La 26 se pasa rápido: es referencia. |
 | **83-87** | 27-28 | En tu investigación + la advertencia | En la 27, la vara del ruido al lado del «de 8 siguen 2». |
 | **87-104** | 29 | **Práctico 2** | Notebook, secciones 5-10, de a dos. |
-| **104-109** | 30-32 | El orden vuelve | La 32 (VIZ bolsa vs orden) es la que engancha. |
-| **109-114** | 33-35 | RNN y su falla | **La 35 es lo primero que se recorta.** |
-| **114-120** | 36-40 | Cierre | La pregunta, tres ideas, herramientas, glosario, puente. |
+| **104-109** | 30-31 | **Lo que encontraron + para qué sí y para qué no** | Devolución del TODO 4: el corte es de registro (2008), no político. Con palabras de contenido el corte se afloja: Macri se aleja de Cristina Fernández y Néstor Kirchner se le acerca (celda que sigue al TODO 4). Después, la slide que evita que se vayan pensando que los embeddings no sirven. |
+| **109-114** | 32-34 | El orden vuelve | La 34 (VIZ bolsa vs orden) es la que engancha. |
+| **114-119** | 35-37 | RNN y su falla | **La 37 es lo primero que se recorta.** |
+| **119-125** | 38-42 | Cierre | La pregunta, tres ideas, herramientas, glosario, puente. |
 
-> Los minutos de esta tabla son **los mismos que dicen las notas del orador** de cada
-> slide en `slides.html`: sumadas, dan 120. Los dos bloques prácticos duran 20 y 17
+> **Ojo: con las slides 30-31 (agregadas el 2026-11-08) la tabla suma 125, no 120.**
+> Hay que sacar cinco minutos de algún lado: achicar el práctico 2 o recortar la 37
+> (ver §6). Fuera de esas dos slides, los minutos de esta tabla son **los mismos que
+> dicen las notas del orador** de cada slide en `slides.html`: sin ellas, dan 120. Los dos bloques prácticos duran 20 y 17
 > minutos, y `PROGRAMA.md` usa los mismos minutos (el segundo práctico en 87-104,
 > porque antes entran la apuesta, la viz del eje y la advertencia de validez, que
 > no se recortan). No sobra ningún minuto: si una
@@ -84,7 +87,7 @@ usan parecido, no que signifiquen lo mismo.*
 
 | Momento | La pregunta | Para qué |
 |---|---|---|
-| Slide 3 | **«¿Significan lo mismo?»** | Que alguien use la palabra *quién*. Anotala en el pizarrón: vuelve en la slide 31. |
+| Slide 3 | **«¿Significan lo mismo?»** | Que alguien use la palabra *quién*. Anotala en el pizarrón: vuelve en la slide 33. |
 | Slide 5 | «¿Quién de acá publicó con diccionarios o con LDA?» | Manos arriba. La clase deja de ser una amenaza a lo que ya saben. |
 | Slide 7 | «¿Qué se perdió al partir así?» | Que vean que tokenizar es un libro de códigos, no un automatismo. |
 | Slide 8 | «¿Cuál usarían ustedes?» | Casi todos dicen «por palabras». Anotalo: la viz que sigue lo desarma. |
@@ -97,7 +100,7 @@ usan parecido, no que signifiquen lo mismo.*
 | **Slide 23** | **«¿Dónde cae cada palabra? A, B o C. Voten.»** | Sin esta apuesta, la viz del eje es un dibujito lindo. |
 | Slide 24 | *(nada)* | **No preguntes. Callate.** Dejá que hablen ellos primero. |
 | Slide 28 | «¿Por qué `importaciones` y `exportaciones` quedan cerca?» | La respuesta la dice el aula, no vos. |
-| Slide 32 | «¿Quién tiene una variable que depende de una negación?» | Se levantan manos. Es el puente a su propia investigación. |
+| Slide 34 | «¿Quién tiene una variable que depende de una negación?» | Se levantan manos. Es el puente a su propia investigación. |
 
 ---
 
@@ -105,7 +108,7 @@ usan parecido, no que signifiquen lo mismo.*
 
 **Slide 3, «¿significan lo mismo?»**
 Dicen «no, cambia quién rechaza». Perfecto: escribí **QUIÉN** en el pizarrón y dejalo
-ahí toda la clase. En la slide 31, cuando el promedio dé 1,000 exacto, señalalo.
+ahí toda la clase. En la slide 33, cuando el promedio dé 1,000 exacto, señalalo.
 
 **Slide 4, «pero arriba las dos bolsas no son idénticas»**
 Si sale, es el mejor comentario de los primeros diez minutos, y hay que agradecerlo.
@@ -157,7 +160,7 @@ Y el corpus son treinta y cinco discursos de Estado.* Eso abre la slide 25 sola.
 | **«El sesgo es un bug»** | Piden «el modelo sin sesgo». | Slide 25. Un embedding sin sesgo es un embedding que no refleja el corpus: un termómetro roto. La corrección tiene sentido en aplicaciones de **decisión**, y aun ahí es difícil y parcial. |
 | **«Los tokens son palabras»** | Reportan «cantidad de palabras» contando fichas. | Viz del tokenizador. Regla práctica para castellano: **1,3 a 2 fichas por palabra**, según el tokenizador. Importa para el costo de una API y para el límite de contexto (clase 8). |
 | **«Más dimensiones es mejor»** | Piden 300 o 1000 dimensiones. | Es la clase 4 otra vez: más dimensiones = más perillas, y con poco texto las dimensiones de más tienden a capturar ruido. Acá no lo medimos: 100 es un valor habitual para un corpus de este tamaño. Si alguien lo quiere defender en su tesis, que pruebe 50, 100 y 300 y mire si cambian las vecinas de sus palabras clave. |
-| **Embedding de palabra ≠ de oración** | Promedian y esperan que capture la oración. | Slides 31-32, con el número medido: 1,000 exacto. Los embeddings de oración de verdad llegan en la clase 9 y usan un transformer. |
+| **Embedding de palabra ≠ de oración** | Promedian y esperan que capture la oración. | Slides 33-34, con el número medido: 1,000 exacto. Los embeddings de oración de verdad llegan en la clase 9 y usan un transformer. |
 | **«La aritmética funciona»** (o «no funciona nunca») | Prueban analogías y se frustran, o invierten la resta sin darse cuenta. | Slide 22 y los botones de la viz. De diez, cinco aciertan entre las cinco primeras y una sola sale primera. **Y el orden de la resta importa**: `a − b + c` le aplica a `c` la relación que va de `b` a `a`. Planteadas al revés, seis de esas relaciones aciertan cero. **Decilo antes de que lo descubran solos.** |
 | **«Hay que abandonar bag-of-words»** | Descartan sus herramientas previas. | Slide 5, dicha en serio. Para muchas preguntas un diccionario validado es mejor, más barato y más interpretable. Se retoma en la clase 10. |
 | **«Todos los discursos son iguales»** | Les da 0,98 de similitud entre todos y concluyen que no hay variación. | Es el momento más pedagógico del notebook. **Es un problema de instrumento, no un hallazgo**: el promedio está dominado por el fondo común. Restás la media y aparece la estructura. |
@@ -168,13 +171,13 @@ Y el corpus son treinta y cinco discursos de Estado.* Eso abre la slide 25 sola.
 
 **Se recorta, en este orden:**
 
-1. **Slide 35, «las RNN en treinta segundos».** Se dice de pie, en dos oraciones,
+1. **Slide 37, «las RNN en treinta segundos».** Se dice de pie, en dos oraciones,
    sin proyectar. Es contenido de contexto, no de examen.
 2. **Slide 22, la aritmética.** Se muestra una sola fila de la tabla
    (`senado − senadores + diputados`, que acierta, y al revés no) y se dice «de diez,
    aciertan cinco, y una sola sale primera». Treinta segundos.
 3. **Slide 26, el código.** Es referencia; está en el notebook.
-4. **Slide 38, herramientas.** Se menciona de palabra al cerrar.
+4. **Slide 40, herramientas.** Se menciona de palabra al cerrar.
 5. **El práctico 2 baja de 17 a 12 minutos**, y el notebook se termina en casa.
    Avisalo explícitamente: *«las secciones 8, 9 y 10 se terminan en casa antes de la
    clase 7; es una media hora»*. El TODO 5 no tiene minutos en la clase 7: si querés
@@ -187,7 +190,7 @@ Y el corpus son treinta y cinco discursos de Estado.* Eso abre la slide 25 sola.
 - **La apuesta (23) y la viz del eje (24).** Es la escena central de la clase y el
   momento de mayor empoderamiento del curso. Si sólo te queda tiempo para una cosa
   en la segunda mitad, es ésta.
-- **La pregunta que abre la clase 7 (slide 36).** Sin ese puente, la clase 7 arranca
+- **La pregunta que abre la clase 7 (slide 38).** Sin ese puente, la clase 7 arranca
   sin motivación y se convierte en una clase de álgebra.
 - **La advertencia de validez (28).** Es lo que les evita publicar una barbaridad.
 
@@ -227,7 +230,7 @@ Y el corpus son treinta y cinco discursos de Estado.* Eso abre la slide 25 sola.
   chica que ya está llena mientras «leés»: para que entre lo nuevo, algo se cae. Es
   la misma metáfora del glosario (tamaño fijo, se va sobrescribiendo). Es tonto y se
   lo acuerdan seis meses después.
-- **«Volvimos al mismo problema, con más decimales»** (slide 31). Se ríen, y después
+- **«Volvimos al mismo problema, con más decimales»** (slide 33). Se ríen, y después
   entienden que es literal.
 - **El análisis de correspondencias.** *«Esto que parece de Silicon Valley lo viene
   haciendo la sociología francesa desde los setenta.»* Baja la ansiedad muchísimo.
