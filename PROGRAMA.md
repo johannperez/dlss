@@ -471,13 +471,20 @@ posibles con un millón y medio de perillas. **Es la misma máquina.**
 **Plan minuto a minuto.**
 | Min | Bloque | Qué pasa |
 |---|---|---|
-| 0-10 | Gancho | ¿Real o generado? Se vota. |
-| 10-20 | El objetivo más tonto del mundo | Predecir la próxima ficha. Se muestra el dataset: ventana de texto → siguiente ficha. Se muestra el modelo bigram tonto, que ya escribe algo, y se ve por qué no alcanza. |
-| 20-40 | Manos 1: entrenar | Notebook: se apilan los bloques de la clase 7, se entrena sobre el corpus de debates. La loss baja. A lo largo del entrenamiento (pasos 50, 150, 400, 800 y 1200) se imprime una muestra: de sopa de letras a palabras a sintaxis a cadencia parlamentaria. **Es el momento más lindo del curso.** |
-| 40-50 | Pausa (mientras entrena) | El entrenamiento sigue corriendo de fondo. |
-| 50-75 | **La traducción**: el modelo → ChatGPT | El bloque que paga todo el módulo. Una pieza a la vez, con su viz, y cada una termina en un comportamiento observable: `viz/temperatura.html`, `viz/ventana-de-contexto.html`, `viz/por-que-alucina.html`, `viz/contar-letras.html`. Ver la tabla de traducción en la especificación de la clase. |
-| 75-100 | Manos 2 | Notebook: jugar con la temperatura sobre tu propio modelo; medir cuánto empeora al pasarse de ventana; hacer que alucine a propósito y explicar por qué; probar el conteo de letras. Ejercicio de a dos: *escribí el prompt que rompe el modelo* y explicá por qué se rompió. |
-| 100-120 | Cierre | Qué le falta a tu mini-GPT para ser ChatGPT (escala, datos, instruction tuning y RLHF contados en 5 minutos) y qué **no** cambia con la escala. `[EN TU INVESTIGACIÓN]`: usar LLMs en investigación — para qué sí (asistente de codificación con validación humana), para qué no (fuente de hechos). **Puente**: "entrenar uno tuyo desde cero es carísimo y casi nunca es lo que necesitás. Lo que vas a hacer de verdad es agarrar uno entrenado por otro. Clase que viene." |
+| 0-8 | Gancho | ¿Real o generado? Se vota. Mientras, el aula abre el notebook y corre la sección 0. |
+| 8-15 | El bloque de la clase 7, en una hoja | Re-anclaje: cuatro piezas (attention = las fichas se pasan información; MLP = cada ficha piensa sola; residual = el original adjunto; norma = plomería) y las dos líneas de código del bloque. Q/K/V, máscara y cabezas en una frase cada una. No se vuelve a dar la clase 7: se ordena. |
+| 15-33 | Code-along A: armar y arrancar | **En plenario, sin sub-salas**: la docente corre una celda y el aula corre la misma. El objetivo más tonto del mundo, el dataset que se arma solo, el bigrama tonto, y **las cinco piezas de cualquier modelo en PyTorch** (datos, modelo, loss, loop, generar). Se apilan los bloques de la clase 7 y el entrenamiento arranca en el minuto 33. |
+| 33-45 | Mientras entrena | La cross-entropy y las muestras leídas entre todos (pasos 0, 400, 800 y 1200): de sopa de letras a palabras a sintaxis a cadencia parlamentaria. **Es el momento más lindo del curso.** Si a alguien no le termina, la celda «plan B» carga el modelo del curso. |
+| 45-55 | Pausa | |
+| 55-90 | **La traducción**: el modelo → ChatGPT | El bloque que paga todo el módulo, **en vivo sobre el modelo de cada uno** y en el orden del notebook: `viz/temperatura.html`, el prompt, `viz/ventana-de-contexto.html`, `viz/por-que-alucina.html` (el clímax) y `viz/contar-letras.html`. Cada pieza: apuesta → celda → viz → «por eso». Ver la tabla de traducción en la especificación de la clase. |
+| 90-105 | Rompan el modelo, entre todos | *Escribí el prompt que rompe el modelo*: cada uno lo propone en el chat, se corren cuatro o cinco en vivo y el aula explica qué pieza lo explica. Los ejercicios del notebook quedan como práctica opcional para casa. |
+| 105-120 | Cierre | Qué le falta a tu mini-GPT para ser ChatGPT (escala, datos, instruction tuning y RLHF contados en 5 minutos) y qué **no** cambia con la escala. `[EN TU INVESTIGACIÓN]`: usar LLMs en investigación — para qué sí (asistente de codificación con validación humana), para qué no (fuente de hechos). **Puente**: "entrenar uno tuyo desde cero es carísimo y casi nunca es lo que necesitás. Lo que vas a hacer de verdad es agarrar uno entrenado por otro. Clase que viene." |
+
+**Por qué este plan no tiene sub-salas.** La clase 7 es la más densa del curso y suele
+dejar el bloque a medio asentar; y el aula pidió resolver al menos parte de los ejercicios
+entre todos («capaz que esta dinámica se podría hacer solo una vez a la semana»). La 8 es
+entonces toda en plenario, con la práctica adentro de cada bloque, y las sub-salas
+vuelven en la 9.
 
 **Conexión hacia atrás:** entrena el bloque de la clase 7 con las herramientas de las clases 3 y 4.
 **Hacia adelante:** el costo del pre-entrenamiento motiva el transfer learning.

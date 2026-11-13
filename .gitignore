@@ -16,6 +16,8 @@ checkpoints/
 runs/
 *.pt
 *.pth
+# excepción: el modelo de respaldo de la clase 8 (plan B del notebook, 6,5 MB)
+!clases/08-mini-gpt-y-los-llm/modelo-del-curso.pt
 
 # Sistema
 .DS_Store

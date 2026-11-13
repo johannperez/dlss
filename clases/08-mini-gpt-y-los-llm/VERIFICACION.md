@@ -382,3 +382,25 @@ ejecutable en `/opt/pw-browsers/chromium`), abriendo por `file://` con un
 recorren las 41 slides con `Reveal.slide(i,0,0)` en tema claro y oscuro, y las cuatro viz
 se ejercitan control por control (slider a los dos extremos y al medio, cada botón, cada
 opción de cada select), sueltas y embebidas, a 1280 y a 760 px.
+
+---
+
+## 7. Versión ágil en plenario (después de la primera edición de la clase 7)
+
+Cambio: re-anclaje de la clase 7 (slide 6), las cinco piezas en PyTorch (slide 11),
+code-along en plenario sin sub-salas, traducción en el orden del notebook, cuatro
+slides ocultas (`slides.html?completo` las recupera), `PLAN_CORTO` y la celda 🛟 plan B
+con `modelo-del-curso.pt`. Lo que se comprobó, en un contenedor Linux con 4 hilos de CPU
+y torch 2.5.1:
+
+| Qué | Resultado |
+|---|---|
+| `entrenar-mini-gpt.py --guardar-modelo-del-curso` | 1200 pasos en 243 s; loss final train 0,186 · val 0,191; 6,5 MB. `datos-mini-gpt.json/.js` **sin tocar** (`git diff` vacío). |
+| El `.pt` carga con `torch.load(..., weights_only=True)` | ✓ (la versión de torch se guarda como texto: con el objeto `TorchVersion` fallaba). |
+| Notebook entero, configuración por defecto (nbclient) | 0 errores, 313 s. El plan B dice «tu entrenamiento terminó» y no toca nada. |
+| Notebook entero con `PLAN_CORTO = True` y `USAR_MODELO_DEL_CURSO = True` | 0 errores, 151 s. El plan B carga el modelo del curso, verifica vocabulario y configuración, y escribe la muestra del paso final; las secciones 6 a 12 corren sobre el modelo cargado. |
+| Slides en Chromium (Playwright), deck ágil y `?completo` | 39 y 43 slides, 0 errores de consola. Desborde vertical: sólo la 27 (viz de la ventana, 815 px), que **ya desbordaba antes** del cambio (era la 26). |
+
+**No se probó:** el plan B en Colab con GPU (el `map_location=device` debería
+alcanzar), ni el code-along con un aula de verdad: el primer uso dirá si los 18 minutos
+del code-along A alcanzan.
