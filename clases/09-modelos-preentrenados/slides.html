@@ -262,14 +262,15 @@ clasificador(titulares[:20])
     <div class="tarjetas">
       <div><h4><span aria-hidden="true">🔒</span> Capas de abajo</h4>Congeladas. Ya saben castellano.
         <strong>Cero</strong> perillas que mover.</div>
-      <div><h4><span aria-hidden="true">🔧</span> Capa de arriba</h4>La única que entrenás. Unas pocas miles de perillas.</div>
+      <div><h4><span aria-hidden="true">🔧</span> Capa de arriba</h4>La única que entrenás. Unos cientos de perillas (385 en el nivel 1 de hoy).</div>
       <div><h4><span aria-hidden="true">📉</span> Consecuencia</h4>Menos perillas = <strong>menos datos necesarios</strong>.
         Eso es la clase 4, otra vez.</div>
     </div>
     <p style="font-size:.74em; margin:.3em 0">Es un espectro: <strong>congelar todo y
-      entrenar sólo la de arriba</strong> (la estrategia A; el <b>nivel 1</b> del notebook)
-      → descongelar las últimas capas → <strong>entrenar todo</strong> (el fine-tuning, la
-      C; el <b>nivel 2</b>, con la perilla <code>CAPAS_LIBRES</code>).</p>
+      entrenar sólo la de arriba</strong> (embeddings + clasificador: el <b>nivel 1</b> del
+      notebook) → descongelar las últimas capas → <strong>entrenar todo</strong>. Esos dos
+      últimos son el fine-tuning, el <b>nivel 2</b>: la perilla <code>CAPAS_LIBRES</code>
+      elige dónde parar.</p>
     <div class="aha compacta">
       Congelar no es una optimización técnica: es <strong>bajar la capacidad del modelo
       a propósito</strong>, para que 200 ejemplos alcancen. La misma decisión que tomaste
@@ -281,7 +282,10 @@ clasificador(titulares[:20])
       Respuesta que van a dar: sobreajuste. Es el riesgo, sí: el fine-tuning completo con
       pocos datos puede calcar, y sobre todo es inestable (cambia mucho con la semilla).
       Con learning rate bajo y pocas épocas suele andar razonable; congelar es el freno
-      más fuerte. Ubicá la A y la C (slides 12 y 14) en el espectro de la línea de abajo.
+      más fuerte. Ubicá en el espectro de la línea de abajo los dos niveles del notebook:
+      el nivel 1 es la punta congelada; el nivel 2 va del medio a la otra punta según
+      CAPAS_LIBRES. Las dos filas de abajo de la tabla de estrategias (dos slides más
+      adelante) son estos mismos dos niveles.
     </aside>
   </section>
 
@@ -320,20 +324,24 @@ clasificador(titulares[:20])
       <tr>
         <td><strong>0 etiquetas</strong></td>
         <td><strong>zero-shot</strong> / diccionario</td>
-        <td>Le describís la categoría con palabras. Clasifica sin ejemplos.</td>
+        <td>Le describís la categoría con palabras. Clasifica sin ejemplos.
+          <b>No entrena nada</b>: queda afuera del espectro congelar / descongelar.</td>
         <td>0 etiquetas para entrenar; <strong>200-300 para evaluarlo</strong>, como
           todo. Sin esas, <em>no tenés con qué saber si anda</em>.</td>
       </tr>
       <tr class="destaca">
         <td><strong>50 a 500</strong></td>
-        <td class="destaca"><strong>embeddings + clasificador simple</strong></td>
-        <td>Texto → vector (modelo prestado) → regresión logística.</td>
+        <td class="destaca"><strong>embeddings + clasificador simple</strong><br>
+          <span style="font-size:.85em">= <b>nivel 1</b>: todo congelado</span></td>
+        <td>Texto → vector (modelo prestado, quieto) → regresión logística.</td>
         <td>Barato, corre en CPU, <strong>interpretable</strong>.</td>
       </tr>
       <tr>
         <td><strong>300 y más</strong></td>
-        <td><strong>fine-tuning</strong></td>
-        <td>Seguís entrenando el modelo entero con tus ejemplos.</td>
+        <td><strong>fine-tuning</strong><br>
+          <span style="font-size:.85em">= <b>nivel 2</b>: descongelar</span></td>
+        <td>Seguís entrenando el modelo prestado con tus ejemplos: sus capas de arriba o
+          todas.</td>
         <td>Más cómputo (GPU si el modelo es grande) y más cuidado: con pocas etiquetas
           es inestable. Hay que medirlo contra la del medio.</td>
       </tr>
