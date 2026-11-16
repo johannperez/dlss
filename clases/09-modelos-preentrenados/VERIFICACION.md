@@ -29,7 +29,7 @@ Entorno: Apple M3, Python 3.12, `torch` 2.15, `transformers` 5.23, `scikit-learn
 | `extra/notebook-completo.ipynb` corrido desde `extra/` | **0 errores**, 13 s, camino A |
 | Revisiones de los modelos | MiniLM `e8f8c21…`, BETO `d1c9c45…`, `MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli` `0a71e92…`: consultadas en la API del Hub el 13-11 |
 | Links de `extra/README.md` y de la receta final | los nueve devolvieron 200 el 13-11 |
-| Slides | deck ágil de 21 (capturas de las cuatro nuevas en Chrome headless); `?completo` devuelve las 40 originales y oculta las cuatro nuevas |
+| Slides | deck ágil de 21 (capturas de las nuevas en Chrome headless); `?completo` devuelve las 40 originales y oculta las cinco nuevas |
 
 **No se midió en Colab.** Los tiempos de arriba son de una laptop; en Colab sin GPU
 contá varias veces eso. Antes de la primera clase, correr `notebook.ipynb` una vez en

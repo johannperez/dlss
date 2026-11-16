@@ -99,6 +99,33 @@
     </aside>
   </section>
 
+  <!-- =========================== B0 · DE QUÉ HABLAMOS HOY (sólo ágil) =========================== -->
+  <section data-solo-agil>
+    <h2>Hoy: usar un modelo que entrenó otro</h2>
+    <div class="tarjetas">
+      <div><h4>El modelo prestado</h4>Un <strong>modelo pre-entrenado</strong>: alguien lo
+        entrenó con muchísimo texto y lo publicó, y vos lo bajás como un archivo. El de hoy,
+        <b>MiniLM multilingüe</b>: 118 M de perillas, unos 50 idiomas.
+        <strong>Nadie le enseñó qué es una nota sobre política.</strong></div>
+      <div><h4>Tu tarea</h4>1471 titulares reales de prensa en castellano.
+        <em>¿Esta nota es sobre política?</em> Tenés <strong>200</strong> etiquetados a mano,
+        que son unas dos horas de codificación.</div>
+      <div><h4>La pregunta de hoy</h4>¿Cómo aprovecho lo que ese modelo ya sabe para
+        enseñarle <strong>mi</strong> distinción con sólo 200 ejemplos?<br>
+        Eso es <strong>transfer learning</strong>.</div>
+    </div>
+    <div class="ojo compacta fragment">Y la otra pregunta, la que separa un paper de un
+      posteo: <strong>¿cómo sabés que está bien?</strong> La contestamos con una tabla, al
+      final del code-along: el mismo test, contra aprender desde cero y contra el piso.</div>
+    <aside class="notes">
+      2 min. Esta slide presenta el tema: sin ella, «¿por qué funciona?» no tiene sujeto.
+      Leé las tres tarjetas de izquierda a derecha: el modelo, la tarea, la pregunta.
+      Decí «pre-entrenado» y «transfer learning» en voz alta: son las dos palabras de hoy.
+      El recuadro de abajo reemplaza a la votación de la versión larga («¿cómo sabés que
+      está bien?»): plantalo y seguí, se contesta en la slide 14.
+    </aside>
+  </section>
+
   <!-- =========================== 4 · LAS TRES LÍNEAS =========================== -->
   <section data-visibility="hidden" data-solo-completo>
     <h3>Tres líneas</h3>
@@ -166,7 +193,7 @@ clasificador(titulares[:20])
   </section>
 
   <!-- =========================== 6 · LA PREGUNTA =========================== -->
-  <section class="pregunta">
+  <section class="pregunta" data-visibility="hidden" data-solo-completo>
     <h2>¿Cómo sabés que está bien?</h2>
     <div class="opciones">
       <div><b>A</b> leí unos cuantos y tenían sentido</div>
@@ -187,11 +214,11 @@ clasificador(titulares[:20])
   <section>
     <h2>¿Por qué funciona, si nadie le enseñó tu tarea?</h2>
     <div class="intuicion">
-      Alguien ya le enseñó <strong>castellano</strong>: gramática, qué palabras van juntas,
-      que "renunció" y "dimitió" son casi lo mismo. En un modelo grande eso cuesta
-      millones; en BETO, semanas de una TPU. Igual, mucho más de lo que tenés vos.
-      Vos sólo le tenés que enseñar <strong>tu distinción</strong>, que es una capita fina
-      arriba de todo eso.
+      Alguien ya le enseñó <strong>castellano</strong> (y otros idiomas): gramática, qué
+      palabras van juntas, que "renunció" y "dimitió" son casi lo mismo. Eso costó muchísimo
+      más texto y cómputo del que vas a tener nunca: en un modelo grande, millones de
+      dólares. Vos le enseñás <strong>tu distinción</strong>, que como mínimo es una capita
+      fina arriba de todo eso.
     </div>
     <p>Se llama <span class="glosario"><span class="en">transfer learning</span><span class="es">aprendizaje por transferencia</span></span>.
        Y es la razón por la que doscientos ejemplos etiquetados a veces alcanzan.</p>

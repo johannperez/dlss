@@ -16,10 +16,10 @@
 >    **recetas** (`extra/recetas-transfer-learning.ipynb`): `sentence-transformers`,
 >    fine-tuning de BETO con `Trainer`, zero-shot y un CSV propio, cada una corta y
 >    para copiar. La guía es `extra/README.md`.
-> 4. **Deck ágil de 21 slides.** Cuatro nuevas (los dos niveles, el code-along, la
->    tabla de hoy y el material extra) y 23 ocultas que se recuperan con
+> 4. **Deck ágil de 21 slides.** Cinco nuevas (de qué hablamos hoy, los dos niveles,
+>    el code-along, la tabla de hoy y el material extra) y 24 ocultas que se recuperan con
 >    `slides.html?completo`, que vuelve al deck de 40 de la versión de dos horas (y
->    oculta las cuatro nuevas).
+>    oculta las cinco nuevas).
 >
 > **Sin pausa.** Son 75 minutos de corrido. Si el aula la necesita, cinco minutos al
 > salir del code-along (minuto 54), y los descontás con la lista de «si tenés 60
@@ -57,8 +57,8 @@ que achicar, se achica antes o después, no adentro.
 |---|---|---|
 | **0-1** | 1 | Portada. **Antes de hablar: «abran `notebook.ipynb` en Colab y corran las secciones 0 a 3»**, así el modelo se baja mientras arrancás. |
 | 1-3 | 2 | Dónde quedamos. «Y ahí terminó lo que podemos entrenar nosotros.» |
-| 3-5 | 3 | El presupuesto. Un minuto y medio, no más. |
-| 5-6 | 4 | ¿Cómo sabés que está bien? **Sin votación larga**: plantala y decí «hoy contestamos una parte: comparar con el mismo test y contra un piso. La otra parte es la clase 10». |
+| 3-4 | 3 | El presupuesto. Un minuto y medio, no más. |
+| 4-6 | 4 | **De qué hablamos hoy**: el modelo prestado, la tarea (200 titulares etiquetados) y la pregunta: eso es transfer learning. El recuadro «¿cómo sabés que está bien?» se planta sin votación: «la contestamos con la tabla de la slide 14; la otra mitad es la clase 10». |
 | 6-8 | 5 | Por qué funciona: alguien ya le enseñó castellano. |
 | 8-9 | 6 | Callback clase 5, en una frase. |
 | 9-12 | 7 | Qué se congela. Cobrá la clase 4: «si dejo todas las capas libres con 200 ejemplos, ¿qué pasa?». |
@@ -128,7 +128,8 @@ puede afirmar que una gane. **Se reporta el rango, no la mejor corrida.** Es la 
 de la clase.
 
 **«¿Por qué la tabla de fichas no se toca nunca?»** Son 96 de las 118 M de perillas,
-una fila por cada una de las 250 mil fichas de cien idiomas. Es lo más genérico del
+una fila por cada una de sus 250 mil fichas (un vocabulario armado para muchos idiomas
+a la vez). Es lo más genérico del
 modelo, y 200 titulares no la mejoran: sólo la pueden estropear.
 
 **«A mí me salió distinto.»** El nivel 1, el desde cero y el diccionario tienen que
