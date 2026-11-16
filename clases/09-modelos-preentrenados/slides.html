@@ -340,8 +340,8 @@ clasificador(titulares[:20])
         <td><strong>300 y más</strong></td>
         <td><strong>fine-tuning</strong><br>
           <span style="font-size:.85em">= <b>nivel 2</b>: descongelar</span></td>
-        <td>Seguís entrenando el modelo prestado con tus ejemplos: sus capas de arriba o
-          todas.</td>
+        <td>Seguís entrenando el modelo prestado con tus ejemplos: sus bloques de arriba
+          o todos.</td>
         <td>Más cómputo (GPU si el modelo es grande) y más cuidado: con pocas etiquetas
           es inestable. Hay que medirlo contra la del medio.</td>
       </tr>
@@ -362,6 +362,8 @@ clasificador(titulares[:20])
   <section data-solo-agil>
     <span class="marca">hoy, en tu notebook</span>
     <h3>Transfer learning en dos niveles</h3>
+    <p class="bajada" style="font-size:.78em; margin:.1em 0 .4em">Las dos filas de abajo de
+      la tabla de estrategias, hoy en tu notebook. El zero-shot no entra: no entrena nada.</p>
     <div class="comparacion">
       <div>
         <h4>Nivel 1 · congelar todo</h4>
@@ -378,7 +380,7 @@ clasificador(titulares[:20])
     </div>
     <table class="numeros" style="font-size:.6em">
       <tr><th><code>CAPAS_LIBRES</code></th><th>qué se entrena</th><th>perillas que se mueven</th></tr>
-      <tr><td>0</td><td>sólo la capa nueva</td><td>770</td></tr>
+      <tr><td>0</td><td>sólo la capa nueva: no descongela nada, es casi el nivel 1</td><td>770</td></tr>
       <tr><td>2</td><td>la capa nueva + los 2 bloques de arriba</td><td>3,5 M</td></tr>
       <tr><td>12</td><td>la capa nueva + los 12 bloques</td><td>21,3 M</td></tr>
     </table>
