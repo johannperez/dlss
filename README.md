@@ -46,12 +46,13 @@ en la investigación de ellos, desde ya.
 | **6** | [La forma de los datos manda: texto](clases/06-texto-secuencias-embeddings/) | El orden es información, y cada palabra necesita un lugar en un mapa. | 19 s |
 | **7** | [Attention: cada palabra arma su resumen](clases/07-attention-y-transformer/) | En vez de leer en orden y olvidarse, cada palabra mira a todas y decide a cuál prestarle atención. | 15 s |
 | **8** | [Un mini-GPT propio, y la traducción a ChatGPT](clases/08-mini-gpt-y-los-llm/) | Un LLM dibuja la distribución de la próxima ficha. Todo lo raro que hace ChatGPT sale de ahí. | 5 min 29 s |
-| **9** | [Usar modelos que ya existen, sin creerles](clases/09-modelos-preentrenados/) | Un modelo pre-entrenado es un informante clave: sabe muchísimo y tiene sus sesgos. | 17 s |
+| **9** | [Usar modelos que ya existen, sin creerles](clases/09-modelos-preentrenados/) | Un modelo pre-entrenado es un informante clave: sabe muchísimo y tiene sus sesgos. Hoy le enseñamos tu distinción: transfer learning, congelado y con fine-tuning. | 20 s |
 | **10** | [Criterio: validez, sesgo, reproducibilidad y el revisor 2](clases/10-criterio-validacion-y-etica/) | El modelo mide *algo*. Tu trabajo es demostrar que ese algo es lo que decís que es. | 15 s |
 
 Los tiempos son **medidos**, no estimados: `nbconvert --execute` de punta a punta
-en CPU, sin GPU, el 2026-08-29. En Colab gratis (2 vCPU) contá entre una y dos
-veces eso.
+en CPU, sin GPU, el 2026-08-29 (la clase 9 se volvió a medir el 2026-11-13, con su
+versión de 75 minutos y el modelo pre-entrenado ya bajado). En Colab gratis (2 vCPU)
+contá entre una y dos veces eso.
 
 Cada clase abre una puerta y la siguiente la cruza. El mapa completo de esos
 puentes está en [`PROGRAMA.md` §4](PROGRAMA.md).

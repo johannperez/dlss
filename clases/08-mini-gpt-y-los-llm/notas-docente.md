@@ -12,7 +12,8 @@
 > 1. **Sin sub-salas.** La clase entera es *code-along* en plenario: compartís
 >    pantalla, corrés una celda, el aula corre la misma y pone 👍 en el chat. Nadie
 >    escribe código: se lee, se apuesta (🎲) y se corre. Lo que en clase se saltea está
->    marcado 🏠 en el notebook. Las sub-salas vuelven en la clase 9.
+>    marcado 🏠 en el notebook. La clase 9, en su versión de 75 minutos, también va en
+>    plenario.
 > 2. **Re-anclaje de la clase 7 en una slide** (la 6, «el bloque en una hoja»), en vez
 >    de dar el bloque por sabido. La clase 8 no necesita el código de la 7: lo trae
 >    copiado.
@@ -104,8 +105,8 @@ Y si a alguien no le termina, no esperes: la celda 🛟 plan B lo pone al día.
 
 **Las sub-salas.** Esta clase no las usa, a propósito (ver el recuadro de arriba). Si
 el aula pide trabajar en grupo, ofrecé los 🏠 del notebook como trabajo en pares
-**después** de la clase. Las sub-salas vuelven en la 9, donde auditar un modelo ajeno
-se presta para el trabajo en grupo y el aula ya llega con las cinco piezas.
+**después** de la clase. La clase 9 (versión de 75 minutos) también es code-along en
+plenario: el aula llega con las cinco piezas y las usa para hacer transfer learning.
 
 ---
 

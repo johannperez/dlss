@@ -1,5 +1,177 @@
 # Clase 9 — Notas para quien da la clase
 
+> **Qué cambió en esta versión, y por qué (2026-11-13).** La clase 9 pasa a durar
+> **75 minutos como máximo** y se centra en que **cada estudiante haga transfer learning
+> con sus manos**, no en verlo en una slide. Por eso:
+>
+> 1. **Notebook nuevo y corto** (`notebook.ipynb`): un solo modelo pre-entrenado
+>    (MiniLM multilingüe, ~470 MB), y dos niveles de transferencia sobre **las mismas
+>    200 etiquetas**: *nivel 1*, el modelo congelado + regresión logística; *nivel 2*,
+>    fine-tuning con una perilla, `CAPAS_LIBRES` (0, 2 o 12 bloques sueltos). Todo
+>    contra aprender desde cero, un diccionario y el piso, con el mismo test.
+> 2. **Code-along en plenario**, como en la clase 8: compartís pantalla, corrés una
+>    celda, el aula corre la misma. Sin sub-salas. Marcas 🎥 / 🎲 / 🏠 en el notebook.
+> 3. **El material de dos horas no se tiró: pasó a `extra/`.** El notebook original
+>    está entero en `extra/notebook-completo.ipynb`, y hay un notebook nuevo de
+>    **recetas** (`extra/recetas-transfer-learning.ipynb`): `sentence-transformers`,
+>    fine-tuning de BETO con `Trainer`, zero-shot y un CSV propio, cada una corta y
+>    para copiar. La guía es `extra/README.md`.
+> 4. **Deck ágil de 21 slides.** Cuatro nuevas (los dos niveles, el code-along, la
+>    tabla de hoy y el material extra) y 23 ocultas que se recuperan con
+>    `slides.html?completo`, que vuelve al deck de 40 de la versión de dos horas (y
+>    oculta las cuatro nuevas).
+>
+> **Sin pausa.** Son 75 minutos de corrido. Si el aula la necesita, cinco minutos al
+> salir del code-along (minuto 54), y los descontás con la lista de «si tenés 60
+> minutos». **Lo que se pierde** respecto de la versión larga: la trampa del corpus, el
+> umbral en el notebook, leer los 30 errores, el techo humano y la búsqueda semántica.
+> Todo eso está en `extra/notebook-completo.ipynb`, y la trampa del corpus se menciona
+> en la slide 20 como puente a la clase 10.
+>
+> **De acá a la sección «Versión completa» las slides se numeran según el deck ágil.**
+> Las secciones 1 a 10 que siguen después son las notas originales de la versión de dos
+> horas, con la numeración de `slides.html?completo`.
+
+---
+
+## Versión de 75 minutos (la que se da)
+
+### A. Antes de entrar (checklist de 5 minutos)
+
+- [ ] **Corré `notebook.ipynb` entero en Colab** una vez, el día anterior. Confirma que el
+      modelo sigue en el Hub con su revisión (`e8f8c21`) y te deja los números de tu
+      corrida a mano.
+- [ ] Armá **el reparto del `TODO 1`**: nueve combinaciones, `CAPAS_LIBRES` 0 / 2 / 12 ×
+      `SEMILLA` 1983 / 1984 / 1985. Por orden de lista: la persona 1 hace (0, 1983), la 2
+      hace (0, 1984), y así; la 10 vuelve a empezar. Pegalo en el chat al llegar a la
+      sección 6.
+- [ ] Tené abierta la slide 14 (la tabla de hoy) para cotejar lo que el aula pega en el
+      chat.
+
+### B. Plan de tiempos
+
+**Suma 75.** El code-along es la mitad de la clase y es el objetivo: si algo se tiene
+que achicar, se achica antes o después, no adentro.
+
+| Min | Slides | Qué hacés |
+|---|---|---|
+| **0-1** | 1 | Portada. **Antes de hablar: «abran `notebook.ipynb` en Colab y corran las secciones 0 a 3»**, así el modelo se baja mientras arrancás. |
+| 1-3 | 2 | Dónde quedamos. «Y ahí terminó lo que podemos entrenar nosotros.» |
+| 3-5 | 3 | El presupuesto. Un minuto y medio, no más. |
+| 5-6 | 4 | ¿Cómo sabés que está bien? **Sin votación larga**: plantala y decí «hoy contestamos una parte: comparar con el mismo test y contra un piso. La otra parte es la clase 10». |
+| 6-8 | 5 | Por qué funciona: alguien ya le enseñó castellano. |
+| 8-9 | 6 | Callback clase 5, en una frase. |
+| 9-12 | 7 | Qué se congela. Cobrá la clase 4: «si dejo todas las capas libres con 200 ejemplos, ¿qué pasa?». |
+| 12-14 | 8 | El informante clave. Es el `[CALLBACK DIBUJO]`. |
+| 14-17 | 9 | Las tres estrategias. Foto. |
+| 17-19 | 10 | **Los dos niveles**: el mapa del code-along. |
+| 19-20 | 11 | Apuesta: con 25 etiquetas, ¿cuál gana? |
+| 20-24 | 12 | Viz de la curva. Movela vos. |
+| **24-54** | 13 | **Code-along.** El detalle, abajo. |
+| 54-58 | 14 | **La tabla de hoy.** Primero la que armó el chat, después esta. |
+| 58-59 | 15 | Apuesta del umbral y de la prevalencia. |
+| 59-66 | 16 | **Viz de la matriz.** La central de la evaluación: siete minutos. |
+| 66-69 | 17 | `[EN TU INVESTIGACIÓN]`. Foto. Proyecto de mediano plazo, no tarea. |
+| 69-70 | 18 | El material extra: qué es cada archivo. |
+| 70-72 | 19 | Qué te llevás. |
+| 72-74 | 20-21 | Lo que falta y el puente a la clase 10. Dejalo incómodo. |
+| 74-75 | — | Colchón. |
+
+**El code-along, por dentro (minutos 24-54):**
+
+| Min | Notebook | Qué hacés |
+|---|---|---|
+| 24-27 | §0-3 | Ya lo corrieron al llegar. Mostrá §2 (el piso: 72 % de accuracy y F1 0) y §3: las fichas de un titular (`▁capacita`, `rá`: la clase 8) y los **117,7 M** de perillas, 80 veces el mini-GPT. |
+| 27-28 | 🎲 | **La apuesta**: con 200 etiquetas, ¿*prestado* o *desde cero*? En el chat, antes de correr. |
+| 28-34 | §4-5 | Nivel 1 contra desde cero: **0,64 contra 0,44**. Leé las frases de `reportar()` en voz alta. ¿Quién acertó? |
+| 34-46 | §6 | Nivel 2. Mostrá la tabla de `CAPAS_LIBRES` y el loop (las cinco estaciones de la clase 4: «lo único nuevo es de dónde arrancan las perillas»). Corré la de 12 capas vos. Después, **el `TODO 1` repartido**: cada uno corre su combinación y pega «capas 2, semilla 1984: F1 0.61» en el chat. |
+| 46-54 | §7-8 | La tabla honesta y `clasificar_corpus()`. El titular «Paro de colectivos en el AMBA» sale *política*: preguntá si lo es. Es una discusión sobre la definición de la categoría, y es la buena. |
+
+### C. Si tenés sólo 60 minutos
+
+Se recorta **en este orden**:
+
+1. **Slide 6 (callback clase 5).** Una frase en la slide 5. −1 min.
+2. **Slide 8 (el informante).** Decí la frase de la etnografía en la slide 7. −2 min.
+3. **Slides 11-12 (apuesta de 25 y la curva).** La tabla de la slide 14 dice lo mismo
+   con los números del aula. −5 min.
+4. **`TODO 1` sin reparto**: corré vos `CAPAS_LIBRES = 0` y `SEMILLA = 1984` y mostrá
+   el resto en la slide 14. −3 min.
+5. **Slide 16 en cuatro minutos**: sólo el slider de prevalencia. −3 min.
+6. **Slide 18**: una frase. −1 min.
+
+**Lo que no se recorta:** la apuesta antes de la §4, las §4 a 7 del notebook (es el
+objetivo de la clase), la slide 14, el slider de prevalencia y el
+`[EN TU INVESTIGACIÓN]`.
+
+### D. Si vas adelantado/a
+
+- **La trampa del corpus**, de la versión larga: abrí `slides.html?completo` y andá a
+  «El detector de desinformación que era un detector de chistes». Cinco minutos y es
+  el mejor puente a la clase 10.
+- **`N_ETIQUETAS = 50`** en vivo: el nivel 1 y el desde cero se separan todavía más.
+- **La receta 3 (zero-shot) en vivo**: F1 0,39 con cero etiquetas, casi igual que el
+  diccionario. Y los falsos positivos que muestra son, varios, política de verdad.
+
+### E. Lo que va a pasar, y qué contestar
+
+**«¿Por qué el fine-tuning no le gana al nivel 1, si es más potente?»** Porque con 200
+etiquetas el límite no es la potencia: son los datos (clase 4). Lo medido: con 800
+etiquetas el fine-tuning de MiniLM llega a 0,67 de promedio (revisión del 28-09, abajo
+en §10). Y con más etiquetas o modelos más grandes suele ganar más. Se mide en tu
+corpus, no se supone.
+
+**«A mí `CAPAS_LIBRES = 2` me dio 0,62, ¡es el mejor!»** Mirá la fila entera: con
+la semilla se mueve entre 0,61 y 0,62; la de 12 capas, entre 0,57 y 0,65. Las
+diferencias entre niveles son más chicas que el ruido de la semilla, así que no se
+puede afirmar que una gane. **Se reporta el rango, no la mejor corrida.** Es la frase
+de la clase.
+
+**«¿Por qué la tabla de fichas no se toca nunca?»** Son 96 de las 118 M de perillas,
+una fila por cada una de las 250 mil fichas de cien idiomas. Es lo más genérico del
+modelo, y 200 titulares no la mejoran: sólo la pueden estropear.
+
+**«A mí me salió distinto.»** El nivel 1, el desde cero y el diccionario tienen que
+dar igual en cualquier máquina. El nivel 2 puede cambiar en el segundo decimal con GPU
+o con otra versión de torch: el orden de las cuentas no es idéntico. Es esperable y es
+contenido (clase 10, reproducibilidad).
+
+**«Me dice CAMINO B.»** No bajó el modelo (red, Hub caído o límite de pedidos). El nivel
+1 corre igual con los vectores de la clase 6, y el nivel 2 imprime lo medido. Que siga
+con la persona de al lado mirando su pantalla para la §6.
+
+### F. Producción (versión de 75 minutos)
+
+- **Medido el 2026-11-13**, `nbconvert --execute` de punta a punta: **20 s** con el
+  modelo ya bajado (Apple M3, CPU, `transformers` 5.23, `torch` 2.15). El fine-tuning de
+  la §6 con 200 etiquetas tarda **3 a 7 s** según `CAPAS_LIBRES`, con 2 hilos. No se
+  midió en Colab: en CPU contá varias veces eso, y aun así son segundos.
+- **Los números de la slide 14** salen del notebook (mismos 200 titulares, semilla de la
+  muestra 1983; nivel 2 con `SEMILLA` 1983 / 1984 / 1985):
+
+  | `CAPAS_LIBRES` | 1983 | 1984 | 1985 |
+  |---|---|---|---|
+  | 0 | 0,61 | 0,55 | 0,58 |
+  | 2 | 0,61 | 0,61 | 0,62 |
+  | 12 | 0,60 | 0,57 | 0,65 |
+
+  Nivel 1: 0,64. Desde cero: 0,44. Diccionario: 0,40. Piso: 0,00. Si cambiás el modelo,
+  la revisión o la muestra, **volvé a correr y actualizá la slide**.
+- **El material extra se corrió entero** el mismo día: `extra/recetas-transfer-learning.ipynb`
+  (~1 min la primera vez, baja BETO y el modelo de zero-shot) y `extra/notebook-completo.ipynb`
+  (13 s, camino A, 0 errores). Revisiones fijadas: MiniLM `e8f8c21`, BETO `d1c9c45`,
+  zero-shot `MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli` @ `0a71e92`.
+- El notebook completo, corrido desde `extra/` en tu máquina, guarda sus figuras en
+  `extra/figuras/` (está en `.gitignore`).
+
+---
+
+## Versión completa (120 minutos, `slides.html?completo`)
+
+Lo que sigue son las notas originales de la clase de dos horas. El notebook de esa
+versión es `extra/notebook-completo.ipynb`.
+
+
 > **Lo primero, antes de cualquier otra cosa.** Esta clase se puede arruinar de una sola
 > manera: dedicándole 90 minutos a Hugging Face y 20 a evaluación. Es al revés. La
 > biblioteca es el medio; el criterio es el contenido. Si tenés que recortar, recortá

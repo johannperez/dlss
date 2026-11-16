@@ -106,7 +106,10 @@ El plan minuto a minuto de cada clase respeta esta forma, con variaciones declar
 > la clase 2 corre de 90 a 107 en vez de 85 a 105, y el juicio de la clase 10 dura 20 minutos en
 > vez de 25— **manda el de la clase**, que declara y justifica la desviación en sus notas y dice
 > cómo volver al reloj original si el aula va holgada. Las diez clases siguen sumando 120 minutos
-> y **la pausa de 10 no se toca en ninguna**.
+> y **la pausa de 10 no se toca en ninguna** — con una excepción declarada: la **clase 9** se da
+> en una **versión de 75 minutos, sin pausa**, centrada en que cada estudiante haga transfer
+> learning en un code-along (ver su sección más abajo y su `notas-docente.md`). El plan de 120
+> minutos de la clase 9 sigue vigente como versión completa, con su material en `extra/`.
 
 ### 0.3 Convenciones de producción (para el equipo que construye)
 
@@ -526,6 +529,27 @@ enseñamos nuestro estilo con cuatro trazos.
 | 55-75 | Evaluar de verdad | `viz/matriz-de-confusion.html` con slider de umbral: se ve cómo precisión y recall se pelean. Traducción a lenguaje llano: "de cada 100 notas que llamó *protesta*, 23 no lo eran". Baseline tonto. El acuerdo entre humanos como techo realista, medido con la **misma** métrica que el modelo (el F1 de un codificador contra el otro); kappa sirve para reportar ese acuerdo, no como techo del F1. |
 | 75-100 | Manos 2: el proyecto chico | Notebook: un clasificador sobre titulares etiquetados, con las representaciones de un modelo pre-entrenado más una regresión logística; comparación honesta contra aprender el vocabulario desde cero (TF-IDF) y contra el baseline; `viz/zero-shot-vs-finetune.html` (cuántas etiquetas hacen falta). El fine-tuning completo y el zero-shot se discuten con la viz, pero no son el ejercicio central de la clase. |
 | 100-120 | Cierre | `[EN TU INVESTIGACIÓN]`: la receta reproducible para clasificar un corpus propio, y qué números hay que reportar sí o sí. **Puente**: "sabés hacerlo andar y sabés medirlo. Falta lo más difícil: convencer a otro —y a vos mismo— de que lo que medís es lo que decís que medís. Última clase." |
+
+**Versión de 75 minutos (la que se da desde 2026-11).** Mismo arranque (gancho y transfer
+learning, minutos 0-24), y después un solo bloque práctico **en plenario**: el notebook nuevo
+(`notebook.ipynb`) hace transfer learning en dos niveles sobre las mismas 200 etiquetas
+—*nivel 1*, el modelo pre-entrenado congelado más una regresión logística; *nivel 2*,
+fine-tuning eligiendo cuántos bloques se descongelan— y lo compara contra aprender desde
+cero, un diccionario y el piso, con el mismo test. Cierra con la viz de la matriz de
+confusión (el slider de prevalencia) y el `[EN TU INVESTIGACIÓN]`.
+
+| Min | Bloque |
+|---|---|
+| 0-24 | Gancho, por qué funciona, qué se congela, las tres estrategias, los dos niveles, la curva |
+| 24-54 | Code-along: niveles 1 y 2, la tabla honesta, `clasificar_corpus()` |
+| 54-66 | La tabla del aula, y evaluar: umbral y prevalencia (`viz/matriz-de-confusion.html`) |
+| 66-75 | `[EN TU INVESTIGACIÓN]`, el material extra, puente a la clase 10 |
+
+Lo que en esta versión queda fuera del aula (la trampa del corpus, el umbral en el notebook,
+leer los errores, el techo humano, la búsqueda semántica) está entero en
+`extra/notebook-completo.ipynb`, y las implementaciones con bibliotecas (`sentence-transformers`,
+`Trainer`, zero-shot, un CSV propio) en `extra/recetas-transfer-learning.ipynb`. Deck:
+`slides.html` (21 slides); el de dos horas, `slides.html?completo`.
 
 **Conexión hacia atrás:** aprovecha lo aprendido sobre pre-entrenamiento en la clase 8.
 **Hacia adelante:** la métrica no alcanza; falta validez.

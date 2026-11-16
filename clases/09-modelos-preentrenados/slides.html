@@ -39,7 +39,10 @@
     <p class="gancho">Bajar un modelo que entrenó otro y clasificar tu corpus son
       tres líneas y cuarenta segundos. Saber si sirve es todo lo demás.</p>
     <aside class="notes">
-      2 min. No leas el temario. Decí: "hoy cambia el registro del curso. Hasta acá
+      2 min. <b>Versión ágil (75 min): antes de hablar, pedí que abran
+      <code>notebook.ipynb</code> en Colab y corran las secciones 0 a 3</b> mientras
+      arrancás: bajan el modelo (~470 MB) y así el code-along no espera a nadie.
+      No leas el temario. Decí: "hoy cambia el registro del curso. Hasta acá
       construimos para entender. A partir de hoy usamos para investigar."
       Y avisá el reparto: "la parte de hacerlo andar es corta y fácil; la de saber si
       anda es larga y difícil, y le vamos a dedicar el doble de tiempo. Es a propósito."
@@ -97,7 +100,7 @@
   </section>
 
   <!-- =========================== 4 · LAS TRES LÍNEAS =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>Tres líneas</h3>
     <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 from transformers import pipeline
@@ -122,7 +125,7 @@ clasificador(titulares[:20])
   </section>
 
   <!-- =========================== 5 · LOS RESULTADOS =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>Los resultados. Ahora mirá <em>qué</em> estás midiendo.</h3>
     <table class="numeros" style="font-size:.66em">
       <tr><th>titular (real, del corpus del curso)</th><th>el corpus dice</th><th>y en realidad es…</th></tr>
@@ -237,8 +240,9 @@ clasificador(titulares[:20])
         Eso es la clase 4, otra vez.</div>
     </div>
     <p style="font-size:.74em; margin:.3em 0">Es un espectro: <strong>congelar todo y
-      entrenar sólo la de arriba</strong> (la estrategia A, slide 12) → descongelar las
-      últimas capas → <strong>entrenar todo</strong> (el fine-tuning completo, la C, slide 14).</p>
+      entrenar sólo la de arriba</strong> (la estrategia A; el <b>nivel 1</b> del notebook)
+      → descongelar las últimas capas → <strong>entrenar todo</strong> (el fine-tuning, la
+      C; el <b>nivel 2</b>, con la perilla <code>CAPAS_LIBRES</code>).</p>
     <div class="aha compacta">
       Congelar no es una optimización técnica: es <strong>bajar la capacidad del modelo
       a propósito</strong>, para que 200 ejemplos alcancen. La misma decisión que tomaste
@@ -322,8 +326,46 @@ clasificador(titulares[:20])
     </aside>
   </section>
 
+  <!-- =========================== A · LOS DOS NIVELES (sólo ágil) =========================== -->
+  <section data-solo-agil>
+    <span class="marca">hoy, en tu notebook</span>
+    <h3>Transfer learning en dos niveles</h3>
+    <div class="comparacion">
+      <div>
+        <h4>Nivel 1 · congelar todo</h4>
+        <p style="font-size:.8em">titular → <b>modelo prestado</b> (quieto) → 384 números →
+          <b>regresión logística</b><br>
+          Se mueven <strong>385 perillas</strong>. Corre en CPU en segundos.</p>
+      </div>
+      <div>
+        <h4>Nivel 2 · descongelar (<em>fine-tuning</em>)</h4>
+        <p style="font-size:.8em">titular → <b>modelo prestado</b> (sigue aprendiendo) →
+          <b>capa nueva</b> <code>nn.Linear(384, 2)</code><br>
+          Vos elegís cuántos bloques se mueven: <code>CAPAS_LIBRES</code>.</p>
+      </div>
+    </div>
+    <table class="numeros" style="font-size:.6em">
+      <tr><th><code>CAPAS_LIBRES</code></th><th>qué se entrena</th><th>perillas que se mueven</th></tr>
+      <tr><td>0</td><td>sólo la capa nueva</td><td>770</td></tr>
+      <tr><td>2</td><td>la capa nueva + los 2 bloques de arriba</td><td>3,5 M</td></tr>
+      <tr><td>12</td><td>la capa nueva + los 12 bloques</td><td>21,3 M</td></tr>
+    </table>
+    <div class="aha compacta">El modelo prestado tiene <strong>117,7 M</strong> de perillas
+      y 96 M son la tabla de fichas, que no se toca nunca. Elegir cuántas soltás es la
+      decisión de la clase 4: <strong>más perillas, más datos</strong>.</div>
+    <aside class="notes">
+      2 min. Esta slide es el mapa del code-along: las dos mitades son las secciones 4 y 6
+      del notebook. Los números son los que imprime el notebook (MiniLM multilingüe,
+      revisión e8f8c21).
+      Frase: «el nivel 1 es pedirle al informante que lea y te resuma; el nivel 2 es
+      además enseñarle tu libro de códigos».
+      Detalle que vale decir: con CAPAS_LIBRES = 0 el nivel 2 es casi el nivel 1 otra vez
+      (una capa lineal arriba de los mismos vectores). El espectro es continuo.
+    </aside>
+  </section>
+
   <!-- =========================== 12 · ESTRATEGIA A =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>A · Embeddings + clasificador simple</h3>
     <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers="1-2|3-4|5-6">
 X = vectorizar(titulares)          # texto -> un punto en cientos de dimensiones
@@ -347,7 +389,7 @@ proba_a = modelo_a.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el s�
   </section>
 
   <!-- =========================== 13 · ESTRATEGIA B =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>B · Zero-shot: cero etiquetas</h3>
     <div class="comparacion">
       <div>
@@ -378,7 +420,7 @@ proba_a = modelo_a.predict_proba(X[i_test])[:, 1]   # el puntaje, no sólo el s�
   </section>
 
   <!-- =========================== 14 · ESTRATEGIA C =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>C · Fine-tuning: y adentro no hay magia</h3>
     <pre style="font-size:.72em"><code class="language-python" data-trim data-line-numbers>
 for epoca in range(3):
@@ -447,7 +489,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 17 · MODELOS EN CASTELLANO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>Y que sea en castellano, por favor</h3>
     <div class="tarjetas">
       <div><h4>BETO</h4>BERT entrenado en castellano por la Universidad de Chile.
@@ -487,11 +529,78 @@ for epoca in range(3):
     </aside>
   </section>
 
+  <!-- =========================== B · CODE-ALONG (sólo ágil) =========================== -->
+  <section data-solo-agil>
+    <h2>A las manos · todos juntos</h2>
+    <div class="manos">
+      Abrí <code>notebook.ipynb</code> en Colab. Yo corro una celda, vos corrés la misma, 👍 en el chat.
+      <ol style="font-size:.88em">
+        <li><b>Secciones 0-3:</b> entorno, datos y el piso, y bajar el modelo
+          (~470 MB la primera vez: <b>si no lo corriste al llegar, corrélo ya</b>).</li>
+        <li><b>🎲 Apuesta</b> en el chat: con 200 etiquetas, ¿<em>prestado</em> o
+          <em>desde cero</em>?</li>
+        <li><b>Secciones 4-5:</b> nivel 1 contra nada prestado. ¿Acertaste?</li>
+        <li><b>Sección 6:</b> nivel 2, fine-tuning. <b>TODO 1</b>: cada uno corre
+          <b>una</b> combinación de <code>CAPAS_LIBRES</code> y <code>SEMILLA</code>
+          (te la asigno yo) y pega su F1 en el chat.</li>
+        <li><b>Secciones 7-8:</b> la tabla honesta y <code>clasificar_corpus()</code>.</li>
+      </ol>
+      <strong>30 minutos.</strong> Ninguna celda tarda más que unos segundos.
+    </div>
+    <aside class="notes">
+      30 min (del minuto 24 al 54). Compartí pantalla y andá celda por celda. No hay
+      sub-salas.
+      · Sección 3: leé en voz alta las fichas del titular («▁capacita», «rá»): es la clase 8.
+        Y el número: 117,7 M de perillas, 80 veces el mini-GPT.
+      · Antes de la sección 4, LA APUESTA. Sin apuesta, la tabla es decoración.
+      · TODO 1 repartido: nueve combinaciones (CAPAS_LIBRES 0 / 2 / 12 × SEMILLA 1983 /
+        1984 / 1985). Asigná por orden de lista y pedí que peguen «capas 2, semilla 1984:
+        F1 0.61». Cada corrida tardó 3 a 7 s con 2 hilos en una laptop reciente (no
+        medido en Colab: contá varias veces eso sin GPU). El chat arma solo la tabla de la
+        slide siguiente. Si alguien no llega, las nueve medidas están ahí.
+      · Si el modelo no baja (red, Hub caído): el notebook cae solo al camino B. El nivel
+        1 corre igual y el nivel 2 imprime lo medido. Seguí sin drama.
+    </aside>
+  </section>
+
+  <!-- =========================== C · LA TABLA DE HOY (sólo ágil) =========================== -->
+  <section data-solo-agil>
+    <span class="marca">medido en el notebook</span>
+    <h3>La tabla de hoy: 200 etiquetas, el mismo test</h3>
+    <table class="numeros" style="font-size:.62em">
+      <tr><th>estrategia</th><th>qué se toma prestado</th><th>F1 en test</th></tr>
+      <tr><td>el piso: decir siempre «no»</td><td>nada, y 0 etiquetas</td><td class="c-error">0,00</td></tr>
+      <tr><td>diccionario de palabras clave</td><td>nada, y 0 etiquetas</td><td>0,40</td></tr>
+      <tr><td>desde cero · TF-IDF + logística</td><td>nada</td><td>0,44</td></tr>
+      <tr><td><b>nivel 1</b> · congelado + logística</td><td>el modelo entero, quieto</td><td class="c-ok"><b>0,64</b></td></tr>
+      <tr><td><b>nivel 2</b> · <code>CAPAS_LIBRES</code> = 0</td><td>todo; se mueve la capa nueva</td><td>0,55 · 0,58 · 0,61</td></tr>
+      <tr><td><b>nivel 2</b> · <code>CAPAS_LIBRES</code> = 2</td><td>todo; se mueven 2 bloques</td><td>0,61 · 0,61 · 0,62</td></tr>
+      <tr><td><b>nivel 2</b> · <code>CAPAS_LIBRES</code> = 12</td><td>todo; se mueven los 12</td><td>0,57 · 0,60 · 0,65</td></tr>
+    </table>
+    <p style="font-size:.62em; color:var(--tinta-2); margin:.1em 0">Nivel 2: tres semillas
+      (1983, 1984 y 1985), de menor a mayor. Los mismos 200 titulares para todas las filas.</p>
+    <div class="aha compacta">Lo prestado le gana a aprender desde cero por <strong>20
+      puntos</strong>. Descongelar <strong>no</strong> le gana al nivel 1: la diferencia es
+      más chica que lo que se mueve con la semilla. Con 200 etiquetas, el nivel 1 es la
+      recomendación: barato, estable y explicable.</div>
+    <aside class="notes">
+      4 min. Primero la tabla del chat (la que armaron ellos), después esta. Si coinciden,
+      decilo: «mismos números, porque fijamos la semilla y el modelo con su revisión».
+      En Colab con GPU o con otra versión de torch, el nivel 2 puede salir distinto en el
+      segundo decimal; el nivel 1 y el TF-IDF no deberían moverse.
+      La lectura correcta, en este orden: (1) transfer learning gana claro con pocas
+      etiquetas; (2) entre los dos niveles no hay diferencia que puedas afirmar;
+      (3) por eso se reporta el rango de semillas, no la mejor corrida.
+      Medido el 2026-11-13 (notas-docente §10). Con 800 etiquetas el fine-tuning sí sube
+      un poco (0,67 en la revisión anterior): el material extra lo muestra.
+    </aside>
+  </section>
+
   <!-- =========================== 18 · PRÁCTICO 1 =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>A las manos · bloque 1</h2>
     <div class="manos">
-      Abrí <code>notebook.ipynb</code>. Secciones 1 a 4.
+      Abrí <code>extra/notebook-completo.ipynb</code>. Secciones 1 a 4.
       <ol>
         <li>Corré la celda que <strong>detecta si hay Hugging Face</strong> y mirá por qué
             camino te mandó.</li>
@@ -514,7 +623,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 19 · VIZ BÚSQUEDA =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <span class="marca">viz</span>
     <h3>Buscar por significado, no por palabra</h3>
     <div class="viz-frame" data-alto="grande">
@@ -534,7 +643,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 20 · PAUSA =========================== -->
-  <section class="pausa">
+  <section data-visibility="hidden" data-solo-completo class="pausa">
     <h2>Pausa</h2>
     <p class="minutos">10 minutos</p>
     <p class="letra-chica">
@@ -548,7 +657,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 21 · SEGUNDA PARTE =========================== -->
-  <section class="portada">
+  <section data-visibility="hidden" data-solo-completo class="portada">
     <p class="num-clase">Segunda parte</p>
     <h1>Ahora sí: evaluar</h1>
     <div class="franja"></div>
@@ -561,7 +670,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 22 · ETIQUETAR A MANO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>Primero: etiquetá a mano</h2>
     <ol>
       <li>Sacá una muestra <strong>al azar</strong> de 200 a 300 casos.</li>
@@ -587,7 +696,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 23 · LA MATRIZ =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>La matriz de confusión, en tu problema y no en abstracto</h3>
     <div class="comparacion">
       <div>
@@ -668,7 +777,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 26 · PRECISIÓN Y RECALL =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>Precisión y recall, en castellano</h3>
     <div class="comparacion">
       <div>
@@ -695,7 +804,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 27 · CUÁL TE IMPORTA =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>¿Cuál te importa más? Depende de tu pregunta.</h3>
     <div class="tarjetas">
       <div><h4>Estimar una prevalencia</h4>"¿Cuántas notas del tema hubo?"<br>
@@ -715,7 +824,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 28 · EL BASELINE TONTO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h3>El modelo bobo, y por qué siempre se reporta</h3>
     <table class="numeros">
       <tr><th>estrategia</th><th>accuracy</th><th>F1</th><th>etiquetas</th></tr>
@@ -740,7 +849,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 29 · EL TECHO HUMANO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>El techo humano</h2>
     <div class="intuicion compacta">
       Dos codificadores coinciden en el <strong>73 %</strong> de los casos (kappa 0,46).
@@ -778,10 +887,10 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 30 · PRÁCTICO 2 =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>A las manos · bloque 2 — el proyecto chico</h2>
     <div class="manos">
-      <strong>De a dos.</strong> Notebook, secciones 5 a 11.
+      <strong>De a dos.</strong> <code>extra/notebook-completo.ipynb</code>, secciones 5 a 11.
       <ol>
         <li>Entrená las <strong>tres estrategias</strong> y armá la tabla comparativa
             con el piso incluido.</li>
@@ -802,7 +911,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 31 · RESULTADOS DEL AULA =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>Poné en común</h2>
     <ul>
       <li>¿A quién le ganó la <strong>regresión logística sobre vectores prestados</strong>
@@ -821,7 +930,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 32 · LA TRAMPA =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <span class="marca">el corpus de hoy</span>
     <h3>El detector de desinformación que era un detector de chistes</h3>
     <table class="numeros">
@@ -854,7 +963,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 33 · MIRÁ LOS ERRORES =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>Mirá los errores. Leelos.</h2>
     <div class="intuicion">
       Leer <strong>30 errores</strong> del modelo te enseña más sobre tu propia definición
@@ -879,7 +988,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 34 · QUÉ REPORTAR =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <span class="marca">la sección de métodos</span>
     <h3>Lo que hay que reportar, sí o sí</h3>
     <ol style="font-size:.85em">
@@ -916,8 +1025,8 @@ for epoca in range(3):
       <li><strong>Reportá</strong> los siete puntos de la slide anterior.</li>
     </ol>
     <div class="manos compacta">Con esto, la próxima vez que te sientes con tu corpus, lo
-      clasificás. En serio. La función <code>clasificar_corpus(textos)</code> está en la
-      sección 13 del notebook, lista para que le pases tus datos.</div>
+      clasificás. En serio. <code>clasificar_corpus(textos)</code> está en la sección 8 del
+      notebook, y la <b>receta 4</b> del material extra lo hace entero desde un CSV tuyo.</div>
     <aside class="notes">
       3 min. Decilo explícito: no es tarea para la clase que viene. Es un proyecto de
       mediano plazo (sólo el paso 2 son unas 2,5 horas, más la otra persona del paso 3).
@@ -928,8 +1037,28 @@ for epoca in range(3):
     </aside>
   </section>
 
+  <!-- =========================== D · EL MATERIAL EXTRA (sólo ágil) =========================== -->
+  <section data-solo-agil>
+    <span class="marca">para casa</span>
+    <h3>Las implementaciones, para cuando lo uses de verdad</h3>
+    <div class="tarjetas">
+      <div><h4>extra/recetas-transfer-learning</h4>Cuatro recetas cortas para copiar:
+        <code>sentence-transformers</code> en 3 líneas, fine-tuning de BETO con
+        <code>Trainer</code>, zero-shot, y <b>tu propio CSV</b>. Con los links que siguen.</div>
+      <div><h4>extra/notebook-completo</h4>La clase de dos horas: búsqueda semántica, la
+        curva de etiquetas, el umbral, leer los errores, la <b>trampa del corpus</b> y el
+        acuerdo entre codificadores.</div>
+      <div><h4>extra/README.md</h4>Por dónde empezar, cuánto tarda cada cosa y qué
+        necesita. Y <code>referencias.md</code>: qué leer, en qué orden.</div>
+    </div>
+    <aside class="notes">
+      1 min. Mostrá la carpeta extra/ en el repo. Decí qué es cada cosa y nada más.
+      Recomendación concreta: «si van a hacer una sola cosa, la receta 4 con un CSV suyo».
+    </aside>
+  </section>
+
   <!-- =========================== 36 · CUÁNDO NO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>Cuando el modelo no es la respuesta</h2>
     <div class="comparacion contra">
       <div>
@@ -959,10 +1088,10 @@ for epoca in range(3):
   <section>
     <h2>Qué te llevás de hoy</h2>
     <div class="tarjetas">
-      <div><h4>1</h4>Hacerlo andar es fácil. <strong>Saber si anda es tu trabajo</strong>,
-        y es lo que separa un paper de un posteo.</div>
-      <div><h4>2</h4>La estrategia se elige por <strong>cuántas etiquetas podés
-        producir</strong>, no por cuál técnica está de moda. Con pocas, lo simple gana.</div>
+      <div><h4>1</h4><strong>Transfer learning es pedir prestado lo genérico</strong> y
+        entrenar sólo tu distinción. Con pocas etiquetas, le gana por lejos a empezar de cero.</div>
+      <div><h4>2</h4>Congelar o descongelar es elegir <strong>cuántas perillas movés</strong>.
+        Se elige por cuántas etiquetas tenés, y se compara <strong>con varias semillas</strong>.</div>
       <div><h4>3</h4>Toda métrica va con su <strong>frase en castellano</strong> y su
         <strong>piso al lado</strong>. Sin las dos cosas, el número no significa nada.</div>
     </div>
@@ -973,7 +1102,7 @@ for epoca in range(3):
   </section>
 
   <!-- =========================== 38 · GLOSARIO =========================== -->
-  <section>
+  <section data-visibility="hidden" data-solo-completo>
     <h2>Glosario de hoy</h2>
     <ul class="glosario-lista" style="font-size:.82em">
       <li><b>transfer learning</b><span>aprendizaje por transferencia — aprovechar lo que otro modelo ya aprendió</span></li>
@@ -996,8 +1125,9 @@ for epoca in range(3):
   <!-- =========================== 39 · LO QUE FALTA =========================== -->
   <section>
     <h2>Tenemos un número bueno.<br>¿Eso prueba algo?</h2>
-    <p class="bajada">El detector de sátira de hace un rato tenía un número bueno.
-      Era reproducible. Y no medía lo que decía medir.</p>
+    <p class="bajada">Con este mismo corpus, un «detector de desinformación» saca F1 0,68
+      y en realidad detecta sátira (sección 11 del notebook completo). El número era real y
+      reproducible. Lo que medía, no.</p>
     <div class="ojo">
       Desempeño (<em>¿acierta?</em>) y validez (<em>¿mide lo que digo que mide?</em>)
       son <strong>dos preguntas distintas</strong>. Hoy contestamos la primera.
@@ -1054,6 +1184,15 @@ for epoca in range(3):
     }
   });
 
+  // Deck ágil (75 min) por defecto: se ocultan las slides data-solo-completo.
+  // Con ?completo en la URL (slides.html?completo) vuelve el deck de dos horas, y se
+  // ocultan las que sólo tienen sentido en la ágil (data-solo-agil).
+  if (new URLSearchParams(location.search).has('completo')) {
+    document.querySelectorAll('[data-solo-completo]').forEach(
+      (sl) => sl.removeAttribute('data-visibility'));
+    document.querySelectorAll('[data-solo-agil]').forEach(
+      (sl) => sl.setAttribute('data-visibility', 'hidden'));
+  }
   Reveal.initialize({
     hash: true,
     slideNumber: 'c/t',

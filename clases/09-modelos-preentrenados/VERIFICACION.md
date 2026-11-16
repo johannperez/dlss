@@ -8,6 +8,35 @@ afirmaciones corregidas donde la revisión encontró que decían de más.
 
 ---
 
+## 0. Versión de 75 minutos (13-11-2026)
+
+La clase pasa a 75 minutos, centrada en hacer transfer learning (`notebook.ipynb`
+nuevo). El notebook de dos horas pasó intacto a `extra/notebook-completo.ipynb` (sólo
+se le agregó un aviso arriba y la ruta `../viz/`); lo que dicen las secciones 1 y 2 de
+este archivo vale para él.
+
+Entorno: Apple M3, Python 3.12, `torch` 2.15, `transformers` 5.23, `scikit-learn` 1.9.1,
+`sentence-transformers` 6.3, con red hacia `huggingface.co`.
+
+| Chequeo | Resultado |
+|---|---|
+| `notebook.ipynb`, camino A, `nbconvert --execute` | **0 errores**, 15-20 s de pared con el modelo en caché |
+| `notebook.ipynb`, camino B forzado (`FORZAR_CAMINO_B = True`) | **0 errores**, 4 s. Nivel 1 con PPMI+SVD: F1 0,57; el nivel 2 imprime lo medido |
+| Celda de bootstrap | copiada byte a byte de la del notebook completo |
+| Números de la slide 14 (tabla de hoy) | medidos con el código del notebook: nivel 1 0,64, desde cero 0,44, diccionario 0,40; nivel 2 por `CAPAS_LIBRES` × `SEMILLA` en `notas-docente.md` §F |
+| Perillas de la slide 10 | impresas por el notebook: 117,7 M en total, 96,0 M la tabla de fichas, 770 / 3,5 M / 21,3 M entrenables con 0 / 2 / 12 capas libres |
+| `extra/recetas-transfer-learning.ipynb` | **0 errores**, 21 s con los modelos en caché. Receta 1: F1 0,64; receta 2 (BETO, `Trainer`): 0,58 en MPS y 0,56 en CPU con 2 hilos (13 s); receta 3 (zero-shot): 0,39 |
+| `extra/notebook-completo.ipynb` corrido desde `extra/` | **0 errores**, 13 s, camino A |
+| Revisiones de los modelos | MiniLM `e8f8c21…`, BETO `d1c9c45…`, `MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli` `0a71e92…`: consultadas en la API del Hub el 13-11 |
+| Links de `extra/README.md` y de la receta final | los nueve devolvieron 200 el 13-11 |
+| Slides | deck ágil de 21 (capturas de las cuatro nuevas en Chrome headless); `?completo` devuelve las 40 originales y oculta las cuatro nuevas |
+
+**No se midió en Colab.** Los tiempos de arriba son de una laptop; en Colab sin GPU
+contá varias veces eso. Antes de la primera clase, correr `notebook.ipynb` una vez en
+Colab y anotar el tiempo acá.
+
+---
+
 ## 1. Estado actual (29-09-2026)
 
 **Se puede dar.** La revisión del 28-09 encontró errores conceptuales (el más serio:

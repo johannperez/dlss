@@ -6,6 +6,9 @@
 > gráfico, y las últimas son de criterio aplicado a tu propia investigación — esas no
 > tienen una respuesta correcta única, tienen respuestas **defendibles**.
 > Contestá con el notebook al lado si lo necesitás: no es una prueba de memoria.
+> **Si cursaste la versión de 75 minutos:** las preguntas 9 y 10 se apoyan en material
+> que está en `extra/notebook-completo.ipynb` (el acuerdo entre codificadores, §12, y la
+> lectura de errores, §10). Corré esas dos secciones antes de contestarlas.
 
 ---
 

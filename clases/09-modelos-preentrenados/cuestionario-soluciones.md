@@ -112,7 +112,7 @@ slider de prevalencia: es exactamente ese movimiento.
 
 Con más precisión: el recall **nunca baja** al bajar el umbral (sólo sube o se queda
 igual). La precisión **tiende** a bajar, pero no es monótona: si el caso que entra al
-bajar el umbral es un acierto, sube un poco. En el gráfico de la sección 9 del notebook se
+bajar el umbral es un acierto, sube un poco. En el gráfico de la sección 9 del notebook completo se
 ven esos saltitos (el propio código los cuenta). Lo que no hay es un umbral que mejore las
 dos **de forma sostenida**: es un trade-off.
 Si alguien contesta "depende del modelo", es **parcialmente correcta para la precisión**
@@ -258,7 +258,7 @@ entonces la palabra "reclamo" no alcanza ni de cerca: hay reclamos sin acción c
 (el societario, el deportivo), sin espacio público (el parlamentario) y sin destinatario
 político (el publicitario). El modelo no se equivocó: **hizo explícito que tu definición
 operativa era más pobre que tu definición teórica.** Esto es lo que la sección 10 del
-notebook llama "leer 30 errores te enseña más sobre tu categoría que leer 300 aciertos".
+notebook completo llama "leer 30 errores te enseña más sobre tu categoría que leer 300 aciertos".
 
 **(c) Cuáles podrían estar bien.** El **1** (vecinos que elevan un reclamo formal al
 municipio) y el **5** (usuarios por cortes de luz) son candidatos legítimos: hay un
